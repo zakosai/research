@@ -73,7 +73,7 @@ class vanilla_vae:
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
         saver = tf.train.Saver()
-        ckpt_dir = "pre_model/" + "vae3.ckpt"
+        ckpt_dir = "pre_model/" + "vae_amazon.ckpt"
         if train == True:
             # num_turn = x_input.shape[0] / self.batch_size
             start = time.time()

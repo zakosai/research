@@ -2,13 +2,16 @@ import tensorflow as tf
 import numpy as np
 from vae import vanilla_vae
 import scipy.io as sio
+from scipy.sparse import load_npz
 
 np.random.seed(0)
 tf.set_random_seed(0)
 
-variables = sio.loadmat("data/citeulike-a/mult_nor.mat")
-print(variables)
-data = variables['X']
+# variables = sio.loadmat("data/citeulike-a/mult_nor.mat")
+# print(variables)
+# data = variables['X']
+variables = load_npz("data/amazon/mult_nor.npz")
+data = variables.to_array()
 idx = np.random.rand(data.shape[0]) < 0.8
 train_X = data[idx]
 test_X = data[~idx]
