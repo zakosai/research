@@ -63,7 +63,7 @@ class vanilla_vae:
         x_recons = y
 
         if self.loss == "cross_entropy":
-            loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(x_recons, x_), axis=1))
+            loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(x_, x_recons), axis=1))
             loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
             # loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
             loss = loss_recons + loss_kl
@@ -73,7 +73,7 @@ class vanilla_vae:
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
         saver = tf.train.Saver()
-        ckpt_dir = "pre_model/" + "vae.ckpt"
+        ckpt_dir = "pre_model/" + "vae3.ckpt"
         if train == True:
             # num_turn = x_input.shape[0] / self.batch_size
             start = time.time()

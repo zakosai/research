@@ -78,7 +78,7 @@ class cf_vae:
         x_recons = y
 
         if self.loss_type == "cross_entropy":
-            loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(x_recons, self.x_), axis=1))
+            loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_, x_recons), axis=1))
             loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
             loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z), 1))
             # reg_loss we don't use reg_loss temporailly
@@ -86,7 +86,7 @@ class cf_vae:
         train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss_e_step)
 
 
-        ckpt_file = "pre_model/" + "vae.ckpt"
+        ckpt_file = "pre_model/" + "vae3.ckpt"
         self.saver = tf.train.Saver()
         # if init == True:
         self.saver.restore(self.sess, ckpt_file)
@@ -148,6 +148,7 @@ class cf_vae:
         self.e_step(x_data)
         self.exp_z = self.get_exp_hidden(x_data)
         for i in range(params.EM_iter):
+            print("iter: %d"%i)
 
             self.m_step(users, items, params)
             self.e_step(x_data)
