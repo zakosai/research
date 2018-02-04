@@ -11,7 +11,7 @@ tf.set_random_seed(0)
 # print(variables)
 # data = variables['X']
 variables = load_npz("data/amazon/mult_nor.npz")
-data = variables.to_array()
+data = variables.toarray()
 idx = np.random.rand(data.shape[0]) < 0.8
 train_X = data[idx]
 test_X = data[~idx]
