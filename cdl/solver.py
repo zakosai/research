@@ -124,6 +124,8 @@ class Solver(object):
             batch_size=batch_size, shuffle=False,
             last_batch_handle='pad')
         data_iter.reset()
+        fp = open(dir_save+'/cdl.log','a')
+
         for i in range(begin_iter, end_iter):
             if self.iter_start_callback is not None:
                 if self.iter_start_callback(i):
@@ -153,10 +155,8 @@ class Solver(object):
                 Recon_loss = lambda_v/np.square(lambda_v_rt_old[0,0])*np.sum(np.square(Y-X))/2.0
                 print "Epoch %d - tr_err/bcd_err/rec_err: %.1f/%.1f/%.1f" % (epoch,
                     BCD_loss+Recon_loss, BCD_loss, Recon_loss)
-                fp = open(dir_save+'/cdl.log','a')
                 fp.write("Epoch %d - tr_err/bcd_err/rec_err: %.1f/%.1f/%.1f\n" % (epoch,
                     BCD_loss+Recon_loss, BCD_loss, Recon_loss))
-                fp.close()
                 lambda_v_rt[:] = lambda_v_rt_old[:] # back to normal lambda_v_rt
                 data_iter = mx.io.NDArrayIter({'data': X, 'V': V, 'lambda_v_rt':
                     lambda_v_rt},
@@ -200,5 +200,5 @@ class Solver(object):
             data_iter, X.shape[0], xpu).values()[0]
         U, V, BCD_loss = BCD_one(R, U, V, theta, lambda_u, lambda_v,
             dir_save, True, 1)
-        #fp.close()
+        fp.close()
         return U, V, theta, BCD_loss
