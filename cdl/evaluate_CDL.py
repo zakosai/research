@@ -1,5 +1,4 @@
 from __future__ import  division
-from data import read_user
 import matplotlib.pyplot as plt
 import numpy as np
 

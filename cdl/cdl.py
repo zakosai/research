@@ -2,7 +2,6 @@
 import mxnet as mx
 import numpy as np
 import logging
-import data
 from math import sqrt
 from autoencoder import AutoEncoderModel
 import os
