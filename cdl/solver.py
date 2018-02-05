@@ -127,9 +127,9 @@ class Solver(object):
         fp = open(dir_save+'/cdl.log','a')
 
         for i in range(begin_iter, end_iter):
-            if self.iter_start_callback is not None:
-                if self.iter_start_callback(i):
-                    return
+            # if self.iter_start_callback is not None:
+            #     if self.iter_start_callback(i):
+            #         return
             #if i==100:
             #    V = np.zeros(V.shape)
             #    data_iter = mx.io.NDArrayIter({'data': X, 'V': V, 'lambda_v_rt':
