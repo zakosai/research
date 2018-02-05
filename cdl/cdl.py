@@ -23,7 +23,7 @@ if __name__ == '__main__':
     lambda_v = 10 # lambda_v in CDL
     K = 50  # no of latent vectors in the compact representation
     p = 10 # used for data-folder name
-    data_dir ="../cf-vae/data/amazon" # whether to use dummy data
+    data_dir ="../cf-vae/data/amazon/" # whether to use dummy data
     num_iter = 100
     batch_size = 256
 
