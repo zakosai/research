@@ -93,6 +93,7 @@ class Solver(object):
         # update_dict = {name: nd for name, nd in zip(sym.list_arguments(), exe.grad_arrays) if nd}
         update_dict = {}
         for name, nd in zip(sym.list_arguments(), exe.grad_arrays):
+            print(nd)
             if nd:
                 update_dict += {name:nd}
         batch_size = input_buffs[0].shape[0]
