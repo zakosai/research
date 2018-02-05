@@ -14,12 +14,12 @@ def load_cvae_data():
   data_dir = "data/amazon/"
   # variables = scipy.io.loadmat(data_dir + "mult_nor.mat")
   # data["content"] = variables['X']
-  variables = load_npz("data/amazon/mult_nor.npz")
+  variables = load_npz("data/amazon/mult_nor-small.npz")
   data["content"] = variables.toarray()
-  data["train_users"] = load_rating(data_dir + "cf-train-1-users.dat")
-  data["train_items"] = load_rating(data_dir + "cf-train-1-items.dat")
-  data["test_users"] = load_rating(data_dir + "cf-test-1-users.dat")
-  data["test_items"] = load_rating(data_dir + "cf-test-1-items.dat")
+  data["train_users"] = load_rating(data_dir + "cf-train-1-users-small.dat")
+  data["train_items"] = load_rating(data_dir + "cf-train-1-items-small.dat")
+  data["test_users"] = load_rating(data_dir + "cf-test-1-users-small.dat")
+  data["test_items"] = load_rating(data_dir + "cf-test-1-items-small.dat")
 
   return data
 
@@ -52,7 +52,7 @@ params.max_iter_m = 1
 
 data = load_cvae_data()
 num_factors = 50
-model = cf_vae(num_users=768438, num_items=171760, num_factors=num_factors, params=params,
+model = cf_vae(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000],
     loss_type='cross_entropy')
 model.fit(data["train_users"], data["train_items"], data["content"], params)

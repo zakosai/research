@@ -10,7 +10,7 @@ tf.set_random_seed(0)
 # variables = sio.loadmat("data/citeulike-a/mult_nor.mat")
 # print(variables)
 # data = variables['X']
-variables = load_npz("data/amazon/mult_nor.npz")
+variables = load_npz("data/amazon/mult_nor-small.npz")
 data = variables.toarray()
 idx = np.random.rand(data.shape[0]) < 0.8
 train_X = data[idx]
