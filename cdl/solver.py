@@ -95,7 +95,7 @@ class Solver(object):
         for name, nd in zip(sym.list_arguments(), exe.grad_arrays):
             print(name, nd)
             NoneType = type(None)
-            if not isinstance(x, NoneType):
+            if not isinstance(nd, NoneType):
                 update_dict += {name:nd}
         batch_size = input_buffs[0].shape[0]
         self.optimizer.rescale_grad = 1.0/batch_size
