@@ -94,7 +94,7 @@ class Solver(object):
         update_dict = {}
         for name, nd in zip(sym.list_arguments(), exe.grad_arrays):
             print(nd)
-            if nd:
+            if nd != None:
                 update_dict += {name:nd}
         batch_size = input_buffs[0].shape[0]
         self.optimizer.rescale_grad = 1.0/batch_size
