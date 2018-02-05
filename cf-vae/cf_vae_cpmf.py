@@ -108,7 +108,8 @@ class cf_vae:
     def m_step(self, users, items, params):
         num_users = len(users)
         num_items = len(items)
-
+        print("M-step")
+        start =time.time()
         for i in range(params.max_iter_m):
             likelihood = 0
 
@@ -125,7 +126,6 @@ class cf_vae:
 
                 likelihood += -0.5 * params.lambda_u * np.sum(self.U[u] * self.U[u])
 
-
             for v in range(num_items):
                 idx_a = np.ones(num_users) < 0
                 idx_a[items[v]] = True
@@ -135,7 +135,7 @@ class cf_vae:
 
                 rx = params.C_a * np.sum(self.U[items[v], :], axis=0) + params.lambda_v * self.exp_z[v, :]
                 self.V[v, :] = scipy.linalg.solve(Lambda_inv, rx)
-
+            print("iter: %d\t time:%d" %(i, time.time()-start))
         return None
 
     def get_exp_hidden(self, x_data):
