@@ -3,6 +3,7 @@ import mxnet as mx
 import numpy as np
 import logging
 from math import sqrt
+from scipy.sparse import load_npz
 from autoencoder import AutoEncoderModel
 import os
 
