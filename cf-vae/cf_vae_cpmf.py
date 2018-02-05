@@ -125,6 +125,8 @@ class cf_vae:
                 self.U[u, :] = scipy.linalg.solve(Lambda_inv, rx)
 
                 likelihood += -0.5 * params.lambda_u * np.sum(self.U[u] * self.U[u])
+                if u % 10000 == 0:
+                    print("num_user: %d - time: %d" %(u, time.time()-start))
 
             for v in range(num_items):
                 idx_a = np.ones(num_users) < 0
@@ -135,6 +137,10 @@ class cf_vae:
 
                 rx = params.C_a * np.sum(self.U[items[v], :], axis=0) + params.lambda_v * self.exp_z[v, :]
                 self.V[v, :] = scipy.linalg.solve(Lambda_inv, rx)
+
+                if v % 10000 == 0:
+                    print("num_item: %d - time: %d" %(v, time.time()-start))
+
             print("iter: %d\t time:%d" %(i, time.time()-start))
         return None
 
