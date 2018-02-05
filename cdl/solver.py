@@ -96,7 +96,7 @@ class Solver(object):
             print(name, nd)
             NoneType = type(None)
             if not isinstance(nd, NoneType):
-                update_dict += {name:nd}
+                update_dict.update({name:nd})
         batch_size = input_buffs[0].shape[0]
         self.optimizer.rescale_grad = 1.0/batch_size
         self.optimizer.set_lr_mult(args_lrmult)
