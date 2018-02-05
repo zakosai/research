@@ -7,16 +7,14 @@ from scipy.sparse import load_npz
 from autoencoder import AutoEncoderModel
 import os
 
-def load_rating(path):
-  arr = []
-  for line in open(path):
-    a = line.strip().split()
-    if a[0]==0:
-      l = []
-    else:
-      l = [int(x) for x in a[1:]]
-    arr.append(l)
-  return arr
+def load_rating(path, num_u=8000, num_v=16000):
+  R = np.mat(np.zeros((num_u,num_v)))
+  fp =open(path)
+  for i,line in enumerate(fp):
+    segs = line.strip().split(' ')[1:]
+    for seg in segs:
+        R[i,int(seg)] = 1
+  return R
 
 if __name__ == '__main__':
     lambda_u = .1 # lambda_u in CDL

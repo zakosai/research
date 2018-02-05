@@ -2,16 +2,14 @@ from __future__ import  division
 import matplotlib.pyplot as plt
 import numpy as np
 
-def load_rating(path):
-  arr = []
-  for line in open(path):
-    a = line.strip().split()
-    if a[0]==0:
-      l = []
-    else:
-      l = [int(x) for x in a[1:]]
-    arr.append(l)
-  return arr
+def load_rating(path, num_u=8000, num_v=16000):
+  R = np.mat(np.zeros((num_u,num_v)))
+  fp =open(path)
+  for i,line in enumerate(fp):
+    segs = line.strip().split(' ')[1:]
+    for seg in segs:
+        R[i,int(seg)] = 1
+  return R
 
 def cal_rec(p, cut):
     R_true = load_rating("../cf-vae/data/amazon/cf-test-1-users-small.dat")
