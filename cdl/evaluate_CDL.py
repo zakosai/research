@@ -29,11 +29,9 @@ def cal_rec(train_users, test_users, M):
     user_all = map(add, train_users, test_users)
     U = np.mat(np.loadtxt('cdl10/final-U.dat'))
     V = np.mat(np.loadtxt('cdl10/final-V.dat'))
-    print(U.shape, V.shape)
     ground_tr_num = [len(user) for user in user_all]
 
     pred_all = np.dot(U, (V.T))
-    print(pred_all.shape)
     pred_all = list(pred_all)
 
     recall_avgs = []
@@ -41,7 +39,8 @@ def cal_rec(train_users, test_users, M):
         print "m = " + "{:>10d}".format(m) + "done"
         recall_vals = []
         for i in range(len(user_all)):
-            top_M = np.argsort(-pred_all[i])[0:m]
+            top_M = np.argsort(-pred_all[i])
+            top_M = top_M[:m]
             print(len(pred_all), len(pred_all[i]), top_M.shape )
             top_M.reshape((m))
             hits = set(top_M) & set(user_all[i])   # item idex from 0
