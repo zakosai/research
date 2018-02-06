@@ -41,7 +41,7 @@ def cal_rec(train_users, test_users, M):
         for i in range(len(user_all)):
             top_M = np.argsort(-pred_all[i])
             print(top_M.shape)
-            top_M = top_M.reshape(top_M.shape[1])
+            top_M = top_M.reshape(16000)
             print(top_M.shape)
 
 
