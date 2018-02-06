@@ -37,6 +37,8 @@ class MF(object):
         # item biases
         if b is None:
             self.b = np.random.randn(self.n_items)
+        else:
+            self.b = b
         self.d = np.random.randn(self.n_users)
         #self.all_users = self.Y_data[:,0] # all users (may be duplicated)
         self.n_ratings = Y_data.shape[0]
