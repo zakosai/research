@@ -7,9 +7,9 @@ def load_data():
   data = {}
   data_dir = "../cf-vae/data/amazon/"
 
-  data["train_users"] = load_rating(data_dir + "cf-train-1-users.dat")
-  data["train_items"] = load_rating(data_dir + "cf-train-1-items.dat")
-  data["test_users"] = load_rating(data_dir + "cf-test-1-users.dat")
+  data["train_users"] = load_rating(data_dir + "cf-train-1-users-small.dat")
+  data["train_items"] = load_rating(data_dir + "cf-train-1-items-small.dat")
+  data["test_users"] = load_rating(data_dir + "cf-test-1-users-small.dat")
 
   return data
 
