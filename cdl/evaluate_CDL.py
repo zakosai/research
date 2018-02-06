@@ -55,7 +55,7 @@ if __name__ == '__main__':
 
     # give the same p as given in cdl.py
     data = load_data()
-    recalls = cal_rec(data['train_users'], data['train_items'], 30)
+    recalls = cal_rec(data['train_users'], data['test_users'], 30)
 
     plt.figure()
     plt.xlabel("M")
