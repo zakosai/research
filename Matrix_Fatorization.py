@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 class MF(object):
     """docstring for CF"""
     def __init__(self, Y_data, K, lam = 0.1, Xinit = None, Winit = None,
-                 learning_rate = 0.5, max_iter = 1000, print_every = 100, user_based = 0):
+                 learning_rate = 0.5, max_iter = 1000, print_every = 100, user_based = 0, b=None):
         self.Y_raw = Y_data.copy()
         self.Y_data = Y_data.copy()
         self.K = K
@@ -35,7 +35,8 @@ class MF(object):
             self.W = Winit
 
         # item biases
-        self.b = np.random.randn(self.n_items)
+        if b is None:
+            self.b = np.random.randn(self.n_items)
         self.d = np.random.randn(self.n_users)
         #self.all_users = self.Y_data[:,0] # all users (may be duplicated)
         self.n_ratings = Y_data.shape[0]
@@ -249,7 +250,6 @@ def load_rating(path):
   return arr
 
 
-r_cols = ['user_id', 'item_id', 'rating']
 ratings = pd.read_csv("cf-vae/data/amazon/ratings_MF.csv", header=None)
 Y_data = ratings.as_matrix()
 
