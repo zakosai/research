@@ -1,105 +1,64 @@
 from __future__ import  division
 import matplotlib.pyplot as plt
 import numpy as np
+from operator import add
 
-def load_rating(path, num_u=8000, num_v=16000):
-  R = np.mat(np.zeros((num_u,num_v)))
-  fp =open(path)
-  for i,line in enumerate(fp):
-    segs = line.strip().split(' ')[1:]
-    for seg in segs:
-        R[i,int(seg)] = 1
-  return R
+def load_data():
+  data = {}
+  data_dir = "../cf-vae/data/amazon/"
 
-def cal_rec(p, cut):
-    R_true = load_rating("../cf-vae/data/amazon/cf-test-1-users-small.dat")
-    dir_save = 'cdl' + str(p)
-    U = np.mat(np.loadtxt(dir_save + '/final-U.dat'))
-    V = np.mat(np.loadtxt(dir_save + '/final-V.dat'))
-    R = U * V.T
+  data["train_users"] = load_rating(data_dir + "cf-train-1-users.dat")
+  data["train_items"] = load_rating(data_dir + "cf-train-1-items.dat")
+  data["test_users"] = load_rating(data_dir + "cf-test-1-users.dat")
 
-    print "recommendations shape"+str(R.shape)
-    num_u = R.shape[0]
-    num_hit = 0
-    fp = open(dir_save + '/rec-list.dat', 'w')
-    for i in range(num_u):
-        if i != 0 and i % 100 == 0:
-            print 'User ' + str(i)
-        l_score = R[i, :].A1.tolist()
-        pl = sorted(enumerate(l_score), key=lambda d: d[1], reverse=True)
-        l_rec = list(zip(*pl)[0])[:cut]
-        s_rec = set(l_rec)
-        s_true = set(np.where(R_true[i, :] > 0)[1])
-        cnt_hit = len(s_rec.intersection(s_true))
-        fp.write('%d:' % cnt_hit)
-        fp.write(' '.join(map(str, l_rec)))
-        fp.write('\n')
-    fp.close()
+  return data
+
+def load_rating(path):
+  arr = []
+  for line in open(path):
+    a = line.strip().split()
+    if a[0]==0:
+      l = []
+    else:
+      l = [int(x) for x in a[1:]]
+    arr.append(l)
+  return arr
+
+
+def cal_rec(train_users, test_users, M):
+    user_all = map(add, train_users, test_users)
+    U = np.mat(np.loadtxt('/cdl10/final-U.dat'))
+    V = np.mat(np.loadtxt('cdl10/final-V.dat'))
+
+    ground_tr_num = [len(user) for user in user_all]
+
+    pred_all = U * V.T
+    pred_all = list(pred_all)
+
+    recall_avgs = []
+    for m in range(5, M, 5):
+        print "m = " + "{:>10d}".format(m) + "done"
+        recall_vals = []
+        for i in range(len(user_all)):
+            top_M = np.argsort(-pred_all[i])[0:m]
+            hits = set(top_M) & set(user_all[i])   # item idex from 0
+            hits_num = len(hits)
+            recall_val = float(hits_num) / float(ground_tr_num[i])
+            recall_vals.append(recall_val)
+        recall_avg = np.mean(np.array(recall_vals))
+        print recall_avg
+        recall_avgs.append(recall_avg)
+    return recall_avgs
 
 
 if __name__ == '__main__':
 
     # give the same p as given in cdl.py
-    p = 1
-    M_low = 50
-    M_high = 300
-    cal_rec(p, M_high)
-    dir_save = 'cdl%d' % p
-    R_test = read_user('data/test_P1_3.dat')
-    fp = open(dir_save + '/rec-list.dat')
-    lines = fp.readlines()
+    data = load_data()
+    recalls = cal_rec(data["train_users"], data["train_items"], 30)
 
-    total = 0
-    correct = 0
-    users = 0
-    total_items_liked = 0
-    num_users = len(range(R_test.shape[0]))
-
-    # recall@M is calculated for M = 50 to 300
-
-    recall_levels = M_high-M_low + 1
-    recallArray = np.zeros(shape=(num_users,recall_levels))
-
-    for user_id in range(num_users):
-
-        s_test = set(np.where(R_test[user_id, :] > 0)[1])
-        total_items_liked = len(s_test)
-        l_pred = map(int, lines[user_id].strip().split(':')[1].split(' '))
-        num_items_liked_in_top_M = 0
-        M = 0;
-
-        # array to store the likes at each M
-        likesArray = np.zeros(recall_levels)
-
-        for item in l_pred:
-            M += 1
-            total=total+1
-
-            if item in s_test:
-                correct=correct+1
-                num_items_liked_in_top_M += 1
-
-            if M >= M_low:
-
-                #M-M_low as array indices start from 0
-                likesArray[M-M_low] = num_items_liked_in_top_M
-
-        if total_items_liked > 0:
-            recallArray[user_id] = likesArray/total_items_liked
-            users +=1
-        else:
-            recallArray[user_id] = np.nan
-
-    fp.close()
-
-    print " total predicted %d" % (total)
-    print " correct %d" % (correct)
-    print " users %d" %(users)
-    print " Recall at M"
-    print "recall@300 " +str(np.nanmean(recallArray,axis=0))
-    plt.plot(range(M_low,M_high+1),np.nanmean(recallArray,axis=0))
-    plt.ylabel("Recall")
+    plt.figure()
     plt.xlabel("M")
-    plt.title("CDL: Recall@M")
-    plt.show()
-
+    plt.ylabel("Recall@M")
+    plt.plot(np.arange(5, 30, 5),recalls)
+    plt.savefig("../cf-vae/result/cdl-result.png")
