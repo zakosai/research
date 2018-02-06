@@ -220,56 +220,13 @@ class MF(object):
         RMSE = np.sqrt(SE/n_tests)
         return RMSE
 
-    def evaluate_recall(self):
-        file1 = open("data/Sato/transaction_200001.csv", "r")
-        trans1 = file1.readlines()
 
-        file2 = open("data/Sato/in_200002_not_200001.csv", "r")
-        test = file2.readlines()
-
-        precision = 0
-        out = 0
-
-        for n in range(self.n_users):
-            data = trans1[n]
-            data = data.split(",")
-            data_test = test[n]
-            data_test = data_test.split(",")
-            right = 0
-
-            try:
-
-                data_test = np.array(data_test, dtype=np.int32)
-                data = np.array(data, dtype=np.int32)
-
-                list_not_in = list(set(range(self.n_items)) - set(data))
-
-                pred = []
-                for item in list_not_in:
-                    p = self.pred(n, item)
-                    pred.append(p)
-
-                pred = np.array(pred)
-                recommend = pred.argsort()[-5:][::-1]
-
-                for item in range(5):
-                    if recommend[item] in data_test:
-                        right += 1
-                        print(right)
-                    precision += float(right)/(item+1)
-                    print(precision)
-            except:
-                out += 1
-
-        print(precision, out)
-        print(float(precision)/((self.n_users - out)))
-        print(float(precision)/self.n_users)
 
 
 
 def load_cvae_data():
   data = {}
-  data_dir = "data/amazon/"
+  data_dir = "/cf-vae/data/amazon/"
 
   data["train_users"] = load_rating(data_dir + "cf-train-1-users-small.dat")
   data["test_users"] = load_rating(data_dir + "cf-test-1-users-small.dat")
@@ -303,7 +260,7 @@ recalls = rs.predict(data["train_users"], data["test_users"], 30)
 plt.figure()
 plt.ylabel("Recall@M")
 plt.xlabel("M")
-plt.plot(np.arange(50, 350, 50),recalls)
-plt.show()
+plt.plot(np.arange(5, 30, 5),recalls)
+plt.savefig("/cf-vae/result/MF-result.png")
 
 
