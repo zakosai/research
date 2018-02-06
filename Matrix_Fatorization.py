@@ -249,23 +249,24 @@ def load_rating(path):
     arr.append(l)
   return arr
 
-
-ratings = pd.read_csv("cf-vae/data/amazon/ratings_MF.csv", header=None)
-Y_data = ratings.as_matrix()
-
-
-rs = MF(Y_data, K = 50, max_iter = 1000, print_every = 100, lam = 0.1)
-
-rs.fit()
-rs.save_model("MF-model")
-
-data = load_cvae_data()
-recalls = rs.predict(data["train_users"], data["test_users"], 30)
-
-plt.figure()
-plt.ylabel("Recall@M")
-plt.xlabel("M")
-plt.plot(np.arange(5, 30, 5),recalls)
-plt.savefig("/cf-vae/result/MF-result.png")
+# if __name__ == '__main__':
+#
+#     ratings = pd.read_csv("cf-vae/data/amazon/ratings_MF.csv", header=None)
+#     Y_data = ratings.as_matrix()
+#
+#
+#     rs = MF(Y_data, K = 50, max_iter = 1000, print_every = 100, lam = 0.1)
+#
+#     rs.fit()
+#     rs.save_model("MF-model")
+#
+#     data = load_cvae_data()
+#     recalls = rs.predict(data["train_users"], data["test_users"], 30)
+#
+#     plt.figure()
+#     plt.ylabel("Recall@M")
+#     plt.xlabel("M")
+#     plt.plot(np.arange(5, 30, 5),recalls)
+#     plt.savefig("/cf-vae/result/MF-result.png")
 
 

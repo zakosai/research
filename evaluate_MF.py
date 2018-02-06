@@ -36,7 +36,7 @@ data = load_cvae_data()
 
 ratings = pd.read_csv("cf-vae/data/amazon/ratings_MF.csv", header=None)
 Y_data = ratings.as_matrix()
-rs = MF(Y_data, K = 50, max_iter = 1000, print_every = 100, lam = 0.1)
+rs = MF(Y_data, K = 50, max_iter = 1000, print_every = 100, lam = 0.1, Xinit=V, Winit=U, b=b)
 recalls = rs.predict(data["train_users"], data["test_users"], 30)
 
 plt.figure()
