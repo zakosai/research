@@ -1,2 +1,2 @@
-model_checkpoint_path: "vae.ckpt"
-all_model_checkpoint_paths: "vae.ckpt"
+model_checkpoint_path: "vae_amazon_small.ckpt"
+all_model_checkpoint_paths: "vae_amazon_small.ckpt"
