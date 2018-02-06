@@ -61,5 +61,7 @@ model.save_model("cf_vae.mat")
 recalls = model.predict(data['train_users'], data['test_users'], 350)
 
 plt.figure()
+plt.ylabel("Recall@M")
+plt.xlabel("M")
 plt.plot(np.arange(50, 350, 50),recalls)
 plt.show()
