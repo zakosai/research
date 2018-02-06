@@ -40,8 +40,9 @@ def cal_rec(train_users, test_users, M):
         recall_vals = []
         for i in range(len(user_all)):
             top_M = np.argsort(-pred_all[i]).T
-            top_M = top_M[:m].reshape(m)
+            top_M = top_M[:m]
             print(top_M.shape)
+            top_M =list(top_M)
 
             top_M.reshape((m))
             hits = set(top_M) & set(user_all[i])   # item idex from 0
