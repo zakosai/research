@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from Matrix_Fatorization import MF
 def load_cvae_data():
   data = {}
-  data_dir = "/cf-vae/data/amazon/"
+  data_dir = "cf-vae/data/amazon/"
 
   data["train_users"] = load_rating(data_dir + "cf-train-1-users-small.dat")
   data["test_users"] = load_rating(data_dir + "cf-test-1-users-small.dat")
