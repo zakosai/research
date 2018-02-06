@@ -33,6 +33,7 @@ def cal_rec(train_users, test_users, M):
     ground_tr_num = [len(user) for user in user_all]
 
     pred_all = np.dot(U, (V.T))
+    print(pred_all.shape)
     pred_all = list(pred_all)
 
     recall_avgs = []
