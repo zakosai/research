@@ -289,7 +289,7 @@ def load_rating(path):
 
 
 r_cols = ['user_id', 'item_id', 'rating']
-ratings = pd.read_csv("cf-vae/data/amazon/ratings_MF.csv", header=False)
+ratings = pd.read_csv("cf-vae/data/amazon/ratings_MF.csv", header=None)
 Y_data = ratings.as_matrix()
 
 
