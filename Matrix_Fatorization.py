@@ -199,14 +199,14 @@ class MF(object):
 
 
         pred_all = self.pred_all()
-        pred_all = list(pred_all)
+        pred_all = pred_all.tolist()
 
         recall_avgs = []
         for m in range(5, M, 5):
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
             for i in range(len(user_all)):
-                top_M = np.argsort(-pred_all[i])[0:m]
+                top_M = np.argsort(pred_all[i])[-m:]
                 hits = set(top_M) & set(user_all[i])   # item idex from 0
                 hits_num = len(hits)
                 recall_val = float(hits_num) / float(ground_tr_num[i])
