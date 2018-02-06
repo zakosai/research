@@ -191,7 +191,7 @@ class Solver(object):
             if self.iter_end_callback is not None:
                 if self.iter_end_callback(i):
                     return
-            # exe.outputs[0].wait_to_read()
+            exe.outputs[0].wait_to_read()
         #Y = model.extract_feature(sym[0], args, auxs,
         #        data_iter, X.shape[0], xpu).values()[0]
         #print Y
