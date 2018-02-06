@@ -40,7 +40,8 @@ def cal_rec(train_users, test_users, M):
         recall_vals = []
         for i in range(len(user_all)):
             top_M = np.argsort(-pred_all[i])
-            top_M = top_M[0,:m]
+            top_M = top_M[0,:m].T
+            print(top_M)
             print(top_M.shape)
 
 
