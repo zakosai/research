@@ -147,6 +147,10 @@ class MF(object):
                 rmse_train = self.evaluate_RMSE(self.Y_raw)
                 print 'iter =', it + 1, ', loss =', self.loss(), ', RMSE train =', rmse_train
 
+    def save_model(self, dir_save):
+        np.savetxt(dir_save+'/final-U.dat',self.W,fmt='%.5f',comments='')
+        np.savetxt(dir_save+'/final-V.dat',self.X,fmt='%.5f',comments='')
+        np.savetxt(dir_save+'/final-b.dat',self.b,fmt='%.5f',comments='')
 
     def pred(self, u, i):
         """
@@ -253,6 +257,7 @@ Y_data = ratings.as_matrix()
 rs = MF(Y_data, K = 50, max_iter = 1000, print_every = 100, lam = 0.1)
 
 rs.fit()
+rs.save_model("MF-model")
 
 data = load_cvae_data()
 recalls = rs.predict(data["train_users"], data["test_users"], 30)
