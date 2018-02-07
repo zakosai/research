@@ -52,14 +52,16 @@ model.load_model("cf_vae.mat")
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
 price = pd.read_csv("data/amazon/price-small.csv")
+p =price.price
 X = []
 for u, i in enumerate(data["train_users"]):
-    if not pd.isna(price.price[i[0]]):
-        X.append([pred[u, i[0]], price.price[i[0]]])
+    if not pd.isna(p[i[0]]):
+        print(i[0])
+        X.append([pred[u, i[0]], p[i[0]]])
         j = np.random.randint(0, 16000)
-        while pd.isna(price.price[j]) or j == i[0]:
+        while pd.isna(p[j]) or j == i[0]:
             j = np.random.randint(0, 16000)
-        X.append([pred[u,j], price.price[j]])
+        X.append([pred[u,j], p[j]])
 
 
 X = np.array(X).reshape((len(X), 2))
@@ -68,9 +70,9 @@ lr =LogisticRegression()
 lr.fit(X, y)
 
 for j in range(16000):
-    if not pd.isna(price.price[j]):
+    if not pd.isna(p[j]):
         for i in range(8000):
-            pred[i,j] = lr.predict_proba([[pred[i,j]]])[0,1]
+            pred[i,j] = lr.predict_proba([[pred[i,j], price[j]]])[0,1]
 
 recalls = model.predict(pred, data['train_users'], data['test_users'], 30)
 
