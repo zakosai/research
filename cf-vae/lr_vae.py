@@ -56,7 +56,7 @@ p =price.price
 X = []
 for u, i in enumerate(data["train_users"]):
     if not pd.isna(p[i[0]]):
-        print(i[0])
+        print(i)
         X.append([pred[u, i[0]], p[i[0]]])
         j = np.random.randint(0, 16000)
         while pd.isna(p[j]) or j == i[0]:
