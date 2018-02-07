@@ -1,13 +1,14 @@
+__author__ = 'linh'
+
+__author__ = 'linh'
+
 import numpy as np
-import tensorflow as tf
-import scipy.io
+import pandas as pd
 import matplotlib.pyplot as plt
-from cf_vae_cpmf import cf_vae, params
 from scipy.sparse import load_npz
+from sklearn.linear_model import LogisticRegression
+from cf_vae_cpmf import cf_vae, params
 
-
-np.random.seed(0)
-tf.set_random_seed(0)
 
 def load_cvae_data():
   data = {}
@@ -42,27 +43,39 @@ params.C_a = 1
 params.C_b = 0.01
 params.max_iter_m = 1
 
-
-# # for updating W and b in vae
-# self.learning_rate = 0.001
-# self.batch_size = 500
-# self.num_iter = 3000
-# self.EM_iter = 100
-
-
 data = load_cvae_data()
 num_factors = 50
 model = cf_vae(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000],
     loss_type='cross_entropy')
-model.fit(data["train_users"], data["train_items"], data["content"], params)
-model.save_model("cf_vae.mat")
+model.load_model("cf_vae.mat")
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
-recalls = model.predict(pred, data['train_users'], data['test_users'], 350)
+price = pd.read_csv("data/amazon/price-small.csv")
+X = []
+for u, i in enumerate(data["train_users"]):
+    if not pd.isna(price.price[i[0]]):
+        X.append([pred[u, i[0]], price.price[i[0]]])
+        j = np.random.randint(0, 16000)
+        while pd.isna(price.price[j]) or j == i[0]:
+            j = np.random.randint(0, 16000)
+        X.append([pred[u,j], price.price[j]])
+
+
+X = np.array(X).reshape((len(X), 2))
+y = [1,0]*X.shape[0]
+lr =LogisticRegression()
+lr.fit(X, y)
+
+for j in range(16000):
+    if not pd.isna(price.price[j]):
+        for i in range(8000):
+            pred[i,j] = lr.predict_proba([[pred[i,j]]])[0,1]
+
+recalls = model.predict(pred, data['train_users'], data['test_users'], 30)
 
 plt.figure()
 plt.ylabel("Recall@M")
 plt.xlabel("M")
-plt.plot(np.arange(50, 350, 50),recalls)
-plt.show()
+plt.plot(np.arange(5, 30, 5),recalls)
+plt.savefig("result/cf-vae-lr-result.png")

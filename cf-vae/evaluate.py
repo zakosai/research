@@ -46,7 +46,8 @@ model = cf_vae(num_users=8000, num_items=16000, num_factors=num_factors, params=
     loss_type='cross_entropy')
 model.load_model("cf_vae.mat")
 # model.load_model("cf_vae.mat")
-recalls = model.predict(data['train_users'], data['test_users'], 30)
+pred = model.predict_all()
+recalls = model.predict(pred, data['train_users'], data['test_users'], 30)
 
 plt.figure()
 plt.ylabel("Recall@M")

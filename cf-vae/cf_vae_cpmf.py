@@ -170,13 +170,12 @@ class cf_vae:
         self.exp_z = data["Z"]
         print "model loaded"
 
-    def predict(self, train_users, test_users, M):
+    def predict(self, pred_all, train_users, test_users, M):
         user_all = map(add, train_users, test_users)
         # user_all = np.array(user_all)    # item idex from 1
         ground_tr_num = [len(user) for user in user_all]
 
 
-        pred_all = np.dot(self.U, (self.V.T))
         pred_all = list(pred_all)
 
         recall_avgs = []
@@ -193,3 +192,6 @@ class cf_vae:
             print recall_avg
             recall_avgs.append(recall_avg)
         return recall_avgs
+
+    def predict_all(self):
+        return np.dot(self.U, (self.V.T))
