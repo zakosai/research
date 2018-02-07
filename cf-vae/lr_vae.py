@@ -72,7 +72,7 @@ lr.fit(X, y)
 for j in range(16000):
     if not pd.isna(p[j]):
         for i in range(8000):
-            pred[i,j] = lr.predict_proba([[pred[i,j], price[j]]])[0,1]
+            pred[i,j] = lr.predict_proba([[pred[i,j], p[j]]])[0,1]
 
 recalls = model.predict(pred, data['train_users'], data['test_users'], 30)
 
