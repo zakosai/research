@@ -65,7 +65,7 @@ for u, i in enumerate(data["train_users"]):
 
 
 X = np.array(X).reshape((len(X), 2))
-y = [1,0]*X.shape[0]
+y = [1,0]*(X.shape[0]/2)
 lr =LogisticRegression()
 lr.fit(X, y)
 
