@@ -52,7 +52,7 @@ model.load_model("cf_vae.mat")
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
 price = pd.read_csv("data/amazon/price-small.csv")
-p =price.price
+p =price.price.tolist()
 X = []
 for u, i in enumerate(data["train_users"]):
     if not pd.isna(p[i[0]]):
