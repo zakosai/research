@@ -56,7 +56,6 @@ p =price.price.tolist()
 X = []
 for u, i in enumerate(data["train_users"]):
     if not pd.isna(p[i[0]]):
-        print(i)
         X.append([pred[u, i[0]], p[i[0]]])
         j = np.random.randint(0, 16000)
         while pd.isna(p[j]) or j == i[0]:
@@ -71,8 +70,9 @@ lr.fit(X, y)
 
 for j in range(16000):
     if not pd.isna(p[j]):
+        X = np.concatenate(([pred[:,j]], [p[j]*8000]), axis =0)
         for i in range(8000):
-            pred[i,j] = lr.predict_proba([[pred[i,j], p[j]]])[0,1]
+            pred[:,j] = lr.predict_proba(X.T)[:,1].T
 
 recalls = model.predict(pred, data['train_users'], data['test_users'], 30)
 
