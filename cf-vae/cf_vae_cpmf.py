@@ -86,10 +86,12 @@ class cf_vae:
         train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss_e_step)
 
 
-        ckpt_file = "pre_model/" + "vae_amazon_small.ckpt"
+        ckpt_file = "pre_model/" + "vae.ckpt"
         self.saver = tf.train.Saver()
         # if init == True:
         self.saver.restore(self.sess, ckpt_file)
+        for v in tf.get_collection(tf.GraphKeys.VARIABLES):
+            print(v)
         start = time.time()
         for i in range(self.params.num_iter):
             idx = np.random.choice(self.num_items, self.params.batch_size, replace=False)

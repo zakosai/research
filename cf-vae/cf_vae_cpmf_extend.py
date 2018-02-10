@@ -28,7 +28,7 @@ class params:
         self.num_iter = 300   # used in the e_step
         self.EM_iter = 30
 
-class cf_vae:
+class cf_vae_extend:
     def __init__(self, num_users, num_items, num_factors, params, input_dim, encoding_dims, z_dim, decoding_dims,
                  loss_type="cross_entropy", useTranse = False, eps = 1e-10):
         self.num_users = num_users
