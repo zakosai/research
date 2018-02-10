@@ -204,7 +204,10 @@ class cf_vae:
 
     def get_exp_hidden(self, x_data, im_data):
         self.exp_z = self.sess.run(self.z_mu, feed_dict={self.x_: x_data})
-        self.exp_z_im = self.sess.run(self.z_im_mu, feed_dict={self.x_im_: im_data})
+        for i in range(len(im_data), self.params.batch_size):
+            im_batch = im_data[i:i+self.params.batch_size]
+            exp_z_im = self.sess.run(self.z_im_mu, feed_dict={self.x_im_: im_batch})
+            self.exp_z_im = np.concatenate((self.exp_z_im, exp_z_im), axis=0)
         return self.exp_z, self.exp_z_im
 
     def fit(self, users, items, x_data, im_data, params):
