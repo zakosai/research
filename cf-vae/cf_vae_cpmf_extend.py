@@ -107,10 +107,10 @@ class cf_vae:
             y_im = Reshape((4,4,512))(h_upsample)
 
             for i in range(self.num_conv-1):
-                y_im = conv2d_transpose(y, self.filter*np.power(2,self.num_conv-2-i), kernel_size=(2,2),
+                y_im = conv2d_transpose(y_im, self.filter*np.power(2,self.num_conv-2-i), kernel_size=(2,2),
                                      strides=(2,2), scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
 
-            y_im = conv2d_transpose(y, self.channel, scope="dec_layer"+"%s" %(self.num_conv-1) , kernel_size=(2,2),
+            y_im = conv2d_transpose(y_im, self.channel, scope="dec_layer"+"%s" %(self.num_conv-1) , kernel_size=(2,2),
                                      strides=(2,2), activation=tf.nn.relu)
                     # if last_layer_nonelinear: depth_gen -1
 
