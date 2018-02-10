@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorbayes.layers import dense, placeholder, conv2d, conv2d_transpose
 from tensorbayes.utils import progbar
 from tensorbayes.tfutils import softmax_cross_entropy_with_two_logits
-from keras.backend import binary_crossentropy
+from keras.metrics import binary_crossentropy
 from keras.layers import Input, Dense, Lambda, Flatten, Reshape
 from keras.layers import Conv2D, Conv2DTranspose
 from keras.models import Model
@@ -49,11 +49,13 @@ class vanilla_vae:
         ########TEXT###################
         with tf.variable_scope(scope):
             x_ = placeholder((None, self.input_width, self.input_height, self.channel))
+            print(x_.shape)
             x = x_
             for i in range(self.num_conv):
                 x = conv2d(x, self.filter * np.power(2, i),kernel_size=(2,2), strides=(2,2), scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
             flat = Flatten()(x)
-            h_encode = dense(flat, self.intermediate_dim, activation=tf.nn.relu)
+            print(flat.shape)
+            h_encode = Dense(self.intermediate_dim, activation='relu')(flat)
             z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
             z_log_sigma_sq = dense(h_encode, self.z_dim, scope = "sigma_layer")
             e = tf.random_normal(tf.shape(z_mu))
@@ -61,23 +63,24 @@ class vanilla_vae:
 
             # generative process
             h_decode = dense(z, self.intermediate_dim, activation=tf.nn.relu)
-            h_upsample = dense(h_decode, flat.shape[1], activation=tf.nn.relu)
-            y = Reshape((x.shape[1], x.shape[2], x.shape[3]))(h_upsample)
+            h_upsample = dense(h_decode, 8192, activation=tf.nn.relu)
+            y = Reshape((4,4,512))(h_upsample)
 
             for i in range(self.num_conv-1):
-                y = conv2d_transpose(y, self.filter*np.power(2,self.num_conv-2-i), scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
+                y = conv2d_transpose(y, self.filter*np.power(2,self.num_conv-2-i), kernel_size=(2,2),
+                                     strides=(2,2), scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
 
-            y = conv2d_transpose(y, self.channel, scope="dec_layer"+"%s" %(self.num_conv-1) , activation=tf.nn.relu)
+            y = conv2d_transpose(y, self.channel, scope="dec_layer"+"%s" %(self.num_conv-1) , kernel_size=(2,2),
+                                     strides=(2,2), activation=tf.nn.relu)
                     # if last_layer_nonelinear: depth_gen -1
 
             x_recons = y
+            print(y.shape)
 
-        if self.loss == "cross_entropy":
-            loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(K.flatten(x_), K.flatten(x_recons)), axis=1))
-
-        loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
+        loss_recons = self.input_width*self.input_height*binary_crossentropy(K.flatten(x_), K.flatten(x_recons))
+        loss_kl = 0.5 * tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, -1)
         # loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
-        loss = loss_recons + loss_kl
+        loss = K.mean(loss_recons + loss_kl)
         # other cases not finished yet
         train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(loss)
 
