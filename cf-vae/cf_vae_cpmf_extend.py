@@ -63,7 +63,7 @@ class cf_vae:
         print "e_step finetuning"
         tf.reset_default_graph()
         self.x_ = placeholder((None, self.input_dim))  # we need these global nodes
-        self.x_im_ = placeholder((None, self.input_dim))
+        self.x_im_ = placeholder((None, self.input_width, self.input_height, self.channel))
         self.v_ = placeholder((None, self.num_factors))
 
         # inference process
@@ -90,7 +90,7 @@ class cf_vae:
 
 
         with tf.variable_scope("image"):
-            x_im_ = placeholder((None, self.input_width, self.input_height, self.channel))
+            x_im_ = self.x_im_
             x_im = x_im_
             for i in range(self.num_conv):
                 x_im = conv2d(x, self.filter * np.power(2, i),kernel_size=(2,2), strides=(2,2), scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
