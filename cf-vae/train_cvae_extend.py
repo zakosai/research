@@ -11,7 +11,7 @@ tf.set_random_seed(0)
 
 def load_cvae_data():
   data = {}
-  data_dir = "data/amzon/"
+  data_dir = "data/amazon/"
   # variables = scipy.io.loadmat(data_dir + "mult_nor-small.mat")
   # data["content"] = variables['X']
   variables = load_npz("data/amazon/mult_nor-small.npz")
