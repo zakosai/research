@@ -48,7 +48,7 @@ class cf_vae_extend:
         self.loss_type = loss_type
         self.useTranse = useTranse
         self.eps = eps
-        self.initial = False
+        self.initial = True
 
         self.input_width = 64
         self.input_height = 64
