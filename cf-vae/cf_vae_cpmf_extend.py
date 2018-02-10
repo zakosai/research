@@ -93,7 +93,7 @@ class cf_vae:
             x_im_ = self.x_im_
             x_im = x_im_
             for i in range(self.num_conv):
-                x_im = conv2d(x, self.filter * np.power(2, i),kernel_size=(2,2), strides=(2,2), scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
+                x_im = conv2d(x_im, self.filter * np.power(2, i),kernel_size=(2,2), strides=(2,2), scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
             flat = Flatten()(x_im)
             h_im_encode = Dense(self.intermediate_dim, activation='relu')(flat)
             z_im_mu = dense(h_im_encode, self.z_dim, scope="mu_layer")
