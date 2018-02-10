@@ -27,7 +27,7 @@ class vanilla_vae:
 
 
 
-    def fit(self, x_input, epochs = 1000, learning_rate = 0.001, batch_size = 100, print_size = 50, train=True):
+    def fit(self, x_input, epochs = 1000, learning_rate = 0.001, batch_size = 100, print_size = 50, train=True, scope="text"):
         # training setting
         self.DO_SHARE = False
         self.epochs = epochs
@@ -37,30 +37,32 @@ class vanilla_vae:
 
         self.g = tf.Graph()
         # inference process
-        x_ = placeholder((None, self.input_dim))
-        x = x_
-        depth_inf = len(self.encoding_dims)
-        for i in range(depth_inf):
-            x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
-        h_encode = x
-        z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
-        z_log_sigma_sq = dense(h_encode, self.z_dim, scope = "sigma_layer")
-        e = tf.random_normal(tf.shape(z_mu))
-        z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
+        ########TEXT###################
+        with tf.variable_scope(scope):
+            x_ = placeholder((None, self.input_dim))
+            x = x_
+            depth_inf = len(self.encoding_dims)
+            for i in range(depth_inf):
+                x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+            h_encode = x
+            z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
+            z_log_sigma_sq = dense(h_encode, self.z_dim, scope = "sigma_layer")
+            e = tf.random_normal(tf.shape(z_mu))
+            z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
 
-        # generative process
-        if self.useTranse == False:
-            depth_gen = len(self.decoding_dims)
+            # generative process
+            if self.useTranse == False:
+                depth_gen = len(self.decoding_dims)
 
-            for i in range(depth_gen):
-                y = dense(z, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
-                # if last_layer_nonelinear: depth_gen -1
+                for i in range(depth_gen):
+                    y = dense(z, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    # if last_layer_nonelinear: depth_gen -1
 
-        else:
-            depth_gen = depth_inf
-            ## haven't finnished yet...
+            else:
+                depth_gen = depth_inf
+                ## haven't finnished yet...
 
-        x_recons = y
+            x_recons = y
 
         if self.loss == "cross_entropy":
             loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(x_, x_recons), axis=1))
@@ -72,8 +74,8 @@ class vanilla_vae:
 
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
-        saver = tf.train.Saver()
-        ckpt_dir = "pre_model/" + "vae_amazon_small.ckpt"
+        saver = tf.train.Saver(tf.get_collection(tf.GraphKeys.VARIABLES, scope=scope))
+        ckpt_file = "pre_model/" + "vae_%s.ckpt" %scope
         if train == True:
             # num_turn = x_input.shape[0] / self.batch_size
             start = time.time()
@@ -83,6 +85,9 @@ class vanilla_vae:
                 _, l = sess.run((train_op, loss), feed_dict={x_:x_batch})
                 if i % self.print_size == 0:
                     print("epoches: %d\t loss: %f\t time: %d s"%(i, l, time.time()-start))
-            saver.save(sess, ckpt_dir)
+
+            saver.save(sess, ckpt_file)
         else:
-            saver.restore(sess, ckpt_dir)
+            saver.restore(sess, ckpt_file)
+
+
