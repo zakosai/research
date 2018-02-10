@@ -57,7 +57,6 @@ num_factors = 50
 model_im = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000],
     loss_type='cross_entropy')
-model_im.fit(data["train_users"], data["train_items"], data["content"],img, params)
 model_im.save_model("cf_vae_extend.mat")
 # model.load_model("cf_vae.mat")
 pred_im = model_im.predict_all()
