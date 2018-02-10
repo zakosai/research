@@ -145,7 +145,9 @@ class cf_vae:
 
             self.initial = False
             self.saver = tf.train.Saver()
+
         else:
+            self.saver = tf.train.Saver()
             self.saver.restore(self.sess, ckpt)
 
         start = time.time()
@@ -208,6 +210,8 @@ class cf_vae:
             im_batch = im_data[i:i+self.params.batch_size]
             exp_z_im = self.sess.run(self.z_im_mu, feed_dict={self.x_im_: im_batch})
             self.exp_z_im = np.concatenate((self.exp_z_im, exp_z_im), axis=0)
+
+        print(self.exp_z_im.shape)
         return self.exp_z, self.exp_z_im
 
     def fit(self, users, items, x_data, im_data, params):
