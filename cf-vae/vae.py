@@ -66,9 +66,11 @@ class vanilla_vae:
 
         if self.loss == "cross_entropy":
             loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(x_, x_recons), axis=1))
-            loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
-            # loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
-            loss = loss_recons + loss_kl
+        elif self.loss == "l2":
+            loss_recons = tf.reduce_mean(tf.nn.l2_loss(x_, x_recons))
+        loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
+        # loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
+        loss = loss_recons + loss_kl
         # other cases not finished yet
         train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(loss)
 
