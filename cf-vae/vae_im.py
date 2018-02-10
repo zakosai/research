@@ -76,7 +76,7 @@ class vanilla_vae:
 
             x_recons = y
 
-        loss_recons = self.input_width*self.input_height*self.channel*binary_crossentropy(K.flatten(x_), K.flatten(x_recons))
+        loss_recons = binary_crossentropy(K.flatten(x_), K.flatten(x_recons))
         loss_kl = 0.5 * tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, -1)
         # loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
         loss = K.mean(loss_recons + loss_kl)
