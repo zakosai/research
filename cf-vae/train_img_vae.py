@@ -8,7 +8,8 @@ np.random.seed(0)
 tf.set_random_seed(0)
 
 images = np.fromfile("data/amazon/images.bin", dtype=np.uint8)
-data = images.reshape((16000, 3072))
+data = images.reshape((16001, 3072))
+data = data[:16000]
 
 idx = np.random.rand(data.shape[0]) < 0.8
 train_X = data[idx]
