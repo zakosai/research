@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.sparse import load_npz
 from cf_vae_cpmf import cf_vae, params
+from cf_vae_cpmf_extend import cf_vae_extend
 
 
 def load_cvae_data():
@@ -47,10 +48,25 @@ model = cf_vae(num_users=8000, num_items=16000, num_factors=num_factors, params=
 model.load_model("cf_vae.mat")
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
-recalls = model.predict(pred, data['train_users'], data['test_users'], 30)
+recalls = model.predict(pred, data['train_users'], data['test_users'], 40)
+
+images = np.fromfile("data/amazon/images.bin", dtype=np.uint8)
+img = images.reshape((16000, 64, 64, 3))
+img = img.astype(np.float32)/255
+num_factors = 50
+model_im = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
+    input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000],
+    loss_type='cross_entropy')
+model_im.fit(data["train_users"], data["train_items"], data["content"],img, params)
+model_im.save_model("cf_vae_extend.mat")
+# model.load_model("cf_vae.mat")
+pred_im = model_im.predict_all()
+recalls_im= model_im.predict(pred, data['train_users'], data['test_users'], 40)
 
 plt.figure()
 plt.ylabel("Recall@M")
 plt.xlabel("M")
-plt.plot(np.arange(5, 30, 5),recalls)
-plt.savefig("result/cf-vae-result.png")
+plt.plot(np.arange(5, 40, 5),recalls, '-b', label="cf-vae")
+plt.plot(np.arange(5, 40, 5), recalls_im, '-r', label="img-extend")
+plt.legend(loc='upper left')
+plt.savefig("result/cf-vae-extend-result.png")
