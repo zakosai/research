@@ -1,8 +1,11 @@
 import tensorflow as tf
-from tensorbayes.layers import dense, placeholder
+from tensorbayes.layers import dense, placeholder, conv2d, conv2d_transpose
 from tensorbayes.utils import progbar
 from tensorbayes.tfutils import softmax_cross_entropy_with_two_logits
 from keras.backend import binary_crossentropy
+from keras.layers import Input, Dense, Lambda, Flatten, Reshape
+from keras import metrics
+from keras import backend as K
 import numpy as np
 import time
 from vae import vanilla_vae
@@ -47,6 +50,13 @@ class cf_vae:
         self.eps = eps
         self.initial = True
 
+        self.input_width = 64
+        self.input_height = 64
+        self.channel = 3
+        self.num_conv = 4
+        self.intermediate_dim = 256
+        self.filter = 64
+
 
     # def e_step(self, x_data, reuse = None):
     def e_step(self, x_data, im_data):
@@ -80,33 +90,40 @@ class cf_vae:
 
 
         with tf.variable_scope("image"):
-            x_im = self.x_im_
-            depth_inf = len(self.encoding_dims)
-            for i in range(depth_inf):
-                x_im = dense(x_im, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
-                # print("enc_layer0/weights:0".graph)
-            h_im_encode = x_im
+            x_im_ = placeholder((None, self.input_width, self.input_height, self.channel))
+            x_im = x_im_
+            for i in range(self.num_conv):
+                x_im = conv2d(x, self.filter * np.power(2, i),kernel_size=(2,2), strides=(2,2), scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
+            flat = Flatten()(x_im)
+            h_im_encode = Dense(self.intermediate_dim, activation='relu')(flat)
             z_im_mu = dense(h_im_encode, self.z_dim, scope="mu_layer")
             z_im_log_sigma_sq = dense(h_im_encode, self.z_dim, scope = "sigma_layer")
             e_im = tf.random_normal(tf.shape(z_im_mu))
             z_im = z_im_mu + tf.sqrt(tf.maximum(tf.exp(z_im_log_sigma_sq), self.eps)) * e_im
 
             # generative process
-            depth_gen = len(self.decoding_dims)
-            for i in range(depth_gen):
-                y_im = dense(z_im, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
-                # if last_layer_nonelinear: depth_gen -1
+            h_decode = dense(z_im, self.intermediate_dim, activation=tf.nn.relu)
+            h_upsample = dense(h_decode, 8192, activation=tf.nn.relu)
+            y_im = Reshape((4,4,512))(h_upsample)
+
+            for i in range(self.num_conv-1):
+                y_im = conv2d_transpose(y, self.filter*np.power(2,self.num_conv-2-i), kernel_size=(2,2),
+                                     strides=(2,2), scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
+
+            y_im = conv2d_transpose(y, self.channel, scope="dec_layer"+"%s" %(self.num_conv-1) , kernel_size=(2,2),
+                                     strides=(2,2), activation=tf.nn.relu)
+                    # if last_layer_nonelinear: depth_gen -1
 
             x_im_recons = y_im
 
         if self.loss_type == "cross_entropy":
             loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_, x_recons), axis=1))
             loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
-            loss_im_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_im_, x_im_recons), axis=1))
-            loss_im_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_im_mu) + tf.exp(z_im_log_sigma_sq) - z_im_log_sigma_sq - 1, 1))
+            loss_im_recons = self.input_width*self.input_height*metrics.binary_crossentropy(K.flatten(x_im_), K.flatten(x_im_recons))
+            loss_im_kl = 0.5 * tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, -1)
             loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z - z_im), 1))
             # reg_loss we don't use reg_loss temporailly
-        self.loss_e_step = loss_recons + loss_kl + loss_v + loss_im_recons + loss_im_kl
+        self.loss_e_step = loss_recons + loss_kl + loss_v + K.mean(loss_im_recons + loss_im_kl)
         train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss_e_step)
 
         self.sess = tf.Session()
