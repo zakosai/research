@@ -49,7 +49,6 @@ class vanilla_vae:
         ########TEXT###################
         with tf.variable_scope(scope):
             x_ = placeholder((None, self.input_width, self.input_height, self.channel))
-            print(x_.shape)
             x = x_
             for i in range(self.num_conv):
                 x = conv2d(x, self.filter * np.power(2, i),kernel_size=(2,2), strides=(2,2), scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
@@ -57,6 +56,7 @@ class vanilla_vae:
             print(flat.shape)
             h_encode = Dense(self.intermediate_dim, activation='relu')(flat)
             z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
+            print(z_mu.shape)
             z_log_sigma_sq = dense(h_encode, self.z_dim, scope = "sigma_layer")
             e = tf.random_normal(tf.shape(z_mu))
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
@@ -75,7 +75,6 @@ class vanilla_vae:
                     # if last_layer_nonelinear: depth_gen -1
 
             x_recons = y
-            print(y.shape)
 
         loss_recons = self.input_width*self.input_height*binary_crossentropy(K.flatten(x_), K.flatten(x_recons))
         loss_kl = 0.5 * tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, -1)
@@ -87,7 +86,7 @@ class vanilla_vae:
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
         saver = tf.train.Saver(tf.get_collection(tf.GraphKeys.VARIABLES, scope=scope))
-        ckpt_file = "pre_model/" + "vae_%s.ckpt" %scope
+        ckpt_file = "pre_model/" + "vae_%s_2.ckpt" %scope
         if train == True:
             # num_turn = x_input.shape[0] / self.batch_size
             start = time.time()
