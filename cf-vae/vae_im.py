@@ -50,8 +50,15 @@ class vanilla_vae:
         with tf.variable_scope(scope):
             x_ = placeholder((None, self.input_width, self.input_height, self.channel))
             x = x_
-            for i in range(self.num_conv):
-                x = conv2d(x, self.filter * np.power(2, i),kernel_size=(2,2), strides=(2,2), scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
+
+            # for i in range(self.num_conv):
+            #     x = conv2d(x, self.filter * np.power(2, i),kernel_size=(2,2), strides=(2,2), scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
+            x = conv2d(x, 64,kernel_size=(3,3), strides=(2,2), scope="enc_layer0", activation=tf.nn.relu)
+            x = conv2d(x, 128,kernel_size=(3,3), strides=(2,2), scope="enc_layer1", activation=tf.nn.relu)
+            x = conv2d(x, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
+            x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
+            x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
+            x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
             flat = Flatten()(x)
             print(flat.shape)
             h_encode = Dense(self.intermediate_dim, activation='relu')(flat)
@@ -64,16 +71,21 @@ class vanilla_vae:
             # generative process
             h_decode = dense(z, self.intermediate_dim, activation=tf.nn.relu)
             h_upsample = dense(h_decode, 8192, activation=tf.nn.relu)
-            y = Reshape((4,4,512))(h_upsample)
+            y = Reshape((1,1,512))(h_upsample)
 
-            for i in range(self.num_conv-1):
-                y = conv2d_transpose(y, self.filter*np.power(2,self.num_conv-2-i), kernel_size=(2,2),
-                                     strides=(2,2), scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
-
-            y = conv2d_transpose(y, self.channel, scope="dec_layer"+"%s" %(self.num_conv-1) , kernel_size=(2,2),
-                                     strides=(2,2), activation=tf.nn.relu)
+            # for i in range(self.num_conv-1):
+            #     y = conv2d_transpose(y, self.filter*np.power(2,self.num_conv-2-i), kernel_size=(2,2),
+            #                          strides=(2,2), scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
+            #
+            # y = conv2d_transpose(y, self.channel, scope="dec_layer"+"%s" %(self.num_conv-1) , kernel_size=(2,2),
+            #                          strides=(2,2), activation=tf.nn.relu)
                     # if last_layer_nonelinear: depth_gen -1
-
+            y = conv2d_transpose(y, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer0", activation=tf.nn.relu)
+            y = conv2d_transpose(y, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer1", activation=tf.nn.relu)
+            y = conv2d_transpose(y, 256, kernel_size=(3,3), strides=(2,2), scope="dec_layer2", activation=tf.nn.relu)
+            y = conv2d_transpose(y, 128, kernel_size=(3,3), strides=(2,2), scope="dec_layer3", activation=tf.nn.relu)
+            y = conv2d_transpose(y, 64, kernel_size=(3,3), strides=(2,2), scope="dec_layer4", activation=tf.nn.relu)
+            y = conv2d_transpose(y, 3, kernel_size=(3,3), strides=(2,2), scope="dec_layer0", activation=tf.nn.relu)
             x_recons = y
 
         loss_recons = self.input_width * self.input_height * self.channel *binary_crossentropy(K.flatten(x_), K.flatten(x_recons))
@@ -86,7 +98,7 @@ class vanilla_vae:
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
         saver = tf.train.Saver(tf.get_collection(tf.GraphKeys.VARIABLES, scope=scope))
-        ckpt_file = "pre_model/" + "vae_%s_2.ckpt" %scope
+        ckpt_file = "pre_model/" + "vae_%s_5layers.ckpt" %scope
         if train == True:
             # num_turn = x_input.shape[0] / self.batch_size
             start = time.time()
