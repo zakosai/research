@@ -85,7 +85,7 @@ class vanilla_vae:
             y = conv2d_transpose(y, 256, kernel_size=(3,3), strides=(2,2), scope="dec_layer2", activation=tf.nn.relu)
             y = conv2d_transpose(y, 128, kernel_size=(3,3), strides=(2,2), scope="dec_layer3", activation=tf.nn.relu)
             y = conv2d_transpose(y, 64, kernel_size=(3,3), strides=(2,2), scope="dec_layer4", activation=tf.nn.relu)
-            y = conv2d_transpose(y, 3, kernel_size=(3,3), strides=(2,2), scope="dec_layer0", activation=tf.nn.relu)
+            y = conv2d_transpose(y, 3, kernel_size=(3,3), strides=(2,2), scope="dec_layer5", activation=tf.nn.relu)
             x_recons = y
 
         loss_recons = self.input_width * self.input_height * self.channel *binary_crossentropy(K.flatten(x_), K.flatten(x_recons))
