@@ -132,7 +132,7 @@ class cf_vae_extend:
         if self.loss_type == "cross_entropy":
             loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_, x_recons), axis=1))
             loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
-            loss_im_recons = self.input_width * self.input_height *self.channel * metrics.binary_crossentropy(K.flatten(x_im_), K.flatten(x_im_recons))
+            loss_im_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_im_), K.flatten(x_im_recons))
             loss_im_kl = 0.5 * tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1)
             loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z - z_im), 1))
             # reg_loss we don't use reg_loss temporailly
@@ -142,7 +142,7 @@ class cf_vae_extend:
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
         # LOAD TEXT#
-        ckpt = "pre_model/" + "cvae_5layers.ckpt"
+        ckpt = "pre_model/" + "cvae_5layers_2.ckpt"
         if self.initial:
             ckpt_file = "pre_model/" + "vae_text.ckpt"
             text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
@@ -151,7 +151,7 @@ class cf_vae_extend:
             text_saver.restore(self.sess, ckpt_file)
 
             # LOAD IMAGE##
-            ckpt_file_img = "pre_model/" + "vae_image_5layers.ckpt"
+            ckpt_file_img = "pre_model/" + "vae_image_5layers_2.ckpt"
             img_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="image")
             img_saver = tf.train.Saver(var_list=img_varlist)
             img_saver.restore(self.sess, ckpt_file_img)

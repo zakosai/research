@@ -88,7 +88,7 @@ class vanilla_vae:
             y = conv2d_transpose(y, 3, kernel_size=(3,3), strides=(2,2), scope="dec_layer5", activation=tf.nn.relu)
             x_recons = y
 
-        loss_recons = self.input_width * self.input_height * self.channel *binary_crossentropy(K.flatten(x_), K.flatten(x_recons))
+        loss_recons = self.input_width * self.input_height *binary_crossentropy(K.flatten(x_), K.flatten(x_recons))
         loss_kl = 0.5 * tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1)
         # loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
         loss = K.mean(loss_recons + loss_kl)
@@ -98,7 +98,7 @@ class vanilla_vae:
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
         saver = tf.train.Saver(tf.get_collection(tf.GraphKeys.VARIABLES, scope=scope))
-        ckpt_file = "pre_model/" + "vae_%s_5layers.ckpt" %scope
+        ckpt_file = "pre_model/" + "vae_%s_5layers_2.ckpt" %scope
         if train == True:
             # num_turn = x_input.shape[0] / self.batch_size
             start = time.time()
