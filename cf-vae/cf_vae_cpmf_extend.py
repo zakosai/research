@@ -212,7 +212,7 @@ class cf_vae_extend:
         self.z_im_mu = z_im_mu
         self.x_im_recons = x_im_recons
 
-        self.z__s_mu = z_s_mu
+        self.z_s_mu = z_s_mu
         self.x_s_recons = x_s_recons
         self.saver.save(self.sess, ckpt)
         return None
