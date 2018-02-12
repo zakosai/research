@@ -59,11 +59,12 @@ class cf_vae_extend:
 
 
     # def e_step(self, x_data, reuse = None):
-    def e_step(self, x_data, im_data):
+    def e_step(self, x_data, im_data, str_data):
         print "e_step finetuning"
         tf.reset_default_graph()
         self.x_ = placeholder((None, self.input_dim))  # we need these global nodes
         self.x_im_ = placeholder((None, self.input_width, self.input_height, self.channel))
+        self.x_s_ = placeholder((None, 1863))
         self.v_ = placeholder((None, self.num_factors))
 
         # inference process
@@ -87,6 +88,26 @@ class cf_vae_extend:
                 # if last_layer_nonelinear: depth_gen -1
 
             x_recons = y
+
+        with tf.variable_scope("structure"):
+            x_s = self.x_s_
+            depth_inf = len(self.encoding_dims)
+            for i in range(depth_inf):
+                x_s = dense(x_s, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                # print("enc_layer0/weights:0".graph)
+            h_s_encode = x_s
+            z_s_mu = dense(h_s_encode, self.z_dim, scope="mu_layer")
+            z_s_log_sigma_sq = dense(h_s_encode, self.z_dim, scope = "sigma_layer")
+            e_s = tf.random_normal(tf.shape(z_s_mu))
+            z_s = z_s_mu + tf.sqrt(tf.maximum(tf.exp(z_s_log_sigma_sq), self.eps)) * e_s
+
+            # generative process
+            depth_gen = len(self.decoding_dims)
+            for i in range(depth_gen):
+                y_s = dense(z_s, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                # if last_layer_nonelinear: depth_gen -1
+
+            x_s_recons = y_s
 
 
         with tf.variable_scope("image"):
@@ -132,17 +153,19 @@ class cf_vae_extend:
         if self.loss_type == "cross_entropy":
             loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_, x_recons), axis=1))
             loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
+            loss_s_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_s_, x_s_recons), axis=1))
+            loss_s_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_s_mu) + tf.exp(z_s_log_sigma_sq) - z_s_log_sigma_sq - 1, 1))
             loss_im_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_im_), K.flatten(x_im_recons))
             loss_im_kl = 0.5 * tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1)
             loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z - z_im), 1))
             # reg_loss we don't use reg_loss temporailly
-        self.loss_e_step = loss_recons + loss_kl + loss_v + K.mean(loss_im_recons + loss_im_kl)
+        self.loss_e_step = loss_recons + loss_kl + loss_v + K.mean(loss_im_recons + loss_im_kl) + loss_s_recons + loss_s_kl
         train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss_e_step)
 
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
         # LOAD TEXT#
-        ckpt = "pre_model/" + "cvae_5layers_2.ckpt"
+        ckpt = "pre_model/" + "cvae_total.ckpt"
         if self.initial:
             ckpt_file = "pre_model/" + "vae_text.ckpt"
             text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
@@ -155,6 +178,13 @@ class cf_vae_extend:
             img_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="image")
             img_saver = tf.train.Saver(var_list=img_varlist)
             img_saver.restore(self.sess, ckpt_file_img)
+
+            # Load Structure
+            ckpt_file = "pre_model/" + "vae_structure.ckpt"
+            structure_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="structure")
+            structure_saver = tf.train.Saver(var_list=structure_varlist)
+            # if init == True:
+            structure_saver.restore(self.sess, ckpt_file)
 
             self.initial = False
             self.saver = tf.train.Saver()
@@ -169,8 +199,9 @@ class cf_vae_extend:
             x_batch = x_data[idx]
             v_batch = self.V[idx]
             img_batch = im_data[idx]
+            str_batch = str_data[idx]
             _, l = self.sess.run((train_op, self.loss_e_step),
-                                 feed_dict={self.x_:x_batch, self.x_im_:img_batch, self.v_:v_batch})
+                                 feed_dict={self.x_:x_batch, self.x_im_:img_batch, self.v_:v_batch, self.x_s_:str_batch})
             if i % 50 == 0:
                print("epoches: %d\t loss: %f\t time: %d s"%(i, l, time.time()-start))
 
@@ -179,6 +210,9 @@ class cf_vae_extend:
 
         self.z_im_mu = z_im_mu
         self.x_im_recons = x_im_recons
+
+        self.z__s_mu = z_s_mu
+        self.x_s_recons = x_s_recons
         self.saver.save(self.sess, ckpt)
         return None
 
@@ -217,7 +251,7 @@ class cf_vae_extend:
             print("iter: %d\t time:%d" %(i, time.time()-start))
         return None
 
-    def get_exp_hidden(self, x_data, im_data):
+    def get_exp_hidden(self, x_data, im_data, str_data):
         self.exp_z = self.sess.run(self.z_mu, feed_dict={self.x_: x_data})
         for i in range(len(im_data), self.params.batch_size):
             im_batch = im_data[i:i+self.params.batch_size]
@@ -225,18 +259,19 @@ class cf_vae_extend:
             self.exp_z_im = np.concatenate((self.exp_z_im, exp_z_im), axis=0)
 
         print(self.exp_z_im.shape)
-        return self.exp_z, self.exp_z_im
+        self.exp_z_s = self.sess.run(self.z_s_mu, feed_dict={self.x_s_: str_data})
+        return self.exp_z, self.exp_z_im, self.exp_z_s
 
-    def fit(self, users, items, x_data, im_data, params):
+    def fit(self, users, items, x_data, im_data, str_data, params):
 
-        self.e_step(x_data, im_data)
-        self.exp_z, self.exp_z_im = self.get_exp_hidden(x_data, im_data)
+        self.e_step(x_data, im_data, str_data)
+        self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
         for i in range(params.EM_iter):
             print("iter: %d"%i)
 
             self.m_step(users, items, params)
-            self.e_step(x_data, im_data)
-            self.exp_z, self.exp_z_im = self.get_exp_hidden(x_data, im_data)
+            self.e_step(x_data, im_data, str_data)
+            self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
 
         return None
 
