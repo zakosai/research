@@ -30,7 +30,7 @@ class params:
 
 class cf_vae_extend:
     def __init__(self, num_users, num_items, num_factors, params, input_dim, encoding_dims, z_dim, decoding_dims,
-                 loss_type="cross_entropy", useTranse = False, eps = 1e-10):
+                 decoding_dims_str, loss_type="cross_entropy", useTranse = False, eps = 1e-10):
         self.num_users = num_users
         self.num_items = num_items
         self.num_factors = num_factors
@@ -45,6 +45,7 @@ class cf_vae_extend:
         self.z_dim = z_dim
         self.encoding_dims = encoding_dims
         self.decoding_dims = decoding_dims
+        self.decoding_dims_str = decoding_dims_str
         self.loss_type = loss_type
         self.useTranse = useTranse
         self.eps = eps
@@ -102,9 +103,9 @@ class cf_vae_extend:
             z_s = z_s_mu + tf.sqrt(tf.maximum(tf.exp(z_s_log_sigma_sq), self.eps)) * e_s
 
             # generative process
-            depth_gen = len(self.decoding_dims)
+            depth_gen = len(self.decoding_dims_str)
             for i in range(depth_gen):
-                y_s = dense(z_s, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                y_s = dense(z_s, self.decoding_dims_str[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
                 # if last_layer_nonelinear: depth_gen -1
 
             x_s_recons = y_s
