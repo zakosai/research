@@ -111,62 +111,62 @@ class cf_vae_extend:
             x_s_recons = y_s
 
 
-        with tf.variable_scope("image"):
-            x_im_ = self.x_im_
-            x_im = x_im_
-            # for i in range(self.num_conv):
-            #     x_im = conv2d(x_im, self.filter * np.power(2, i),kernel_size=(2,2), strides=(2,2), scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
-
-            x_im = conv2d(x_im, 64,kernel_size=(3,3), strides=(2,2), scope="enc_layer0", activation=tf.nn.relu)
-            x_im = conv2d(x_im, 128,kernel_size=(3,3), strides=(2,2), scope="enc_layer1", activation=tf.nn.relu)
-            x_im = conv2d(x_im, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
-            x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
-            x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
-            x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
-            flat = Flatten()(x_im)
-            h_im_encode = Dense(self.intermediate_dim, activation='relu')(flat)
-            z_im_mu = dense(h_im_encode, self.z_dim, scope="mu_layer")
-            z_im_log_sigma_sq = dense(h_im_encode, self.z_dim, scope = "sigma_layer")
-            e_im = tf.random_normal(tf.shape(z_im_mu))
-            z_im = z_im_mu + tf.sqrt(tf.maximum(tf.exp(z_im_log_sigma_sq), self.eps)) * e_im
-
-            # generative process
-            h_decode = dense(z_im, self.intermediate_dim, activation=tf.nn.relu)
-            h_upsample = dense(h_decode, 512, activation=tf.nn.relu)
-            y_im = Reshape((1,1,512))(h_upsample)
-
-            # for i in range(self.num_conv-1):
-            #     y_im = conv2d_transpose(y_im, self.filter*np.power(2,self.num_conv-2-i), kernel_size=(2,2),
-            #                          strides=(2,2), scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
-            #
-            # y_im = conv2d_transpose(y_im, self.channel, scope="dec_layer"+"%s" %(self.num_conv-1) , kernel_size=(2,2),
-            #                          strides=(2,2), activation=tf.nn.relu)
-                    # if last_layer_nonelinear: depth_gen -1
-            y_im = conv2d_transpose(y_im, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer0", activation=tf.nn.relu)
-            y_im = conv2d_transpose(y_im, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer1", activation=tf.nn.relu)
-            y_im = conv2d_transpose(y_im, 256, kernel_size=(3,3), strides=(2,2), scope="dec_layer2", activation=tf.nn.relu)
-            y_im = conv2d_transpose(y_im, 128, kernel_size=(3,3), strides=(2,2), scope="dec_layer3", activation=tf.nn.relu)
-            y_im= conv2d_transpose(y_im, 64, kernel_size=(3,3), strides=(2,2), scope="dec_layer4", activation=tf.nn.relu)
-            y_im = conv2d_transpose(y_im, 3, kernel_size=(3,3), strides=(2,2), scope="dec_layer5", activation=tf.nn.relu)
-
-            x_im_recons = y_im
+        # with tf.variable_scope("image"):
+        #     x_im_ = self.x_im_
+        #     x_im = x_im_
+        #     # for i in range(self.num_conv):
+        #     #     x_im = conv2d(x_im, self.filter * np.power(2, i),kernel_size=(2,2), strides=(2,2), scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
+        #
+        #     x_im = conv2d(x_im, 64,kernel_size=(3,3), strides=(2,2), scope="enc_layer0", activation=tf.nn.relu)
+        #     x_im = conv2d(x_im, 128,kernel_size=(3,3), strides=(2,2), scope="enc_layer1", activation=tf.nn.relu)
+        #     x_im = conv2d(x_im, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
+        #     x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
+        #     x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
+        #     x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
+        #     flat = Flatten()(x_im)
+        #     h_im_encode = Dense(self.intermediate_dim, activation='relu')(flat)
+        #     z_im_mu = dense(h_im_encode, self.z_dim, scope="mu_layer")
+        #     z_im_log_sigma_sq = dense(h_im_encode, self.z_dim, scope = "sigma_layer")
+        #     e_im = tf.random_normal(tf.shape(z_im_mu))
+        #     z_im = z_im_mu + tf.sqrt(tf.maximum(tf.exp(z_im_log_sigma_sq), self.eps)) * e_im
+        #
+        #     # generative process
+        #     h_decode = dense(z_im, self.intermediate_dim, activation=tf.nn.relu)
+        #     h_upsample = dense(h_decode, 512, activation=tf.nn.relu)
+        #     y_im = Reshape((1,1,512))(h_upsample)
+        #
+        #     # for i in range(self.num_conv-1):
+        #     #     y_im = conv2d_transpose(y_im, self.filter*np.power(2,self.num_conv-2-i), kernel_size=(2,2),
+        #     #                          strides=(2,2), scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
+        #     #
+        #     # y_im = conv2d_transpose(y_im, self.channel, scope="dec_layer"+"%s" %(self.num_conv-1) , kernel_size=(2,2),
+        #     #                          strides=(2,2), activation=tf.nn.relu)
+        #             # if last_layer_nonelinear: depth_gen -1
+        #     y_im = conv2d_transpose(y_im, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer0", activation=tf.nn.relu)
+        #     y_im = conv2d_transpose(y_im, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer1", activation=tf.nn.relu)
+        #     y_im = conv2d_transpose(y_im, 256, kernel_size=(3,3), strides=(2,2), scope="dec_layer2", activation=tf.nn.relu)
+        #     y_im = conv2d_transpose(y_im, 128, kernel_size=(3,3), strides=(2,2), scope="dec_layer3", activation=tf.nn.relu)
+        #     y_im= conv2d_transpose(y_im, 64, kernel_size=(3,3), strides=(2,2), scope="dec_layer4", activation=tf.nn.relu)
+        #     y_im = conv2d_transpose(y_im, 3, kernel_size=(3,3), strides=(2,2), scope="dec_layer5", activation=tf.nn.relu)
+        #
+        #     x_im_recons = y_im
 
         if self.loss_type == "cross_entropy":
             loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_, x_recons), axis=1))
             loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
             loss_s_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_s_, x_s_recons), axis=1))
             loss_s_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_s_mu) + tf.exp(z_s_log_sigma_sq) - z_s_log_sigma_sq - 1, 1))
-            loss_im_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_im_), K.flatten(x_im_recons))
-            loss_im_kl = 0.5 * tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1)
-            loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z - z_im - z_s), 1))
+            # loss_im_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_im_), K.flatten(x_im_recons))
+            # loss_im_kl = 0.5 * tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1)
+            loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z  - z_s), 1))
             # reg_loss we don't use reg_loss temporailly
-        self.loss_e_step = loss_recons + loss_kl + loss_v + K.mean(loss_im_recons + loss_im_kl) + loss_s_recons + loss_s_kl
+        self.loss_e_step = loss_recons + loss_kl + loss_v  + loss_s_recons + loss_s_kl #+ K.mean(loss_im_recons + loss_im_kl)
         train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss_e_step)
 
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
         # LOAD TEXT#
-        ckpt = "pre_model/" + "cvae_total.ckpt"
+        ckpt = "pre_model/" + "cvae_str.ckpt"
         if self.initial:
             ckpt_file = "pre_model/" + "vae_text.ckpt"
             text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
@@ -174,11 +174,11 @@ class cf_vae_extend:
             # if init == True:
             text_saver.restore(self.sess, ckpt_file)
 
-            # LOAD IMAGE##
-            ckpt_file_img = "pre_model/" + "vae_image_5layers_2.ckpt"
-            img_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="image")
-            img_saver = tf.train.Saver(var_list=img_varlist)
-            img_saver.restore(self.sess, ckpt_file_img)
+            # # LOAD IMAGE##
+            # ckpt_file_img = "pre_model/" + "vae_image_5layers_2.ckpt"
+            # img_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="image")
+            # img_saver = tf.train.Saver(var_list=img_varlist)
+            # img_saver.restore(self.sess, ckpt_file_img)
 
             # Load Structure
             ckpt_file = "pre_model/" + "vae_structure.ckpt"
@@ -209,8 +209,8 @@ class cf_vae_extend:
         self.z_mu = z_mu
         self.x_recons = x_recons
 
-        self.z_im_mu = z_im_mu
-        self.x_im_recons = x_im_recons
+        # self.z_im_mu = z_im_mu
+        # self.x_im_recons = x_im_recons
 
         self.z_s_mu = z_s_mu
         self.x_s_recons = x_s_recons
@@ -254,12 +254,13 @@ class cf_vae_extend:
 
     def get_exp_hidden(self, x_data, im_data, str_data):
         self.exp_z = self.sess.run(self.z_mu, feed_dict={self.x_: x_data})
-        for i in range(len(im_data), self.params.batch_size):
-            im_batch = im_data[i:i+self.params.batch_size]
-            exp_z_im = self.sess.run(self.z_im_mu, feed_dict={self.x_im_: im_batch})
-            self.exp_z_im = np.concatenate((self.exp_z_im, exp_z_im), axis=0)
+        # for i in range(len(im_data), self.params.batch_size):
+        #     im_batch = im_data[i:i+self.params.batch_size]
+        #     exp_z_im = self.sess.run(self.z_im_mu, feed_dict={self.x_im_: im_batch})
+        #     self.exp_z_im = np.concatenate((self.exp_z_im, exp_z_im), axis=0)
 
-        print(self.exp_z_im.shape)
+        # print(self.exp_z_im.shape)
+        self.exp_z_im = 0
         self.exp_z_s = self.sess.run(self.z_s_mu, feed_dict={self.x_s_: str_data})
         return self.exp_z, self.exp_z_im, self.exp_z_s
 
