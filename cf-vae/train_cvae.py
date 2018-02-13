@@ -11,10 +11,10 @@ tf.set_random_seed(0)
 
 def load_cvae_data():
   data = {}
-  data_dir = "data/amazon/"
+  data_dir = "data/amazon-sub/"
   # variables = scipy.io.loadmat(data_dir + "mult_nor.mat")
   # data["content"] = variables['X']
-  variables = load_npz("data/amazon/mult_nor-small.npz")
+  variables = load_npz("data/amazon-sub/mult_nor.npz")
   data["content"] = variables.toarray()
   data["train_users"] = load_rating(data_dir + "cf-train-1-users-small.dat")
   data["train_items"] = load_rating(data_dir + "cf-train-1-items-small.dat")
@@ -52,11 +52,11 @@ params.max_iter_m = 1
 
 data = load_cvae_data()
 num_factors = 50
-model = cf_vae(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
+model = cf_vae(num_users=5282, num_items=11414, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000],
     loss_type='cross_entropy')
 model.fit(data["train_users"], data["train_items"], data["content"], params)
-model.save_model("cf_vae.mat")
+model.save_model("pre_model/sub/cf_vae.mat")
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
 recalls = model.predict(pred, data['train_users'], data['test_users'], 350)
