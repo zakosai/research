@@ -86,7 +86,7 @@ class cf_vae:
         train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss_e_step)
 
 
-        ckpt_file = "pre_model/" + "vae.ckpt"
+        ckpt_file = "pre_model/sub/" + "vae_structure.ckpt"
         self.saver = tf.train.Saver()
         # if init == True:
         self.saver.restore(self.sess, ckpt_file)

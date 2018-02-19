@@ -49,7 +49,7 @@ class cf_vae_extend:
         self.loss_type = loss_type
         self.useTranse = useTranse
         self.eps = eps
-        self.initial = False
+        self.initial = True
 
         self.input_width = 64
         self.input_height = 64
@@ -90,25 +90,25 @@ class cf_vae_extend:
 
             x_recons = y
 
-        with tf.variable_scope("structure"):
-            x_s = self.x_s_
-            depth_inf = len(self.encoding_dims)
-            for i in range(depth_inf):
-                x_s = dense(x_s, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
-                # print("enc_layer0/weights:0".graph)
-            h_s_encode = x_s
-            z_s_mu = dense(h_s_encode, self.z_dim, scope="mu_layer")
-            z_s_log_sigma_sq = dense(h_s_encode, self.z_dim, scope = "sigma_layer")
-            e_s = tf.random_normal(tf.shape(z_s_mu))
-            z_s = z_s_mu + tf.sqrt(tf.maximum(tf.exp(z_s_log_sigma_sq), self.eps)) * e_s
-
-            # generative process
-            depth_gen = len(self.decoding_dims_str)
-            for i in range(depth_gen):
-                y_s = dense(z_s, self.decoding_dims_str[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
-                # if last_layer_nonelinear: depth_gen -1
-
-            x_s_recons = y_s
+        # with tf.variable_scope("structure"):
+        #     x_s = self.x_s_
+        #     depth_inf = len(self.encoding_dims)
+        #     for i in range(depth_inf):
+        #         x_s = dense(x_s, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+        #         # print("enc_layer0/weights:0".graph)
+        #     h_s_encode = x_s
+        #     z_s_mu = dense(h_s_encode, self.z_dim, scope="mu_layer")
+        #     z_s_log_sigma_sq = dense(h_s_encode, self.z_dim, scope = "sigma_layer")
+        #     e_s = tf.random_normal(tf.shape(z_s_mu))
+        #     z_s = z_s_mu + tf.sqrt(tf.maximum(tf.exp(z_s_log_sigma_sq), self.eps)) * e_s
+        #
+        #     # generative process
+        #     depth_gen = len(self.decoding_dims_str)
+        #     for i in range(depth_gen):
+        #         y_s = dense(z_s, self.decoding_dims_str[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
+        #         # if last_layer_nonelinear: depth_gen -1
+        #
+        #     x_s_recons = y_s
 
 
         # with tf.variable_scope("image"):
@@ -154,21 +154,21 @@ class cf_vae_extend:
         if self.loss_type == "cross_entropy":
             loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_, x_recons), axis=1))
             loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
-            loss_s_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_s_, x_s_recons), axis=1))
-            loss_s_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_s_mu) + tf.exp(z_s_log_sigma_sq) - z_s_log_sigma_sq - 1, 1))
+            # loss_s_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_s_, x_s_recons), axis=1))
+            # loss_s_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_s_mu) + tf.exp(z_s_log_sigma_sq) - z_s_log_sigma_sq - 1, 1))
             # loss_im_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_im_), K.flatten(x_im_recons))
             # loss_im_kl = 0.5 * tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1)
-            loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z  - z_s), 1))
+            loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z), 1))
             # reg_loss we don't use reg_loss temporailly
-        self.loss_e_step = loss_recons + loss_kl + loss_v  + loss_s_recons + loss_s_kl #+ K.mean(loss_im_recons + loss_im_kl)
+        self.loss_e_step = loss_recons + loss_kl + loss_v  #+ loss_s_recons + loss_s_kl #+ K.mean(loss_im_recons + loss_im_kl)
         train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss_e_step)
 
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
         # LOAD TEXT#
-        ckpt = "pre_model/" + "cvae_str.ckpt"
+        ckpt = "pre_model/sub/" + "cvae_str.ckpt"
         if self.initial:
-            ckpt_file = "pre_model/" + "vae_text.ckpt"
+            ckpt_file = "pre_model/sub/" + "vae_text.ckpt"
             text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
             text_saver = tf.train.Saver(var_list=text_varlist)
             # if init == True:
@@ -181,11 +181,11 @@ class cf_vae_extend:
             # img_saver.restore(self.sess, ckpt_file_img)
 
             # Load Structure
-            ckpt_file = "pre_model/" + "vae_structure.ckpt"
-            structure_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="structure")
-            structure_saver = tf.train.Saver(var_list=structure_varlist)
-            # if init == True:
-            structure_saver.restore(self.sess, ckpt_file)
+            # ckpt_file = "pre_model/" + "vae_structure.ckpt"
+            # structure_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="structure")
+            # structure_saver = tf.train.Saver(var_list=structure_varlist)
+            # # if init == True:
+            # structure_saver.restore(self.sess, ckpt_file)
 
             self.initial = False
             self.saver = tf.train.Saver()
@@ -212,8 +212,8 @@ class cf_vae_extend:
         # self.z_im_mu = z_im_mu
         # self.x_im_recons = x_im_recons
 
-        self.z_s_mu = z_s_mu
-        self.x_s_recons = x_s_recons
+        # self.z_s_mu = z_s_mu
+        # self.x_s_recons = x_s_recons
         self.saver.save(self.sess, ckpt)
         return None
 
@@ -261,7 +261,8 @@ class cf_vae_extend:
 
         # print(self.exp_z_im.shape)
         self.exp_z_im = 0
-        self.exp_z_s = self.sess.run(self.z_s_mu, feed_dict={self.x_s_: str_data})
+        self.exp_z_s = 0
+        # self.exp_z_s = self.sess.run(self.z_s_mu, feed_dict={self.x_s_: str_data})
         return self.exp_z, self.exp_z_im, self.exp_z_s
 
     def fit(self, users, items, x_data, im_data, str_data, params):
