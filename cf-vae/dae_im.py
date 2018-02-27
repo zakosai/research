@@ -65,7 +65,7 @@ class vanilla_vae:
             # x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
             num_blocks = 3
             is_training = True
-            data_format = 'channel_last'
+            data_format = 'channels_last'
             x = conv2d_fixed_padding( inputs=x, filters=64, kernel_size=3, strides=1,
                                            data_format=data_format)
             x = tf.identity(x, 'initial_conv')
