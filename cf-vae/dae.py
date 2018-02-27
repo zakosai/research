@@ -48,10 +48,8 @@ class vanilla_vae:
             for i in range(depth_inf):
                 x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
             h_encode = x
-            z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
-            z_log_sigma_sq = dense(h_encode, self.z_dim, scope = "sigma_layer")
-            e = tf.random_normal(tf.shape(z_mu))
-            z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
+            z = dense(h_encode, self.z_dim, scope="mu_layer")
+
 
             # generative process
             if self.useTranse == False:
@@ -80,7 +78,7 @@ class vanilla_vae:
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
         saver = tf.train.Saver(tf.get_collection(tf.GraphKeys.VARIABLES, scope=scope))
-        ckpt_file = "pre_model/sub/" + "vae_%s.ckpt" %scope
+        ckpt_file = "pre_model/dae/" + "dae_%s.ckpt" %scope
         if train == True:
             # num_turn = x_input.shape[0] / self.batch_size
             start = time.time()
