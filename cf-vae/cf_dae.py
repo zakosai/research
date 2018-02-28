@@ -270,7 +270,7 @@ class cf_vae_extend:
                              np.eye(self.num_factors) * params.lambda_u
 
                 rx = params.C_a * np.sum(self.V[users[u], :], axis=0)
-                self.U[u, :] = scipy.linalg.solve(Lambda_inv, rx)
+                self.U[u, :] = scipy.linalg.solve(Lambda_inv, rx, check_finite=True)
 
                 likelihood += -0.5 * params.lambda_u * np.sum(self.U[u] * self.U[u])
 
@@ -282,7 +282,7 @@ class cf_vae_extend:
                              np.eye(self.num_factors) * params.lambda_v
 
                 rx = params.C_a * np.sum(self.U[items[v], :], axis=0) + params.lambda_v * self.exp_z[v, :]
-                self.V[v, :] = scipy.linalg.solve(Lambda_inv, rx)
+                self.V[v, :] = scipy.linalg.solve(Lambda_inv, rx, check_finite=True)
 
             print("iter: %d\t time:%d" %(i, time.time()-start))
         return None
