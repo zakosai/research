@@ -10,6 +10,15 @@ import  argparse
 np.random.seed(0)
 tf.set_random_seed(0)
 
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('--model',  type=int, default=0,
+                   help='type of model: 0-only text, 1-text+image, 2-text+image+structure, 3-text+structure')
+
+
+args = parser.parse_args()
+model = args.model
+print(model)
+
 def load_cvae_data():
   data = {}
   data_dir = "data/amazon/"
@@ -51,21 +60,13 @@ params.max_iter_m = 1
 # self.batch_size = 500
 # self.num_iter = 3000
 # self.EM_iter = 100
-parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument('--model',  type=int, default=0,
-                   help='type of model: 0-only text, 1-text+image, 2-text+image+structure, 3-text+structure')
-
-
-args = parser.parse_args()
-model = args[0]
-print(model)
 
 
 data = load_cvae_data()
 np.random.seed(0)
 tf.set_random_seed(0)
 
-model = argparse.ar
+
 
 images = np.fromfile("data/amazon/images.bin", dtype=np.uint8)
 img = images.reshape((16000, 64, 64, 3))
