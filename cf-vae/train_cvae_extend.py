@@ -4,6 +4,7 @@ import scipy.io
 import matplotlib.pyplot as plt
 from cf_vae_cpmf_extend import cf_vae_extend, params
 from scipy.sparse import load_npz
+import argparse
 
 
 np.random.seed(0)
