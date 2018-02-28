@@ -5,7 +5,7 @@ import scipy.io
 import matplotlib.pyplot as plt
 from cf_dae import cf_vae_extend, params
 from scipy.sparse import load_npz
-
+import  argparse
 
 np.random.seed(0)
 tf.set_random_seed(0)
@@ -51,11 +51,21 @@ params.max_iter_m = 1
 # self.batch_size = 500
 # self.num_iter = 3000
 # self.EM_iter = 100
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('--model',  type=int, default=0,
+                   help='type of model: 0-only text, 1-text+image, 2-text+image+structure, 3-text+structure')
+
+
+args = parser.parse_args()
+model = args[0]
+print(model)
 
 
 data = load_cvae_data()
 np.random.seed(0)
 tf.set_random_seed(0)
+
+model = argparse.ar
 
 images = np.fromfile("data/amazon/images.bin", dtype=np.uint8)
 img = images.reshape((16000, 64, 64, 3))
@@ -65,7 +75,7 @@ model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, 
     input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000],
     decoding_dims_str=[100,200, 1863], loss_type='cross_entropy')
 model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params)
-model.save_model("pre_model/dae/cf_dae_extend_resnet.mat")
+model.save_model("pre_model/dae/cf_dae.mat")
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
 recalls = model.predict(pred, data['train_users'], data['test_users'], 40)
