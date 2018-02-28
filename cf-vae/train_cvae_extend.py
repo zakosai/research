@@ -9,6 +9,16 @@ from scipy.sparse import load_npz
 np.random.seed(0)
 tf.set_random_seed(0)
 
+
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('--model',  type=int, default=0,
+                   help='type of model: 0-only text, 1-text+image, 2-text+image+structure, 3-text+structure')
+
+
+args = parser.parse_args()
+model = args.model
+print(model)
+
 def load_cvae_data():
   data = {}
   data_dir = "data/amazon/"
@@ -62,9 +72,9 @@ img = img.astype(np.float32)/255
 num_factors = 50
 model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000],
-    decoding_dims_str=[100,200, 1863], loss_type='cross_entropy')
+    decoding_dims_str=[100,200, 1863], loss_type='cross_entropy', model = model)
 model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params)
-model.save_model("pre_model/cf_vae_extend_resnet.mat")
+model.save_model("pre_model/vae/cf_vae_%d.mat"%model)
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
 recalls = model.predict(pred, data['train_users'], data['test_users'], 40)

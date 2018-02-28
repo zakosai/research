@@ -60,9 +60,9 @@ class vanilla_vae:
             # x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
             # x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
             # x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
-            num_blocks = 3
+            num_blocks = 5
             is_training = True
-            data_format = 'channel_last'
+            data_format = 'channels_last'
             x = conv2d_fixed_padding( inputs=x, filters=64, kernel_size=3, strides=1,
                                            data_format=data_format)
             x = tf.identity(x, 'initial_conv')
@@ -79,7 +79,7 @@ class vanilla_vae:
             x = block_layer(inputs=x, filters=512, block_fn=building_block, blocks=num_blocks,
                                  strides=2, is_training=is_training, name='block_layer4', data_format=data_format)
             x = block_layer(inputs=x, filters=512, block_fn=building_block, blocks=num_blocks,
-                                 strides=2, is_training=is_training, name='block_layer4', data_format=data_format)
+                                 strides=2, is_training=is_training, name='block_layer5', data_format=data_format)
             flat = Flatten()(x)
             print(flat.shape)
             h_encode = Dense(self.intermediate_dim, activation='relu')(flat)
@@ -119,7 +119,7 @@ class vanilla_vae:
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
         saver = tf.train.Saver(tf.get_collection(tf.GraphKeys.VARIABLES, scope=scope))
-        ckpt_file = "pre_model/sub/" + "vae_%s_resnet.ckpt" %scope
+        ckpt_file = "pre_model/" + "vae_%s_resnet.ckpt" %scope
         if train == True:
             # num_turn = x_input.shape[0] / self.batch_size
             start = time.time()
