@@ -126,7 +126,7 @@ class cf_vae_extend:
 
             num_blocks = 3
             is_training = True
-            data_format = 'channel_last'
+            data_format = 'channels_last'
             x_im = conv2d_fixed_padding( inputs=x_im, filters=64, kernel_size=3, strides=1,
                                            data_format=data_format)
             x_im = tf.identity(x_im, 'initial_conv')
