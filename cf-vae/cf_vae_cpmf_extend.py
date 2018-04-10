@@ -32,7 +32,7 @@ class params:
 
 class cf_vae_extend:
     def __init__(self, num_users, num_items, num_factors, params, input_dim, encoding_dims, z_dim, decoding_dims,
-                 decoding_dims_str, loss_type="cross_entropy", useTranse = False, eps = 1e-10, model=0, ckpt_folder='pre_model'):
+                 decoding_dims_str, loss_type="cross_entropy", useTranse = False, eps = 1e-10, model=0, ckpt_folder='pre_model', initial=True):
         self.num_users = num_users
         self.num_items = num_items
         self.num_factors = num_factors
@@ -51,7 +51,7 @@ class cf_vae_extend:
         self.loss_type = loss_type
         self.useTranse = useTranse
         self.eps = eps
-        self.initial = True
+        self.initial = initial
 
         self.input_width = 64
         self.input_height = 64
@@ -77,8 +77,8 @@ class cf_vae_extend:
         with tf.variable_scope("text"):
             x = self.x_
             depth_inf = len(self.encoding_dims)
-            # noisy_level = 1
-            # x = x + noisy_level*tf.random_normal(tf.shape(x))
+            noisy_level = 1
+            x = x + noisy_level*tf.random_normal(tf.shape(x))
             for i in range(depth_inf):
                 x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
                 # print("enc_layer0/weights:0".graph)
