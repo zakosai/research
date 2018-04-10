@@ -1,7 +1,6 @@
 import tensorflow as tf
 from tensorbayes.layers import dense, placeholder
-from tensorbayes.utils import progbar
-from tensorbayes.tfutils import softmax_cross_entropy_with_two_logits
+
 from keras.backend import binary_crossentropy
 import numpy as np
 import time
