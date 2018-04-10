@@ -31,7 +31,7 @@ class params:
 
 class cf_vae_extend:
     def __init__(self, num_users, num_items, num_factors, params, input_dim, encoding_dims, z_dim, decoding_dims,
-                 decoding_dims_str, loss_type="cross_entropy", useTranse = False, eps = 1e-10, model=0):
+                 decoding_dims_str, loss_type="cross_entropy", useTranse = False, eps = 1e-10, model=0,):
         self.num_users = num_users
         self.num_items = num_items
         self.num_factors = num_factors
@@ -211,9 +211,9 @@ class cf_vae_extend:
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
         # LOAD TEXT#
-        ckpt = "pre_model/vae/cvae_%d.ckpt"%self.model
+        ckpt = "pre_model/exp1/cvae_%d.ckpt"%self.model
         if self.initial:
-            ckpt_file = "pre_model/" + "vae_text.ckpt"
+            ckpt_file = "pre_model/exp1/" + "vae_text.ckpt"
             text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
             text_saver = tf.train.Saver(var_list=text_varlist)
             # if init == True:

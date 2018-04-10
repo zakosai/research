@@ -17,8 +17,8 @@ parser.add_argument('--model',  type=int, default=0,
 
 
 args = parser.parse_args()
-model = args.model
-print(model)
+model_type = args.model
+print(model_type)
 
 def load_cvae_data():
   data = {}
@@ -27,7 +27,7 @@ def load_cvae_data():
   # data["content"] = variables['X']
   variables = load_npz("data/amazon/mult_nor-small.npz")
   data["content"] = variables.toarray()
-  variables = load_npz("data/amazon/structure_mult_nor-small.npz")
+  # variables = load_npz("data/amazon/structure_mult_nor-small.npz")
   data["structure"] = variables.toarray()
   data["train_users"] = load_rating(data_dir + "cf-train-1-users-small.dat")
   data["train_items"] = load_rating(data_dir + "cf-train-1-items-small.dat")
@@ -73,9 +73,9 @@ img = img.astype(np.float32)/255
 num_factors = 50
 model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000],
-    decoding_dims_str=[100,200, 1863], loss_type='cross_entropy', model = model)
+    decoding_dims_str=[100,200, 1863], loss_type='cross_entropy', model = model_type)
 model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params)
-model.save_model("pre_model/vae/cf_vae_%d.mat"%model)
+model.save_model("pre_model/exp1/cf_vae_%d.mat"%model_type)
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
 recalls = model.predict(pred, data['train_users'], data['test_users'], 40)
