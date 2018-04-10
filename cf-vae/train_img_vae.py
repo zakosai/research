@@ -3,6 +3,15 @@ import numpy as np
 from vae_im import vanilla_vae
 import scipy.io as sio
 from scipy.sparse import load_npz
+import argparse
+
+parser = argparse.ArgumentParser(description='Process some integers.')
+
+parser.add_argument('--ckpt_folder',  type=str, default='pre_model/exp1/',
+                   help='where model is stored')
+
+args = parser.parse_args()
+ckpt = args.ckpt_folder
 
 np.random.seed(0)
 tf.set_random_seed(0)
@@ -19,7 +28,7 @@ print(len(test_X), len(test_X[0]))
 #
 
 
-model = vanilla_vae(width=64, height=64, loss='l2')
+model = vanilla_vae(width=64, height=64, loss='l2', ckpt_folder=ckpt)
 # As there will be an additional layer from 100 to 50 in the encoder. in decoder, we also take this layer
                     # lr=0.01, batch_size=128, print_step=50)
 print('fitting data starts...')
