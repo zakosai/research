@@ -77,6 +77,8 @@ class cf_vae_extend:
         with tf.variable_scope("text"):
             x = self.x_
             depth_inf = len(self.encoding_dims)
+            drop_rate = 0.3
+            x = tf.layers.dropout(x, drop_rate, training=True)
             for i in range(depth_inf):
                 x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
                 # print("enc_layer0/weights:0".graph)

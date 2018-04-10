@@ -10,7 +10,7 @@ class vanilla_vae:
     you can customize the activation functions pf each layer yourself.
     """
 
-    def __init__(self, input_dim, encoding_dims, z_dim, decoding_dims, loss="cross_entropy", useTranse = False, eps = 1e-10):
+    def __init__(self, input_dim, encoding_dims, z_dim, decoding_dims, loss="cross_entropy", useTranse = False, eps = 1e-10, ckpt_folder="pre_model"):
         # useTranse: if we use trasposed weigths of inference nets
         # eps for numerical stability
         # structural info
@@ -23,10 +23,11 @@ class vanilla_vae:
         self.eps = eps
         self.weights = []    # better in np form. first run, then append in
         self.bias = []
+        self.ckpt = ckpt_folder
 
 
 
-    def fit(self, x_input, epochs = 1000, learning_rate = 0.001, batch_size = 100, print_size = 50, train=True, scope="text", ckpt_folder="pre_model"):
+    def fit(self, x_input, epochs = 1000, learning_rate = 0.001, batch_size = 100, print_size = 50, train=True, scope="text"):
         # training setting
         self.DO_SHARE = False
         self.epochs = epochs
@@ -35,13 +36,15 @@ class vanilla_vae:
         self.print_size = print_size
 
         self.g = tf.Graph()
-        self.ckpt = ckpt_folder
         # inference process
         ########TEXT###################
         with tf.variable_scope(scope):
             x_ = placeholder((None, self.input_dim))
             x = x_
             depth_inf = len(self.encoding_dims)
+
+            drop_rate = 0.3
+            x = tf.layers.dropout(x, drop_rate, training=True)
             for i in range(depth_inf):
                 x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
             h_encode = x
