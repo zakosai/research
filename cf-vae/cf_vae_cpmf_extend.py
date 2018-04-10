@@ -1,4 +1,5 @@
 import tensorflow as tf
+import os
 from tensorbayes.layers import dense, placeholder, conv2d, conv2d_transpose
 from tensorbayes.utils import progbar
 from tensorbayes.tfutils import softmax_cross_entropy_with_two_logits
@@ -31,7 +32,7 @@ class params:
 
 class cf_vae_extend:
     def __init__(self, num_users, num_items, num_factors, params, input_dim, encoding_dims, z_dim, decoding_dims,
-                 decoding_dims_str, loss_type="cross_entropy", useTranse = False, eps = 1e-10, model=0,):
+                 decoding_dims_str, loss_type="cross_entropy", useTranse = False, eps = 1e-10, model=0, ckpt_folder='pre_model'):
         self.num_users = num_users
         self.num_items = num_items
         self.num_factors = num_factors
@@ -59,6 +60,7 @@ class cf_vae_extend:
         self.intermediate_dim = 256
         self.filter = 64
         self.model = model
+        self.ckpt_model = ckpt_folder
 
 
     # def e_step(self, x_data, reuse = None):
@@ -211,9 +213,9 @@ class cf_vae_extend:
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
         # LOAD TEXT#
-        ckpt = "pre_model/exp1/cvae_%d.ckpt"%self.model
+        ckpt = os.path.join(self.ckpt_model, "cvae_%d.ckpt"%self.model)
         if self.initial:
-            ckpt_file = "pre_model/exp1/" + "vae_text.ckpt"
+            ckpt_file = os.path.join(self.ckpt_model, "vae_text.ckpt")
             text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
             text_saver = tf.train.Saver(var_list=text_varlist)
             # if init == True:
@@ -221,14 +223,14 @@ class cf_vae_extend:
 
             # LOAD IMAGE##
             if self.model == 1 or self.model == 2:
-                ckpt_file_img = "pre_model/" + "vae_image_resnet.ckpt"
+                ckpt_file_img = os.path.join(self.ckpt_model, "vae_image.ckpt")
                 img_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="image")
                 img_saver = tf.train.Saver(var_list=img_varlist)
                 img_saver.restore(self.sess, ckpt_file_img)
 
             # Load Structure
             if self.model == 2 or self.model == 3:
-                ckpt_file = "pre_model/" + "vae_structure.ckpt"
+                ckpt_file = os.path.join(self.ckpt_model, "vae_structure.ckpt")
                 structure_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="structure")
                 structure_saver = tf.train.Saver(var_list=structure_varlist)
                 structure_saver.restore(self.sess, ckpt_file)

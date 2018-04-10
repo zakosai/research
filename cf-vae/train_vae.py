@@ -3,6 +3,15 @@ import numpy as np
 from vae import vanilla_vae
 import scipy.io as sio
 from scipy.sparse import load_npz
+import argparse
+
+parser = argparse.ArgumentParser(description='Process some integers.')
+
+parser.add_argument('--ckpt_folder',  type=str, default='pre_model/exp1/',
+                   help='where model is stored')
+
+args = parser.parse_args()
+ckpt = args.ckpt_folder
 
 np.random.seed(0)
 tf.set_random_seed(0)
@@ -21,7 +30,7 @@ test_X = data[~idx]
 # train_img = images[idx]
 # test_img = images[~idx]
 
-model = vanilla_vae(input_dim=8000, encoding_dims=[200, 100], z_dim=50, decoding_dims=[100, 200, 8000], loss='cross_entropy')
+model = vanilla_vae(input_dim=8000, encoding_dims=[200, 100], z_dim=50, decoding_dims=[100, 200, 8000], loss='cross_entropy', ckpt_folder=ckpt)
 # As there will be an additional layer from 100 to 50 in the encoder. in decoder, we also take this layer
                     # lr=0.01, batch_size=128, print_step=50)
 print('fitting data starts...')

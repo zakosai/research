@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from cf_vae_cpmf_extend import cf_vae_extend, params
 from scipy.sparse import load_npz
 import argparse
+import os
 
 
 np.random.seed(0)
@@ -14,10 +15,12 @@ tf.set_random_seed(0)
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--model',  type=int, default=0,
                    help='type of model: 0-only text, 1-text+image, 2-text+image+structure, 3-text+structure')
-
+parser.add_argument('--ckpt_folder',  type=str, default='pre_model/exp1/',
+                   help='where model is stored')
 
 args = parser.parse_args()
 model_type = args.model
+ckpt = args.ckpt_folder
 print(model_type)
 
 def load_cvae_data():
@@ -73,9 +76,9 @@ img = img.astype(np.float32)/255
 num_factors = 50
 model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000],
-    decoding_dims_str=[100,200, 1863], loss_type='cross_entropy', model = model_type)
+    decoding_dims_str=[100,200, 1863], loss_type='cross_entropy', model = model_type, ckpt_folder=ckpt)
 model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params)
-model.save_model("pre_model/exp1/cf_vae_%d.mat"%model_type)
+model.save_model(os.path.join(ckpt,"cf_vae_%d.mat"%model_type))
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
 recalls = model.predict(pred, data['train_users'], data['test_users'], 40)

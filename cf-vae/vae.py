@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorbayes.layers import dense, placeholder
-
+import os
 from keras.backend import binary_crossentropy
 import numpy as np
 import time
@@ -26,7 +26,7 @@ class vanilla_vae:
 
 
 
-    def fit(self, x_input, epochs = 1000, learning_rate = 0.001, batch_size = 100, print_size = 50, train=True, scope="text"):
+    def fit(self, x_input, epochs = 1000, learning_rate = 0.001, batch_size = 100, print_size = 50, train=True, scope="text", ckpt_folder="pre_model"):
         # training setting
         self.DO_SHARE = False
         self.epochs = epochs
@@ -35,6 +35,7 @@ class vanilla_vae:
         self.print_size = print_size
 
         self.g = tf.Graph()
+        self.ckpt = ckpt_folder
         # inference process
         ########TEXT###################
         with tf.variable_scope(scope):
@@ -76,7 +77,7 @@ class vanilla_vae:
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
         saver = tf.train.Saver(tf.get_collection(tf.GraphKeys.VARIABLES, scope=scope))
-        ckpt_file = "pre_model/exp1/" + "vae_%s.ckpt" %scope
+        ckpt_file = os.path.join(self.ckpt,"vae_%s.ckpt" %scope)
         if train == True:
             # num_turn = x_input.shape[0] / self.batch_size
             start = time.time()
