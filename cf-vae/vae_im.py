@@ -95,7 +95,7 @@ class vanilla_vae:
 
             # generative process
             h_decode = dense(z, self.intermediate_dim, activation=tf.nn.relu)
-            h_upsample = dense(h_decode, 4096, activation=tf.nn.relu)
+            h_upsample = dense(h_decode, 8192, activation=tf.nn.relu)
             y = Reshape((4,4,512))(h_upsample)
 
             # for i in range(self.num_conv-1):
