@@ -56,34 +56,34 @@ class vanilla_vae:
 
             # for i in range(self.num_conv):
             #     x = conv2d(x, self.filter * np.power(2, i),kernel_size=(2,2), strides=(2,2), scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
-            # x = conv2d(x, 64,kernel_size=(3,3), strides=(2,2), scope="enc_layer0", activation=tf.nn.relu)
-            # x = conv2d(x, 128,kernel_size=(3,3), strides=(2,2), scope="enc_layer1", activation=tf.nn.relu)
-            # x = conv2d(x, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
-            # x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
-            # x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
-            # x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
-            num_blocks = 5
-            is_training = True
-            data_format = 'channels_last'
-            x = conv2d_fixed_padding( inputs=x, filters=64, kernel_size=3, strides=1,
-                                           data_format=data_format)
-            x = tf.identity(x, 'initial_conv')
-
-            x = block_layer(inputs=x, filters=64, block_fn=building_block, blocks=num_blocks,
-                                 strides=2, is_training=is_training, name='block_layer1', data_format=data_format)
-
-            x = block_layer(inputs=x, filters=128, block_fn=building_block, blocks=num_blocks,
-                                 strides=2, is_training=is_training, name='block_layer2', data_format=data_format)
-
-            x = block_layer(inputs=x, filters=256, block_fn=building_block, blocks=num_blocks,
-                                strides=2, is_training=is_training, name='block_layer3',data_format=data_format)
-
-            x = block_layer(inputs=x, filters=512, block_fn=building_block, blocks=num_blocks,
-                                 strides=2, is_training=is_training, name='block_layer4', data_format=data_format)
-            x = block_layer(inputs=x, filters=512, block_fn=building_block, blocks=num_blocks,
-                                 strides=2, is_training=is_training, name='block_layer5', data_format=data_format)
-            x = block_layer(inputs=x, filters=512, block_fn=building_block, blocks=num_blocks,
-                                 strides=2, is_training=is_training, name='block_layer5', data_format=data_format)
+            x = conv2d(x, 64,kernel_size=(3,3), strides=(2,2), scope="enc_layer0", activation=tf.nn.relu)
+            x = conv2d(x, 128,kernel_size=(3,3), strides=(2,2), scope="enc_layer1", activation=tf.nn.relu)
+            x = conv2d(x, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
+            x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
+            x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
+            x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
+            # num_blocks = 5
+            # is_training = True
+            # data_format = 'channels_last'
+            # x = conv2d_fixed_padding( inputs=x, filters=64, kernel_size=3, strides=1,
+            #                                data_format=data_format)
+            # x = tf.identity(x, 'initial_conv')
+            #
+            # x = block_layer(inputs=x, filters=64, block_fn=building_block, blocks=num_blocks,
+            #                      strides=2, is_training=is_training, name='block_layer1', data_format=data_format)
+            #
+            # x = block_layer(inputs=x, filters=128, block_fn=building_block, blocks=num_blocks,
+            #                      strides=2, is_training=is_training, name='block_layer2', data_format=data_format)
+            #
+            # x = block_layer(inputs=x, filters=256, block_fn=building_block, blocks=num_blocks,
+            #                     strides=2, is_training=is_training, name='block_layer3',data_format=data_format)
+            #
+            # x = block_layer(inputs=x, filters=512, block_fn=building_block, blocks=num_blocks,
+            #                      strides=2, is_training=is_training, name='block_layer4', data_format=data_format)
+            # x = block_layer(inputs=x, filters=512, block_fn=building_block, blocks=num_blocks,
+            #                      strides=2, is_training=is_training, name='block_layer5', data_format=data_format)
+            # x = block_layer(inputs=x, filters=512, block_fn=building_block, blocks=num_blocks,
+            #                      strides=2, is_training=is_training, name='block_layer5', data_format=data_format)
             flat = Flatten()(x)
             print(flat.shape)
             h_encode = Dense(self.intermediate_dim, activation='relu')(flat)

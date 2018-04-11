@@ -26,7 +26,7 @@ class params:
 
         # for updating W and b in vae
         self.learning_rate = 0.001
-        self.batch_size = 200
+        self.batch_size = 500
         self.num_iter = 300   # used in the e_step
         self.EM_iter = 30
 
@@ -132,28 +132,28 @@ class cf_vae_extend:
                 # x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
                 # x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
 
-                num_blocks = 5
-                is_training = True
-                data_format = 'channels_last'
-                x_im = conv2d_fixed_padding( inputs=x_im, filters=64, kernel_size=3, strides=1,
-                                               data_format=data_format)
-                x_im = tf.identity(x_im, 'initial_conv')
-
-                x_im = block_layer(inputs=x_im, filters=64, block_fn=building_block, blocks=num_blocks,
-                                     strides=2, is_training=is_training, name='block_layer1', data_format=data_format)
-
-                x_im = block_layer(inputs=x_im, filters=128, block_fn=building_block, blocks=num_blocks,
-                                     strides=2, is_training=is_training, name='block_layer2', data_format=data_format)
-
-                x_im = block_layer(inputs=x_im, filters=256, block_fn=building_block, blocks=num_blocks,
-                                    strides=2, is_training=is_training, name='block_layer3',data_format=data_format)
-
-                x_im = block_layer(inputs=x_im, filters=512, block_fn=building_block, blocks=num_blocks,
-                                     strides=2, is_training=is_training, name='block_layer4', data_format=data_format)
-                x_im = block_layer(inputs=x_im, filters=512, block_fn=building_block, blocks=num_blocks,
-                                     strides=2, is_training=is_training, name='block_layer5', data_format=data_format)
-                x_im = block_layer(inputs=x_im, filters=512, block_fn=building_block, blocks=num_blocks,
-                                     strides=2, is_training=is_training, name='block_layer6', data_format=data_format)
+                # num_blocks = 5
+                # is_training = True
+                # data_format = 'channels_last'
+                # x_im = conv2d_fixed_padding( inputs=x_im, filters=64, kernel_size=3, strides=1,
+                #                                data_format=data_format)
+                # x_im = tf.identity(x_im, 'initial_conv')
+                #
+                # x_im = block_layer(inputs=x_im, filters=64, block_fn=building_block, blocks=num_blocks,
+                #                      strides=2, is_training=is_training, name='block_layer1', data_format=data_format)
+                #
+                # x_im = block_layer(inputs=x_im, filters=128, block_fn=building_block, blocks=num_blocks,
+                #                      strides=2, is_training=is_training, name='block_layer2', data_format=data_format)
+                #
+                # x_im = block_layer(inputs=x_im, filters=256, block_fn=building_block, blocks=num_blocks,
+                #                     strides=2, is_training=is_training, name='block_layer3',data_format=data_format)
+                #
+                # x_im = block_layer(inputs=x_im, filters=512, block_fn=building_block, blocks=num_blocks,
+                #                      strides=2, is_training=is_training, name='block_layer4', data_format=data_format)
+                # x_im = block_layer(inputs=x_im, filters=512, block_fn=building_block, blocks=num_blocks,
+                #                      strides=2, is_training=is_training, name='block_layer5', data_format=data_format)
+                # x_im = block_layer(inputs=x_im, filters=512, block_fn=building_block, blocks=num_blocks,
+                #                      strides=2, is_training=is_training, name='block_layer6', data_format=data_format)
                 flat = Flatten()(x_im)
                 h_im_encode = Dense(self.intermediate_dim, activation='relu')(flat)
                 z_im_mu = dense(h_im_encode, self.z_dim, scope="mu_layer")
