@@ -225,7 +225,7 @@ class cf_vae_extend:
 
             # LOAD IMAGE##
             if self.model == 1 or self.model == 2:
-                ckpt_file_img = os.path.join(self.ckpt_model, "vae_image.ckpt")
+                ckpt_file_img = os.path.join(self.ckpt_model, "vae_image_resnet.ckpt")
                 img_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="image")
                 img_saver = tf.train.Saver(var_list=img_varlist)
                 img_saver.restore(self.sess, ckpt_file_img)
