@@ -30,7 +30,7 @@ test_X = data[~idx]
 # train_img = images[idx]
 # test_img = images[~idx]
 
-model = vanilla_vae(input_dim=8000, encoding_dims=[200, 100], z_dim=50, decoding_dims=[100, 200, 8000], loss='cross_entropy', ckpt_folder=ckpt)
+model = vanilla_vae(input_dim=8000, encoding_dims=[1000, 500], z_dim=100, decoding_dims=[500, 1000, 8000], loss='cross_entropy', ckpt_folder=ckpt)
 # As there will be an additional layer from 100 to 50 in the encoder. in decoder, we also take this layer
                     # lr=0.01, batch_size=128, print_step=50)
 print('fitting data starts...')
