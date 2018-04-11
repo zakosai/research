@@ -44,7 +44,7 @@ num_factors = 50
 model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000], decoding_dims_str=[100,200, 1863],
     loss_type='cross_entropy')
-model.load_model("pre_model/cf_vae_extend_resnet.mat")
+model.load_model("pre_model/cf_vae_0.mat")
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
 recalls = model.predict(pred, data['train_users'], data['test_users'], 40)
@@ -56,7 +56,7 @@ img = img.astype(np.float32)/255
 model_im = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000], decoding_dims_str=[100,200, 1863],
     loss_type='cross_entropy')
-model_im.load_model("pre_model/dae/cf_dae_extend_resnet.mat")
+model_im.load_model("pre_model/dae/cf_vae_1.mat")
 # model.load_model("cf_vae.mat")
 pred_im = model_im.predict_all()
 recalls_im= model_im.predict(pred_im, data['train_users'], data['test_users'], 40)
@@ -64,7 +64,7 @@ recalls_im= model_im.predict(pred_im, data['train_users'], data['test_users'], 4
 plt.figure()
 plt.ylabel("Recall@M")
 plt.xlabel("M")
-plt.plot(np.arange(5, 40, 5),recalls, '-b', label="cf-dae")
+plt.plot(np.arange(5, 40, 5),recalls, '-b', label="cf-vae")
 plt.plot(np.arange(5, 40, 5), recalls_im, '-r', label="img-extend")
 plt.legend(loc='upper left')
-plt.savefig("result/cf-dae-extend-result.png")
+plt.savefig("result/cf-vae-extend-result.png")
