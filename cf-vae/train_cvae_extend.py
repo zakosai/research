@@ -73,9 +73,9 @@ tf.set_random_seed(0)
 images = np.fromfile("data/amazon/images.bin", dtype=np.uint8)
 img = images.reshape((16000, 64, 64, 3))
 img = img.astype(np.float32)/255
-num_factors = 100
+num_factors = 500
 model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
-    input_dim=8000, encoding_dims=[1000, 500], z_dim = 100, decoding_dims=[500, 1000, 8000],
+    input_dim=8000, encoding_dims=[2000, 1000], z_dim = 500, decoding_dims=[100, 2000, 8000],
     decoding_dims_str=[100,200, 1863], loss_type='cross_entropy', model = model_type, ckpt_folder=ckpt, initial=True)
 model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params)
 model.save_model(os.path.join(ckpt,"cf_vae_%d.mat"%model_type))
@@ -87,4 +87,4 @@ plt.figure()
 plt.ylabel("Recall@M")
 plt.xlabel("M")
 plt.plot(np.arange(5, 40, 5),recalls)
-plt.show()
+plt.savefig(os.path.join(ckpt, "cvae_%d.png"%model))
