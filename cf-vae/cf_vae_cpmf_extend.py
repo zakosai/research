@@ -61,6 +61,7 @@ class cf_vae_extend:
         self.filter = 64
         self.model = model
         self.ckpt_model = ckpt_folder
+        print(self.params.EM_iter)
 
 
     # def e_step(self, x_data, reuse = None):

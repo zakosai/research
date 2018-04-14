@@ -17,12 +17,15 @@ parser.add_argument('--model',  type=int, default=0,
                    help='type of model: 0-only text, 1-text+image, 2-text+image+structure, 3-text+structure')
 parser.add_argument('--ckpt_folder',  type=str, default='pre_model/exp1/',
                    help='where model is stored')
-parser.add_argument('--initial',  type=str, default=True,
+parser.add_argument('--initial',  type=bool, default=True,
+                   help='where model is stored')
+parser.add_argument('--iter',  type=int, default=30,
                    help='where model is stored')
 args = parser.parse_args()
 model_type = args.model
 ckpt = args.ckpt_folder
 initial = args.initial
+iter = args.iter
 print(model_type)
 
 def load_cvae_data():
@@ -59,6 +62,7 @@ params.lambda_r = 1
 params.C_a = 1
 params.C_b = 0.01
 params.max_iter_m = 1
+params.EM_iter = args.iter
 
 
 # # for updating W and b in vae
