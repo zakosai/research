@@ -47,7 +47,7 @@ model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, 
 model.load_model("pre_model/zdim2/cf_vae_0.mat")
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
-recalls = model.predict(pred, data['train_users'], data['test_users'], 40)
+recalls = model.predict(pred, data['train_users'], data['test_users'], 10)
 
 images = np.fromfile("data/amazon/images.bin", dtype=np.uint8)
 img = images.reshape((16000, 64, 64, 3))
@@ -59,7 +59,7 @@ model_im = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factor
 model_im.load_model("pre_model/zdim2/cf_vae_1.mat")
 # model.load_model("cf_vae.mat")
 pred_im = model_im.predict_all()
-recalls_im= model_im.predict(pred_im, data['train_users'], data['test_users'], 40)
+recalls_im= model_im.predict(pred_im, data['train_users'], data['test_users'], 10)
 
 plt.figure()
 plt.ylabel("Recall@M")
