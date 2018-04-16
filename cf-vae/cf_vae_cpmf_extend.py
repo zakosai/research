@@ -358,7 +358,7 @@ class cf_vae_extend:
         pred_all = list(pred_all)
 
         recall_avgs = []
-        for m in range(1, M):
+        for m in range(5, M, 5):
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
             for i in range(len(user_all)):

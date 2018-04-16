@@ -44,27 +44,37 @@ num_factors = 50
 model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[2000, 1000], z_dim = 500, decoding_dims=[1000, 2000, 8000], decoding_dims_str=[100,200, 1863],
     loss_type='cross_entropy')
-model.load_model("pre_model/zdim2/cf_vae_0.mat")
+model.load_model("pre_model/exp1/cf_vae_0.mat")
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
-recalls = model.predict(pred, data['train_users'], data['test_users'], 10)
+recalls = model.predict(pred, data['train_users'], data['test_users'], 40)
 
-images = np.fromfile("data/amazon/images.bin", dtype=np.uint8)
-img = images.reshape((16000, 64, 64, 3))
-img = img.astype(np.float32)/255
-# num_factors = 50
-model_im = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
-    input_dim=8000, encoding_dims=[2000, 1000], z_dim = 500, decoding_dims=[1000, 2000, 8000], decoding_dims_str=[100,200, 1863],
-    loss_type='cross_entropy')
-model_im.load_model("pre_model/zdim2/cf_vae_1.mat")
-# model.load_model("cf_vae.mat")
-pred_im = model_im.predict_all()
-recalls_im= model_im.predict(pred_im, data['train_users'], data['test_users'], 10)
+model.load_model("pre_model/zdim/cf_vae_0.mat")
+pred = model.predict_all()
+recalls_1 = model.predict(pred, data['train_users'], data['test_users'], 40)
+
+model.load_model("pre_model/zdim2/cf_vae_0.mat")
+pred = model.predict_all()
+recalls_2 = model.predict(pred, data['train_users'], data['test_users'], 40)
+
+# images = np.fromfile("data/amazon/images.bin", dtype=np.uint8)
+# img = images.reshape((16000, 64, 64, 3))
+# img = img.astype(np.float32)/255
+# # num_factors = 50
+# model_im = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
+#     input_dim=8000, encoding_dims=[2000, 1000], z_dim = 500, decoding_dims=[1000, 2000, 8000], decoding_dims_str=[100,200, 1863],
+#     loss_type='cross_entropy')
+# model_im.load_model("pre_model/zdim2/cf_vae_1.mat")
+# # model.load_model("cf_vae.mat")
+# pred_im = model_im.predict_all()
+# recalls_im= model_im.predict(pred_im, data['train_users'], data['test_users'], 10)
 
 plt.figure()
 plt.ylabel("Recall@M")
 plt.xlabel("M")
-plt.plot(np.arange(1, 10, 1),recalls, '-b', label="cf-vae")
-plt.plot(np.arange(1, 10, 1), recalls_im, '-r', label="img-extend")
+plt.plot(np.arange(5, 40, 5),recalls, '-b', label="zdim = 50")
+plt.plot(np.arange(5, 40, 5), recalls_1, '-r', label="zdim=100")
+plt.plot(np.arange(5, 40, 5), recalls_1, '-g', label="zdim=500")
+
 plt.legend(loc='upper left')
-plt.savefig("result/cf-vae-extend-result_zdim500_M10.png")
+plt.savefig("result/cf-vae-zdim.png")
