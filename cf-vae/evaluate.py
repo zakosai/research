@@ -74,7 +74,7 @@ plt.ylabel("Recall@M")
 plt.xlabel("M")
 plt.plot(np.arange(5, 40, 5),recalls, '-b', label="zdim = 50")
 plt.plot(np.arange(5, 40, 5), recalls_1, '-r', label="zdim=100")
-plt.plot(np.arange(5, 40, 5), recalls_1, '-g', label="zdim=500")
+plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="zdim=500")
 
 plt.legend(loc='upper left')
 plt.savefig("result/cf-vae-zdim.png")
