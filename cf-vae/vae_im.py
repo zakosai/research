@@ -61,7 +61,7 @@ class vanilla_vae:
             x = conv2d(x, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
             x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
             x = conv2d(x, 1024,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
-            x = conv2d(x, 2048,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
+            x = conv2d(x, 1024,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
             # num_blocks = 5
             # is_training = True
             # data_format = 'channels_last'
@@ -95,8 +95,8 @@ class vanilla_vae:
 
             # generative process
             h_decode = dense(z, self.intermediate_dim, activation=tf.nn.relu)
-            h_upsample = dense(h_decode, 2048, activation=tf.nn.relu)
-            y = Reshape((1,1,2048))(h_upsample)
+            h_upsample = dense(h_decode, 1024, activation=tf.nn.relu)
+            y = Reshape((1,1,1024))(h_upsample)
 
             # for i in range(self.num_conv-1):
             #     y = conv2d_transpose(y, self.filter*np.power(2,self.num_conv-2-i), kernel_size=(2,2),
@@ -123,7 +123,7 @@ class vanilla_vae:
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
         saver = tf.train.Saver(tf.get_collection(tf.GraphKeys.VARIABLES, scope=scope))
-        ckpt_file = os.path.join(self.ckpt,"vae_%s_resnet.ckpt" %scope)
+        ckpt_file = os.path.join(self.ckpt,"vae_%s.ckpt" %scope)
         if train == True:
             # num_turn = x_input.shape[0] / self.batch_size
             start = time.time()

@@ -28,7 +28,7 @@ print(len(test_X), len(test_X[0]))
 #
 
 
-model = vanilla_vae(width=64, height=64, loss='l2', ckpt_folder=ckpt, z_dim=1000)
+model = vanilla_vae(width=64, height=64, loss='l2', ckpt_folder=ckpt, z_dim=500)
 # As there will be an additional layer from 100 to 50 in the encoder. in decoder, we also take this layer
                     # lr=0.01, batch_size=128, print_step=50)
 print('fitting data starts...')
