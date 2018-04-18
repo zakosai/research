@@ -21,19 +21,21 @@ parser.add_argument('--initial',  type=bool, default=True,
                    help='where model is stored')
 parser.add_argument('--iter',  type=int, default=30,
                    help='where model is stored')
+parser.add_argument('--data_dir',  type=str, default='data/amazon',
+                   help='where model is stored')
 args = parser.parse_args()
 model_type = args.model
 ckpt = args.ckpt_folder
 initial = args.initial
 iter = args.iter
+data_dir = args.data_dir
 print(model_type)
 
-def load_cvae_data():
+def load_cvae_data(data_dir):
   data = {}
-  data_dir = "data/amazon/"
   # variables = scipy.io.loadmat(data_dir + "mult_nor-small.mat")
   # data["content"] = variables['X']
-  variables = load_npz("data/amazon/mult_nor-small.npz")
+  variables = load_npz(os.path.join(data_dir,"mult_nor-small.npz"))
   data["content"] = variables.toarray()
   # variables = load_npz("data/amazon/structure_mult_nor-small.npz")
   data["structure"] = variables.toarray()
@@ -72,7 +74,7 @@ params.EM_iter = args.iter
 # self.EM_iter = 100
 
 
-data = load_cvae_data()
+data = load_cvae_data(data_dir)
 np.random.seed(0)
 tf.set_random_seed(0)
 

@@ -16,7 +16,7 @@ ckpt = args.ckpt_folder
 np.random.seed(0)
 tf.set_random_seed(0)
 
-images = np.fromfile("data/amazon/images.bin", dtype=np.uint8)
+images = np.fromfile("data/movie/images.bin", dtype=np.uint8)
 data = images.reshape((16000, 64, 64, 3))
 data = data.astype(np.float32)/255
 

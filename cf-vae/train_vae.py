@@ -18,7 +18,7 @@ tf.set_random_seed(0)
 
 # variables = sio.loadmat("data/citeulike-a/mult_nor.mat")
 # data = variables['X']
-variables = load_npz("data/amazon/mult_nor-small.npz")
+variables = load_npz("data/movie/mult_nor-small.npz")
 data = variables.toarray()
 idx = np.random.rand(data.shape[0]) < 0.8
 train_X = data[idx]
@@ -30,7 +30,7 @@ test_X = data[~idx]
 # train_img = images[idx]
 # test_img = images[~idx]
 
-model = vanilla_vae(input_dim=8000, encoding_dims=[4000, 2000], z_dim=1000, decoding_dims=[2000, 4000, 8000], loss='cross_entropy', ckpt_folder=ckpt)
+model = vanilla_vae(input_dim=8000, encoding_dims=[2000, 1000], z_dim=500, decoding_dims=[1000, 2000, 8000], loss='cross_entropy', ckpt_folder=ckpt)
 # As there will be an additional layer from 100 to 50 in the encoder. in decoder, we also take this layer
                     # lr=0.01, batch_size=128, print_step=50)
 print('fitting data starts...')

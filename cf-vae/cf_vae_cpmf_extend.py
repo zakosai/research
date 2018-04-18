@@ -131,8 +131,8 @@ class cf_vae_extend:
                 x_im = conv2d(x_im, 128,kernel_size=(3,3), strides=(2,2), scope="enc_layer1", activation=tf.nn.relu)
                 x_im = conv2d(x_im, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
                 x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
-                x_im = conv2d(x_im, 1024,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
-                x_im = conv2d(x_im, 1024,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
+                x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
+                x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
 
                 # num_blocks = 5
                 # is_training = True
@@ -165,8 +165,8 @@ class cf_vae_extend:
 
                 # generative process
                 h_decode = dense(z_im, self.intermediate_dim, activation=tf.nn.relu)
-                h_upsample = dense(h_decode, 1024, activation=tf.nn.relu)
-                y_im = Reshape((1,1,1024))(h_upsample)
+                h_upsample = dense(h_decode, 512, activation=tf.nn.relu)
+                y_im = Reshape((1,1,512))(h_upsample)
 
                 # for i in range(self.num_conv-1):
                 #     y_im = conv2d_transpose(y_im, self.filter*np.power(2,self.num_conv-2-i), kernel_size=(2,2),
@@ -175,7 +175,7 @@ class cf_vae_extend:
                 # y_im = conv2d_transpose(y_im, self.channel, scope="dec_layer"+"%s" %(self.num_conv-1) , kernel_size=(2,2),
                 #                          strides=(2,2), activation=tf.nn.relu)
                         # if last_layer_nonelinear: depth_gen -1
-                y_im = conv2d_transpose(y_im, 1024, kernel_size=(3,3), strides=(2,2), scope="dec_layer0", activation=tf.nn.relu)
+                y_im = conv2d_transpose(y_im, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer0", activation=tf.nn.relu)
                 y_im = conv2d_transpose(y_im, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer1", activation=tf.nn.relu)
                 y_im = conv2d_transpose(y_im, 256, kernel_size=(3,3), strides=(2,2), scope="dec_layer2", activation=tf.nn.relu)
                 y_im = conv2d_transpose(y_im, 128, kernel_size=(3,3), strides=(2,2), scope="dec_layer3", activation=tf.nn.relu)
@@ -383,20 +383,20 @@ class cf_vae_extend:
                 except:
                     recall_val = 1
                 recall_vals.append(recall_val)
-                precision = float(hits_num) / float(m)
-                precision_vals.append(precision)
+                # precision = float(hits_num) / float(m)
+                # precision_vals.append(precision)
 
             recall_avg = np.mean(np.array(recall_vals))
-            precision_avg = np.mean(np.array(precision_vals))
-            # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
-            #                        [u for u in user_all if len(u)!=0], m)
-            mapk = ml_metrics.mapk([list(np.argsort(-k)) for k in pred_all], user_all, m)
-            print recall_avg, precision_avg, mapk
+            # precision_avg = np.mean(np.array(precision_vals))
+            # # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
+            # #                        [u for u in user_all if len(u)!=0], m)
+            # mapk = ml_metrics.mapk([list(np.argsort(-k)) for k in pred_all], user_all, m)
+            print recall_avg
             recall_avgs.append(recall_avg)
-            precision_avgs.append(precision_avg)
-            mapk_avgs.append(mapk)
+            # precision_avgs.append(precision_avg)
+            # mapk_avgs.append(mapk)
 
-        return recall_avgs, precision_avgs, mapk_avgs
+        return recall_avgs
 
     def predict_all(self):
         return np.dot(self.U, (self.V.T))
