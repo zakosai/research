@@ -39,6 +39,7 @@ params.C_a = 1
 params.C_b = 0.01
 params.max_iter_m = 1
 
+
 data = load_cvae_data()
 num_factors = 50
 model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
