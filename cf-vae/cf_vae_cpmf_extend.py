@@ -367,17 +367,19 @@ class cf_vae_extend:
             recall_vals = []
             precision_vals = []
             for i in range(len(user_all)):
-                top_M = np.argsort(-pred_all[i])[0:m]
-                hits = set(top_M) & set(user_all[i])   # item idex from 0
-                hits_num = len(hits)
-                recall_val = float(hits_num) / float(ground_tr_num[i])
-                recall_vals.append(recall_val)
-                precision = float(hits_num) / float(m)
-                precision_vals.append(precision)
+                if len(user_all[i]) != 0:
+                    top_M = np.argsort(-pred_all[i])[0:m]
+                    hits = set(top_M) & set(user_all[i])   # item idex from 0
+                    hits_num = len(hits)
+                    recall_val = float(hits_num) / float(ground_tr_num[i])
+                    recall_vals.append(recall_val)
+                    precision = float(hits_num) / float(m)
+                    precision_vals.append(precision)
 
             recall_avg = np.mean(np.array(recall_vals))
             precision_avg = np.mean(np.array(precision_vals))
-            mapk = ml_metrics.mapk([list(np.argsort(-k)) for k in pred_all], user_all, m)
+            mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) and len(user_all[k])!= 0],
+                                   [u for u in user_all and len(u)!=0], m)
             print recall_avg, precision_avg
             recall_avgs.append(recall_avg)
             precision_avgs.append(precision_avg)
