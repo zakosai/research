@@ -78,7 +78,7 @@ plt.plot(np.arange(1, 10, 1), recalls_1, '-r', label="img-extend")
 # plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="zdim=500")
 
 plt.legend(loc='upper left')
-plt.savefig("result/recall_zdim2_10_remove0.png")
+plt.savefig("result/recall_zdim2_10_remove0_2.png")
 plt.close()
 
 plt.figure()
@@ -89,7 +89,7 @@ plt.plot(np.arange(1, 10, 1), precision_1, '-r', label="img-extend")
 # plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="zdim=500")
 
 plt.legend(loc='upper left')
-plt.savefig("result/precision_zdim2_10_remove0.png")
+plt.savefig("result/precision_zdim2_10_remove0_2.png")
 plt.close()
 
 plt.figure()
@@ -100,5 +100,5 @@ plt.plot(np.arange(1, 10, 1), mapk_1, '-r', label="img-extend")
 # plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="zdim=500")
 
 plt.legend(loc='upper left')
-plt.savefig("result/mapk_zdim2_10_remove0.png")
+plt.savefig("result/mapk_zdim2_10_remove0_2.png")
 plt.close()
