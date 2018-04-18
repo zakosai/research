@@ -78,7 +78,7 @@ data = load_cvae_data(data_dir)
 np.random.seed(0)
 tf.set_random_seed(0)
 
-images = np.fromfile("data/amazon/images.bin", dtype=np.uint8)
+images = np.fromfile("data/movie/images.bin", dtype=np.uint8)
 img = images.reshape((16000, 64, 64, 3))
 img = img.astype(np.float32)/255
 num_factors = 500
