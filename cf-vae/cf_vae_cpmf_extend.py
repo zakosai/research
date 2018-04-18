@@ -351,9 +351,9 @@ class cf_vae_extend:
         print "model loaded"
 
     def predict(self, pred_all, train_users, test_users, M):
-        user_all = map(add, train_users, test_users)
+        # user_all = map(add, train_users, test_users)
         # user_all = np.array(user_all)    # item idex from 1
-        # user_all = test_users
+        user_all = test_users
         ground_tr_num = [len(user) for user in user_all]
 
 
@@ -367,7 +367,11 @@ class cf_vae_extend:
             recall_vals = []
             precision_vals = []
             for i in range(len(user_all)):
-                top_M = np.argsort(-pred_all[i])[0:m]
+                top_M = list(np.argsort(-pred_all[i])[0:(m+1)])
+                if train_users[i] in top_M:
+                    top_M.remove(train_users[i])
+                else:
+                    top_M = top_M[:-1]
                 hits = set(top_M) & set(user_all[i])   # item idex from 0
                 hits_num = len(hits)
                 try:
