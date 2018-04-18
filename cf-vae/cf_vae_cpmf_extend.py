@@ -351,9 +351,9 @@ class cf_vae_extend:
         print "model loaded"
 
     def predict(self, pred_all, train_users, test_users, M):
-        # user_all = map(add, train_users, test_users)
+        user_all = map(add, train_users, test_users)
         # user_all = np.array(user_all)    # item idex from 1
-        user_all = test_users
+        # user_all = test_users
         ground_tr_num = [len(user) for user in user_all]
 
 
@@ -383,7 +383,7 @@ class cf_vae_extend:
             # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
             #                        [u for u in user_all if len(u)!=0], m)
             mapk = ml_metrics.mapk([list(np.argsort(-k)) for k in pred_all], user_all, m)
-            print recall_avg, precision_avg
+            print recall_avg, precision_avg, mapk
             recall_avgs.append(recall_avg)
             precision_avgs.append(precision_avg)
             mapk_avgs.append(mapk)
