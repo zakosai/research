@@ -8,10 +8,10 @@ from cf_vae_cpmf_extend import cf_vae_extend, params
 
 def load_cvae_data():
   data = {}
-  data_dir = "data/movie/"
+  data_dir = "data/amazon/"
   # variables = scipy.io.loadmat(data_dir + "mult_nor.mat")
   # data["content"] = variables['X']
-  variables = load_npz("data/movie/mult_nor-small.npz")
+  variables = load_npz("data/amazon/mult_nor-small.npz")
   data["content"] = variables.toarray()
   data["train_users"] = load_rating(data_dir + "cf-train-1-users-small.dat")
   data["train_items"] = load_rating(data_dir + "cf-train-1-items-small.dat")
@@ -45,14 +45,14 @@ num_factors = 50
 model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[2000, 1000], z_dim = 500, decoding_dims=[1000, 2000, 8000], decoding_dims_str=[100,200, 1863],
     loss_type='cross_entropy')
-model.load_model("pre2/zdim250/cf_vae_0.mat")
+model.load_model("pre_model/zdim2/cf_vae_0.mat")
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
-recalls= model.predict(pred, data['train_users'], data['test_users'], 40)
+recalls= model.predict(pred, data['train_users'], data['test_users'], 10)
 
-model.load_model("pre2/zdim250/cf_vae_1.mat")
+model.load_model("pre_model/zdim2/cf_vae_1.mat")
 pred = model.predict_all()
-recalls_1 = model.predict(pred, data['train_users'], data['test_users'], 40)
+recalls_1 = model.predict(pred, data['train_users'], data['test_users'], 10)
 
 # model.load_model("pre_model/zdim2/cf_vae_0.mat")
 # pred = model.predict_all()
@@ -73,12 +73,12 @@ recalls_1 = model.predict(pred, data['train_users'], data['test_users'], 40)
 plt.figure()
 plt.ylabel("Recall@M")
 plt.xlabel("M")
-plt.plot(np.arange(5, 40, 5),recalls, '-b', label="cvae")
-plt.plot(np.arange(5, 40, 5), recalls_1, '-r', label="img-extend")
+plt.plot(np.arange(1, 10, 1),recalls, '-b', label="cvae")
+plt.plot(np.arange(1, 10, 1), recalls_1, '-r', label="img-extend")
 # plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="zdim=500")
 
 plt.legend(loc='upper left')
-plt.savefig("result/recall_movie_40_zdim250.png")
+plt.savefig("result/recall_amzon_40_case3.png")
 plt.close()
 
 # plt.figure()
