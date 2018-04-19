@@ -351,9 +351,9 @@ class cf_vae_extend:
         print "model loaded"
 
     def predict(self, pred_all, train_users, test_users, M):
-        user_all = map(add, train_users, test_users)
+        # user_all = map(add, train_users, test_users)
         # user_all = np.array(user_all)    # item idex from 1
-        # user_all = test_users
+        user_all = test_users
         ground_tr_num = [len(user) for user in user_all]
 
 
@@ -362,7 +362,7 @@ class cf_vae_extend:
         recall_avgs = []
         precision_avgs = []
         mapk_avgs = []
-        for m in range(1, M, 1):
+        for m in range(5, M, 5):
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
             precision_vals = []
