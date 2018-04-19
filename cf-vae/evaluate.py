@@ -8,10 +8,10 @@ from cf_vae_cpmf_extend import cf_vae_extend, params
 
 def load_cvae_data():
   data = {}
-  data_dir = "data/amazon/"
+  data_dir = "data/movie/"
   # variables = scipy.io.loadmat(data_dir + "mult_nor.mat")
   # data["content"] = variables['X']
-  variables = load_npz("data/amazon/mult_nor-small.npz")
+  variables = load_npz("data/movie/mult_nor-small.npz")
   data["content"] = variables.toarray()
   data["train_users"] = load_rating(data_dir + "cf-train-1-users-small.dat")
   data["train_items"] = load_rating(data_dir + "cf-train-1-items-small.dat")
@@ -78,7 +78,7 @@ plt.plot(np.arange(1, 10, 1), recalls_1, '-r', label="img-extend")
 # plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="zdim=500")
 
 plt.legend(loc='upper left')
-plt.savefig("result/recall_movie_case2.png")
+plt.savefig("result/recall_movie.png")
 plt.close()
 
 # plt.figure()
