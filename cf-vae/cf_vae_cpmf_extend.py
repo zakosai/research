@@ -367,15 +367,15 @@ class cf_vae_extend:
             recall_vals = []
             precision_vals = []
             for i in range(len(user_all)):
-                top_M = list(np.argsort(-pred_all[i])[0:(m+1)])
-                if train_users[i] in top_M:
-                    top_M.remove(train_users[i])
-                else:
-                    top_M = top_M[:-1]
-                if len(top_M) != m:
-                    print(top_M, train_users[i])
-                if len(train_users[i]) != 1:
-                    print(i)
+                top_M = list(np.argsort(-pred_all[i])[0:(m)])
+                # if train_users[i] in top_M:
+                #     top_M.remove(train_users[i])
+                # else:
+                #     top_M = top_M[:-1]
+                # if len(top_M) != m:
+                #     print(top_M, train_users[i])
+                # if len(train_users[i]) != 1:
+                #     print(i)
                 hits = set(top_M) & set(user_all[i])   # item idex from 0
                 hits_num = len(hits)
                 try:
