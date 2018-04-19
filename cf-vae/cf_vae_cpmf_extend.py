@@ -351,9 +351,9 @@ class cf_vae_extend:
         print "model loaded"
 
     def predict(self, pred_all, train_users, test_users, M):
-        user_all = map(add, train_users, test_users)
+        # user_all = map(add, train_users, test_users)
         # user_all = np.array(user_all)    # item idex from 1
-        # user_all = test_users
+        user_all = test_users
         ground_tr_num = [len(user) for user in user_all]
 
 

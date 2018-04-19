@@ -78,7 +78,7 @@ plt.plot(np.arange(1, 10, 1), recalls_1, '-r', label="img-extend")
 # plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="zdim=500")
 
 plt.legend(loc='upper left')
-plt.savefig("result/recall_movie.png")
+plt.savefig("result/recall_movie_case2.png")
 plt.close()
 
 # plt.figure()
