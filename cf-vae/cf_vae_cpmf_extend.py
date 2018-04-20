@@ -194,7 +194,7 @@ class cf_vae_extend:
 
             elif self.model == 1:
                 loss_im_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(K.flatten(x_im_), K.flatten(x_im_recons)), axis=1))
-                loss_im_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
+                loss_im_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_im_mu) + tf.exp(z_im_log_sigma_sq) - z_im_log_sigma_sq - 1, 1))
                 loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z  - z_im), 1))
                 self.loss_e_step = loss_recons + loss_kl + loss_v + loss_im_recons + loss_im_kl
 
