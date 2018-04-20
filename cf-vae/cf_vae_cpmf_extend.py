@@ -21,7 +21,7 @@ class params:
         self.C_a = 1.0
         self.C_b = 0.01
         self.lambda_u = 0.1
-        self.lambda_v = 10.0
+        self.lambda_v = 1.0
         self.lambda_r = 1.0
         self.max_iter_m = 30
 
@@ -193,7 +193,9 @@ class cf_vae_extend:
                 self.loss_e_step = loss_recons + loss_kl + loss_v
 
             elif self.model == 1:
-                loss_im_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_im_), K.flatten(x_im_recons))
+                x_im_f = Flatten()(x_im_)
+                x_im_recons_f = Flatten()(x_im_recons)
+                loss_im_recons = tf.reduce_sum(binary_crossentropy(x_im_f, x_im_recons_f), axis=1)
                 loss_im_kl = 0.5 * tf.reduce_sum(tf.square(z_im_mu) + tf.exp(z_im_log_sigma_sq) - z_im_log_sigma_sq - 1, 1)
                 loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z  - z_im), 1))
                 self.loss_e_step = loss_recons + loss_kl + loss_v + K.mean(loss_im_recons + loss_im_kl)
