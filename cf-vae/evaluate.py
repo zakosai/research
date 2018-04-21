@@ -4,19 +4,29 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.sparse import load_npz
 from cf_vae_cpmf_extend import cf_vae_extend, params
+import argparse
+import os
 
+parser = argparse.ArgumentParser(description='Process some integers.')
 
-def load_cvae_data():
+parser.add_argument('--ckpt_folder',  type=str, default='pre_model/exp1/',
+                   help='where model is stored')
+parser.add_argument('--data_dir',  type=str, default='data/amazon',
+                   help='where model is stored')
+args = parser.parse_args()
+ckpt = args.ckpt_folder
+data_dir = args.data_dir
+
+def load_cvae_data(data_dir):
   data = {}
-  data_dir = "data/amazon/"
   # variables = scipy.io.loadmat(data_dir + "mult_nor.mat")
   # data["content"] = variables['X']
-  variables = load_npz("data/amazon/mult_nor-small.npz")
+  variables = load_npz(os.path.join(data_dir, "mult_nor-small.npz"))
   data["content"] = variables.toarray()
-  data["train_users"] = load_rating(data_dir + "cf-train-1-users-small.dat")
-  data["train_items"] = load_rating(data_dir + "cf-train-1-items-small.dat")
-  data["test_users"] = load_rating(data_dir + "cf-test-1-users-small.dat")
-  data["test_items"] = load_rating(data_dir + "cf-test-1-items-small.dat")
+  data["train_users"] = load_rating(os.path.join(data_dir + "cf-train-1-users-small.dat"))
+  data["train_items"] = load_rating(os.path.join(data_dir + "cf-train-1-items-small.dat"))
+  data["test_users"] = load_rating(os.path.join(data_dir + "cf-test-1-users-small.dat"))
+  data["test_items"] = load_rating(os.path.join(data_dir + "cf-test-1-items-small.dat"))
 
   return data
 
@@ -40,17 +50,17 @@ params.C_b = 0.01
 params.max_iter_m = 1
 
 
-data = load_cvae_data()
+data = load_cvae_data(data_dir)
 num_factors = 50
 model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[2000, 1000], z_dim = 500, decoding_dims=[1000, 2000, 8000], decoding_dims_str=[100,200, 1863],
     loss_type='cross_entropy')
-model.load_model("pre_model/v1/cf_vae_0.mat")
+model.load_model(os.path.join(ckpt, "cf_vae_0.mat"))
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
 recalls= model.predict(pred, data['train_users'], data['test_users'], 10)
 
-model.load_model("pre_model/v1/cf_vae_1.mat")
+model.load_model(os.path.join(ckpt, "cf_vae_1.mat"))
 pred = model.predict_all()
 recalls_1 = model.predict(pred, data['train_users'], data['test_users'], 10)
 
@@ -78,7 +88,8 @@ plt.plot(np.arange(1, 10, 1), recalls_1, '-r', label="img-extend")
 # plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="zdim=500")
 
 plt.legend(loc='upper left')
-plt.savefig("result/recall_amzon_v1.png")
+data_dir = data_dir.split("/")[1]
+plt.savefig("result/recall_%s_%s.png"%(data_dir, ckpt))
 plt.close()
 
 # plt.figure()
