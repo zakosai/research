@@ -89,6 +89,7 @@ plt.plot(np.arange(1, 10, 1), recalls_1, '-r', label="img-extend")
 
 plt.legend(loc='upper left')
 data_dir = data_dir.split("/")[1]
+ckpt = ckpt.split("/")[-1]
 plt.savefig("result/recall_%s_%s.png"%(data_dir, ckpt))
 plt.close()
 
