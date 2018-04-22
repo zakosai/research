@@ -61,10 +61,10 @@ def load_rating(path):
 
 
 params = params()
-params.lambda_u = 0.01
+params.lambda_u = 0.1
 params.lambda_v = 10
 params.lambda_r = 1
-params.C_a = 1
+params.C_a = 10
 params.C_b = 0.01
 params.max_iter_m = 1
 params.EM_iter = args.iter
@@ -124,11 +124,11 @@ model.fit(data["train_users"], data["train_items"], data["content"],img, data["s
 model.save_model(os.path.join(ckpt,"cf_vae_%d.mat"%(model_type)))
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
-recalls = model.predict(pred, data['train_users'], data['test_users'], 10)
+recalls = model.predict(pred, data['train_users'], data['test_users'], 40)
 # recalls.append(recall)
 plt.figure()
 plt.ylabel("Recall@M")
 plt.xlabel("M")
-plt.plot(np.arange(1, 10, 1),recalls)
+plt.plot(np.arange(5, 40, 5),recalls)
 plt.savefig(os.path.join(ckpt, "cvae_%d.png"%(model_type)))
 plt.close()
