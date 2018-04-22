@@ -84,7 +84,7 @@ plt.figure()
 plt.ylabel("Recall@M")
 plt.xlabel("M")
 plt.plot(np.arange(5, 40, 5),recalls, '-b', label="cvae")
-plt.plot(np.arange(1, 10, 1), recalls_1, '-r', label="img-extend")
+plt.plot(np.arange(5, 40, 5), recalls_1, '-r', label="img-extend")
 # plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="zdim=500")
 
 plt.legend(loc='upper left')
