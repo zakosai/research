@@ -64,12 +64,12 @@ params = params()
 params.lambda_u = 0.1
 params.lambda_v = 10
 params.lambda_r = 1
-params.C_a = 10
+params.C_a = 1
 params.C_b = 0.01
 params.max_iter_m = 1
 params.EM_iter = args.iter
 
-C = [0.1, 1]
+C = [0.1, 1, 10]
 
 # # for updating W and b in vae
 # self.learning_rate = 0.001
@@ -87,48 +87,49 @@ img = img.astype(np.float32)/255
 num_factors = 50
 
 
-# i = 0
-# recalls = []
-# for u in C:
-#     params.lambda_u = u
-#     for v in C:
-#         params.lambda_v = v
-#         for r in C:
-#             params.lambda_r = r
-#
-#             model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
-#                                   input_dim=8000, encoding_dims=[1000, 200], z_dim = 50, decoding_dims=[200, 1000, 8000],
-#                                   decoding_dims_str=[100,200, 1863], loss_type='cross_entropy', model = model_type, ckpt_folder=ckpt, initial=initial)
-#             model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params)
-#             model.save_model(os.path.join(ckpt,"cf_vae_%d_%d.mat"%(model_type, i)))
-#             # model.load_model("cf_vae.mat")
-#             pred = model.predict_all()
-#             recall = model.predict(pred, data['train_users'], data['test_users'], 10)
-#             recalls.append(recall)
-#             plt.figure()
-#             plt.ylabel("Recall@M")
-#             plt.xlabel("M")
-#             plt.plot(np.arange(1, 10, 1),recalls)
-#             plt.savefig(os.path.join(ckpt, "cvae_%d_%d.png"%(model_type, i)))
-#             plt.close()
-#
-# with open(os.path.join(ckpt, "result_%d.csv"%model_type), "w") as csvfile:
-#     wr = csv.writer(csvfile)
-#     wr.writerows(recalls)
+i = 0
+recalls = []
+for u in C:
+    params.lambda_u = u
+    for v in C:
+        params.lambda_v = v
+        for r in C:
+            params.lambda_r = r
+
+            model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
+                                  input_dim=8000, encoding_dims=[1000, 200], z_dim = 50, decoding_dims=[200, 1000, 8000],
+                                  decoding_dims_str=[100,200, 1863], loss_type='cross_entropy', model = model_type, ckpt_folder=ckpt, initial=initial)
+            model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params)
+            model.save_model(os.path.join(ckpt,"cf_vae_%d_%d.mat"%(model_type, i)))
+            # model.load_model("cf_vae.mat")
+            pred = model.predict_all()
+            recall = model.predict(pred, data['train_users'], data['test_users'], 40)
+            recalls.append(recall)
+            plt.figure()
+            plt.ylabel("Recall@M")
+            plt.xlabel("M")
+            plt.plot(np.arange(5, 40, 5),recalls)
+            plt.savefig(os.path.join(ckpt, "cvae_%d_%d.png"%(model_type, i)))
+            plt.close()
+
+print(recalls)
+with open(os.path.join(ckpt, "result_%d.csv"%model_type), "w") as csvfile:
+    wr = csv.writer(csvfile)
+    wr.writerows(recalls)
 
 
-model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
-                      input_dim=8000, encoding_dims=[1000, 200], z_dim = 50, decoding_dims=[200, 1000, 8000],
-                      decoding_dims_str=[100,200, 1863], loss_type='cross_entropy', model = model_type, ckpt_folder=ckpt, initial=initial)
-model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params)
-model.save_model(os.path.join(ckpt,"cf_vae_%d.mat"%(model_type)))
-# model.load_model("cf_vae.mat")
-pred = model.predict_all()
-recalls = model.predict(pred, data['train_users'], data['test_users'], 40)
-# recalls.append(recall)
-plt.figure()
-plt.ylabel("Recall@M")
-plt.xlabel("M")
-plt.plot(np.arange(5, 40, 5),recalls)
-plt.savefig(os.path.join(ckpt, "cvae_%d.png"%(model_type)))
-plt.close()
+# model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
+#                       input_dim=8000, encoding_dims=[1000, 200], z_dim = 50, decoding_dims=[200, 1000, 8000],
+#                       decoding_dims_str=[100,200, 1863], loss_type='cross_entropy', model = model_type, ckpt_folder=ckpt, initial=initial)
+# model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params)
+# model.save_model(os.path.join(ckpt,"cf_vae_%d.mat"%(model_type)))
+# # model.load_model("cf_vae.mat")
+# pred = model.predict_all()
+# recalls = model.predict(pred, data['train_users'], data['test_users'], 40)
+# # recalls.append(recall)
+# plt.figure()
+# plt.ylabel("Recall@M")
+# plt.xlabel("M")
+# plt.plot(np.arange(5, 40, 5),recalls)
+# plt.savefig(os.path.join(ckpt, "cvae_%d.png"%(model_type)))
+# plt.close()
