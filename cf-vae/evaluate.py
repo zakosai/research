@@ -58,11 +58,11 @@ model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, 
 model.load_model(os.path.join(ckpt, "cf_vae_0.mat"))
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
-recalls= model.predict(pred, data['train_users'], data['test_users'], 10)
+recalls= model.predict(pred, data['train_users'], data['test_users'], 40)
 
 model.load_model(os.path.join(ckpt, "cf_vae_1.mat"))
 pred = model.predict_all()
-recalls_1 = model.predict(pred, data['train_users'], data['test_users'], 10)
+recalls_1 = model.predict(pred, data['train_users'], data['test_users'], 40)
 
 # model.load_model("pre_model/zdim2/cf_vae_0.mat")
 # pred = model.predict_all()
@@ -83,14 +83,14 @@ recalls_1 = model.predict(pred, data['train_users'], data['test_users'], 10)
 plt.figure()
 plt.ylabel("Recall@M")
 plt.xlabel("M")
-plt.plot(np.arange(1, 10, 1),recalls, '-b', label="cvae")
+plt.plot(np.arange(5, 40, 5),recalls, '-b', label="cvae")
 plt.plot(np.arange(1, 10, 1), recalls_1, '-r', label="img-extend")
 # plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="zdim=500")
 
 plt.legend(loc='upper left')
 data_dir = data_dir.split("/")[1]
 ckpt = ckpt.split("/")[-1]
-plt.savefig("result/recall_%s_%s.png"%(data_dir, ckpt))
+plt.savefig("result/recall_40_%s_%s.png"%(data_dir, ckpt))
 plt.close()
 
 # plt.figure()
