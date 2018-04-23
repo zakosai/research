@@ -198,9 +198,9 @@ class cf_vae_extend:
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
         # LOAD TEXT#
-        ckpt = "pre_model/dae/cf_dae_%d.ckpt"%self.model
+        ckpt = "pre3/dae/cf_dae_%d.ckpt"%self.model
         if self.initial:
-            ckpt_file = "pre_model/dae/" + "dae_text.ckpt"
+            ckpt_file = "pre3/dae/" + "dae_text.ckpt"
             text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
             text_saver = tf.train.Saver(var_list=text_varlist)
             # if init == True:
@@ -208,14 +208,14 @@ class cf_vae_extend:
 
             # LOAD IMAGE##
             if self.model == 1 or self.model == 2:
-                ckpt_file_img = "pre_model/dae/" + "dae_image_resnet.ckpt"
+                ckpt_file_img = "pre3/dae/" + "dae_image_resnet.ckpt"
                 img_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="image")
                 img_saver = tf.train.Saver(var_list=img_varlist)
                 img_saver.restore(self.sess, ckpt_file_img)
 
             # Load Structure
             if self.model == 2 or self.model == 3:
-                ckpt_file = "pre_model/dae/" + "dae_structure.ckpt"
+                ckpt_file = "pre3/dae/" + "dae_structure.ckpt"
                 structure_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="structure")
                 structure_saver = tf.train.Saver(var_list=structure_varlist)
                 structure_saver.restore(self.sess, ckpt_file)
