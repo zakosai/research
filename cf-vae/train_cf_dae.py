@@ -53,6 +53,7 @@ params.lambda_r = 1
 params.C_a = 1
 params.C_b = 0.01
 params.max_iter_m = 1
+params.EM_iter = 15
 
 
 # # for updating W and b in vae
