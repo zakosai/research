@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from vae import vanilla_vae
+from ave import vanilla_vae
 import scipy.io as sio
 from scipy.sparse import load_npz
 import argparse
