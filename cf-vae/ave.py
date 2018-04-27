@@ -130,9 +130,9 @@ class vanilla_vae:
             for i in range(epochs):
                 idx = np.random.choice(x_input.shape[0], batch_size, replace=False)
                 x_batch = x_input[idx]
-                ELBO_out, g_loss = sess.run([loss_primal, train_op_primal], feed_dict={x_real:x_batch})
-                g_loss = sess.run(train_op_primal, feed_dict={x_real:x_batch})
-                d_loss = sess.run(train_op_dual, feed_dict={x_real:x_batch})
+                sess.run([loss_primal, train_op_primal], feed_dict={x_real:x_batch})
+                g_loss, _ = sess.run([loss_primal, train_op_primal], feed_dict={x_real:x_batch})
+                d_loss, _ = sess.run([loss_dual, train_op_dual], feed_dict={x_real:x_batch})
                 if i % self.print_size == 0:
                     print("epoches: %d\t g_loss: %f\t d_loss: %f\t time: %d s"%(i, g_loss, d_loss, time.time()-start))
 
