@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorbayes.layers import dense, placeholder, conv2d, conv2d_transpose
+from tensorbayes.layers import dense, placeholder, conv2d, conv2d_transpose, max_pool
 from tensorbayes.utils import progbar
 from tensorbayes.tfutils import softmax_cross_entropy_with_two_logits
 from keras.metrics import binary_crossentropy
@@ -61,7 +61,8 @@ class vanilla_vae:
             x = conv2d(x, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
             x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
             x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
-            x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
+            # x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
+            x = max_pool(x, kernel_size=(3,3), strides=(2,2))
             # num_blocks = 3
             # is_training = True
             # data_format = 'channels_last'
