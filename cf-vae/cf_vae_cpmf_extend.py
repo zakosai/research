@@ -1,6 +1,6 @@
 import tensorflow as tf
 import os
-from tensorbayes.layers import dense, placeholder, conv2d, conv2d_transpose
+from tensorbayes.layers import dense, placeholder, conv2d, conv2d_transpose, max_pool
 from tensorbayes.utils import progbar
 from tensorbayes.tfutils import softmax_cross_entropy_with_two_logits
 from keras.backend import binary_crossentropy
@@ -132,7 +132,9 @@ class cf_vae_extend:
                 x_im = conv2d(x_im, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
                 x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
                 x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
-                x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
+                # x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
+                x = max_pool(x, kernel_size=(3,3), strides=(2,2))
+
 
                 # num_blocks = 3
                 # is_training = True
