@@ -84,7 +84,7 @@ tf.set_random_seed(0)
 images = np.fromfile(os.path.join(data_dir,"images.bin"), dtype=np.uint8)
 img = images.reshape((16000, 64, 64, 3))
 img = img.astype(np.float32)/255
-num_factors = 500
+num_factors = 50
 
 
 i = 0
