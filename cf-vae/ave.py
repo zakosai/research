@@ -113,9 +113,9 @@ class vanilla_vae:
             optimizer_primal = tf.train.AdamOptimizer(2e-5)
             optimizer_dual = tf.train.AdamOptimizer(1e-4)
 
-            qvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, "encoder")
-            pvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, "decoder")
-            dvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, "discriminator")
+            qvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope +"/encoder")
+            pvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope +"/decoder")
+            dvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope + "/discriminator")
 
         train_op_primal = optimizer_primal.minimize(loss_primal, var_list=pvars+qvars)
         train_op_dual = optimizer_dual.minimize(loss_dual, var_list=dvars)
