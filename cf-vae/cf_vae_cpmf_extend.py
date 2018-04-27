@@ -133,7 +133,7 @@ class cf_vae_extend:
                 x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
                 x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
                 # x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
-                x = max_pool(x, kernel_size=(3,3), strides=(2,2))
+                x_im = max_pool(x_im, kernel_size=(3,3), strides=(2,2))
 
 
                 # num_blocks = 3
