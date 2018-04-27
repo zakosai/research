@@ -99,23 +99,23 @@ class vanilla_vae:
             Tjoint = discriminator(x_real, z_inferred)
             Tseperate = discriminator(x_real, z_sampled)
 
-            reconstr_err = tf.reduce_sum(
-                tf.nn.sigmoid_cross_entropy_with_logits(labels=x_real, logits=x_reconstr_logits),
-                axis=1
-            )
+        reconstr_err = tf.reduce_sum(
+            tf.nn.sigmoid_cross_entropy_with_logits(labels=x_real, logits=x_reconstr_logits),
+            axis=1
+        )
 
-            loss_primal = tf.reduce_mean(reconstr_err + Tjoint)
-            loss_dual = tf.reduce_mean(
-                tf.nn.sigmoid_cross_entropy_with_logits(logits=Tjoint, labels=tf.ones_like(Tjoint))
-                + tf.nn.sigmoid_cross_entropy_with_logits(logits=Tseperate, labels=tf.zeros_like(Tseperate))
-            )
+        loss_primal = tf.reduce_mean(reconstr_err + Tjoint)
+        loss_dual = tf.reduce_mean(
+            tf.nn.sigmoid_cross_entropy_with_logits(logits=Tjoint, labels=tf.ones_like(Tjoint))
+            + tf.nn.sigmoid_cross_entropy_with_logits(logits=Tseperate, labels=tf.zeros_like(Tseperate))
+        )
 
-            optimizer_primal = tf.train.AdamOptimizer(2e-5)
-            optimizer_dual = tf.train.AdamOptimizer(1e-4)
+        optimizer_primal = tf.train.AdamOptimizer(2e-5)
+        optimizer_dual = tf.train.AdamOptimizer(1e-4)
 
-            qvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope +"/encoder")
-            pvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope +"/decoder")
-            dvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope + "/discriminator")
+        qvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope +"/encoder")
+        pvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope +"/decoder")
+        dvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope + "/discriminator")
 
         train_op_primal = optimizer_primal.minimize(loss_primal, var_list=pvars+qvars)
         train_op_dual = optimizer_dual.minimize(loss_dual, var_list=dvars)
