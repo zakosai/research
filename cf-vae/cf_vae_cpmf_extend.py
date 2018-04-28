@@ -302,7 +302,7 @@ class cf_vae_extend:
                              params.C_b * np.dot(self.U[~idx_a].T, self.U[~idx_a]) + \
                              np.eye(self.num_factors) * params.lambda_v
 
-                rx = params.C_a * np.sum(self.U[items[v], :], axis=0) + params.lambda_v * self.exp_z[v, :]
+                rx = params.C_a * np.sum(self.U[items[v], :], axis=0) + params.lambda_v * (self.exp_z[v, :] + self.exp_z_im)
                 self.V[v, :] = scipy.linalg.solve(Lambda_inv, rx, check_finite=True)
 
             print("iter: %d\t time:%d" %(i, time.time()-start))
