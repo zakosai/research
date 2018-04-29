@@ -84,7 +84,7 @@ tf.set_random_seed(0)
 images = np.fromfile(os.path.join(data_dir,"images.bin"), dtype=np.uint8)
 img = images.reshape((16000, 64, 64, 3))
 img = img.astype(np.float32)/255
-num_factors = 50
+num_factors = 500
 
 
 # i = 0
@@ -119,7 +119,7 @@ num_factors = 50
 
 
 model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
-                      input_dim=8000, encoding_dims=[1000, 200], z_dim = 50, decoding_dims=[200, 1000, 8000],
+                      input_dim=8000, encoding_dims=[2000, 1000], z_dim = 500, decoding_dims=[1000, 2000, 8000],
                       decoding_dims_str=[100,200, 1863], loss_type='cross_entropy', model = model_type, ckpt_folder=ckpt, initial=initial)
 model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params)
 model.save_model(os.path.join(ckpt,"cf_vae_%d.mat"%(model_type)))
