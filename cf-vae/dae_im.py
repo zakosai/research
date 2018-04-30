@@ -10,6 +10,7 @@ from keras import backend as K
 from keras import metrics
 import numpy as np
 import time
+import os
 from resnet_model import conv2d_fixed_padding, block_layer, building_block
 class vanilla_vae:
     """
@@ -17,7 +18,8 @@ class vanilla_vae:
     you can customize the activation functions pf each layer yourself.
     """
 
-    def __init__(self, width, height, channel=3, filter=64, intermediate_dim=256, num_conv=4, num_layers=4, z_dim=50, loss="cross_entropy", useTranse = False, eps = 1e-10):
+    def __init__(self, width, height, channel=3, filter=64, intermediate_dim=256, num_conv=4, num_layers=4,
+                 z_dim=50, loss="cross_entropy", useTranse = False, eps = 1e-10, ckpt_folder="pre3/dae"):
         # useTranse: if we use trasposed weigths of inference nets
         # eps for numerical stability
         # structural info
@@ -34,6 +36,7 @@ class vanilla_vae:
         self.eps = eps
         self.weights = []    # better in np form. first run, then append in
         self.bias = []
+        self.ckpt = ckpt_folder
 
 
 
@@ -57,34 +60,34 @@ class vanilla_vae:
 
             # for i in range(self.num_conv):
             #     x = conv2d(x, self.filter * np.power(2, i),kernel_size=(2,2), strides=(2,2), scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
-            # x = conv2d(x, 64,kernel_size=(3,3), strides=(2,2), scope="enc_layer0", activation=tf.nn.relu)
-            # x = conv2d(x, 128,kernel_size=(3,3), strides=(2,2), scope="enc_layer1", activation=tf.nn.relu)
-            # x = conv2d(x, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
-            # x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
-            # x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
-            # x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
-            num_blocks = 3
-            is_training = True
-            data_format = 'channels_last'
-            x = conv2d_fixed_padding( inputs=x, filters=64, kernel_size=3, strides=1,
-                                           data_format=data_format)
-            x = tf.identity(x, 'initial_conv')
-
-            x = block_layer(inputs=x, filters=64, block_fn=building_block, blocks=num_blocks,
-                                 strides=2, is_training=is_training, name='block_layer1', data_format=data_format)
-
-            x = block_layer(inputs=x, filters=128, block_fn=building_block, blocks=num_blocks,
-                                 strides=2, is_training=is_training, name='block_layer2', data_format=data_format)
-
-            x = block_layer(inputs=x, filters=256, block_fn=building_block, blocks=num_blocks,
-                                strides=2, is_training=is_training, name='block_layer3',data_format=data_format)
-
-            x = block_layer(inputs=x, filters=512, block_fn=building_block, blocks=num_blocks,
-                                 strides=2, is_training=is_training, name='block_layer4', data_format=data_format)
-            x = block_layer(inputs=x, filters=512, block_fn=building_block, blocks=num_blocks,
-                                 strides=2, is_training=is_training, name='block_layer5', data_format=data_format)
-            x = block_layer(inputs=x, filters=512, block_fn=building_block, blocks=num_blocks,
-                                 strides=2, is_training=is_training, name='block_layer6', data_format=data_format)
+            x = conv2d(x, 64,kernel_size=(3,3), strides=(2,2), scope="enc_layer0", activation=tf.nn.relu)
+            x = conv2d(x, 128,kernel_size=(3,3), strides=(2,2), scope="enc_layer1", activation=tf.nn.relu)
+            x = conv2d(x, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
+            x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
+            x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
+            x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
+            # num_blocks = 3
+            # is_training = True
+            # data_format = 'channels_last'
+            # x = conv2d_fixed_padding( inputs=x, filters=64, kernel_size=3, strides=1,
+            #                                data_format=data_format)
+            # x = tf.identity(x, 'initial_conv')
+            #
+            # x = block_layer(inputs=x, filters=64, block_fn=building_block, blocks=num_blocks,
+            #                      strides=2, is_training=is_training, name='block_layer1', data_format=data_format)
+            #
+            # x = block_layer(inputs=x, filters=128, block_fn=building_block, blocks=num_blocks,
+            #                      strides=2, is_training=is_training, name='block_layer2', data_format=data_format)
+            #
+            # x = block_layer(inputs=x, filters=256, block_fn=building_block, blocks=num_blocks,
+            #                     strides=2, is_training=is_training, name='block_layer3',data_format=data_format)
+            #
+            # x = block_layer(inputs=x, filters=512, block_fn=building_block, blocks=num_blocks,
+            #                      strides=2, is_training=is_training, name='block_layer4', data_format=data_format)
+            # x = block_layer(inputs=x, filters=512, block_fn=building_block, blocks=num_blocks,
+            #                      strides=2, is_training=is_training, name='block_layer5', data_format=data_format)
+            # x = block_layer(inputs=x, filters=512, block_fn=building_block, blocks=num_blocks,
+            #                      strides=2, is_training=is_training, name='block_layer6', data_format=data_format)
             flat = Flatten()(x)
             print(flat.shape)
             h_encode = Dense(self.intermediate_dim, activation='relu')(flat)
@@ -120,7 +123,7 @@ class vanilla_vae:
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
         saver = tf.train.Saver(tf.get_collection(tf.GraphKeys.VARIABLES, scope=scope))
-        ckpt_file = "pre_model/dae/" + "dae_%s_resnet.ckpt" %scope
+        ckpt_file = os.path.join(self.ckpt,"vae_%s.ckpt" %scope)
         if train == True:
             # num_turn = x_input.shape[0] / self.batch_size
             start = time.time()

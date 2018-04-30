@@ -6,13 +6,14 @@ from tensorbayes.tfutils import softmax_cross_entropy_with_two_logits
 from keras.backend import binary_crossentropy
 import numpy as np
 import time
+import os
 class vanilla_vae:
     """
     build a vanilla vae
     you can customize the activation functions pf each layer yourself.
     """
 
-    def __init__(self, input_dim, encoding_dims, z_dim, decoding_dims, loss="cross_entropy", useTranse = False, eps = 1e-10):
+    def __init__(self, input_dim, encoding_dims, z_dim, decoding_dims, loss="cross_entropy", useTranse = False, eps = 1e-10, ckpt_folder="pre3/dae"):
         # useTranse: if we use trasposed weigths of inference nets
         # eps for numerical stability
         # structural info
@@ -25,6 +26,7 @@ class vanilla_vae:
         self.eps = eps
         self.weights = []    # better in np form. first run, then append in
         self.bias = []
+        self.ckpt = ckpt_folder
 
 
 
@@ -78,7 +80,7 @@ class vanilla_vae:
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
         saver = tf.train.Saver(tf.get_collection(tf.GraphKeys.VARIABLES, scope=scope))
-        ckpt_file = "pre3/dae/" + "dae_%s.ckpt" %scope
+        ckpt_file = os.path.join(self.ckpt,"dae_%s.ckpt" %scope)
         if train == True:
             # num_turn = x_input.shape[0] / self.batch_size
             start = time.time()
