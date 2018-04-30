@@ -15,6 +15,7 @@ import scipy.io as sio
 from operator import add
 from resnet_model import conv2d_fixed_padding, building_block, block_layer
 import ml_metrics
+import math
 
 class params:
     def __init__(self):
@@ -272,7 +273,84 @@ class cf_vae_extend:
             self.x_s_recons = x_s_recons
         self.saver.save(self.sess, ckpt)
         return None
+    def pmf_estimate(self, users, items, params):
+        """
+        users: list of list
+        """
+        min_iter = 1
+        a_minus_b = params.a - params.b
+        converge = 1.0
+        likelihood_old = 0.0
+        likelihood = -math.exp(20)
+        it = 0
+        while ((it < params.max_iter_m and converge > 1e-6) or it < min_iter):
+            likelihood_old = likelihood
+            likelihood = 0
+            # update U
+            # VV^T for v_j that has at least one user liked
+            ids = np.array([len(x) for x in items]) > 0
+            v = self.V[ids]
+            VVT = np.dot(v.T, v)
+            XX = VVT * params.b + np.eye(self.m_num_factors) * params.lambda_u
 
+            for i in xrange(len(users)):
+                item_ids = users[i]
+                n = len(item_ids)
+                if n > 0:
+                    A = np.copy(XX)
+                    A += np.dot(self.V[item_ids, :].T, self.V[item_ids,:])*a_minus_b
+                    x = params.a * np.sum(self.V[item_ids, :], axis=0)
+                    self.U[i, :] = scipy.linalg.solve(A, x)
+
+                    likelihood += -0.5 * params.lambda_u * np.sum(self.U[i]*self.U[i])
+
+            # update V
+            ids = np.array([len(x) for x in users]) > 0
+            u = self.U[ids]
+            XX = np.dot(u.T, u) * params.b
+            for j in xrange(len(items)):
+                user_ids = items[j]
+                m = len(user_ids)
+                if m>0 :
+                    A = np.copy(XX)
+                    A += np.dot(self.U[user_ids,:].T, self.U[user_ids,:])*a_minus_b
+                    B = np.copy(A)
+                    A += np.eye(self.z_dim) * params.lambda_v
+                    x = params.a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
+                    self.V[j, :] = scipy.linalg.solve(A, x)
+
+                    likelihood += -0.5 * m * params.a
+                    likelihood += params.a * np.sum(np.dot(self.U[user_ids, :], self.V[j,:][:, np.newaxis]),axis=0)
+                    likelihood += -0.5 * self.V[j,:].dot(B).dot(self.v[j,:][:,np.newaxis])
+
+                    ep = self.m_V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:]
+                    likelihood += -0.5 * params.lambda_v * np.sum(ep*ep)
+                else:
+                    # m=0, this article has never been rated
+                    A = np.copy(XX)
+                    A += np.eye(self.z_dim) * params.lambda_v
+                    x = params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
+                    self.m_V[j, :] = scipy.linalg.solve(A, x)
+
+                    ep = self.m_V[j,:] - self.exp_z[j,:]- self.exp_z_im[j,:]
+                    likelihood += -0.5 * params.lambda_v * np.sum(ep*ep)
+            # computing negative log likelihood
+            #likelihood += -0.5 * params.lambda_u * np.sum(self.m_U * self.m_U)
+            #likelihood += -0.5 * params.lambda_v * np.sum(self.m_V * self.m_V)
+            # split R_ij into 0 and 1
+            # -sum(0.5*C_ij*(R_ij - u_i^T * v_j)^2) = -sum_ij 1(R_ij=1) 0.5*C_ij +
+            #  sum_ij 1(R_ij=1) C_ij*u_i^T * v_j - 0.5 * sum_j v_j^T * U C_i U^T * v_j
+
+            it += 1
+            converge = abs(1.0*(likelihood - likelihood_old)/likelihood_old)
+
+            if self.verbose:
+                if likelihood < likelihood_old:
+                    print("likelihood is decreasing!")
+
+                print("[iter=%04d], likelihood=%.5f, converge=%.10f" % (it, likelihood, converge))
+
+        return likelihood
 
     def m_step(self, users, items, params):
         num_users = len(users)
@@ -317,7 +395,7 @@ class cf_vae_extend:
                 self.exp_z_im = np.concatenate((self.exp_z_im, exp_z_im), axis=0)
         else:
         # print(self.exp_z_im.shape)
-             self.exp_z_im = 0
+             self.exp_z_im = np.zeros((params.batch_size, self.z_dim))
 
         if self.model == 2 or self.model == 3:
             self.exp_z_s = self.sess.run(self.z_s_mu, feed_dict={self.x_s_: str_data})
@@ -332,7 +410,7 @@ class cf_vae_extend:
         for i in range(params.EM_iter):
             print("iter: %d"%i)
 
-            self.m_step(users, items, params)
+            self.pmf_estimate(users, items, params)
             self.e_step(x_data, im_data, str_data)
             self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
 
