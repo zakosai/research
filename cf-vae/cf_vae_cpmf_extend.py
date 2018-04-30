@@ -307,7 +307,7 @@ class cf_vae_extend:
             # update V
             ids = np.array([len(x) for x in users]) > 0
             u = self.U[ids]
-            XX = np.dot(u.T, u) * params.b
+            XX = np.dot(u.T, u) * params.C_b
             for j in xrange(len(items)):
                 user_ids = items[j]
                 m = len(user_ids)
@@ -323,7 +323,7 @@ class cf_vae_extend:
                     likelihood += params.C_a * np.sum(np.dot(self.U[user_ids, :], self.V[j,:][:, np.newaxis]),axis=0)
                     likelihood += -0.5 * self.V[j,:].dot(B).dot(self.v[j,:][:,np.newaxis])
 
-                    ep = self.m_V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:]
+                    ep = self.V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:]
                     likelihood += -0.5 * params.lambda_v * np.sum(ep*ep)
                 else:
                     # m=0, this article has never been rated
