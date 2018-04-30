@@ -321,7 +321,7 @@ class cf_vae_extend:
 
                     likelihood += -0.5 * m * params.C_a
                     likelihood += params.C_a * np.sum(np.dot(self.U[user_ids, :], self.V[j,:][:, np.newaxis]),axis=0)
-                    likelihood += -0.5 * self.V[j,:].dot(B).dot(self.v[j,:][:,np.newaxis])
+                    likelihood += -0.5 * self.V[j,:].dot(B).dot((self.V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:])[:,np.newaxis])
 
                     ep = self.V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:]
                     likelihood += -0.5 * params.lambda_v * np.sum(ep*ep)
