@@ -64,6 +64,10 @@ model.load_model(os.path.join(ckpt, "cf_vae_1.mat"))
 pred = model.predict_all()
 recalls_1 = model.predict(pred, data['train_users'], data['test_users'], 40)
 
+model.load_model(os.path.join(ckpt, "cf_dae.mat"))
+pred = model.predict_all()
+recalls_2 = model.predict(pred, data['train_users'], data['test_users'], 40)
+
 # model.load_model("pre_model/zdim2/cf_vae_0.mat")
 # pred = model.predict_all()
 # recalls_2 = model.predict(pred, data['train_users'], data['test_users'], 40)
@@ -83,8 +87,10 @@ recalls_1 = model.predict(pred, data['train_users'], data['test_users'], 40)
 plt.figure()
 plt.ylabel("Recall@M")
 plt.xlabel("M")
-plt.plot(np.arange(5, 40, 5),recalls, '-b', label="cvae")
-plt.plot(np.arange(5, 40, 5), recalls_1, '-r', label="img-extend")
+plt.plot(np.arange(5, 40, 5), recalls_1, '-r', label="our model")
+plt.plot(np.arange(5, 40, 5),recalls, '-b', label="CVAE")
+plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="CDL")
+
 # plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="zdim=500")
 
 plt.legend(loc='upper left')
