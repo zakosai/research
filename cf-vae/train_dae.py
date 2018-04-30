@@ -3,13 +3,25 @@ import numpy as np
 from dae import vanilla_vae
 import scipy.io as sio
 from scipy.sparse import load_npz
+import argparse
 
 np.random.seed(0)
 tf.set_random_seed(0)
 
+parser = argparse.ArgumentParser(description='Process some integers.')
+
+parser.add_argument('--ckpt_folder',  type=str, default='pre_model/exp1/',
+                   help='where model is stored')
+parser.add_argument('--data_dir',  type=str, default='data/amazon',
+                   help='where model is stored')
+
+args = parser.parse_args()
+ckpt = args.ckpt_folder
+dir = args.data_dir
+
 # variables = sio.loadmat("data/citeulike-a/mult_nor.mat")
 # data = variables['X']
-variables = load_npz("data/amazon2/mult_nor-small.npz")
+variables = load_npz(dir + "/mult_nor-small.npz")
 data = variables.toarray()
 idx = np.random.rand(data.shape[0]) < 0.8
 train_X = data[idx]
@@ -21,7 +33,7 @@ test_X = data[~idx]
 # train_img = images[idx]
 # test_img = images[~idx]
 
-model = vanilla_vae(input_dim=8000, encoding_dims=[2000, 1000], z_dim=500, decoding_dims=[1000, 2000, 8000], loss='cross_entropy')
+model = vanilla_vae(input_dim=8000, encoding_dims=[2000, 1000], z_dim=500, decoding_dims=[1000, 2000, 8000], loss='cross_entropy', ckpt_folder=ckpt)
 # As there will be an additional layer from 100 to 50 in the encoder. in decoder, we also take this layer
                     # lr=0.01, batch_size=128, print_step=50)
 print('fitting data starts...')

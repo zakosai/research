@@ -13,6 +13,7 @@ import scipy
 import scipy.io as sio
 from operator import add
 from resnet_model import conv2d_fixed_padding, building_block, block_layer
+import os
 
 class params:
     def __init__(self):
@@ -31,7 +32,7 @@ class params:
 
 class cf_vae_extend:
     def __init__(self, num_users, num_items, num_factors, params, input_dim, encoding_dims, z_dim, decoding_dims,
-                 decoding_dims_str, loss_type="cross_entropy", useTranse = False, eps = 1e-10, model=0):
+                 decoding_dims_str, loss_type="cross_entropy", useTranse = False, eps = 1e-10, model=0, ckpt_folder="pre3/dae"):
         self.num_users = num_users
         self.num_items = num_items
         self.num_factors = num_factors
@@ -59,7 +60,7 @@ class cf_vae_extend:
         self.intermediate_dim = 256
         self.filter = 64
         self.model = model #0 -> only text, 1-> text + image, 2 -> text + image + structure, 3-> text + structure
-
+        self.ckpt =ckpt_folder
 
     # def e_step(self, x_data, reuse = None):
     def e_step(self, x_data, im_data, str_data):
@@ -116,35 +117,35 @@ class cf_vae_extend:
                 # for i in range(self.num_conv):
                 #     x_im = conv2d(x_im, self.filter * np.power(2, i),kernel_size=(2,2), strides=(2,2), scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
 
-                # x_im = conv2d(x_im, 64,kernel_size=(3,3), strides=(2,2), scope="enc_layer0", activation=tf.nn.relu)
-                # x_im = conv2d(x_im, 128,kernel_size=(3,3), strides=(2,2), scope="enc_layer1", activation=tf.nn.relu)
-                # x_im = conv2d(x_im, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
-                # x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
-                # x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
-                # x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
+                x_im = conv2d(x_im, 64,kernel_size=(3,3), strides=(2,2), scope="enc_layer0", activation=tf.nn.relu)
+                x_im = conv2d(x_im, 128,kernel_size=(3,3), strides=(2,2), scope="enc_layer1", activation=tf.nn.relu)
+                x_im = conv2d(x_im, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
+                x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
+                x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
+                x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
 
-                num_blocks = 3
-                is_training = True
-                data_format = 'channels_last'
-                x_im = conv2d_fixed_padding( inputs=x_im, filters=64, kernel_size=3, strides=1,
-                                               data_format=data_format)
-                x_im = tf.identity(x_im, 'initial_conv')
-
-                x_im = block_layer(inputs=x_im, filters=64, block_fn=building_block, blocks=num_blocks,
-                                     strides=2, is_training=is_training, name='block_layer1', data_format=data_format)
-
-                x_im = block_layer(inputs=x_im, filters=128, block_fn=building_block, blocks=num_blocks,
-                                     strides=2, is_training=is_training, name='block_layer2', data_format=data_format)
-
-                x_im = block_layer(inputs=x_im, filters=256, block_fn=building_block, blocks=num_blocks,
-                                    strides=2, is_training=is_training, name='block_layer3',data_format=data_format)
-
-                x_im = block_layer(inputs=x_im, filters=512, block_fn=building_block, blocks=num_blocks,
-                                     strides=2, is_training=is_training, name='block_layer4', data_format=data_format)
-                x_im = block_layer(inputs=x_im, filters=512, block_fn=building_block, blocks=num_blocks,
-                                     strides=2, is_training=is_training, name='block_layer4', data_format=data_format)
-                x_im = block_layer(inputs=x_im, filters=512, block_fn=building_block, blocks=num_blocks,
-                                     strides=2, is_training=is_training, name='block_layer4', data_format=data_format)
+                # num_blocks = 3
+                # is_training = True
+                # data_format = 'channels_last'
+                # x_im = conv2d_fixed_padding( inputs=x_im, filters=64, kernel_size=3, strides=1,
+                #                                data_format=data_format)
+                # x_im = tf.identity(x_im, 'initial_conv')
+                #
+                # x_im = block_layer(inputs=x_im, filters=64, block_fn=building_block, blocks=num_blocks,
+                #                      strides=2, is_training=is_training, name='block_layer1', data_format=data_format)
+                #
+                # x_im = block_layer(inputs=x_im, filters=128, block_fn=building_block, blocks=num_blocks,
+                #                      strides=2, is_training=is_training, name='block_layer2', data_format=data_format)
+                #
+                # x_im = block_layer(inputs=x_im, filters=256, block_fn=building_block, blocks=num_blocks,
+                #                     strides=2, is_training=is_training, name='block_layer3',data_format=data_format)
+                #
+                # x_im = block_layer(inputs=x_im, filters=512, block_fn=building_block, blocks=num_blocks,
+                #                      strides=2, is_training=is_training, name='block_layer4', data_format=data_format)
+                # x_im = block_layer(inputs=x_im, filters=512, block_fn=building_block, blocks=num_blocks,
+                #                      strides=2, is_training=is_training, name='block_layer4', data_format=data_format)
+                # x_im = block_layer(inputs=x_im, filters=512, block_fn=building_block, blocks=num_blocks,
+                #                      strides=2, is_training=is_training, name='block_layer4', data_format=data_format)
                 flat = Flatten()(x_im)
                 h_im_encode = Dense(self.intermediate_dim, activation='relu')(flat)
                 z_im = dense(h_im_encode, self.z_dim, scope="mu_layer")
@@ -199,9 +200,9 @@ class cf_vae_extend:
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
         # LOAD TEXT#
-        ckpt = "pre3/dae/cf_dae_%d.ckpt"%self.model
+        ckpt = os.path.join(self.ckpt, "cf_dae_%d.ckpt"%self.model)
         if self.initial:
-            ckpt_file = "pre3/dae/" + "dae_text.ckpt"
+            ckpt_file = os.path.join(self.ckpt, "dae_text.ckpt")
             text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
             text_saver = tf.train.Saver(var_list=text_varlist)
             # if init == True:
@@ -209,14 +210,14 @@ class cf_vae_extend:
 
             # LOAD IMAGE##
             if self.model == 1 or self.model == 2:
-                ckpt_file_img = "pre3/dae/" + "dae_image_resnet.ckpt"
+                ckpt_file_img = os.path.join(self.ckpt, "dae_image.ckpt")
                 img_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="image")
                 img_saver = tf.train.Saver(var_list=img_varlist)
                 img_saver.restore(self.sess, ckpt_file_img)
 
             # Load Structure
             if self.model == 2 or self.model == 3:
-                ckpt_file = "pre3/dae/" + "dae_structure.ckpt"
+                ckpt_file = os.path.join(self.ckpt, "dae_structure.ckpt")
                 structure_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="structure")
                 structure_saver = tf.train.Saver(var_list=structure_varlist)
                 structure_saver.restore(self.sess, ckpt_file)
@@ -248,7 +249,7 @@ class cf_vae_extend:
             self.x_im_recons = x_im_recons
 
         if self.model == 2 or self.model ==3:
-            self.z_s_mu = z_s_mu
+            self.z_s_mu = z_s
             self.x_s_recons = x_s_recons
         self.saver.save(self.sess, ckpt)
         return None
@@ -282,7 +283,7 @@ class cf_vae_extend:
                              params.C_b * np.dot(self.U[~idx_a].T, self.U[~idx_a]) + \
                              np.eye(self.num_factors) * params.lambda_v
 
-                rx = params.C_a * np.sum(self.U[items[v], :], axis=0) + params.lambda_v * self.exp_z[v, :]
+                rx = params.C_a * np.sum(self.U[items[v], :], axis=0) + params.lambda_v * (self.exp_z[v, :] + self.exp_z_im[v, :])
                 self.V[v, :] = scipy.linalg.solve(Lambda_inv, rx, check_finite=True)
 
             print("iter: %d\t time:%d" %(i, time.time()-start))
@@ -298,7 +299,7 @@ class cf_vae_extend:
         else:
 
         # print(self.exp_z_im.shape)
-            self.exp_z_im = 0
+            self.exp_z_im = np.zeros((params.batch_size, self.z_dim))
 
 
         if self.model == 2 or self.model == 3:

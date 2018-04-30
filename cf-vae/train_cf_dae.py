@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from cf_dae import cf_vae_extend, params
 from scipy.sparse import load_npz
 import  argparse
+import os
 
 np.random.seed(0)
 tf.set_random_seed(0)
@@ -13,21 +14,30 @@ tf.set_random_seed(0)
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--model',  type=int, default=0,
                    help='type of model: 0-only text, 1-text+image, 2-text+image+structure, 3-text+structure')
-
-
+parser.add_argument('--ckpt_folder',  type=str, default='pre_model/exp1/',
+                   help='where model is stored')
+parser.add_argument('--initial',  type=bool, default=True,
+                   help='where model is stored')
+parser.add_argument('--iter',  type=int, default=30,
+                   help='where model is stored')
+parser.add_argument('--data_dir',  type=str, default='data/amazon',
+                   help='where model is stored')
 args = parser.parse_args()
-model = args.model
-print(model)
+model_type = args.model
+ckpt = args.ckpt_folder
+initial = args.initial
+iter = args.iter
+data_dir = args.data_dir
+print(model_type)
 
-def load_cvae_data():
+def load_cvae_data(data_dir):
   data = {}
-  data_dir = "data/amazon2/"
   # variables = scipy.io.loadmat(data_dir + "mult_nor-small.mat")
   # data["content"] = variables['X']
-  variables = load_npz("data/amazon2/mult_nor-small.npz")
+  variables = load_npz(os.path.join(data_dir,"mult_nor-small.npz"))
   data["content"] = variables.toarray()
-  # variables = load_npz("data/amazon2/structure_mult_nor-small.npz")
-  # data["structure"] = variables.toarray()
+  # variables = load_npz("data/amazon/structure_mult_nor-small.npz")
+  data["structure"] = variables.toarray()
   data["train_users"] = load_rating(data_dir + "cf-train-1-users-small.dat")
   data["train_items"] = load_rating(data_dir + "cf-train-1-items-small.dat")
   data["test_users"] = load_rating(data_dir + "cf-test-1-users-small.dat")
@@ -69,15 +79,15 @@ tf.set_random_seed(0)
 
 
 
-images = np.fromfile("data/amazon2/images.bin", dtype=np.uint8)
+images = np.fromfile(os.path.join(data_dir, "images.bin"), dtype=np.uint8)
 img = images.reshape((16000, 64, 64, 3))
 img = img.astype(np.float32)/255
-num_factors = 50
+num_factors = 500
 model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[2000, 1000], z_dim = 500, decoding_dims=[1000, 2000, 8000],
     decoding_dims_str=[100,200, 1863], loss_type='cross_entropy')
 model.fit(data["train_users"], data["train_items"], data["content"],img, data["content"], params)
-model.save_model("pre3/dae/cf_dae.mat")
+model.save_model(os.path.join(ckpt,"cf_dae.mat"))
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
 recalls = model.predict(pred, data['train_users'], data['test_users'], 40)
