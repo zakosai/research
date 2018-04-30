@@ -29,7 +29,7 @@ class params:
         # for updating W and b in vae
         self.learning_rate = 0.001
         self.batch_size = 500
-        self.num_iter = 300   # used in the e_step
+        self.num_iter = 100   # used in the e_step
         self.EM_iter = 30
 
 class cf_vae_extend:
@@ -278,7 +278,7 @@ class cf_vae_extend:
         users: list of list
         """
         min_iter = 1
-        a_minus_b = params.a - params.b
+        a_minus_b = params.C_a - params.C_b
         converge = 1.0
         likelihood_old = 0.0
         likelihood = -math.exp(20)
@@ -291,7 +291,7 @@ class cf_vae_extend:
             ids = np.array([len(x) for x in items]) > 0
             v = self.V[ids]
             VVT = np.dot(v.T, v)
-            XX = VVT * params.b + np.eye(self.m_num_factors) * params.lambda_u
+            XX = VVT * params.b + np.eye(self.z_dim) * params.lambda_u
 
             for i in xrange(len(users)):
                 item_ids = users[i]
@@ -332,7 +332,7 @@ class cf_vae_extend:
                     x = params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
                     self.m_V[j, :] = scipy.linalg.solve(A, x)
 
-                    ep = self.m_V[j,:] - self.exp_z[j,:]- self.exp_z_im[j,:]
+                    ep = self.V[j,:] - self.exp_z[j,:]- self.exp_z_im[j,:]
                     likelihood += -0.5 * params.lambda_v * np.sum(ep*ep)
             # computing negative log likelihood
             #likelihood += -0.5 * params.lambda_u * np.sum(self.m_U * self.m_U)
