@@ -291,7 +291,7 @@ class cf_vae_extend:
             ids = np.array([len(x) for x in items]) > 0
             v = self.V[ids]
             VVT = np.dot(v.T, v)
-            XX = VVT * params.b + np.eye(self.z_dim) * params.lambda_u
+            XX = VVT * params.C_b + np.eye(self.z_dim) * params.lambda_u
 
             for i in xrange(len(users)):
                 item_ids = users[i]
@@ -299,7 +299,7 @@ class cf_vae_extend:
                 if n > 0:
                     A = np.copy(XX)
                     A += np.dot(self.V[item_ids, :].T, self.V[item_ids,:])*a_minus_b
-                    x = params.a * np.sum(self.V[item_ids, :], axis=0)
+                    x = params.C_a * np.sum(self.V[item_ids, :], axis=0)
                     self.U[i, :] = scipy.linalg.solve(A, x)
 
                     likelihood += -0.5 * params.lambda_u * np.sum(self.U[i]*self.U[i])
@@ -316,11 +316,11 @@ class cf_vae_extend:
                     A += np.dot(self.U[user_ids,:].T, self.U[user_ids,:])*a_minus_b
                     B = np.copy(A)
                     A += np.eye(self.z_dim) * params.lambda_v
-                    x = params.a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
+                    x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
                     self.V[j, :] = scipy.linalg.solve(A, x)
 
-                    likelihood += -0.5 * m * params.a
-                    likelihood += params.a * np.sum(np.dot(self.U[user_ids, :], self.V[j,:][:, np.newaxis]),axis=0)
+                    likelihood += -0.5 * m * params.C_a
+                    likelihood += params.C_a * np.sum(np.dot(self.U[user_ids, :], self.V[j,:][:, np.newaxis]),axis=0)
                     likelihood += -0.5 * self.V[j,:].dot(B).dot(self.v[j,:][:,np.newaxis])
 
                     ep = self.m_V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:]
@@ -330,7 +330,7 @@ class cf_vae_extend:
                     A = np.copy(XX)
                     A += np.eye(self.z_dim) * params.lambda_v
                     x = params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
-                    self.m_V[j, :] = scipy.linalg.solve(A, x)
+                    self.V[j, :] = scipy.linalg.solve(A, x)
 
                     ep = self.V[j,:] - self.exp_z[j,:]- self.exp_z_im[j,:]
                     likelihood += -0.5 * params.lambda_v * np.sum(ep*ep)
