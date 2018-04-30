@@ -299,7 +299,7 @@ class cf_vae_extend:
         else:
 
         # print(self.exp_z_im.shape)
-            self.exp_z_im = np.zeros((params.batch_size, self.z_dim))
+            self.exp_z_im = np.zeros((self.params.batch_size, self.z_dim))
 
 
         if self.model == 2 or self.model == 3:
