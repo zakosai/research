@@ -29,7 +29,7 @@ class params:
         # for updating W and b in vae
         self.learning_rate = 0.001
         self.batch_size = 500
-        self.num_iter = 100   # used in the e_step
+        self.num_iter = 200   # used in the e_step
         self.EM_iter = 30
 
 class cf_vae_extend:
