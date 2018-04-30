@@ -344,11 +344,11 @@ class cf_vae_extend:
             it += 1
             converge = abs(1.0*(likelihood - likelihood_old)/likelihood_old)
 
-            if self.verbose:
-                if likelihood < likelihood_old:
-                    print("likelihood is decreasing!")
+            # if self.verbose:
+            #     if likelihood < likelihood_old:
+            #         print("likelihood is decreasing!")
 
-                print("[iter=%04d], likelihood=%.5f, converge=%.10f" % (it, likelihood, converge))
+            print("[iter=%04d], likelihood=%.5f, converge=%.10f" % (it, likelihood, converge))
 
         return likelihood
 
