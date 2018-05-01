@@ -472,13 +472,13 @@ class cf_vae_extend:
             # precision_avg = np.mean(np.array(precision_vals))
             # # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
             # #                        [u for u in user_all if len(u)!=0], m)
-            # mapk = ml_metrics.mapk([list(np.argsort(-k)) for k in pred_all], user_all, m)
+            mapk = ml_metrics.mapk([list(np.argsort(-k)) for k in pred_all], user_all, m)
             print recall_avg
             recall_avgs.append(recall_avg)
             # precision_avgs.append(precision_avg)
-            # mapk_avgs.append(mapk)
+            mapk_avgs.append(mapk)
 
-        return recall_avgs
+        return recall_avgs, mapk_avgs
 
     def predict_all(self):
         return np.dot(self.U, (self.V.T))
