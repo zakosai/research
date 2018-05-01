@@ -1,13 +1,13 @@
 #python train_img_vae.py --ckpt_folder=grocery/z20 --data_dir=data/amazon2/ --zdim=20
 #python train_cvae_extend.py --model=1 --ckpt_folder=grocery/z20 --data_dir=data/amazon2/ --iter=15 --zdim=20
 
-for i in 20 50 100
+for i in 50 100
 do
     #mkdir grocery/z$i
     #python train_vae.py --ckpt_folder=grocery/z$i --data_dir=data/amazon2/ --zdim=$i
-    python train_cvae_extend.py --model=0 --ckpt_folder=grocery/zdim$i --data_dir=data/amazon2/ --iter=15 --zdim=$i
+    python train_cvae_extend.py --model=0 --ckpt_folder=grocery/zdim$i --data_dir=data/amazon2/ --iter=30 --zdim=$i
     #python train_img_vae.py --ckpt_folder=grocery/z$i --data_dir=data/amazon2/ --zdim=$i
-    python train_cvae_extend.py --model=1 --ckpt_folder=grocery/zdim$i --data_dir=data/amazon2/ --iter=15 --zdim=$i
+    python train_cvae_extend.py --model=1 --ckpt_folder=grocery/zdim$i --data_dir=data/amazon2/ --iter=30 --zdim=$i
 done
 
 #
@@ -21,3 +21,12 @@ done
 #python train_cvae_extend.py --model=0 --ckpt_folder=pre2/v1 --data_dir=data/movie/ --iter=15
 #python train_cvae_extend.py --model=1 --ckpt_folder=pre2/v1 --data_dir=data/movie/ --iter=15
 
+git pull origin resnet
+for i in 250 500
+do
+    mkdir grocery/z$i
+    python train_vae.py --ckpt_folder=grocery/z$i --data_dir=data/amazon2/ --zdim=$i
+    python train_cvae_extend.py --model=0 --ckpt_folder=grocery/zdim$i --data_dir=data/amazon2/ --iter=15 --zdim=$i
+    python train_img_vae.py --ckpt_folder=grocery/z$i --data_dir=data/amazon2/ --zdim=$i
+    python train_cvae_extend.py --model=1 --ckpt_folder=grocery/zdim$i --data_dir=data/amazon2/ --iter=15 --zdim=$i
+done
