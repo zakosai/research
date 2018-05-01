@@ -447,7 +447,7 @@ class cf_vae_extend:
         for m in range(5, M, 5):
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
-            precision_vals = []
+            apk_vals = []
             for i in range(len(user_all)):
                 top_M = list(np.argsort(-pred_all[i])[0:(m +1)])
                 if train_users[i] in top_M:
@@ -467,12 +467,13 @@ class cf_vae_extend:
                 recall_vals.append(recall_val)
                 # precision = float(hits_num) / float(m)
                 # precision_vals.append(precision)
+                apk_vals.append( ml_metrics.apk(top_M, user_all[i], m))
 
             recall_avg = np.mean(np.array(recall_vals))
             # precision_avg = np.mean(np.array(precision_vals))
             # # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
             # #                        [u for u in user_all if len(u)!=0], m)
-            mapk = ml_metrics.mapk([list(np.argsort(-k)) for k in pred_all], user_all, m)
+            mapk = np.mean(np.array(apk_vals))
             print recall_avg
             recall_avgs.append(recall_avg)
             # precision_avgs.append(precision_avg)
