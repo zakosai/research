@@ -80,6 +80,7 @@ class cf_vae_extend:
         with tf.variable_scope("text"):
             x = self.x_
             depth_inf = len(self.encoding_dims)
+            x = tf.layers.dropout(x, rate=0.3)
             # noisy_level = 1
             # x = x + noisy_level*tf.random_normal(tf.shape(x))
             for i in range(depth_inf):
@@ -125,6 +126,7 @@ class cf_vae_extend:
             with tf.variable_scope("image"):
                 x_im_ = self.x_im_
                 x_im = x_im_
+                x_im = tf.layers.dropout(x_im, rate=0.3)
                 # for i in range(self.num_conv):
                 #     x_im = conv2d(x_im, self.filter * np.power(2, i),kernel_size=(2,2), strides=(2,2), scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
 
