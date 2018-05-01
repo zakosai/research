@@ -408,7 +408,7 @@ class cf_vae_extend:
         return self.exp_z, self.exp_z_im, self.exp_z_s
 
     def fit(self, users, items, x_data, im_data, str_data, params):
-
+        start = time.time()
         self.e_step(x_data, im_data, str_data)
         self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
         for i in range(params.EM_iter):
@@ -418,6 +418,7 @@ class cf_vae_extend:
             self.e_step(x_data, im_data, str_data)
             self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
 
+        print("time: %d"%(time.time()-start))
         return None
 
     def save_model(self, save_path_pmf):

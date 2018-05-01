@@ -12,10 +12,12 @@ parser.add_argument('--ckpt_folder',  type=str, default='pre_model/exp1/',
                    help='where model is stored')
 parser.add_argument('--data_dir',  type=str, default='data/amazon',
                    help='where model is stored')
-
+parser.add_argument('--zdim',  type=int, default=50,
+                   help='where model is stored')
 args = parser.parse_args()
 ckpt = args.ckpt_folder
 dir = args.data_dir
+zdim = args.zdim
 
 np.random.seed(0)
 tf.set_random_seed(0)
@@ -34,7 +36,7 @@ test_X = data[~idx]
 # train_img = images[idx]
 # test_img = images[~idx]
 
-model = vanilla_vae(input_dim=8000, encoding_dims=[1000, 200], z_dim=100, decoding_dims=[200, 1000, 8000], loss='cross_entropy', ckpt_folder=ckpt)
+model = vanilla_vae(input_dim=8000, encoding_dims=[1000, 200], z_dim=zdim, decoding_dims=[200, 1000, 8000], loss='cross_entropy', ckpt_folder=ckpt)
 # As there will be an additional layer from 100 to 50 in the encoder. in decoder, we also take this layer
                     # lr=0.01, batch_size=128, print_step=50)
 print('fitting data starts...')
