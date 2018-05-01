@@ -24,7 +24,7 @@ class params:
         self.lambda_u = 0.1
         self.lambda_v = 1.0
         self.lambda_r = 1.0
-        self.max_iter_m = 30
+        self.max_iter_m = 1
 
         # for updating W and b in vae
         self.learning_rate = 0.001
