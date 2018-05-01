@@ -80,7 +80,7 @@ class cf_vae_extend:
         with tf.variable_scope("text"):
             x = self.x_
             depth_inf = len(self.encoding_dims)
-            x = tf.layers.dropout(x, rate=0.3)
+            #x = tf.layers.dropout(x, rate=0.3)
             # noisy_level = 1
             # x = x + noisy_level*tf.random_normal(tf.shape(x))
             for i in range(depth_inf):
@@ -126,7 +126,7 @@ class cf_vae_extend:
             with tf.variable_scope("image"):
                 x_im_ = self.x_im_
                 x_im = x_im_
-                x_im = tf.layers.dropout(x_im, rate=0.3)
+                #x_im = tf.layers.dropout(x_im, rate=0.3)
                 # for i in range(self.num_conv):
                 #     x_im = conv2d(x_im, self.filter * np.power(2, i),kernel_size=(2,2), strides=(2,2), scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
 
@@ -381,8 +381,10 @@ class cf_vae_extend:
                 Lambda_inv = params.C_a * np.dot(self.U[idx_a].T, self.U[idx_a]) + \
                              params.C_b * np.dot(self.U[~idx_a].T, self.U[~idx_a]) + \
                              np.eye(self.num_factors) * params.lambda_v
-
-                rx = params.C_a * np.sum(self.U[items[v], :], axis=0) + params.lambda_v * (self.exp_z[v, :] + self.exp_z_im[v, :])
+                if self.model == 1:
+                    rx = params.C_a * np.sum(self.U[items[v], :], axis=0) + params.lambda_v * (self.exp_z[v, :] + self.exp_z_im[v, :])
+                else:
+                    rx = params.C_a * np.sum(self.U[items[v], :], axis=0) + params.lambda_v * self.exp_z[v, :]
                 self.V[v, :] = scipy.linalg.solve(Lambda_inv, rx, check_finite=True)
 
             print("iter: %d\t time:%d" %(i, time.time()-start))
@@ -397,7 +399,7 @@ class cf_vae_extend:
                 self.exp_z_im = np.concatenate((self.exp_z_im, exp_z_im), axis=0)
         else:
         # print(self.exp_z_im.shape)
-             self.exp_z_im = np.zeros((params.batch_size, self.z_dim))
+             self.exp_z_im = 0
 
         if self.model == 2 or self.model == 3:
             self.exp_z_s = self.sess.run(self.z_s_mu, feed_dict={self.x_s_: str_data})
@@ -412,7 +414,7 @@ class cf_vae_extend:
         for i in range(params.EM_iter):
             print("iter: %d"%i)
 
-            self.pmf_estimate(users, items, params)
+            self.m_step(users, items, params)
             self.e_step(x_data, im_data, str_data)
             self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
 
