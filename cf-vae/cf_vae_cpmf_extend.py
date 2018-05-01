@@ -318,23 +318,36 @@ class cf_vae_extend:
                     A += np.dot(self.U[user_ids,:].T, self.U[user_ids,:])*a_minus_b
                     B = np.copy(A)
                     A += np.eye(self.z_dim) * params.lambda_v
-                    x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
+                    if self.model == 1:
+                        x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
+                    else:
+                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z[j,:]
                     self.V[j, :] = scipy.linalg.solve(A, x)
 
                     likelihood += -0.5 * m * params.C_a
                     likelihood += params.C_a * np.sum(np.dot(self.U[user_ids, :], self.V[j,:][:, np.newaxis]),axis=0)
-                    likelihood += -0.5 * self.V[j,:].dot(B).dot((self.V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:])[:,np.newaxis])
-
-                    ep = self.V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:]
+                    if self.model == 1:
+                        likelihood += -0.5 * self.V[j,:].dot(B).dot((self.V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:])[:,np.newaxis])
+                        ep = self.V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:]
+                    else:
+                        likelihood += -0.5 * self.V[j,:].dot(B).dot((self.V[j,:] - self.exp_z[j,:])[:,np.newaxis])
+                        ep = self.V[j,:] - self.exp_z[j,:]
                     likelihood += -0.5 * params.lambda_v * np.sum(ep*ep)
                 else:
                     # m=0, this article has never been rated
                     A = np.copy(XX)
                     A += np.eye(self.z_dim) * params.lambda_v
-                    x = params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
+                    if self.model == 1:
+                        x = params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
+                    else:
+                        x = params.lambda_v * self.exp_z[j,:]
                     self.V[j, :] = scipy.linalg.solve(A, x)
 
-                    ep = self.V[j,:] - self.exp_z[j,:]- self.exp_z_im[j,:]
+                    if self.model == 1:
+                        ep = self.V[j,:] - self.exp_z[j,:]- self.exp_z_im[j,:]
+                    else:
+                        ep = self.V[j,:] - self.exp_z[j,:]
+
                     likelihood += -0.5 * params.lambda_v * np.sum(ep*ep)
             # computing negative log likelihood
             #likelihood += -0.5 * params.lambda_u * np.sum(self.m_U * self.m_U)
