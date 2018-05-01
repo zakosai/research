@@ -53,7 +53,7 @@ class vanilla_vae:
         with tf.variable_scope(scope):
             x_ = placeholder((None, self.input_width, self.input_height, self.channel))
             x = x_
-
+            #x = tf.layers.dropout(x, rate=0.3)
             # for i in range(self.num_conv):
             #     x = conv2d(x, self.filter * np.power(2, i),kernel_size=(2,2), strides=(2,2), scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
             x = conv2d(x, 64,kernel_size=(3,3), strides=(2,2), scope="enc_layer0", activation=tf.nn.relu)
@@ -61,8 +61,8 @@ class vanilla_vae:
             x = conv2d(x, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
             x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
             x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
-            # x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
-            x = max_pool(x, kernel_size=(3,3), strides=(2,2))
+            x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
+            # x = max_pool(x, kernel_size=(3,3), strides=(2,2))
             # num_blocks = 3
             # is_training = True
             # data_format = 'channels_last'
@@ -204,7 +204,7 @@ class vanilla_vae:
             y = conv2d_transpose(y, 128, kernel_size=(3,3), strides=(2,2), scope="dec_layer3", activation=tf.nn.relu)
             y = conv2d_transpose(y, 64, kernel_size=(3,3), strides=(2,2), scope="dec_layer4", activation=tf.nn.relu)
             y = conv2d_transpose(y, 3, kernel_size=(3,3), strides=(2,2), scope="dec_layer5", activation=tf.nn.relu)
-
+            x_recons = y
 
 
 
