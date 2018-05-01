@@ -1,6 +1,7 @@
-mkdir grocery
+python train_img_vae.py --ckpt_folder=grocery/z20 --data_dir=data/amazon2/ --zdim=20
+python train_cvae_extend.py --model=1 --ckpt_folder=grocery/z20 --data_dir=data/amazon2/ --iter=15 --zdim=20
 
-for i in 20 50 100
+for i in 50 100
 do
     mkdir grocery/z$i
     python train_vae.py --ckpt_folder=grocery/z$i --data_dir=data/amazon2/ --zdim=$i
