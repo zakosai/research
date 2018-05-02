@@ -34,7 +34,7 @@ class params:
 
 class cf_vae_extend:
     def __init__(self, num_users, num_items, num_factors, params, input_dim, encoding_dims, z_dim, decoding_dims,
-                 decoding_dims_str, loss_type="cross_entropy", useTranse = False, eps = 1e-10, model=0, ckpt_folder='pre_model', initial=True):
+                 decoding_dims_str, loss_type="cross_entropy", useTranse = False, eps = 1e-10, model=0, ckpt_folder='pre_model', initial=True, model_mat=None):
         self.num_users = num_users
         self.num_items = num_items
         self.num_factors = num_factors
@@ -64,6 +64,8 @@ class cf_vae_extend:
         self.model = model
         self.ckpt_model = ckpt_folder
         print(self.params.EM_iter)
+        if self.initial == False:
+            self.load_model(model_mat)
 
 
     # def e_step(self, x_data, reuse = None):
@@ -434,6 +436,7 @@ class cf_vae_extend:
             if i%5 == 4:
                 pred_all = self.predict_all(self.U[0:1000, :])
                 self.predict_val(pred_all, users, test_users)
+                self.save_model(save_path_pmf=os.path.join(self.ckpt_model, "cf_vae_%d_%d.mat"%(self.model, i)))
                 print(time.time() - start)
 
         print("time: %d"%(time.time()-start))
