@@ -422,7 +422,7 @@ class cf_vae_extend:
 
     def fit(self, users, items, x_data, im_data, str_data, params, test_users):
         start = time.time()
-        print(users[1:3])
+        print(self.U[1:3])
         self.e_step(x_data, im_data, str_data)
         self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
         for i in range(params.EM_iter):
@@ -433,7 +433,7 @@ class cf_vae_extend:
             self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
 
             # if i%5 == 4:
-            pred_all = self.predict_all(users[0:1000])
+            pred_all = self.predict_all(self.U[0:1000, :])
             self.predict_val(pred_all, users, test_users)
 
         print("time: %d"%(time.time()-start))
