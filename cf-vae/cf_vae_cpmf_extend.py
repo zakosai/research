@@ -431,9 +431,9 @@ class cf_vae_extend:
             self.e_step(x_data, im_data, str_data)
             self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
 
-            if i%5 == 4:
-                pred_all = self.predict_all(self, users[:1000, ])
-                self.predict_val(pred_all, users, test_users)
+            # if i%5 == 4:
+            pred_all = self.predict_all(self, users[:1000])
+            self.predict_val(pred_all, users, test_users)
 
         print("time: %d"%(time.time()-start))
         return None
