@@ -70,7 +70,7 @@ pred = model.predict_all(model.U)
 recalls_1, mapks_1 = model.predict(pred, data['train_users'], data['test_users'], 10)
 
 model.load_model(os.path.join(ckpt, "cf_dae.mat"))
-pred = model.predict_all()
+pred = model.predict_all(model.U)
 recalls_2, mapks_2 = model.predict(pred, data['train_users'], data['test_users'], 10)
 
 # model.load_model("pre_model/zdim2/cf_vae_0.mat")
