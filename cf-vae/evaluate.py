@@ -61,7 +61,7 @@ model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, 
     loss_type='cross_entropy')
 model.load_model(os.path.join(ckpt, "cf_vae_0.mat"))
 # model.load_model("cf_vae.mat")
-pred = model.predict_all()
+pred = model.predict_all(model.U)
 recalls, mapks= model.predict(pred, data['train_users'], data['test_users'], 40)
 
 
