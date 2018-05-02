@@ -13,9 +13,13 @@ parser.add_argument('--ckpt_folder',  type=str, default='pre_model/exp1/',
                    help='where model is stored')
 parser.add_argument('--data_dir',  type=str, default='data/amazon',
                    help='where model is stored')
+parser.add_argument('--mat_file',  type=str, default='cf_vae_1.mat',
+                   help='where model is stored')
+
 args = parser.parse_args()
 ckpt = args.ckpt_folder
 data_dir = args.data_dir
+extend_file =args.mat_file
 
 def load_cvae_data(data_dir):
   data = {}
@@ -53,7 +57,7 @@ params.max_iter_m = 1
 data = load_cvae_data(data_dir)
 num_factors = 50
 model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
-    input_dim=8000, encoding_dims=[2000, 1000], z_dim = 500, decoding_dims=[1000, 2000, 8000], decoding_dims_str=[100,200, 1863],
+    input_dim=8000, encoding_dims=[1000, 200], z_dim = 50, decoding_dims=[200, 1000, 8000], decoding_dims_str=[100,200, 1863],
     loss_type='cross_entropy')
 model.load_model(os.path.join(ckpt, "cf_vae_0.mat"))
 # model.load_model("cf_vae.mat")
@@ -61,13 +65,13 @@ pred = model.predict_all()
 recalls, mapks= model.predict(pred, data['train_users'], data['test_users'], 40)
 
 
-model.load_model(os.path.join(ckpt, "cf_vae_1.mat"))
+model.load_model(os.path.join(ckpt, extend_file))
 pred = model.predict_all()
 recalls_1, mapks_1 = model.predict(pred, data['train_users'], data['test_users'], 40)
-
-model.load_model(os.path.join(ckpt, "cf_dae.mat"))
-pred = model.predict_all()
-recalls_2, mapks_2 = model.predict(pred, data['train_users'], data['test_users'], 40)
+#
+# model.load_model(os.path.join(ckpt, "cf_dae.mat"))
+# pred = model.predict_all()
+# recalls_2, mapks_2 = model.predict(pred, data['train_users'], data['test_users'], 40)
 
 # model.load_model("pre_model/zdim2/cf_vae_0.mat")
 # pred = model.predict_all()
@@ -90,7 +94,7 @@ plt.ylabel("Recall@M")
 plt.xlabel("M")
 plt.plot(np.arange(5, 40, 5), recalls_1, '-r', label="our model")
 plt.plot(np.arange(5, 40, 5),recalls, '-b', label="CVAE")
-plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="CDL")
+# plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="CDL")
 
 # plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="zdim=500")
 
@@ -116,7 +120,7 @@ plt.ylabel("MAP@M")
 plt.xlabel("M")
 plt.plot(np.arange(5, 40, 5),mapks_1, '-b', label="our proposed")
 plt.plot(np.arange(5, 40, 5), mapks, '-r', label="CVAE")
-plt.plot(np.arange(5, 40, 5), mapks_2, '-g', label="CDL")
+# plt.plot(np.arange(5, 40, 5), mapks_2, '-g', label="CDL")
 #
 plt.legend(loc='upper left')
 plt.savefig("result/map_40_%s_%s.png"%(data_dir, ckpt))
