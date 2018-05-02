@@ -66,7 +66,7 @@ recalls, mapks= model.predict(pred, data['train_users'], data['test_users'], 40)
 
 
 model.load_model(os.path.join(ckpt, extend_file))
-pred = model.predict_all()
+pred = model.predict_all(model.U)
 recalls_1, mapks_1 = model.predict(pred, data['train_users'], data['test_users'], 40)
 #
 # model.load_model(os.path.join(ckpt, "cf_dae.mat"))
