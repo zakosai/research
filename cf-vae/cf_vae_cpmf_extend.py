@@ -424,6 +424,7 @@ class cf_vae_extend:
 
     def fit(self, users, items, x_data, im_data, str_data, params, test_users):
         start = time.time()
+        file = open(os.path.join(self.ckpt_model, "result_%d.txt"%self.model), "w")
         self.e_step(x_data, im_data, str_data)
         self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
         for i in range(params.EM_iter):
@@ -434,11 +435,12 @@ class cf_vae_extend:
             self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
 
             if i%5 == 4:
-                pred_all = self.predict_all(self.U[0:1000, :])
-                self.predict_val(pred_all, users, test_users)
+                file.write("---------iter %d--------\n"%i)
+                pred_all = self.predict_all(self.U)
+                self.predict_val(pred_all, users, test_users, file)
                 self.save_model(save_path_pmf=os.path.join(self.ckpt_model, "cf_vae_%d_%d.mat"%(self.model, i)))
                 print(time.time() - start)
-
+        file.close()
         print("time: %d"%(time.time()-start))
         return None
 
@@ -505,7 +507,7 @@ class cf_vae_extend:
 
         return recall_avgs, mapk_avgs
 
-    def predict_val(self, pred_all, train_users, test_users):
+    def predict_val(self, pred_all, train_users, test_users, file):
         user_all = test_users
         ground_tr_num = [len(user) for user in user_all]
 
@@ -518,7 +520,7 @@ class cf_vae_extend:
         for m in [5, 35]:
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
-            for i in range(1000):
+            for i in range(len(user_all)):
                 top_M = list(np.argsort(-pred_all[i])[0:(m +1)])
                 if train_users[i] in top_M:
                     top_M.remove(train_users[i])
@@ -543,6 +545,7 @@ class cf_vae_extend:
             # # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
             # #                        [u for u in user_all if len(u)!=0], m)
             print recall_avg
+            file.write("m = %d, recall = %f"%(m, recall_avg))
             # precision_avgs.append(precision_avg)
 
 
