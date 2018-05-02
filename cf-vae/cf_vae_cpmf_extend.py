@@ -515,7 +515,7 @@ class cf_vae_extend:
         for m in [5, 35]:
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
-            for i in range(len(user_all)):
+            for i in range(1000):
                 top_M = list(np.argsort(-pred_all[i])[0:(m +1)])
                 if train_users[i] in top_M:
                     top_M.remove(train_users[i])
