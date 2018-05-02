@@ -420,7 +420,7 @@ class cf_vae_extend:
             self.exp_z_s = 0
         return self.exp_z, self.exp_z_im, self.exp_z_s
 
-    def fit(self, users, items, x_data, im_data, str_data, params):
+    def fit(self, users, items, x_data, im_data, str_data, params, test_users):
         start = time.time()
         self.e_step(x_data, im_data, str_data)
         self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
@@ -430,6 +430,10 @@ class cf_vae_extend:
             self.m_step(users, items, params)
             self.e_step(x_data, im_data, str_data)
             self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
+
+            if i%5 == 4:
+                pred_all = self.predict_all(self, users[:1000, ])
+                self.predict_val(pred_all, users, test_users)
 
         print("time: %d"%(time.time()-start))
         return None
@@ -497,5 +501,46 @@ class cf_vae_extend:
 
         return recall_avgs, mapk_avgs
 
-    def predict_all(self):
-        return np.dot(self.U, (self.V.T))
+    def predict_val(self, pred_all, train_users, test_users):
+        user_all = test_users
+        ground_tr_num = [len(user) for user in user_all]
+
+
+        pred_all = list(pred_all)
+
+        recall_avgs = []
+        precision_avgs = []
+        mapk_avgs = []
+        for m in [5, 35]:
+            print "m = " + "{:>10d}".format(m) + "done"
+            recall_vals = []
+            for i in range(len(user_all)):
+                top_M = list(np.argsort(-pred_all[i])[0:(m +1)])
+                if train_users[i] in top_M:
+                    top_M.remove(train_users[i])
+                else:
+                    top_M = top_M[:-1]
+                if len(top_M) != m:
+                    print(top_M, train_users[i])
+                if len(train_users[i]) != 1:
+                    print(i)
+                hits = set(top_M) & set(user_all[i])   # item idex from 0
+                hits_num = len(hits)
+                try:
+                    recall_val = float(hits_num) / float(ground_tr_num[i])
+                except:
+                    recall_val = 1
+                recall_vals.append(recall_val)
+                # precision = float(hits_num) / float(m)
+                # precision_vals.append(precision)
+
+            recall_avg = np.mean(np.array(recall_vals))
+            # precision_avg = np.mean(np.array(precision_vals))
+            # # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
+            # #                        [u for u in user_all if len(u)!=0], m)
+            print recall_avg
+            # precision_avgs.append(precision_avg)
+
+
+    def predict_all(self, U):
+        return np.dot(U, (self.V.T))

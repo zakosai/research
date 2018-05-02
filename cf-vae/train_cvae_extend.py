@@ -122,9 +122,9 @@ num_factors = zdim
 
 
 model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
-                      input_dim=8000, encoding_dims=[2000, 1000], z_dim = zdim, decoding_dims=[1000, 2000, 8000],
+                      input_dim=8000, encoding_dims=[1000, 200], z_dim = zdim, decoding_dims=[200, 1000, 8000],
                       decoding_dims_str=[100,200, 1863], loss_type='cross_entropy', model = model_type, ckpt_folder=ckpt, initial=initial)
-model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params)
+model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params, data["test_users"])
 model.save_model(os.path.join(ckpt,"cf_vae_%d.mat"%(model_type)))
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
