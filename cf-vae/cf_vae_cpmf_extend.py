@@ -192,8 +192,14 @@ class cf_vae_extend:
                 x_im_recons = y_im
 
         if self.loss_type == "cross_entropy":
-            loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_, x_recons), axis=1))
-            loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
+            if self.model != 6:
+                loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_, x_recons), axis=1))
+                loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
+            else:
+                loss_im_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_im_), K.flatten(x_im_recons))
+                loss_im_kl = 0.5 * tf.reduce_sum(tf.square(z_im_mu) + tf.exp(z_im_log_sigma_sq) - z_im_log_sigma_sq - 1, 1)
+                loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_  - z_im), 1))
+                self.loss_e_step = loss_v + K.mean(loss_im_recons + loss_im_kl)
 
             if self.model == 0:
                 loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z), 1))
@@ -226,11 +232,12 @@ class cf_vae_extend:
         # LOAD TEXT#
         ckpt = os.path.join(self.ckpt_model, "cvae_%d.ckpt"%self.model)
         if self.initial:
-            ckpt_file = os.path.join(self.ckpt_model, "vae_text.ckpt")
-            text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
-            text_saver = tf.train.Saver(var_list=text_varlist)
-            # if init == True:
-            text_saver.restore(self.sess, ckpt_file)
+            if self.model != 6:
+                ckpt_file = os.path.join(self.ckpt_model, "vae_text.ckpt")
+                text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
+                text_saver = tf.train.Saver(var_list=text_varlist)
+                # if init == True:
+                text_saver.restore(self.sess, ckpt_file)
 
             # LOAD IMAGE##
             if self.model == 1 or self.model == 2:
@@ -265,8 +272,9 @@ class cf_vae_extend:
             if i % 50 == 0:
                print("epoches: %d\t loss: %f\t time: %d s"%(i, l, time.time()-start))
 
-        self.z_mu = z_mu
-        self.x_recons = x_recons
+        if self.model != 6:
+            self.z_mu = z_mu
+            self.x_recons = x_recons
 
         if self.model == 1 or self.model == 2:
             self.z_im_mu = z_im_mu
@@ -322,8 +330,10 @@ class cf_vae_extend:
                     A += np.eye(self.z_dim) * params.lambda_v
                     if self.model == 1:
                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
-                    else:
+                    elif self.model != 6:
                          x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z[j,:]
+                    else:
+                        x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z_im[j,:]
                     self.V[j, :] = scipy.linalg.solve(A, x)
 
                     likelihood += -0.5 * m * params.C_a
@@ -331,9 +341,11 @@ class cf_vae_extend:
                     if self.model == 1:
                         likelihood += -0.5 * self.V[j,:].dot(B).dot((self.V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:])[:,np.newaxis])
                         ep = self.V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:]
-                    else:
+                    elif self.model != 6:
                         likelihood += -0.5 * self.V[j,:].dot(B).dot((self.V[j,:] - self.exp_z[j,:])[:,np.newaxis])
                         ep = self.V[j,:] - self.exp_z[j,:]
+                    else:
+                        likelihood += -0.5 * self.V[j,:].dot(B).dot((self.V[j,:] - self.exp_z_im[j,:])[:,np.newaxis])
                     likelihood += -0.5 * params.lambda_v * np.sum(ep*ep)
                 else:
                     # m=0, this article has never been rated
@@ -341,14 +353,18 @@ class cf_vae_extend:
                     A += np.eye(self.z_dim) * params.lambda_v
                     if self.model == 1:
                         x = params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
-                    else:
+                    elif self.model != 6:
                         x = params.lambda_v * self.exp_z[j,:]
+                    else:
+                        x = params.lambda_v * self.exp_z_im[j,:]
                     self.V[j, :] = scipy.linalg.solve(A, x)
 
                     if self.model == 1:
                         ep = self.V[j,:] - self.exp_z[j,:]- self.exp_z_im[j,:]
-                    else:
+                    elif self.model != 6:
                         ep = self.V[j,:] - self.exp_z[j,:]
+                    else:
+                        ep = self.V[j,:] - self.exp_z_im[j,:]
 
                     likelihood += -0.5 * params.lambda_v * np.sum(ep*ep)
             # computing negative log likelihood
@@ -398,16 +414,21 @@ class cf_vae_extend:
                              np.eye(self.num_factors) * params.lambda_v
                 if self.model == 1:
                     rx = params.C_a * np.sum(self.U[items[v], :], axis=0) + params.lambda_v * (self.exp_z[v, :] + self.exp_z_im[v, :])
-                else:
+                elif self.model != 6:
                     rx = params.C_a * np.sum(self.U[items[v], :], axis=0) + params.lambda_v * self.exp_z[v, :]
+                else:
+                    rx = params.C_a * np.sum(self.U[items[v], :], axis=0) + params.lambda_v * self.exp_z_im[v, :]
                 self.V[v, :] = scipy.linalg.solve(Lambda_inv, rx, check_finite=True)
 
             print("iter: %d\t time:%d" %(i, time.time()-start))
         return None
 
     def get_exp_hidden(self, x_data, im_data, str_data):
-        self.exp_z = self.sess.run(self.z_mu, feed_dict={self.x_: x_data})
-        if self.model == 1 or self.model == 2:
+        if self.model != 6:
+            self.exp_z = self.sess.run(self.z_mu, feed_dict={self.x_: x_data})
+        else:
+            self.exp_z = 0
+        if self.model == 1 or self.model == 2 or self.model == 6:
             for i in range(len(im_data), self.params.batch_size):
                 im_batch = im_data[i:i+self.params.batch_size]
                 exp_z_im = self.sess.run(self.z_im_mu, feed_dict={self.x_im_: im_batch})
