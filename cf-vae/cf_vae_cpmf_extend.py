@@ -78,29 +78,29 @@ class cf_vae_extend:
         self.v_ = placeholder((None, self.num_factors))
 
         # inference process
+        if self.model != 6:
+            with tf.variable_scope("text"):
+                x = self.x_
+                depth_inf = len(self.encoding_dims)
+                #x = tf.layers.dropout(x, rate=0.3)
+                # noisy_level = 1
+                # x = x + noisy_level*tf.random_normal(tf.shape(x))
+                for i in range(depth_inf):
+                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    # print("enc_layer0/weights:0".graph)
+                h_encode = x
+                z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
+                z_log_sigma_sq = dense(h_encode, self.z_dim, scope = "sigma_layer")
+                e = tf.random_normal(tf.shape(z_mu))
+                z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
 
-        with tf.variable_scope("text"):
-            x = self.x_
-            depth_inf = len(self.encoding_dims)
-            #x = tf.layers.dropout(x, rate=0.3)
-            # noisy_level = 1
-            # x = x + noisy_level*tf.random_normal(tf.shape(x))
-            for i in range(depth_inf):
-                x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
-                # print("enc_layer0/weights:0".graph)
-            h_encode = x
-            z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
-            z_log_sigma_sq = dense(h_encode, self.z_dim, scope = "sigma_layer")
-            e = tf.random_normal(tf.shape(z_mu))
-            z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
+                # generative process
+                depth_gen = len(self.decoding_dims)
+                for i in range(depth_gen):
+                    y = dense(z, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    # if last_layer_nonelinear: depth_gen -1
 
-            # generative process
-            depth_gen = len(self.decoding_dims)
-            for i in range(depth_gen):
-                y = dense(z, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
-                # if last_layer_nonelinear: depth_gen -1
-
-            x_recons = y
+                x_recons = y
 
         if self.model == 2 or self.model == 3:
 
@@ -124,7 +124,7 @@ class cf_vae_extend:
 
                 x_s_recons = y_s
 
-        if self.model == 1 or self.model == 2:
+        if self.model == 1 or self.model == 2 or self.model==6:
             with tf.variable_scope("image"):
                 x_im_ = self.x_im_
                 x_im = x_im_
@@ -217,7 +217,7 @@ class cf_vae_extend:
                 loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z  - z_s), 1))
                 self.loss_e_step = loss_recons + loss_kl + loss_s_recons + loss_s_kl + loss_v
 
-            else:
+            elif self.model != 6:
                 loss_im_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_im_), K.flatten(x_im_recons))
                 loss_im_kl = 0.5 * tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1)
                 loss_s_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_s_, x_s_recons), axis=1))
@@ -240,7 +240,7 @@ class cf_vae_extend:
                 text_saver.restore(self.sess, ckpt_file)
 
             # LOAD IMAGE##
-            if self.model == 1 or self.model == 2:
+            if self.model == 1 or self.model == 2 or self.model == 6:
                 ckpt_file_img = os.path.join(self.ckpt_model, "vae_image.ckpt")
                 img_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="image")
                 img_saver = tf.train.Saver(var_list=img_varlist)
