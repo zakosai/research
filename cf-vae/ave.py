@@ -84,12 +84,13 @@ class vanilla_vae:
         #     if savepath:
         #         plt.savefig(savepath, dpi=512)
 
-        encoder = tf.make_template('encoder_%s'%scope, encoder_func)
-        decoder = tf.make_template('decoder_%s'%scope, decoder_func)
-        discriminator = tf.make_template('discriminator_%s'%scope, discriminator_func)
+
 
         # with tf.variable_scope(scope):
         with tf.variable_scope(scope):
+            encoder = tf.make_template('encoder_%s'%scope, encoder_func)
+            decoder = tf.make_template('decoder_%s'%scope, decoder_func)
+            discriminator = tf.make_template('discriminator_%s'%scope, discriminator_func)
             eps = tf.random_normal([self.batch_size, self.input_dim])
             x_real = placeholder((None, self.input_dim))
             z_sampled = tf.random_normal([self.batch_size, self.z_dim])
