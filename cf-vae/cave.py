@@ -76,7 +76,7 @@ class cf_vae_extend:
         self.x_ = placeholder((None, self.input_dim))  # we need these global nodes
         self.v_ = placeholder((None, self.num_factors))
         scope = "text"
-        tf.reset_default_graph()
+        # tf.reset_default_graph()
         def encoder_func(x, eps):
             net = tf.concat([x, eps], axis=-1)
             for i in range(len(self.encoding_dims)):
