@@ -131,10 +131,11 @@ class cf_vae_extend:
             decoder = tf.make_template('decoder_%s'%scope, decoder_func)
             discriminator = tf.make_template('discriminator_%s'%scope, discriminator_func)
             x_real = self.x_
-            eps = tf.random_normal([x_real.shape[0], self.input_dim])
-            z_sampled = tf.random_normal([x_real.shape[0], self.z_dim])
+            eps = tf.random_normal(tf.shape(x_real))
+
             z_inferred = encoder(x_real, eps)
             x_reconstr_logits = decoder(z_inferred)
+            z_sampled = tf.random_normal(tf.shape(z_inferred))
 
             Tjoint = discriminator(x_real, z_inferred)
             Tseperate = discriminator(x_real, z_sampled)
