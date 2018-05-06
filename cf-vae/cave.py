@@ -166,7 +166,7 @@ class cf_vae_extend:
         train_op_dual = optimizer_dual.minimize(loss_dual, var_list=dvars)
 
         self.sess = tf.Session()
-        # self.sess.run(tf.global_variables_initializer())
+        self.sess.run(tf.global_variables_initializer())
         # LOAD TEXT#
         ckpt = os.path.join(self.ckpt_model, "cave_%d.ckpt"%self.model)
         saver = tf.train.Saver(var_list=othervars)
