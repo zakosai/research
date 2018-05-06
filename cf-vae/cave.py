@@ -130,9 +130,9 @@ class cf_vae_extend:
             encoder = tf.make_template('encoder_%s'%scope, encoder_func)
             decoder = tf.make_template('decoder_%s'%scope, decoder_func)
             discriminator = tf.make_template('discriminator_%s'%scope, discriminator_func)
-            eps = tf.random_normal([self.params.batch_size, self.input_dim])
-            z_sampled = tf.random_normal([self.params.batch_size, self.z_dim])
             x_real = self.x_
+            eps = tf.random_normal([x_real.shape[0], self.input_dim])
+            z_sampled = tf.random_normal([x_real.shape[0], self.z_dim])
             z_inferred = encoder(x_real, eps)
             x_reconstr_logits = decoder(z_inferred)
 
