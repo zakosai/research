@@ -73,6 +73,8 @@ class cf_vae_extend:
     # def e_step(self, x_data, reuse = None):
     def e_step(self, x_data, im_data, str_data):
         print "e_step finetuning"
+        self.x_ = placeholder((None, self.input_dim))  # we need these global nodes
+        self.v_ = placeholder((None, self.num_factors))
         scope = "text"
         tf.reset_default_graph()
         def encoder_func(x, eps):
@@ -128,8 +130,8 @@ class cf_vae_extend:
         # with tf.variable_scope(scope):
 
         eps = tf.random_normal([self.params.batch_size, self.encoding_dims[0]])
-        x_real = placeholder((None, self.input_dim))
         z_sampled = tf.random_normal([self.params.batch_size, self.z_dim])
+        x_real = self.x_
         z_inferred = encoder(x_real, eps)
         x_reconstr_logits = decoder(z_inferred)
 
@@ -142,6 +144,8 @@ class cf_vae_extend:
         )
 
         loss_primal = tf.reduce_mean(reconstr_err + Tjoint)
+        loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z_inferred), 1))
+        self.loss_e_step = loss_primal + loss_v
         loss_dual = tf.reduce_mean(
             tf.nn.sigmoid_cross_entropy_with_logits(logits=Tjoint, labels=tf.ones_like(Tjoint))
             + tf.nn.sigmoid_cross_entropy_with_logits(logits=Tseperate, labels=tf.zeros_like(Tseperate))
@@ -154,7 +158,7 @@ class cf_vae_extend:
         pvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, "decoder_%s"%scope)
         dvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, "discriminator_%s"%scope)
 
-        train_op_primal = optimizer_primal.minimize(loss_primal, var_list=pvars+qvars)
+        train_op_primal = optimizer_primal.minimize(self.loss_e_step, var_list=pvars+qvars)
         train_op_dual = optimizer_dual.minimize(loss_dual, var_list=dvars)
 
         self.sess = tf.Session()
@@ -171,10 +175,10 @@ class cf_vae_extend:
             x_batch = x_data[idx]
             v_batch = self.V[idx]
 
-            self.sess.run([loss_primal, train_op_primal], feed_dict={x_real:x_batch})
-            g_loss, _ = self.sess.run([loss_primal, train_op_primal], feed_dict={x_real:x_batch})
-            g_loss, _ = self.sess.run([loss_primal, train_op_primal], feed_dict={x_real:x_batch})
-            d_loss, _ = self.sess.run([loss_dual, train_op_dual], feed_dict={x_real:x_batch})
+            self.sess.run([loss_primal, train_op_primal], feed_dict={self.x_:x_batch, self.v_:v_batch})
+            g_loss, _ = self.sess.run([loss_primal, train_op_primal], feed_dict={self.x_:x_batch, self.v_:v_batch})
+            g_loss, _ = self.sess.run([loss_primal, train_op_primal], feed_dict={self.x_:x_batch, self.v_:v_batch})
+            d_loss, _ = self.sess.run([loss_dual, train_op_dual], feed_dict={self.x_:x_batch, self.v_:v_batch})
             if i % 50 == 0:
                 print("epoches: %d\t g_loss: %f\t d_loss: %f\t time: %d s"%(i, g_loss, d_loss, time.time()-start))
 
