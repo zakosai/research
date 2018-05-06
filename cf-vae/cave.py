@@ -179,6 +179,8 @@ class cf_vae_extend:
                 print("epoches: %d\t g_loss: %f\t d_loss: %f\t time: %d s"%(i, g_loss, d_loss, time.time()-start))
 
         saver.save(self.sess, ckpt)
+        self.z_mu = z_inferred
+        self.x_recons = x_reconstr_logits
 
     def pmf_estimate(self, users, items, params):
         """
