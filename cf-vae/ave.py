@@ -124,7 +124,7 @@ class vanilla_vae:
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
         # saver = tf.train.Saver(tf.get_collection(tf.GraphKeys.VARIABLES, scope=scope))
-        saver = tf.train.Saver(var_list=qvars+pvars+dvars+othervars)
+        saver = tf.train.Saver(var_list=othervars)
         ckpt_file = os.path.join(self.ckpt,"vae_%s.ckpt" %scope)
         if train == True:
             # num_turn = x_input.shape[0] / self.batch_size
