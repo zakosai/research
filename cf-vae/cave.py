@@ -166,7 +166,7 @@ class cf_vae_extend:
         self.sess.run(tf.global_variables_initializer())
         # LOAD TEXT#
         ckpt = os.path.join(self.ckpt_model, "cave_%d.ckpt"%self.model)
-        saver = tf.train.Saver(var_list=qvars+pvars+dvars+othervars)
+        saver = tf.train.Saver(var_list=othervars)
         if self.initial:
 
             text_ckpt = os.path.join(self.ckpt_model, "vae_%s.ckpt"%scope)
