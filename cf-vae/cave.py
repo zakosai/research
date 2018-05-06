@@ -129,7 +129,7 @@ class cf_vae_extend:
 
         # with tf.variable_scope(scope):
 
-        eps = tf.random_normal([self.params.batch_size, self.encoding_dims[0]])
+        eps = tf.random_normal([self.params.batch_size, self.input_dim])
         z_sampled = tf.random_normal([self.params.batch_size, self.z_dim])
         x_real = self.x_
         z_inferred = encoder(x_real, eps)
