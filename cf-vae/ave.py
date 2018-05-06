@@ -89,15 +89,15 @@ class vanilla_vae:
         discriminator = tf.make_template('discriminator_%s'%scope, discriminator_func)
 
         # with tf.variable_scope(scope):
+        with tf.variable_scope(scope):
+            eps = tf.random_normal([self.batch_size, self.input_dim])
+            x_real = placeholder((None, self.input_dim))
+            z_sampled = tf.random_normal([self.batch_size, self.z_dim])
+            z_inferred = encoder(x_real, eps)
+            x_reconstr_logits = decoder(z_inferred)
 
-        eps = tf.random_normal([self.batch_size, self.input_dim])
-        x_real = placeholder((None, self.input_dim))
-        z_sampled = tf.random_normal([self.batch_size, self.z_dim])
-        z_inferred = encoder(x_real, eps)
-        x_reconstr_logits = decoder(z_inferred)
-
-        Tjoint = discriminator(x_real, z_inferred)
-        Tseperate = discriminator(x_real, z_sampled)
+            Tjoint = discriminator(x_real, z_inferred)
+            Tseperate = discriminator(x_real, z_sampled)
 
         reconstr_err = tf.reduce_sum(
             tf.nn.sigmoid_cross_entropy_with_logits(labels=x_real, logits=x_reconstr_logits),
@@ -116,6 +116,7 @@ class vanilla_vae:
         qvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, "encoder_%s"%scope)
         pvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, "decoder_%s"%scope)
         dvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, "discriminator_%s"%scope)
+        othervars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope)
 
         train_op_primal = optimizer_primal.minimize(loss_primal, var_list=pvars+qvars)
         train_op_dual = optimizer_dual.minimize(loss_dual, var_list=dvars)
@@ -123,7 +124,7 @@ class vanilla_vae:
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
         # saver = tf.train.Saver(tf.get_collection(tf.GraphKeys.VARIABLES, scope=scope))
-        saver = tf.train.Saver(var_list=qvars+pvars+dvars)
+        saver = tf.train.Saver(var_list=qvars+pvars+dvars+othervars)
         ckpt_file = os.path.join(self.ckpt,"vae_%s.ckpt" %scope)
         if train == True:
             # num_turn = x_input.shape[0] / self.batch_size
