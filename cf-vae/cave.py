@@ -73,10 +73,11 @@ class cf_vae_extend:
     # def e_step(self, x_data, reuse = None):
     def e_step(self, x_data, im_data, str_data):
         print "e_step finetuning"
+        tf.reset_default_graph()
+
         self.x_ = placeholder((None, self.input_dim))  # we need these global nodes
         self.v_ = placeholder((None, self.num_factors))
         scope = "text"
-        tf.reset_default_graph()
         def encoder_func(x, eps):
             net = tf.concat([x, eps], axis=-1)
             for i in range(len(self.encoding_dims)):
@@ -165,7 +166,7 @@ class cf_vae_extend:
         train_op_dual = optimizer_dual.minimize(loss_dual, var_list=dvars)
 
         self.sess = tf.Session()
-        self.sess.run(tf.global_variables_initializer())
+        # self.sess.run(tf.global_variables_initializer())
         # LOAD TEXT#
         ckpt = os.path.join(self.ckpt_model, "cave_%d.ckpt"%self.model)
         saver = tf.train.Saver(var_list=othervars)
@@ -175,6 +176,7 @@ class cf_vae_extend:
             saver.restore(self.sess, text_ckpt)
         else:
             saver.restore(self.sess, ckpt)
+            self.initial = False
 
             # num_turn = x_input.shape[0] / self.batch_size
         start = time.time()
