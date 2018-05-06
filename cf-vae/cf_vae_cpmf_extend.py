@@ -273,11 +273,11 @@ class cf_vae_extend:
                print("epoches: %d\t loss: %f\t time: %d s"%(i, l, time.time()-start))
 
         if self.model != 6:
-            self.z_mu = z_mu
+            self.exp_z = z_mu
             self.x_recons = x_recons
 
         if self.model == 1 or self.model == 2:
-            self.z_im_mu = z_im_mu
+            self.exp_z_im = z_im_mu
             self.x_im_recons = x_im_recons
 
         if self.model == 2 or self.model == 3:
@@ -450,13 +450,13 @@ class cf_vae_extend:
         start = time.time()
         file = open(os.path.join(self.ckpt_model, "result_%d.txt"%self.model), "w")
         self.e_step(x_data, im_data, str_data)
-        self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
+        # self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
         for i in range(params.EM_iter):
             print("iter: %d"%i)
 
             self.pmf_estimate(users, items, params)
             self.e_step(x_data, im_data, str_data)
-            self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
+            # self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
 
             if i%5 == 4:
                 file.write("---------iter %d--------\n"%i)
