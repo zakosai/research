@@ -164,9 +164,14 @@ class cf_vae_extend:
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
         # LOAD TEXT#
-        ckpt = os.path.join(self.ckpt_model, "vae_%s.ckpt"%scope)
+        ckpt = os.path.join(self.ckpt_model, "cave_%d.ckpt"%self.model)
         saver = tf.train.Saver(var_list=qvars+pvars+dvars)
-        saver.restore(self.sess, ckpt)
+        if self.initial:
+
+            text_ckpt = os.path.join(self.ckpt_model, "vae_%s.ckpt"%scope)
+            saver.restore(self.sess, text_ckpt)
+        else:
+            saver.restore(self.sess, ckpt)
 
             # num_turn = x_input.shape[0] / self.batch_size
         start = time.time()
