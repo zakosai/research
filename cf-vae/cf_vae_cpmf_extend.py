@@ -424,18 +424,21 @@ class cf_vae_extend:
         return None
 
     def get_exp_hidden(self, x_data, im_data, str_data):
-        if self.model != 6:
+        if self.model == 0:
             self.exp_z = self.sess.run(self.z_mu, feed_dict={self.x_: x_data})
-        else:
-            self.exp_z = 0
-        if self.model == 1 or self.model == 2 or self.model == 6:
-            for i in range(len(im_data), self.params.batch_size):
-                im_batch = im_data[i:i+self.params.batch_size]
-                exp_z_im = self.sess.run(self.z_im_mu, feed_dict={self.x_im_: im_batch})
-                self.exp_z_im = np.concatenate((self.exp_z_im, exp_z_im), axis=0)
-        else:
-        # print(self.exp_z_im.shape)
-             self.exp_z_im = 0
+            self.exp_z_im = 0
+        elif self.model == 1:
+            self.exp_z, self.exp_z_im = self.sess.run([self.z_mu, self.z_im_mu],
+                                                      feed_dict={self.x_: x_data, self.x_im_:im_data})
+
+        # if self.model == 1 or self.model == 2 or self.model == 6:
+        #     for i in range(len(im_data), self.params.batch_size):
+        #         im_batch = im_data[i:i+self.params.batch_size]
+        #         exp_z_im = self.sess.run(self.z_im_mu, feed_dict={self.x_im_: im_batch})
+        #         self.exp_z_im = np.concatenate((self.exp_z_im, exp_z_im), axis=0)
+        # else:
+        # # print(self.exp_z_im.shape)
+        #      self.exp_z_im = 0
 
         if self.model == 2 or self.model == 3:
             self.exp_z_s = self.sess.run(self.z_s_mu, feed_dict={self.x_s_: str_data})
