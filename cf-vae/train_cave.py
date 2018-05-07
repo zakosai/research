@@ -39,14 +39,14 @@ def load_cvae_data(data_dir):
   data = {}
   # variables = scipy.io.loadmat(data_dir + "mult_nor-small.mat")
   # data["content"] = variables['X']
-  variables = load_npz(os.path.join(data_dir,"mult_nor-small.npz"))
+  variables = load_npz(os.path.join(data_dir,"mult_nor.npz"))
   data["content"] = variables.toarray()
   # variables = load_npz("data/amazon/structure_mult_nor-small.npz")
   data["structure"] = variables.toarray()
-  data["train_users"] = load_rating(data_dir + "cf-train-1-users-small.dat")
-  data["train_items"] = load_rating(data_dir + "cf-train-1-items-small.dat")
-  data["test_users"] = load_rating(data_dir + "cf-test-1-users-small.dat")
-  data["test_items"] = load_rating(data_dir + "cf-test-1-items-small.dat")
+  data["train_users"] = load_rating(data_dir + "cf-train-1-users.dat")
+  data["train_items"] = load_rating(data_dir + "cf-train-1-items.dat")
+  data["test_users"] = load_rating(data_dir + "cf-test-1-users.dat")
+  data["test_items"] = load_rating(data_dir + "cf-test-1-items.dat")
 
   return data
 
@@ -69,7 +69,7 @@ params.lambda_v = 1
 params.lambda_r = 0.1
 params.C_a = 1
 params.C_b = 0.01
-params.max_iter_m = 1
+params.max_iter_m = 5
 params.EM_iter = args.iter
 
 C = [0.1, 1, 10]
