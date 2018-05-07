@@ -174,9 +174,10 @@ class cf_vae_extend:
 
             text_ckpt = os.path.join(self.ckpt_model, "vae_%s.ckpt"%scope)
             saver.restore(self.sess, text_ckpt)
+            self.initial = False
+
         else:
             saver.restore(self.sess, ckpt)
-            self.initial = False
 
             # num_turn = x_input.shape[0] / self.batch_size
         start = time.time()
