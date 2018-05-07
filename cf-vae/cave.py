@@ -162,7 +162,7 @@ class cf_vae_extend:
         dvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope+"/discriminator_%s"%scope)
         othervars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope)
 
-        train_op_primal = optimizer_primal.minimize(self.loss_e_step, var_list=pvars+qvars)
+        train_op_primal = optimizer_primal.minimize(self.loss_e_step)
         train_op_dual = optimizer_dual.minimize(loss_dual, var_list=dvars)
 
         self.sess = tf.Session()
