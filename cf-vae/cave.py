@@ -169,15 +169,17 @@ class cf_vae_extend:
         self.sess.run(tf.global_variables_initializer())
         # LOAD TEXT#
         ckpt = os.path.join(self.ckpt_model, "cave_%d.ckpt"%self.model)
-        saver = tf.train.Saver(var_list=othervars)
+
         if self.initial:
 
             text_ckpt = os.path.join(self.ckpt_model, "vae_%s.ckpt"%scope)
-            saver.restore(self.sess, text_ckpt)
+            text_saver = tf.train.Saver(var_list=othervars)
+            text_saver.restore(self.sess, text_ckpt)
             self.initial = False
 
         else:
-            saver.restore(self.sess, ckpt)
+            self.saver = tf.train.Saver()
+            self.saver.restore(self.sess, ckpt)
 
             # num_turn = x_input.shape[0] / self.batch_size
         start = time.time()
@@ -193,7 +195,7 @@ class cf_vae_extend:
             if i % 50 == 0:
                 print("epoches: %d\t g_loss: %f\t d_loss: %f\t time: %d s"%(i, g_loss, d_loss, time.time()-start))
 
-        saver.save(self.sess, ckpt)
+        self.saver.save(self.sess, ckpt)
         self.z_mu = z_inferred
         self.x_recons = x_reconstr_logits
 
