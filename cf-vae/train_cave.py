@@ -121,7 +121,7 @@ num_factors = zdim
 #     wr.writerows(recalls)
 model_mat = os.path.join(ckpt,"cave_%d.mat"%(model_type))
 
-model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
+model = cf_vae_extend(num_users=5551, num_items=16980, num_factors=num_factors, params=params,
                       input_dim=8000, encoding_dims=[2000, 500], z_dim = zdim, decoding_dims=[500, 2000, 8000],
                       decoding_dims_str=[100,200, 1863], loss_type='cross_entropy', model = model_type, ckpt_folder=ckpt,
                       initial=initial, model_mat=model_mat)
