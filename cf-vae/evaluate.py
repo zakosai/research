@@ -56,22 +56,22 @@ params.max_iter_m = 1
 
 data = load_cvae_data(data_dir)
 num_factors = 50
-model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
-    input_dim=8000, encoding_dims=[1000, 200], z_dim = 50, decoding_dims=[200, 1000, 8000], decoding_dims_str=[100,200, 1863],
+model = cf_vae_extend(num_users=5551, num_items=16980, num_factors=num_factors, params=params,
+    input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000], decoding_dims_str=[100,200, 1863],
     loss_type='cross_entropy')
 model.load_model(os.path.join(ckpt, "cf_vae_0.mat"))
 # model.load_model("cf_vae.mat")
 pred = model.predict_all(model.U)
-recalls, mapks= model.predict(pred, data['train_users'], data['test_users'], 10)
+recalls, mapks= model.predict(pred, data['train_users'], data['test_users'], 300)
 
 
 model.load_model(os.path.join(ckpt, extend_file))
 pred = model.predict_all(model.U)
-recalls_1, mapks_1 = model.predict(pred, data['train_users'], data['test_users'], 10)
+recalls_1, mapks_1 = model.predict(pred, data['train_users'], data['test_users'], 300)
 
-model.load_model(os.path.join(ckpt, "cf_dae.mat"))
-pred = model.predict_all(model.U)
-recalls_2, mapks_2 = model.predict(pred, data['train_users'], data['test_users'], 10)
+# model.load_model(os.path.join(ckpt, "cf_dae.mat"))
+# pred = model.predict_all(model.U)
+# recalls_2, mapks_2 = model.predict(pred, data['train_users'], data['test_users'], 10)
 
 # model.load_model("pre_model/zdim2/cf_vae_0.mat")
 # pred = model.predict_all()
@@ -92,9 +92,9 @@ recalls_2, mapks_2 = model.predict(pred, data['train_users'], data['test_users']
 plt.figure()
 plt.ylabel("Recall@M")
 plt.xlabel("M")
-plt.plot(np.arange(1, 10, 1), recalls_1, '-r', label="our model")
-plt.plot(np.arange(1, 10, 1),recalls, '-b', label="CVAE")
-plt.plot(np.arange(1,10, 1), recalls_2, '-g', label="CDL")
+plt.plot(np.arange(50, 300, 50), recalls_1, '-r', label="our model")
+plt.plot(np.arange(50, 300, 50),recalls, '-b', label="CVAE")
+# plt.plot(np.arange(1,10, 1), recalls_2, '-g', label="CDL")
 
 # plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="zdim=500")
 
@@ -118,9 +118,9 @@ plt.close()
 plt.figure()
 plt.ylabel("MAP@M")
 plt.xlabel("M")
-plt.plot(np.arange(1, 10, 1),mapks_1, '-r', label="our proposed")
-plt.plot(np.arange(1, 10, 1), mapks, '-b', label="CVAE")
-plt.plot(np.arange(1, 10, 1), mapks_2, '-g', label="CDL")
+plt.plot(np.arange(50, 300, 50),mapks_1, '-r', label="our proposed")
+plt.plot(np.arange(50, 300, 50), mapks, '-b', label="CVAE")
+# plt.plot(np.arange(1, 10, 1), mapks_2, '-g', label="CDL")
 #
 plt.legend(loc='upper left')
 plt.savefig("result/map_10_%s_%s.png"%(data_dir, ckpt))
