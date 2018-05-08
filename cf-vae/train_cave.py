@@ -71,6 +71,7 @@ params.C_a = 1
 params.C_b = 0.01
 params.max_iter_m = 5
 params.EM_iter = args.iter
+params.num_iter = 50
 
 C = [0.1, 1, 10]
 
