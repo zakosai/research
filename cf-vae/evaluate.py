@@ -25,12 +25,12 @@ def load_cvae_data(data_dir):
   data = {}
   # variables = scipy.io.loadmat(data_dir + "mult_nor.mat")
   # data["content"] = variables['X']
-  variables = load_npz(os.path.join(data_dir, "mult_nor-small.npz"))
+  variables = load_npz(os.path.join(data_dir, "mult_nor.npz"))
   data["content"] = variables.toarray()
-  data["train_users"] = load_rating(os.path.join(data_dir + "cf-train-1-users-small.dat"))
-  data["train_items"] = load_rating(os.path.join(data_dir + "cf-train-1-items-small.dat"))
-  data["test_users"] = load_rating(os.path.join(data_dir + "cf-test-1-users-small.dat"))
-  data["test_items"] = load_rating(os.path.join(data_dir + "cf-test-1-items-small.dat"))
+  data["train_users"] = load_rating(os.path.join(data_dir + "cf-train-1-users.dat"))
+  data["train_items"] = load_rating(os.path.join(data_dir + "cf-train-1-items.dat"))
+  data["test_users"] = load_rating(os.path.join(data_dir + "cf-test-1-users.dat"))
+  data["test_items"] = load_rating(os.path.join(data_dir + "cf-test-1-items.dat"))
 
   return data
 
