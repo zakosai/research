@@ -144,9 +144,9 @@ class cf_vae_extend:
         reconstr_err = -tf.reduce_mean(tf.reduce_sum(x_real * tf.log(tf.maximum(x_recon, 1e-10))
                 + (1-x_real) * tf.log(tf.maximum(1 - x_recon, 1e-10)),1))
 
-        # loss_primal = tf.reduce_mean(reconstr_err + Tjoint)
+        loss_primal = tf.reduce_mean(Tjoint)
         loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z_inferred), 1))
-        self.loss_e_step = reconstr_err + loss_v + tf.reduce_mean(Tjoint)
+        self.loss_e_step = reconstr_err + loss_v + loss_primal
         loss_dual = tf.reduce_mean(
             tf.nn.sigmoid_cross_entropy_with_logits(logits=Tjoint, labels=tf.ones_like(Tjoint))
             + tf.nn.sigmoid_cross_entropy_with_logits(logits=Tseperate, labels=tf.zeros_like(Tseperate))
@@ -186,9 +186,9 @@ class cf_vae_extend:
             x_batch = x_data[idx]
             v_batch = self.V[idx]
 
-            self.sess.run([loss_primal, train_op_primal], feed_dict={self.x_:x_batch, self.v_:v_batch})
-            g_loss, _ = self.sess.run([loss_primal, train_op_primal], feed_dict={self.x_:x_batch, self.v_:v_batch})
-            g_loss, _ = self.sess.run([loss_primal, train_op_primal], feed_dict={self.x_:x_batch, self.v_:v_batch})
+            self.sess.run([self.loss_e_step, train_op_primal], feed_dict={self.x_:x_batch, self.v_:v_batch})
+            # g_loss, _ = self.sess.run([loss_primal, train_op_primal], feed_dict={self.x_:x_batch, self.v_:v_batch})
+            g_loss, _ = self.sess.run([self.loss_e_step, train_op_primal], feed_dict={self.x_:x_batch, self.v_:v_batch})
             d_loss, _ = self.sess.run([loss_dual, train_op_dual], feed_dict={self.x_:x_batch, self.v_:v_batch})
             if i % 50 == 0:
                 print("epoches: %d\t g_loss: %f\t d_loss: %f\t time: %d s"%(i, g_loss, d_loss, time.time()-start))
