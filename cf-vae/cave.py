@@ -141,11 +141,11 @@ class cf_vae_extend:
             Tjoint = discriminator(x_real, z_inferred)
             Tseperate = discriminator(x_real, z_sampled)
 
-        reconstr_err = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_, x_recon), axis=1))
+        reconstr_err = tf.reduce_sum(binary_crossentropy(self.x_, x_recon), axis=1)
 
-        loss_primal = tf.reduce_mean(Tjoint)
+        loss_primal = tf.reduce_mean(reconstr_err + Tjoint)
         loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z_inferred), 1))
-        self.loss_e_step = reconstr_err + loss_v - loss_primal
+        self.loss_e_step = loss_v + loss_primal
         loss_dual = tf.reduce_mean(
             tf.nn.sigmoid_cross_entropy_with_logits(logits=Tjoint, labels=tf.ones_like(Tjoint))
             + tf.nn.sigmoid_cross_entropy_with_logits(logits=Tseperate, labels=tf.zeros_like(Tseperate))
