@@ -86,8 +86,10 @@ class cf_vae_extend:
                 # x = x + noisy_level*tf.random_normal(tf.shape(x))
                 reg_loss = 0
                 for i in range(depth_inf):
-                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid, reuse=tf.AUTO_REUSE)
-                    w = tf.get_variable("enc_layer%s/weights"%i)
+                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    with tf.variable_scope("enc_layer%s"%i) as scope:
+                        scope.reuse_variables()
+                        w = tf.get_variable("weights")
                     reg_loss += tf.nn.l2_loss(w)
                     # print("enc_layer0/weights:0".graph)
                 h_encode = x
@@ -99,9 +101,11 @@ class cf_vae_extend:
                 # generative process
                 depth_gen = len(self.decoding_dims)
                 for i in range(depth_gen):
-                    y = dense(z, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid, reuse=tf.AUTO_REUSE)
+                    y = dense(z, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
                     # if last_layer_nonelinear: depth_gen -1
-                    w = tf.get_variable("dec_layer%s/weights"%i)
+                    with tf.variable_scope("dec_layer%s"%i) as scope:
+                        scope.reuse_variables()
+                        w = tf.get_variable("weights")
                     reg_loss += tf.nn.l2_loss(w)
 
                 x_recons = y
