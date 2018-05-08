@@ -42,7 +42,7 @@ def load_cvae_data(data_dir):
   # variables = load_npz(os.path.join(data_dir,"mult_nor.npz"))
   # data["content"] = variables.toarray()
   # variables = load_npz("data/amazon/structure_mult_nor-small.npz")
-  data["structure"] = variables.toarray()
+  data["structure"] = variables['X']
   data["train_users"] = load_rating(data_dir + "cf-train-1-users.dat")
   data["train_items"] = load_rating(data_dir + "cf-train-1-items.dat")
   data["test_users"] = load_rating(data_dir + "cf-test-1-users.dat")
