@@ -141,7 +141,7 @@ class cf_vae_extend:
             Tjoint = discriminator(x_real, z_inferred)
             Tseperate = discriminator(x_real, z_sampled)
 
-        reconstr_err = -tf.reduce_mean(tf.reduce_sum(x_real * tf.log(tf.maximum(x_recon, 1e-10))
+        reconstr_err = tf.reduce_mean(tf.reduce_sum(x_real * tf.log(tf.maximum(x_recon, 1e-10))
                 + (1-x_real) * tf.log(tf.maximum(1 - x_recon, 1e-10)),1))
 
         loss_primal = tf.reduce_mean(Tjoint)
@@ -152,7 +152,7 @@ class cf_vae_extend:
             + tf.nn.sigmoid_cross_entropy_with_logits(logits=Tseperate, labels=tf.zeros_like(Tseperate))
         )
 
-        optimizer_primal = tf.train.AdamOptimizer(2e-5)
+        optimizer_primal = tf.train.AdamOptimizer(0.1)
         optimizer_dual = tf.train.AdamOptimizer(1e-4)
 
         qvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope+"/encoder_%s"%scope)
@@ -360,6 +360,7 @@ class cf_vae_extend:
         file = open(os.path.join(self.ckpt_model, "result_%d.txt"%self.model), "w")
         self.e_step(x_data, im_data, str_data)
         self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
+        self.V = self.exp_z
         for i in range(params.EM_iter):
             print("iter: %d"%i)
 
