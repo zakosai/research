@@ -24,14 +24,14 @@ extend_file =args.mat_file
 
 def load_cvae_data(data_dir):
   data = {}
-  variables = scipy.io.loadmat(data_dir + "mult_nor.mat")
-  data["content"] = variables['X']
-  # variables = load_npz(os.path.join(data_dir, "mult_nor.npz"))
-  # data["content"] = variables.toarray()
-  data["train_users"] = load_rating(os.path.join(data_dir + "cf-train-1-users.dat"))
-  data["train_items"] = load_rating(os.path.join(data_dir + "cf-train-1-items.dat"))
-  data["test_users"] = load_rating(os.path.join(data_dir + "cf-test-1-users.dat"))
-  data["test_items"] = load_rating(os.path.join(data_dir + "cf-test-1-items.dat"))
+  # variables = scipy.io.loadmat(data_dir + "mult_nor.mat")
+  # data["content"] = variables['X']
+  variables = load_npz(os.path.join(data_dir, "mult_nor-small.npz"))
+  data["content"] = variables.toarray()
+  data["train_users"] = load_rating(os.path.join(data_dir + "cf-train-1-users-small.dat"))
+  data["train_items"] = load_rating(os.path.join(data_dir + "cf-train-1-items-small.dat"))
+  data["test_users"] = load_rating(os.path.join(data_dir + "cf-test-1-users-small.dat"))
+  data["test_items"] = load_rating(os.path.join(data_dir + "cf-test-1-items-small.dat"))
 
   return data
 
@@ -57,18 +57,18 @@ params.max_iter_m = 1
 
 data = load_cvae_data(data_dir)
 num_factors = 50
-model = cf_vae_extend(num_users=5551, num_items=16980, num_factors=num_factors, params=params,
+model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000], decoding_dims_str=[100,200, 1863],
     loss_type='cross_entropy')
 model.load_model(os.path.join(ckpt, "cf_vae_0.mat"))
 # model.load_model("cf_vae.mat")
 pred = model.predict_all(model.U)
-recalls, mapks= model.predict(pred, data['train_users'], data['test_users'], 300)
+recalls, mapks= model.predict(pred, data['train_users'], data['test_users'], 10)
 
-
-model.load_model(os.path.join(ckpt, extend_file))
-pred = model.predict_all(model.U)
-recalls_1, mapks_1 = model.predict(pred, data['train_users'], data['test_users'], 300)
+#
+# model.load_model(os.path.join(ckpt, extend_file))
+# pred = model.predict_all(model.U)
+# recalls_1, mapks_1 = model.predict(pred, data['train_users'], data['test_users'], 300)
 
 # model.load_model(os.path.join(ckpt, "cf_dae.mat"))
 # pred = model.predict_all(model.U)
@@ -90,20 +90,20 @@ recalls_1, mapks_1 = model.predict(pred, data['train_users'], data['test_users']
 # pred_im = model_im.predict_all()
 # recalls_im= model_im.predict(pred_im, data['train_users'], data['test_users'], 10)
 
-plt.figure()
-plt.ylabel("Recall@M")
-plt.xlabel("M")
-plt.plot(np.arange(50, 300, 50), recalls_1, '-r', label="our model")
-plt.plot(np.arange(50, 300, 50),recalls, '-b', label="CVAE")
+# plt.figure()
+# plt.ylabel("Recall@M")
+# plt.xlabel("M")
+# plt.plot(np.arange(50, 300, 50), recalls_1, '-r', label="our model")
+# plt.plot(np.arange(50, 300, 50),recalls, '-b', label="CVAE")
 # plt.plot(np.arange(1,10, 1), recalls_2, '-g', label="CDL")
 
 # plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="zdim=500")
 
-plt.legend(loc='upper left')
-data_dir = data_dir.split("/")[1]
-ckpt = ckpt.split("/")[-1]
-plt.savefig("result/recall_10_%s_%s.png"%(data_dir, ckpt))
-plt.close()
+# plt.legend(loc='upper left')
+# data_dir = data_dir.split("/")[1]
+# ckpt = ckpt.split("/")[-1]
+# plt.savefig("result/recall_10_%s_%s.png"%(data_dir, ckpt))
+# plt.close()
 
 # plt.figure()
 # plt.ylabel("Precision@M")
@@ -116,13 +116,13 @@ plt.close()
 # plt.savefig("result/precision_test.png")
 # plt.close()
 #
-plt.figure()
-plt.ylabel("MAP@M")
-plt.xlabel("M")
-plt.plot(np.arange(50, 300, 50),mapks_1, '-r', label="our proposed")
-plt.plot(np.arange(50, 300, 50), mapks, '-b', label="CVAE")
-# plt.plot(np.arange(1, 10, 1), mapks_2, '-g', label="CDL")
-#
-plt.legend(loc='upper left')
-plt.savefig("result/map_10_%s_%s.png"%(data_dir, ckpt))
-plt.close()
+# plt.figure()
+# plt.ylabel("MAP@M")
+# plt.xlabel("M")
+# plt.plot(np.arange(50, 300, 50),mapks_1, '-r', label="our proposed")
+# plt.plot(np.arange(50, 300, 50), mapks, '-b', label="CVAE")
+# # plt.plot(np.arange(1, 10, 1), mapks_2, '-g', label="CDL")
+# #
+# plt.legend(loc='upper left')
+# plt.savefig("result/map_10_%s_%s.png"%(data_dir, ckpt))
+# plt.close()
