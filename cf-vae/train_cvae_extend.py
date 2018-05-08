@@ -37,7 +37,7 @@ print(model_type)
 
 def load_cvae_data(data_dir):
   data = {}
-  variables = scipy.io.loadmat(data_dir + "mult_nor-small.mat")
+  variables = scipy.io.loadmat(data_dir + "mult_nor.mat")
   data["content"] = variables['X']
   # variables = load_npz(os.path.join(data_dir,"mult_nor.npz"))
   # data["content"] = variables.toarray()
