@@ -37,16 +37,16 @@ print(model_type)
 
 def load_cvae_data(data_dir):
   data = {}
-  # variables = scipy.io.loadmat(data_dir + "mult_nor-small.mat")
-  # data["content"] = variables['X']
-  variables = load_npz(os.path.join(data_dir,"mult_nor-small.npz"))
-  data["content"] = variables.toarray()
+  variables = scipy.io.loadmat(data_dir + "mult_nor-small.mat")
+  data["content"] = variables['X']
+  # variables = load_npz(os.path.join(data_dir,"mult_nor.npz"))
+  # data["content"] = variables.toarray()
   # variables = load_npz("data/amazon/structure_mult_nor-small.npz")
   data["structure"] = variables.toarray()
-  data["train_users"] = load_rating(data_dir + "cf-train-1-users-small.dat")
-  data["train_items"] = load_rating(data_dir + "cf-train-1-items-small.dat")
-  data["test_users"] = load_rating(data_dir + "cf-test-1-users-small.dat")
-  data["test_items"] = load_rating(data_dir + "cf-test-1-items-small.dat")
+  data["train_users"] = load_rating(data_dir + "cf-train-1-users.dat")
+  data["train_items"] = load_rating(data_dir + "cf-train-1-items.dat")
+  data["test_users"] = load_rating(data_dir + "cf-test-1-users.dat")
+  data["test_items"] = load_rating(data_dir + "cf-test-1-items.dat")
 
   return data
 
@@ -121,7 +121,7 @@ num_factors = zdim
 #     wr.writerows(recalls)
 model_mat = os.path.join(ckpt,"cf_vae_%d.mat"%(model_type))
 
-model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
+model = cf_vae_extend(num_users=5551, num_items=16980, num_factors=num_factors, params=params,
                       input_dim=8000, encoding_dims=[200, 100], z_dim = zdim, decoding_dims=[100, 200, 8000],
                       decoding_dims_str=[100,200, 1863], loss_type='cross_entropy', model = model_type, ckpt_folder=ckpt,
                       initial=initial, model_mat=model_mat)
