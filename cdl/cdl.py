@@ -83,7 +83,7 @@ if __name__ == '__main__':
     K = 50  # no of latent vectors in the compact representation
     p = 10 # used for data-folder name
     data_dir ="data/amazon2/" # whether to use dummy data
-    num_iter = 10000
+    num_iter = 1000
     batch_size = 512
 
     np.random.seed(1234) # set seed
@@ -111,7 +111,7 @@ if __name__ == '__main__':
     #    internal_act='relu', output_act='relu')
 
     #mx.cpu() no param needed for cpu.
-    ae_model = AutoEncoderModel(mx.gpu(), [X.shape[1],200,K],
+    ae_model = AutoEncoderModel(mx.cpu(), [X.shape[1],200,K],
         pt_dropout=0.2, internal_act='relu', output_act='relu')
 
     train_X = X
