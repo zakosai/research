@@ -135,20 +135,18 @@ class cf_vae_extend:
             eps = tf.random_normal(tf.shape(x_real))
 
             z_inferred = encoder(x_real, eps)
-            x_reconstr_logits = decoder(z_inferred)
+            x_recon = decoder(z_inferred)
             z_sampled = tf.random_normal(tf.shape(z_inferred))
 
             Tjoint = discriminator(x_real, z_inferred)
             Tseperate = discriminator(x_real, z_sampled)
 
-        reconstr_err = tf.reduce_sum(
-            tf.nn.sigmoid_cross_entropy_with_logits(labels=x_real, logits=x_reconstr_logits),
-            axis=1
-        )
+        reconstr_err = -tf.reduce_mean(tf.reduce_sum(self.x * tf.log(tf.maximum(x_recon, 1e-10))
+                + (1-self.x) * tf.log(tf.maximum(1 - x_recon, 1e-10)),1))
 
-        loss_primal = tf.reduce_mean(reconstr_err + Tjoint)
+        # loss_primal = tf.reduce_mean(reconstr_err + Tjoint)
         loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z_inferred), 1))
-        self.loss_e_step = loss_primal + loss_v
+        self.loss_e_step = reconstr_err + loss_v + tf.reduce_mean(Tjoint)
         loss_dual = tf.reduce_mean(
             tf.nn.sigmoid_cross_entropy_with_logits(logits=Tjoint, labels=tf.ones_like(Tjoint))
             + tf.nn.sigmoid_cross_entropy_with_logits(logits=Tseperate, labels=tf.zeros_like(Tseperate))
@@ -197,7 +195,7 @@ class cf_vae_extend:
 
         self.saver.save(self.sess, ckpt)
         self.z_mu = z_inferred
-        self.x_recons = x_reconstr_logits
+        self.x_recons = x_recon
 
     def pmf_estimate(self, users, items, params):
         """
