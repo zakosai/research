@@ -473,11 +473,17 @@ class cf_vae_extend:
     def load_model(self, load_path_pmf):
         # self.saver.restore(self.sess, load_path_weights)
         data = sio.loadmat(load_path_pmf)
-        self.U = data["U"]
-        self.V = data["V"]
-        self.exp_z = data["Z"]
-        self.exp_z_im = data["Z_im"]
-        print "model loaded"
+        try:
+            self.U = data["U"]
+            self.V = data["V"]
+            self.exp_z = data["Z"]
+            self.exp_z_im = data["Z_im"]
+            print "model loaded"
+        except:
+            self.U = data["m_U"]
+            self.V = data["m_V"]
+            self.exp_z = data["m_theta"]
+            print "model loaded"
 
     def predict(self, pred_all, train_users, test_users, M):
         # user_all = map(add, train_users, test_users)
