@@ -111,7 +111,7 @@ if __name__ == '__main__':
     #    internal_act='relu', output_act='relu')
 
     #mx.cpu() no param needed for cpu.
-    ae_model = AutoEncoderModel(mx.cpu(), [X.shape[1],200,K],
+    ae_model = AutoEncoderModel(mx.gpu(), [X.shape[1],200,K],
         pt_dropout=0.2, internal_act='relu', output_act='relu')
 
     train_X = X
