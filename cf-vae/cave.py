@@ -151,7 +151,7 @@ class cf_vae_extend:
             + tf.nn.sigmoid_cross_entropy_with_logits(logits=Tseperate, labels=tf.zeros_like(Tseperate))
         )
 
-        optimizer_primal = tf.train.AdamOptimizer(0.1)
+        optimizer_primal = tf.train.AdamOptimizer(2e-5)
         optimizer_dual = tf.train.AdamOptimizer(1e-4)
 
         qvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope+"/encoder_%s"%scope)
