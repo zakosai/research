@@ -32,6 +32,14 @@ def load_rating(path):
     arr.append(l)
   return arr
 
+def load_rating2(path, num_u=8000, num_v=16000):
+  R = np.mat(np.zeros((num_u,num_v)))
+  fp =open(path)
+  for i,line in enumerate(fp):
+    segs = line.strip().split(' ')[1:]
+    for seg in segs:
+        R[i,int(seg)] = 1
+  return R
 
 def predict_val(pred_all, train_users, test_users, file=None):
     user_all = test_users
@@ -101,10 +109,10 @@ if __name__ == '__main__':
     # variables = load_npz("data/amazon2/mult_nor-small.npz")
     # X = variables.toarray()
     #
-    # R = load_rating(data_dir + "cf-train-1-users-small.dat")
+    R = load_rating2(data_dir + "cf-train-1-users-small.dat")
 
     X = data["content"]
-    R = data["train_users"]
+    # R = data["train_users"]
     # set to INFO to see less information during training
     logging.basicConfig(level=logging.DEBUG)
     #ae_model = AutoEncoderModel(mx.gpu(0), [784,500,500,2000,10], pt_dropout=0.2,
@@ -131,7 +139,7 @@ if __name__ == '__main__':
     np.savetxt(dir_save+'/final-theta.dat',theta,fmt='%.5f',comments='')
 
     pred_all = predict_all(U, V)
-    predict_val(pred_all, R, data["test_users"])
+    predict_val(pred_all, data["train_users"], data["test_users"])
 
     #ae_model.load('cdl_pt.arg')
     Recon_loss = lambda_v/lv*ae_model.eval(train_X,V,lambda_v_rt)
