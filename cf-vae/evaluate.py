@@ -47,9 +47,9 @@ def load_rating(path):
   return arr
 
 params = params()
-params.lambda_u = 0.1
+params.lambda_u = 1
 params.lambda_v = 1
-params.lambda_r = 1
+params.lambda_r = 0.1
 params.C_a = 1
 params.C_b = 0.01
 params.max_iter_m = 1
@@ -65,14 +65,14 @@ model.load_model(os.path.join(ckpt, "cf_vae_0.mat"))
 pred = model.predict_all(model.U)
 recalls, mapks= model.predict(pred, data['train_users'], data['test_users'], 10)
 
-#
-# model.load_model(os.path.join(ckpt, extend_file))
-# pred = model.predict_all(model.U)
-# recalls_1, mapks_1 = model.predict(pred, data['train_users'], data['test_users'], 300)
 
-# model.load_model(os.path.join(ckpt, "cf_dae.mat"))
-# pred = model.predict_all(model.U)
-# recalls_2, mapks_2 = model.predict(pred, data['train_users'], data['test_users'], 10)
+model.load_model(os.path.join(ckpt, extend_file))
+pred = model.predict_all(model.U)
+recalls_1, mapks_1 = model.predict(pred, data['train_users'], data['test_users'], 10)
+
+model.load_model(os.path.join(ckpt, "cf_dae.mat"))
+pred = model.predict_all(model.U)
+recalls_2, mapks_2 = model.predict(pred, data['train_users'], data['test_users'], 10)
 
 # model.load_model("pre_model/zdim2/cf_vae_0.mat")
 # pred = model.predict_all()
@@ -90,20 +90,20 @@ recalls, mapks= model.predict(pred, data['train_users'], data['test_users'], 10)
 # pred_im = model_im.predict_all()
 # recalls_im= model_im.predict(pred_im, data['train_users'], data['test_users'], 10)
 
-# plt.figure()
-# plt.ylabel("Recall@M")
-# plt.xlabel("M")
-# plt.plot(np.arange(50, 300, 50), recalls_1, '-r', label="our model")
-# plt.plot(np.arange(50, 300, 50),recalls, '-b', label="CVAE")
-# plt.plot(np.arange(1,10, 1), recalls_2, '-g', label="CDL")
+plt.figure()
+plt.ylabel("Recall@M")
+plt.xlabel("M")
+plt.plot(np.arange(1, 10, 1), recalls_1, '-r', label="our model")
+plt.plot(np.arange(1, 10, 1),recalls, '-b', label="CVAE")
+plt.plot(np.arange(1,10, 1), recalls_2, '-g', label="CDL")
 
 # plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="zdim=500")
 
-# plt.legend(loc='upper left')
-# data_dir = data_dir.split("/")[1]
-# ckpt = ckpt.split("/")[-1]
-# plt.savefig("result/recall_10_%s_%s.png"%(data_dir, ckpt))
-# plt.close()
+plt.legend(loc='upper left')
+data_dir = data_dir.split("/")[1]
+ckpt = ckpt.split("/")[-1]
+plt.savefig("result/recall_10_%s_%s.png"%(data_dir, ckpt))
+plt.close()
 
 # plt.figure()
 # plt.ylabel("Precision@M")
@@ -116,13 +116,13 @@ recalls, mapks= model.predict(pred, data['train_users'], data['test_users'], 10)
 # plt.savefig("result/precision_test.png")
 # plt.close()
 #
-# plt.figure()
-# plt.ylabel("MAP@M")
-# plt.xlabel("M")
-# plt.plot(np.arange(50, 300, 50),mapks_1, '-r', label="our proposed")
-# plt.plot(np.arange(50, 300, 50), mapks, '-b', label="CVAE")
-# # plt.plot(np.arange(1, 10, 1), mapks_2, '-g', label="CDL")
-# #
-# plt.legend(loc='upper left')
-# plt.savefig("result/map_10_%s_%s.png"%(data_dir, ckpt))
-# plt.close()
+plt.figure()
+plt.ylabel("MAP@M")
+plt.xlabel("M")
+plt.plot(np.arange(1, 10, 1),mapks_1, '-r', label="our proposed")
+plt.plot(np.arange(1, 10, 1), mapks, '-b', label="CVAE")
+plt.plot(np.arange(1, 10, 1), mapks_2, '-g', label="CDL")
+#
+plt.legend(loc='upper left')
+plt.savefig("result/map_10_%s_%s.png"%(data_dir, ckpt))
+plt.close()
