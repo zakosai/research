@@ -84,8 +84,11 @@ class cf_vae_extend:
                 #x = tf.layers.dropout(x, rate=0.3)
                 # noisy_level = 1
                 # x = x + noisy_level*tf.random_normal(tf.shape(x))
+                reg_loss = 0
                 for i in range(depth_inf):
                     x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    w = tf.get_variable("enc_layer%s/weights"%i)
+                    reg_loss += tf.nn.l2_loss(w)
                     # print("enc_layer0/weights:0".graph)
                 h_encode = x
                 z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
@@ -98,6 +101,8 @@ class cf_vae_extend:
                 for i in range(depth_gen):
                     y = dense(z, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
                     # if last_layer_nonelinear: depth_gen -1
+                    w = tf.get_variable("dec_layer%s/weights"%i)
+                    reg_loss += tf.nn.l2_loss(w)
 
                 x_recons = y
 
@@ -206,7 +211,7 @@ class cf_vae_extend:
 
             if self.model == 0:
                 loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z), 1))
-                self.loss_e_step = loss_recons + loss_kl + loss_v
+                self.loss_e_step = loss_recons + loss_kl + loss_v + 2e-4*reg_loss
 
             elif self.model == 1:
                 loss_im_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_im_), K.flatten(x_im_recons))
