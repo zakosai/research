@@ -81,7 +81,7 @@ class cf_vae_extend:
         def encoder_func(x, eps):
             net = tf.concat([x, eps], axis=-1)
             for i in range(len(self.encoding_dims)):
-                net = slim.fully_connected(net, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation_fn=tf.nn.elu)
+                net = slim.fully_connected(net, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation_fn=tf.nn.sigmoid)
 
             z = slim.fully_connected(net, self.z_dim, activation_fn=None)
             return z
@@ -90,7 +90,7 @@ class cf_vae_extend:
         def decoder_func(z):
             net = z
             for i in range(len(self.decoding_dims) -1):
-                net = slim.fully_connected(net, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation_fn=tf.nn.elu)
+                net = slim.fully_connected(net, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation_fn=tf.nn.sigmoid)
 
             xlogits = slim.fully_connected(net, self.decoding_dims[-1], activation_fn=None)
             return xlogits
