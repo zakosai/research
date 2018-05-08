@@ -1,8 +1,16 @@
-python CollaborativeVAE/test_cvae.py
-python research/cf-vae/train_cf_dae.py --model=0 --iter=15 --ckpt_folder=pre3/dae/
+cd CollaborativeVAE
+python test_cvae.py
 
-python research/cf-vae/train_cf_dae.py --model=1 --iter=15 --ckpt_folder=pre3/dae/
-python research/
+
+cd ..
+cd research/cf-vae
+python train_cf_dae.py --model=0 --iter=15 --ckpt_folder=pre3/dae/
+
+python train_cf_dae.py --model=1 --iter=15 --ckpt_folder=pre3/dae/
+
+cd ..
+cd cdl
+python cdl.py
 
 
 
