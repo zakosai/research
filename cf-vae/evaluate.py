@@ -6,6 +6,7 @@ from scipy.sparse import load_npz
 from cf_vae_cpmf_extend import cf_vae_extend, params
 import argparse
 import os
+import scipy
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 
@@ -23,10 +24,10 @@ extend_file =args.mat_file
 
 def load_cvae_data(data_dir):
   data = {}
-  # variables = scipy.io.loadmat(data_dir + "mult_nor.mat")
-  # data["content"] = variables['X']
-  variables = load_npz(os.path.join(data_dir, "mult_nor.npz"))
-  data["content"] = variables.toarray()
+  variables = scipy.io.loadmat(data_dir + "mult_nor.mat")
+  data["content"] = variables['X']
+  # variables = load_npz(os.path.join(data_dir, "mult_nor.npz"))
+  # data["content"] = variables.toarray()
   data["train_users"] = load_rating(os.path.join(data_dir + "cf-train-1-users.dat"))
   data["train_items"] = load_rating(os.path.join(data_dir + "cf-train-1-items.dat"))
   data["test_users"] = load_rating(os.path.join(data_dir + "cf-test-1-users.dat"))
