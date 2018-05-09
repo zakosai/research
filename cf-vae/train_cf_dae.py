@@ -97,7 +97,7 @@ for u in [0.01, 0.1, 1]:
             model.save_model(os.path.join(ckpt,"cf_dae_%d_%d.mat"%(model_type, i)))
             # model.load_model("cf_vae.mat")
             f = open(os.path.join(ckpt, "result_%d.txt"%model_type), 'a')
-            f.write("-----------%d----------%d----------%d\n"%(u,v,r))
+            f.write("-----------%f----------%f----------%f\n"%(u,v,r))
             pred_all = model.predict_all()
             model.predict_val(pred_all, data["train_users"], data["test_users"], f)
             f.write("\n")
