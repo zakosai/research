@@ -81,9 +81,9 @@ img = images.reshape((16000, 64, 64, 3))
 img = img.astype(np.float32)/255
 num_factors = 50
 
-i = 0
+i = 9
 recalls = []
-for u in [0.01, 0.1, 1]:
+for u in [0.1, 1]:
     params.lambda_u = u
     for v in [1, 10, 100]:
         params.lambda_v = v

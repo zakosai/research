@@ -1,16 +1,9 @@
-cd CollaborativeVAE
-python test_cvae.py
+mkdir citeu/z4_50
+cp citeu/z2_50/vae_* citeu/z4_50/.
+python train_cave.py --ckpt_folder=citeu/z4_50 --data_dir=data/citeulike-a/ --iter=15 --zdim=50 --model=0
 
+python train_cf_dae.py --ckpt_folder=pre3/dae --data_dir=data/amazon2/ --iter=15  --zdim=50 --model=1
 
-cd ..
-cd research/cf-vae
-python train_cf_dae.py --model=0 --iter=15 --ckpt_folder=pre3/dae/
-
-python train_cf_dae.py --model=1 --iter=15 --ckpt_folder=pre3/dae/
-
-cd ..
-cd cdl
-python cdl.py
 
 
 
