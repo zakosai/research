@@ -77,6 +77,7 @@ class cf_vae_extend:
         self.x_ = placeholder((None, self.input_dim))  # we need these global nodes
         self.x_s_ = placeholder((None, 8000))
         self.v_ = placeholder((None, self.num_factors))
+        self.x_im_ = placeholder((None, self.input_width, self.input_height, self.channel))
 
         # inference process
         if self.model != 6:
@@ -88,8 +89,8 @@ class cf_vae_extend:
                 # x = x + noisy_level*tf.random_normal(tf.shape(x))
                 reg_loss = 0
                 for i in range(depth_inf):
-                    # x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
-                    x = slim.fully_connected(x, self.encoding_dims[i], activation_fn=tf.nn.sigmoid, scope="enc_layer%s"%i)
+                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    # x = slim.fully_connected(x, self.encoding_dims[i], activation_fn=tf.nn.sigmoid, scope="enc_layer%s"%i)
 
                     # print("enc_layer0/weights:0".graph)
                 # h_encode = x
@@ -108,9 +109,9 @@ class cf_vae_extend:
                 depth_gen = len(self.decoding_dims)
                 y = z
                 for i in range(depth_gen):
-                    # y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
-                    y = slim.fully_connected(y, self.decoding_dims[i], activation_fn=tf.nn.sigmoid,
-                                             scope="dec_layer%s"%i)
+                    y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    # y = slim.fully_connected(y, self.decoding_dims[i], activation_fn=tf.nn.sigmoid,
+                    #                          scope="dec_layer%s"%i)
                     # if last_layer_nonelinear: depth_gen -1
 
 
@@ -139,7 +140,6 @@ class cf_vae_extend:
                 x_s_recons = y_s
 
         if self.model == 1 or self.model == 2 or self.model==6:
-            self.x_im_ = placeholder((None, self.input_width, self.input_height, self.channel))
 
             with tf.variable_scope("image"):
                 x_im_ = self.x_im_
