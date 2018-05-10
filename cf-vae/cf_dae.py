@@ -422,9 +422,9 @@ class cf_vae_extend:
             if i%5 == 4:
                 file = open(os.path.join(self.ckpt, "result_%d.txt"%self.model), 'a')
                 file.write("---------iter %d--------\n"%i)
-                pred_all = self.predict_all(self.U)
+                pred_all = self.predict_all()
                 self.predict_val(pred_all, users, test_users, file)
-                self.save_model(save_path_pmf=os.path.join(self.ckpt, "cf_vae_%d_%d.mat"%(self.model, i)))
+                self.save_model(save_path_pmf=os.path.join(self.ckpt, "cf_dae_%d_%d.mat"%(self.model, i)))
                 print(time.time() - start)
                 file.close()
         print("time: %d"%(time.time()-start))
