@@ -16,6 +16,7 @@ from operator import add
 from resnet_model import conv2d_fixed_padding, building_block, block_layer
 import ml_metrics
 import math
+import tensorflow.contrib.layers as slim
 
 class params:
     def __init__(self):
@@ -31,6 +32,7 @@ class params:
         self.batch_size = 500
         self.num_iter = 300   # used in the e_step
         self.EM_iter = 30
+        self.weight_decay = 2e-4
 
 class cf_vae_extend:
     def __init__(self, num_users, num_items, num_factors, params, input_dim, encoding_dims, z_dim, decoding_dims,
@@ -87,10 +89,10 @@ class cf_vae_extend:
                 reg_loss = 0
                 for i in range(depth_inf):
                     x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
-                    with tf.variable_scope("enc_layer%s"%i) as scope:
-                        scope.reuse_variables()
-                        w = tf.get_variable("weights")
-                    reg_loss += tf.nn.l2_loss(w)
+                    # x = slim.fully_connected(x, self.encoding_dims[i], activation_fn=tf.nn.sigmoid,
+                    #                                 weights_regularizer=slim.l2_regularizer(self.params.weight_decay),
+                    #                          scope="enc_layer%s"%i)
+
                     # print("enc_layer0/weights:0".graph)
                 h_encode = x
                 z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
@@ -98,15 +100,22 @@ class cf_vae_extend:
                 e = tf.random_normal(tf.shape(z_mu))
                 z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
 
+                # h_encode = x
+                # z_mu = slim.fully_connected(h_encode, self.z_dim, scope="mu_layer")
+                # z_log_sigma_sq = slim.fully_connected(h_encode, self.z_dim, scope="sigma_layer")
+                # e = tf.random_normal(tf.shape(z_mu))
+                # z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
+
                 # generative process
                 depth_gen = len(self.decoding_dims)
+                y = z
                 for i in range(depth_gen):
-                    y = dense(z, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    # y = slim.fully_connected(y, self.decoding_dims[i], activation_fn=tf.nn.sigmoid,
+                    #                                 weights_regularizer=slim.l2_regularizer(self.params.weight_decay),
+                    #                          scope="dec_layer%s"%i)
                     # if last_layer_nonelinear: depth_gen -1
-                    with tf.variable_scope("dec_layer%s"%i) as scope:
-                        scope.reuse_variables()
-                        w = tf.get_variable("weights")
-                    reg_loss += tf.nn.l2_loss(w)
+
 
                 x_recons = y
 
@@ -277,7 +286,7 @@ class cf_vae_extend:
             idx = np.random.choice(self.num_items, self.params.batch_size, replace=False)
             x_batch = x_data[idx]
             v_batch = self.V[idx]
-            # img_batch = im_data[idx]
+            img_batch = im_data[idx]
             str_batch = str_data[idx]
             _, l = self.sess.run((train_op, self.loss_e_step),
                                  feed_dict={self.x_:x_batch, self.v_:v_batch, self.x_s_:str_batch})
