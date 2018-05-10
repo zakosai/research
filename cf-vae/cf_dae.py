@@ -88,8 +88,9 @@ class cf_vae_extend:
 
             # generative process
             depth_gen = len(self.decoding_dims)
+            y = z
             for i in range(depth_gen):
-                y = dense(z, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
                 # if last_layer_nonelinear: depth_gen -1
 
             x_recons = y
@@ -419,7 +420,7 @@ class cf_vae_extend:
             self.pmf_estimate(users, items, params)
             self.e_step(x_data, im_data, str_data)
             self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
-            if i%5 == 4:
+            if i%50 == 40:
                 file = open(os.path.join(self.ckpt, "result_%d.txt"%self.model), 'a')
                 file.write("---------iter %d--------\n"%i)
                 pred_all = self.predict_all()

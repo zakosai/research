@@ -56,9 +56,9 @@ class vanilla_vae:
             # generative process
             if self.useTranse == False:
                 depth_gen = len(self.decoding_dims)
-
+                y = z
                 for i in range(depth_gen):
-                    y = dense(z, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
                     # if last_layer_nonelinear: depth_gen -1
 
             else:
