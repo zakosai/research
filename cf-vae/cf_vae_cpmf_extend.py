@@ -286,7 +286,7 @@ class cf_vae_extend:
             img_batch = im_data[idx]
             str_batch = str_data[idx]
             _, l = self.sess.run((train_op, self.loss_e_step),
-                                 feed_dict={self.x_:x_batch, self.v_:v_batch, self.x_s_:str_batch})
+                                 feed_dict={self.x_:x_batch, self.v_:v_batch, self.x_s_:str_batch, self.x_im_:img_batch})
             if i % 50 == 0:
                print("epoches: %d\t loss: %f\t time: %d s"%(i, l, time.time()-start))
 
