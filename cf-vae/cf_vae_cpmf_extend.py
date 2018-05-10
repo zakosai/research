@@ -88,32 +88,29 @@ class cf_vae_extend:
                 # x = x + noisy_level*tf.random_normal(tf.shape(x))
                 reg_loss = 0
                 for i in range(depth_inf):
-                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
-                    # x = slim.fully_connected(x, self.encoding_dims[i], activation_fn=tf.nn.sigmoid,
-                    #                                 weights_regularizer=slim.l2_regularizer(self.params.weight_decay),
-                    #                          scope="enc_layer%s"%i)
+                    # x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    x = slim.fully_connected(x, self.encoding_dims[i], activation_fn=tf.nn.sigmoid, scope="enc_layer%s"%i)
 
                     # print("enc_layer0/weights:0".graph)
-                h_encode = x
-                z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
-                z_log_sigma_sq = dense(h_encode, self.z_dim, scope = "sigma_layer")
-                e = tf.random_normal(tf.shape(z_mu))
-                z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
-
                 # h_encode = x
-                # z_mu = slim.fully_connected(h_encode, self.z_dim, scope="mu_layer")
-                # z_log_sigma_sq = slim.fully_connected(h_encode, self.z_dim, scope="sigma_layer")
+                # z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
+                # z_log_sigma_sq = dense(h_encode, self.z_dim, scope = "sigma_layer")
                 # e = tf.random_normal(tf.shape(z_mu))
                 # z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
+
+                h_encode = x
+                z_mu = slim.fully_connected(h_encode, self.z_dim, scope="mu_layer")
+                z_log_sigma_sq = slim.fully_connected(h_encode, self.z_dim, scope="sigma_layer")
+                e = tf.random_normal(tf.shape(z_mu))
+                z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
 
                 # generative process
                 depth_gen = len(self.decoding_dims)
                 y = z
                 for i in range(depth_gen):
-                    y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
-                    # y = slim.fully_connected(y, self.decoding_dims[i], activation_fn=tf.nn.sigmoid,
-                    #                                 weights_regularizer=slim.l2_regularizer(self.params.weight_decay),
-                    #                          scope="dec_layer%s"%i)
+                    # y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    y = slim.fully_connected(y, self.decoding_dims[i], activation_fn=tf.nn.sigmoid,
+                                             scope="dec_layer%s"%i)
                     # if last_layer_nonelinear: depth_gen -1
 
 
@@ -466,7 +463,6 @@ class cf_vae_extend:
 
     def fit(self, users, items, x_data, im_data, str_data, params, test_users):
         start = time.time()
-        file = open(os.path.join(self.ckpt_model, "result_%d.txt"%self.model), "w")
         self.e_step(x_data, im_data, str_data)
         self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
         for i in range(params.EM_iter):
@@ -476,13 +472,14 @@ class cf_vae_extend:
             self.e_step(x_data, im_data, str_data)
             self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
 
-            if i%5 == 4:
+            if i%50 == 4:
+                file = open(os.path.join(self.ckpt_model, "result_%d.txt"%self.model), 'a')
                 file.write("---------iter %d--------\n"%i)
                 pred_all = self.predict_all(self.U)
                 self.predict_val(pred_all, users, test_users, file)
                 self.save_model(save_path_pmf=os.path.join(self.ckpt_model, "cf_vae_%d_%d.mat"%(self.model, i)))
                 print(time.time() - start)
-        file.close()
+                file.close()
         print("time: %d"%(time.time()-start))
         return None
 
