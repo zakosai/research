@@ -18,7 +18,6 @@
 
 python train_cvae_extend.py --model=1 --ckpt_folder=grocery/z50_fix --data_dir=data/amazon2/ --iter=15 --zdim=50
 
-python train_dae.py --ckpt_folder=grocery/dae_fix --data_dir=data/amazon2/
 python train_cf_dae.py --ckpt_folder=grocery/dae_fix --data_dir=data/amazon2/ --iter=15  --model=0
 python train_cf_dae.py --ckpt_folder=grocery/dae_fix --data_dir=data/amazon2/ --iter=15  --model=1
 python train_cvae_extend.py --model=0 --ckpt_folder=grocery/z50_fix --data_dir=data/amazon2/ --iter=15 --zdim=50
