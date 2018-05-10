@@ -71,7 +71,7 @@ params.C_a = 1
 params.C_b = 0.01
 params.max_iter_m = 5
 params.EM_iter = args.iter
-params.num_iter = 50
+params.num_iter = 300
 
 C = [0.1, 1, 10]
 
@@ -99,7 +99,6 @@ for u in [0.01, 0.1, 1]:
         params.lambda_v = v
         for r in [0.1, 1, 10]:
             params.lambda_r = r
-            print(u, v, r)
             model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
                                   input_dim=8000, encoding_dims=[1000, 200], z_dim = 50, decoding_dims=[200, 1000, 8000],
                                   decoding_dims_str=[100,200, 1863], loss_type='cross_entropy', model = model_type, ckpt_folder=ckpt, initial=initial)
