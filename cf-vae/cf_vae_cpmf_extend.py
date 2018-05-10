@@ -594,5 +594,5 @@ class cf_vae_extend:
             # precision_avgs.append(precision_avg)
 
 
-    def predict_all(self, U):
-        return np.dot(U, (self.V.T))
+    def predict_all(self):
+        return np.dot(self.U, (self.V.T))
