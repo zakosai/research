@@ -100,8 +100,12 @@ class vanilla_vae:
             Tjoint = discriminator(x_real, z_inferred)
             Tseperate = discriminator(x_real, z_sampled)
 
-        reconstr_err =  -tf.reduce_mean(tf.reduce_sum(x_real * tf.log(tf.maximum(x_recon, 1e-10))
-            + (1-x_real) * tf.log(tf.maximum(1 - x_recon, 1e-10)),1))
+        # reconstr_err =  -tf.reduce_mean(tf.reduce_sum(x_real * tf.log(tf.maximum(x_recon, 1e-10))
+        #     + (1-x_real) * tf.log(tf.maximum(1 - x_recon, 1e-10)),1))
+        reconstr_err = tf.reduce_sum(
+    tf.nn.sigmoid_cross_entropy_with_logits(labels=x_real, logits=x_recon),
+    axis=1
+)
 
         loss_primal = tf.reduce_mean(reconstr_err + Tjoint)
         loss_dual = tf.reduce_mean(
@@ -131,9 +135,10 @@ class vanilla_vae:
             for i in range(epochs):
                 idx = np.random.choice(x_input.shape[0], batch_size, replace=False)
                 x_batch = x_input[idx]
-                sess.run([loss_primal, train_op_primal], feed_dict={x_real:x_batch})
+                # sess.run([loss_primal, train_op_primal], feed_dict={x_real:x_batch})
                 g_loss, _ = sess.run([loss_primal, train_op_primal], feed_dict={x_real:x_batch})
-                g_loss, _ = sess.run([loss_primal, train_op_primal], feed_dict={x_real:x_batch})
+                # g_loss, _ = sess.run([loss_primal, train_op_primal], feed_dict={x_real:x_batch})
+                d_loss, _ = sess.run([loss_dual, train_op_dual], feed_dict={x_real:x_batch})
                 d_loss, _ = sess.run([loss_dual, train_op_dual], feed_dict={x_real:x_batch})
                 if i % self.print_size == 0:
                     print("epoches: %d\t g_loss: %f\t d_loss: %f\t time: %d s"%(i, g_loss, d_loss, time.time()-start))
