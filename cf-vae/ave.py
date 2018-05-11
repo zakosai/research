@@ -95,15 +95,13 @@ class vanilla_vae:
             x_real = placeholder((None, self.input_dim))
             z_sampled = tf.random_normal([self.batch_size, self.z_dim])
             z_inferred = encoder(x_real, eps)
-            x_reconstr_logits = decoder(z_inferred)
+            x_recon = decoder(z_inferred)
 
             Tjoint = discriminator(x_real, z_inferred)
             Tseperate = discriminator(x_real, z_sampled)
 
-        reconstr_err = tf.reduce_sum(
-            tf.nn.sigmoid_cross_entropy_with_logits(labels=x_real, logits=x_reconstr_logits),
-            axis=1
-        )
+        reconstr_err =  -tf.reduce_mean(tf.reduce_sum(x_real * tf.log(tf.maximum(x_recon, 1e-10))
+            + (1-x_real) * tf.log(tf.maximum(1 - x_recon, 1e-10)),1))
 
         loss_primal = tf.reduce_mean(reconstr_err + Tjoint)
         loss_dual = tf.reduce_mean(
@@ -111,8 +109,8 @@ class vanilla_vae:
             + tf.nn.sigmoid_cross_entropy_with_logits(logits=Tseperate, labels=tf.zeros_like(Tseperate))
         )
 
-        optimizer_primal = tf.train.AdamOptimizer(2e-5)
-        optimizer_dual = tf.train.AdamOptimizer(1e-4)
+        optimizer_primal = tf.train.AdamOptimizer(1e-2)
+        optimizer_dual = tf.train.AdamOptimizer(1e-2)
 
         qvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope +"/encoder_%s"%scope)
         pvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES,  scope +"/decoder_%s"%scope)
