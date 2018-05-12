@@ -154,8 +154,8 @@ class cf_vae_extend:
             + tf.nn.sigmoid_cross_entropy_with_logits(logits=Tseperate, labels=tf.zeros_like(Tseperate))
         )
 
-        optimizer_primal = tf.train.AdamOptimizer(1e-2)
-        optimizer_dual = tf.train.AdamOptimizer(1e-2)
+        optimizer_primal = tf.train.AdamOptimizer(1e-4)
+        optimizer_dual = tf.train.AdamOptimizer(1e-4)
 
         qvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope+"/encoder_%s"%scope)
         pvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope+"/decoder_%s"%scope)
@@ -370,10 +370,10 @@ class cf_vae_extend:
             self.e_step(x_data, im_data, str_data)
             self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
 
-        #     if i%5 == 4:
-        #         file.write("---------iter %d--------\n"%i)
-        #         pred_all = self.predict_all(self.U)
-        #         self.predict_val(pred_all, users, test_users, file)
+            if i%5 == 4:
+                # file.write("---------iter %d--------\n"%i)
+                pred_all = self.predict_all(self.U)
+                self.predict_val(pred_all, users, test_users, file)
         #         self.save_model(save_path_pmf=os.path.join(self.ckpt_model, "cf_vae_%d_%d.mat"%(self.model, i)))
         #         print(time.time() - start)
         # file.close()

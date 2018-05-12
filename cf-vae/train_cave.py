@@ -90,27 +90,27 @@ img = images.reshape((16000, 64, 64, 3))
 img = img.astype(np.float32)/255
 num_factors = zdim
 
-
-i = 0
-recalls = []
-for u in [0.01, 0.1, 1]:
-    params.lambda_u = u
-    for v in [1, 10, 100]:
-        params.lambda_v = v
-        for r in [0.1, 1, 10]:
-            params.lambda_r = r
-            model = cf_vae_extend(num_users=5551, num_items=16980, num_factors=num_factors, params=params,
-                                  input_dim=8000, encoding_dims=[500, 200], z_dim = 50, decoding_dims=[200, 500, 8000],
-                                  decoding_dims_str=[100,200, 1863], loss_type='cross_entropy', model = model_type, ckpt_folder=ckpt, initial=initial)
-            model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params, data["test_users"])
-            model.save_model(os.path.join(ckpt,"cf_vae_%d_%d.mat"%(model_type, i)))
-            pred_all = model.predict_all(model.U)
-            f = open(os.path.join(ckpt, "result_dae.txt"), 'a')
-            f.write("--------------%f-----------%d---------%f\n"%(u, v, r))
-            model.predict_val(pred_all, data["train_users"], data["test_users"], f)
-            print(u, v, r)
-            f.write("\n")
-            f.close()
+#
+# i = 0
+# recalls = []
+# for u in [0.01, 0.1, 1]:
+#     params.lambda_u = u
+#     for v in [1, 10, 100]:
+#         params.lambda_v = v
+#         for r in [0.1, 1, 10]:
+#             params.lambda_r = r
+#             model = cf_vae_extend(num_users=5551, num_items=16980, num_factors=num_factors, params=params,
+#                                   input_dim=8000, encoding_dims=[500, 200], z_dim = 50, decoding_dims=[200, 500, 8000],
+#                                   decoding_dims_str=[100,200, 1863], loss_type='cross_entropy', model = model_type, ckpt_folder=ckpt, initial=initial)
+#             model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params, data["test_users"])
+#             model.save_model(os.path.join(ckpt,"cf_vae_%d_%d.mat"%(model_type, i)))
+#             pred_all = model.predict_all(model.U)
+#             f = open(os.path.join(ckpt, "result_dae.txt"), 'a')
+#             f.write("--------------%f-----------%d---------%f\n"%(u, v, r))
+#             model.predict_val(pred_all, data["train_users"], data["test_users"], f)
+#             print(u, v, r)
+#             f.write("\n")
+#             f.close()
             # model.load_model("cf_vae.mat")
             # pred = model.predict_all()
             # recall = model.predict(pred, data['train_users'], data['test_users'], 40)
@@ -126,14 +126,16 @@ for u in [0.01, 0.1, 1]:
 # with open(os.path.join(ckpt, "result_%d.csv"%model_type), "w") as csvfile:
 #     wr = csv.writer(csvfile)
 #     wr.writerows(recalls)
-# model_mat = os.path.join(ckpt,"cave_%d.mat"%(model_type))
-#
-# model = cf_vae_extend(num_users=5551, num_items=16980, num_factors=num_factors, params=params,
-#                       input_dim=8000, encoding_dims=[200, 100], z_dim = zdim, decoding_dims=[100, 200, 8000],
-#                       decoding_dims_str=[100,200, 1863], loss_type='cross_entropy', model = model_type, ckpt_folder=ckpt,
-#                       initial=initial, model_mat=model_mat)
-# model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params, data["test_users"])
+model_mat = os.path.join(ckpt,"cave_%d.mat"%(model_type))
+
+model = cf_vae_extend(num_users=5551, num_items=16980, num_factors=num_factors, params=params,
+                      input_dim=8000, encoding_dims=[500, 200], z_dim = zdim, decoding_dims=[200, 500, 8000],
+                      decoding_dims_str=[100,200, 1863], loss_type='cross_entropy', model = model_type, ckpt_folder=ckpt,
+                      initial=initial, model_mat=model_mat)
+model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params, data["test_users"])
 # model.save_model(os.path.join(ckpt,"cave_%d.mat"%(model_type)))
+# pre_all = model.predict_all(model.U)
+
 # # model.load_model("cf_vae.mat")
 # pred = model.predict_all()
 # recalls = model.predict(pred, data['train_users'], data['test_users'], 300)
