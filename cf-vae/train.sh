@@ -16,9 +16,14 @@
 #    python train_cvae_extend.py --model=1 --ckpt_folder=pre2/z3_$i --data_dir=data/movie/ --iter=100 --zdim=$i
 #done
 
-python train_cvae_extend.py --model=1 --ckpt_folder=grocery/z50_fix --data_dir=data/amazon2/ --iter=15 --zdim=50
+python train_ave.py --ckpt_folder=citeu/z3_50 --data_dir=data/citeulike-a/
+python train_cvae_extend.py --model=0 --ckpt_folder=citeu/z3_50 --data_dir=data/citeulike-a/ --iter=200 --zdim=50 --type=0
 
-python train_cf_dae.py --ckpt_folder=grocery/dae_fix --data_dir=data/amazon2/ --iter=15  --model=0
-python train_cf_dae.py --ckpt_folder=grocery/dae_fix --data_dir=data/amazon2/ --iter=15  --model=1
-python train_cvae_extend.py --model=0 --ckpt_folder=grocery/z50_fix --data_dir=data/amazon2/ --iter=15 --zdim=50
+mkdir citeu/z6_50
+cp citeu/z3_50/vae_* citeu/z6_50/.
+python train_cvae_extend.py --model=0 --ckpt_folder=citeu/z3_50 --data_dir=data/citeulike-a/ --iter=15 --zdim=50 --type=1
+
+#python train_cf_dae.py --ckpt_folder=grocery/dae_fix --data_dir=data/amazon2/ --iter=15  --model=0
+#python train_cf_dae.py --ckpt_folder=grocery/dae_fix --data_dir=data/amazon2/ --iter=15  --model=1
+#python train_cvae_extend.py --model=0 --ckpt_folder=grocery/z50_fix --data_dir=data/amazon2/ --iter=15 --zdim=50
 
