@@ -95,6 +95,7 @@ num_factors = zdim
 
 #
 if type == 1:
+    print("1")
     i = 1
     recalls = []
     for u in [0.01, 0.1, 1]:
@@ -131,6 +132,7 @@ if type == 1:
 #     wr = csv.writer(csvfile)
 #     wr.writerows(recalls)
 else:
+    print("0")
     model_mat = os.path.join(ckpt,"cave_%d.mat"%(model_type))
 
     model = cf_vae_extend(num_users=5551, num_items=16980, num_factors=num_factors, params=params,
