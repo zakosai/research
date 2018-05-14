@@ -33,7 +33,7 @@ def load_rating(path):
     arr.append(l)
   return arr
 
-def load_rating2(path, num_u=8000, num_v=16000):
+def load_rating2(path, num_u=5551, num_v=16980):
   R = np.mat(np.zeros((num_u,num_v)))
   fp =open(path)
   for i,line in enumerate(fp):
