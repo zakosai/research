@@ -6,7 +6,7 @@ from math import sqrt
 from scipy.sparse import load_npz
 from autoencoder import AutoEncoderModel
 import os
-import scipy
+import scipy.io
 
 def load_cvae_data():
   data = {}
