@@ -92,7 +92,7 @@ if __name__ == '__main__':
     K = 50  # no of latent vectors in the compact representation
     p = 10 # used for data-folder name
     data_dir ="data/citeulike-a/" # whether to use dummy data
-    num_iter = 200
+    num_iter = 10000
     batch_size = 512
 
     np.random.seed(1234) # set seed
