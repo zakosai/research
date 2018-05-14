@@ -13,8 +13,8 @@ def load_cvae_data():
   data_dir = "data/citeulike-a/"
   variables = scipy.io.loadmat(data_dir + "mult_nor.mat")
   data["content"] = variables['X']
-  variables = load_npz("data/amazon2/mult_nor-small.npz")
-  data["content"] = variables.toarray()
+  # variables = load_npz("data/amazon2/mult_nor-small.npz")
+  # data["content"] = variables.toarray()
   data["train_users"] = load_rating(data_dir + "cf-train-1-users.dat")
   data["train_items"] = load_rating(data_dir + "cf-train-1-items.dat")
   data["test_users"] = load_rating(data_dir + "cf-test-1-users.dat")
