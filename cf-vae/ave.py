@@ -113,8 +113,8 @@ class vanilla_vae:
             + tf.nn.sigmoid_cross_entropy_with_logits(logits=Tseperate, labels=tf.zeros_like(Tseperate))
         )
 
-        optimizer_primal = tf.train.AdamOptimizer(1e-2)
-        optimizer_dual = tf.train.AdamOptimizer(1e-2)
+        optimizer_primal = tf.train.AdamOptimizer(1e-4)
+        optimizer_dual = tf.train.AdamOptimizer(1e-3)
 
         qvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope +"/encoder_%s"%scope)
         pvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES,  scope +"/decoder_%s"%scope)
@@ -139,7 +139,7 @@ class vanilla_vae:
                 g_loss, _ = sess.run([loss_primal, train_op_primal], feed_dict={x_real:x_batch})
                 # g_loss, _ = sess.run([loss_primal, train_op_primal], feed_dict={x_real:x_batch})
                 d_loss, _ = sess.run([loss_dual, train_op_dual], feed_dict={x_real:x_batch})
-                d_loss, _ = sess.run([loss_dual, train_op_dual], feed_dict={x_real:x_batch})
+                # d_loss, _ = sess.run([loss_dual, train_op_dual], feed_dict={x_real:x_batch})
                 if i % self.print_size == 0:
                     print("epoches: %d\t g_loss: %f\t d_loss: %f\t time: %d s"%(i, g_loss, d_loss, time.time()-start))
 
