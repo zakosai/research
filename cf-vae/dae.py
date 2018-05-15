@@ -69,7 +69,7 @@ class vanilla_vae:
         sparsity_weight = 0.2
         sparsity_target = 0.1
         def kl_divergence(p,q):
-            return  p*tf.log(p/q) + (1-p)*tf.log((1-p)/(1-q))
+            return  p*tf.log(p/tf.maximum(q, 1e-10)) + (1-p)*tf.log((1-p)/(tf.maximum(1-q, 1e-10)))
 
         if self.loss == "cross_entropy":
             loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(x_, x_recons), axis=1))
