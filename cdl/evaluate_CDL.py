@@ -5,11 +5,11 @@ from operator import add
 
 def load_data():
   data = {}
-  data_dir = "../cf-vae/data/amazon/"
+  data_dir = "data/citeulike-a/"
 
-  data["train_users"] = load_rating(data_dir + "cf-train-1-users-small.dat")
-  data["train_items"] = load_rating(data_dir + "cf-train-1-items-small.dat")
-  data["test_users"] = load_rating(data_dir + "cf-test-1-users-small.dat")
+  data["train_users"] = load_rating(data_dir + "cf-train-1-users.dat")
+  data["train_items"] = load_rating(data_dir + "cf-train-1-items.dat")
+  data["test_users"] = load_rating(data_dir + "cf-test-1-users.dat")
 
   return data
 
@@ -35,14 +35,25 @@ def cal_rec(train_users, test_users, M):
     pred_all = pred_all.tolist()
 
     recall_avgs = []
-    for m in range(5, M, 5):
+    for m in [50, 300]:
         print "m = " + "{:>10d}".format(m) + "done"
         recall_vals = []
         for i in range(len(user_all)):
-            top_M = np.argsort(pred_all[i])[-m:]
+            top_M = list(np.argsort(-pred_all[i])[0:(m +1)])
+            if train_users[i] in top_M:
+                top_M.remove(train_users[i])
+            else:
+                top_M = top_M[:-1]
+            if len(top_M) != m:
+                print(top_M, train_users[i])
+            if len(train_users[i]) != 1:
+                print(i)
             hits = set(top_M) & set(user_all[i])   # item idex from 0
             hits_num = len(hits)
-            recall_val = float(hits_num) / float(ground_tr_num[i])
+            try:
+                recall_val = float(hits_num) / float(ground_tr_num[i])
+            except:
+                recall_val = 1
             recall_vals.append(recall_val)
         recall_avg = np.mean(np.array(recall_vals))
         print recall_avg
