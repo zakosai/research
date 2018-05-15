@@ -63,7 +63,7 @@ model = cf_vae_extend(num_users=5551, num_items=16980, num_factors=num_factors, 
 model.load_model(os.path.join(ckpt, "cf_dae_0.mat"))
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
-recalls, mapks= model.predict(pred, data['train_users'], data['test_users'], 10)
+recalls, mapks= model.predict_val(pred, data['train_users'], data['test_users'])
 
 
 model.load_model(os.path.join(ckpt, extend_file))
