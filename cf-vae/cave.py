@@ -154,7 +154,7 @@ class cf_vae_extend:
             + tf.nn.sigmoid_cross_entropy_with_logits(logits=Tseperate, labels=tf.zeros_like(Tseperate))
         )
 
-        optimizer_primal = tf.train.AdamOptimizer(1e-2)
+        optimizer_primal = tf.train.AdamOptimizer(1e-3)
         optimizer_dual = tf.train.AdamOptimizer(1e-2)
 
         qvars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope+"/encoder_%s"%scope)
@@ -190,7 +190,7 @@ class cf_vae_extend:
 
             g_loss, _ = self.sess.run([self.loss_e_step, train_op_primal], feed_dict={self.x_:x_batch, self.v_:v_batch})
             # g_loss, _ = self.sess.run([loss_primal, train_op_primal], feed_dict={self.x_:x_batch, self.v_:v_batch})
-            self.sess.run([loss_dual, train_op_dual], feed_dict={self.x_:x_batch, self.v_:v_batch})
+            # self.sess.run([loss_dual, train_op_dual], feed_dict={self.x_:x_batch, self.v_:v_batch})
             d_loss, _ = self.sess.run([loss_dual, train_op_dual], feed_dict={self.x_:x_batch, self.v_:v_batch})
             if i % 50 == 0:
                 print("epoches: %d\t g_loss: %f\t d_loss: %f\t time: %d s"%(i, g_loss, d_loss, time.time()-start))
