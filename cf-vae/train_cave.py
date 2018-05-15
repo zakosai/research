@@ -72,7 +72,7 @@ params.lambda_v = 10
 params.lambda_r = 1
 params.C_a = 1
 params.C_b = 0.1
-params.max_iter_m = 1
+params.max_iter_m = 5
 params.EM_iter = args.iter
 params.num_iter = 300
 
