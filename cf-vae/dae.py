@@ -50,7 +50,7 @@ class vanilla_vae:
             for i in range(depth_inf):
                 x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
             h_encode = x
-            z = dense(h_encode, self.z_dim, scope="mu_layer")
+            z = dense(h_encode, self.z_dim, scope="mu_layer", activation=tf.nn.sigmoid)
 
 
             # generative process
@@ -69,7 +69,7 @@ class vanilla_vae:
         sparsity_weight = 0.2
         sparsity_target = 0.1
         def kl_divergence(p,q):
-            return  p*tf.log(p/tf.maximum(q, 1e-10)) + (1-p)*tf.log((1-p)/(tf.maximum(1-q, 1e-10)))
+            return  p*tf.log(p/tf.maximum(q)) + (1-p)*tf.log((1-p)/(1-q))
 
         if self.loss == "cross_entropy":
             loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(x_, x_recons), axis=1))
