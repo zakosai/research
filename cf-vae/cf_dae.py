@@ -82,7 +82,7 @@ class cf_vae_extend:
                 x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
                 # print("enc_layer0/weights:0".graph)
             h_encode = x
-            z = dense(h_encode, self.z_dim, scope="mu_layer")
+            z = dense(h_encode, self.z_dim, scope="mu_layer", activation=tf.nn.sigmoid)
 
 
             # generative process
@@ -174,9 +174,14 @@ class cf_vae_extend:
                 y_im = conv2d_transpose(y_im, 3, kernel_size=(3,3), strides=(2,2), scope="dec_layer5", activation=tf.nn.relu)
 
                 x_im_recons = y_im
+        sparsity_weight = 0.2
+        sparsity_target = 0.1
+        def kl_divergence(p,q):
+            return  p*tf.log(p/q) + (1-p)*tf.log((1-p)/(1-q))
 
         if self.loss_type == "cross_entropy":
             loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_, x_recons), axis=1))
+            sparsity_loss = tf.reduce_sum(kl_divergence(tf.reduce_mean(z), sparsity_target))
             # loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
             if self.model == 1:
                 # loss_s_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_s_, x_s_recons), axis=1))
@@ -196,7 +201,7 @@ class cf_vae_extend:
 
             else:
                 loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z), 1))
-                self.loss_e_step = loss_recons + loss_v
+                self.loss_e_step = loss_recons + loss_v + sparsity_weight*sparsity_loss
 
         train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss_e_step)
 
