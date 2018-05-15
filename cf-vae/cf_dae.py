@@ -482,7 +482,7 @@ class cf_vae_extend:
 
         pred_all = list(pred_all)
 
-        for m in [5, 35]:
+        for m in [50, 300]:
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
             for i in range(len(user_all)):
