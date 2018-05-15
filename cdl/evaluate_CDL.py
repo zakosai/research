@@ -30,7 +30,6 @@ def cal_rec(train_users, test_users, M):
     U = np.mat(np.loadtxt('cdl10/final-U.dat'))
     V = np.mat(np.loadtxt('cdl10/final-V.dat'))
     user_all = test_users
-    print(U)
     ground_tr_num = [len(user) for user in user_all]
 
 
@@ -42,8 +41,7 @@ def cal_rec(train_users, test_users, M):
         print "m = " + "{:>10d}".format(m) + "done"
         recall_vals = []
         for i in range(len(user_all)):
-            top_M = np.argsort(-pred_all[i])[0:(m +1)]
-            top_M = list(top_M)
+            top_M = list(np.argsort(pred_all[i])[-(m +1):])
             if train_users[i] in top_M:
                 top_M.remove(train_users[i])
             else:
