@@ -24,14 +24,14 @@ extend_file =args.mat_file
 
 def load_cvae_data(data_dir):
   data = {}
-  # variables = scipy.io.loadmat(data_dir + "mult_nor.mat")
-  # data["content"] = variables['X']
-  variables = load_npz(os.path.join(data_dir, "mult_nor-small.npz"))
-  data["content"] = variables.toarray()
-  data["train_users"] = load_rating(os.path.join(data_dir + "cf-train-1-users-small.dat"))
-  data["train_items"] = load_rating(os.path.join(data_dir + "cf-train-1-items-small.dat"))
-  data["test_users"] = load_rating(os.path.join(data_dir + "cf-test-1-users-small.dat"))
-  data["test_items"] = load_rating(os.path.join(data_dir + "cf-test-1-items-small.dat"))
+  variables = scipy.io.loadmat(data_dir + "mult_nor.mat")
+  data["content"] = variables['X']
+  # variables = load_npz(os.path.join(data_dir, "mult_nor-small.npz"))
+  # data["content"] = variables.toarray()
+  data["train_users"] = load_rating(os.path.join(data_dir + "cf-train-1-users.dat"))
+  data["train_items"] = load_rating(os.path.join(data_dir + "cf-train-1-items.dat"))
+  data["test_users"] = load_rating(os.path.join(data_dir + "cf-test-1-users.dat"))
+  data["test_items"] = load_rating(os.path.join(data_dir + "cf-test-1-items.dat"))
 
   return data
 
@@ -57,12 +57,12 @@ params.max_iter_m = 1
 
 data = load_cvae_data(data_dir)
 num_factors = 50
-model = cf_vae_extend(num_users=8000, num_items=16000, num_factors=num_factors, params=params,
+model = cf_vae_extend(num_users=5551, num_items=16980, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000], decoding_dims_str=[100,200, 1863],
     loss_type='cross_entropy')
-model.load_model(os.path.join(ckpt, "cf_vae_0.mat"))
+model.load_model(os.path.join(ckpt, "cf_dae_0.mat"))
 # model.load_model("cf_vae.mat")
-pred = model.predict_all(model.U)
+pred = model.predict_all()
 recalls, mapks= model.predict(pred, data['train_users'], data['test_users'], 10)
 
 
