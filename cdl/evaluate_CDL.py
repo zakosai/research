@@ -26,10 +26,13 @@ def load_rating(path):
 
 
 def cal_rec(train_users, test_users, M):
-    user_all = map(add, train_users, test_users)
+    # user_all = map(add, train_users, test_users)
     U = np.mat(np.loadtxt('cdl10/final-U.dat'))
     V = np.mat(np.loadtxt('cdl10/final-V.dat'))
+    user_all = test_users
+    print(U)
     ground_tr_num = [len(user) for user in user_all]
+
 
     pred_all = np.dot(U, V.T)
     pred_all = pred_all.tolist()
