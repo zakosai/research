@@ -42,7 +42,8 @@ def cal_rec(train_users, test_users, M):
         print "m = " + "{:>10d}".format(m) + "done"
         recall_vals = []
         for i in range(len(user_all)):
-            top_M = list(np.argsort(-pred_all[i])[0:(m +1)])
+            top_M = np.argsort(-pred_all[i])[0:(m +1)]
+            top_M = list(top_M)
             if train_users[i] in top_M:
                 top_M.remove(train_users[i])
             else:
