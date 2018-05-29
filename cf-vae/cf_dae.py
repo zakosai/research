@@ -426,7 +426,7 @@ class cf_vae_extend:
             self.pmf_estimate(users, items, params)
             self.e_step(x_data, im_data, str_data)
             self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
-            if i%5 == 4:
+            if i%500 == 400:
                 file = open(os.path.join(self.ckpt, "result_%d.txt"%self.model), 'a')
                 file.write("---------iter %d--------\n"%i)
                 pred_all = self.predict_all()
@@ -482,7 +482,7 @@ class cf_vae_extend:
 
         pred_all = list(pred_all)
 
-        for m in [50, 300]:
+        for m in [1, 10]:
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
             for i in range(len(user_all)):
