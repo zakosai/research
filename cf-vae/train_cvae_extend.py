@@ -93,7 +93,7 @@ num_factors = zdim
 
 i = 0
 recalls = []
-for u in [0.01, 0.1, 1]:
+for u in [1]:
     params.lambda_u = u
     for v in [1, 10, 100]:
         params.lambda_v = v
