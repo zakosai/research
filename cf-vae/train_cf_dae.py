@@ -64,6 +64,7 @@ params.C_a = 1
 params.C_b = 0.01
 params.max_iter_m = 1
 params.EM_iter = iter
+params.num_iter = 150
 
 
 
