@@ -92,7 +92,7 @@ for u in [0.01, 0.1, 1]:
         for r in [0.1, 1, 10]:
             params.lambda_r = r
 
-            model = cf_vae_extend(num_users=5584, num_items=13791, num_factors=num_factors, params=params,
+            model = cf_vae_extend(num_users=5584, num_items=13790, num_factors=num_factors, params=params,
                 input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000],
                 decoding_dims_str=[100,200, 4562], loss_type='cross_entropy', ckpt_folder=ckpt, model=model_type)
             model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params, data["test_users"])
