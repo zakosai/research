@@ -324,7 +324,7 @@ class cf_vae_extend:
             VVT = np.dot(v.T, v)
             XX = VVT * params.C_b + np.eye(self.z_dim) * params.lambda_u
 
-            for i in xrange(len(users)):
+            for i in xrange(self.num_users):
                 item_ids = users[i]
                 n = len(item_ids)
                 if n > 0:
@@ -339,7 +339,7 @@ class cf_vae_extend:
             ids = np.array([len(x) for x in users]) > 0
             u = self.U[ids]
             XX = np.dot(u.T, u) * params.C_b
-            for j in xrange(len(items)):
+            for j in xrange(self.num_items):
                 user_ids = items[j]
                 m = len(user_ids)
                 if m>0 :
