@@ -18,7 +18,7 @@ ckpt = args.ckpt_folder
 dir = args.data_dir
 
 images = np.fromfile(dir +"images.bin", dtype=np.uint8)
-data = images.reshape((16000, 64, 64, 3))
+data = images.reshape((13791, 32, 32, 3))
 data = data.astype(np.float32)/255
 
 idx = np.random.rand(data.shape[0]) < 0.8

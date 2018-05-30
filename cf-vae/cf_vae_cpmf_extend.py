@@ -57,8 +57,8 @@ class cf_vae_extend:
         self.eps = eps
         self.initial = initial
 
-        self.input_width = 64
-        self.input_height = 64
+        self.input_width = 32
+        self.input_height = 32
         self.channel = 3
         self.num_conv = 4
         self.intermediate_dim = 256
@@ -153,7 +153,7 @@ class cf_vae_extend:
                 x_im = conv2d(x_im, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
                 x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
                 x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
-                x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
+                # x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
                 # x_im = max_pool(x_im, kernel_size=(3,3), strides=(2,2))
 
 
@@ -198,7 +198,7 @@ class cf_vae_extend:
                 # y_im = conv2d_transpose(y_im, self.channel, scope="dec_layer"+"%s" %(self.num_conv-1) , kernel_size=(2,2),
                 #                          strides=(2,2), activation=tf.nn.relu)
                         # if last_layer_nonelinear: depth_gen -1
-                y_im = conv2d_transpose(y_im, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer0", activation=tf.nn.relu)
+                # y_im = conv2d_transpose(y_im, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer0", activation=tf.nn.relu)
                 y_im = conv2d_transpose(y_im, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer1", activation=tf.nn.relu)
                 y_im = conv2d_transpose(y_im, 256, kernel_size=(3,3), strides=(2,2), scope="dec_layer2", activation=tf.nn.relu)
                 y_im = conv2d_transpose(y_im, 128, kernel_size=(3,3), strides=(2,2), scope="dec_layer3", activation=tf.nn.relu)
@@ -562,19 +562,18 @@ class cf_vae_extend:
         recall_avgs = []
         precision_avgs = []
         mapk_avgs = []
-        for m in [50, 300]:
+        for m in [1, 10]:
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
             for i in range(len(user_all)):
-                top_M = list(np.argsort(-pred_all[i])[0:(m +1)])
-                if train_users[i] in top_M:
-                    top_M.remove(train_users[i])
-                else:
-                    top_M = top_M[:-1]
+                train = train_users[i]
+                top_M = list(np.argsort(-pred_all[i])[0:(m +len(train))])
+                for u in train:
+                    if u in top_M:
+                        top_M.remove(u)
+                top_M = top_M[:m]
                 if len(top_M) != m:
                     print(top_M, train_users[i])
-                if len(train_users[i]) != 1:
-                    print(i)
                 hits = set(top_M) & set(user_all[i])   # item idex from 0
                 hits_num = len(hits)
                 try:

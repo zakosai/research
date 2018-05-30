@@ -19,10 +19,10 @@ args = parser.parse_args()
 ckpt = args.ckpt_folder
 dir = args.data_dir
 
-variables = sio.loadmat("data/citeulike-a/mult_nor.mat")
-data = variables['X']
-# variables = load_npz(dir + "/mult_nor-small.npz")
-# data = variables.toarray()
+# variables = sio.loadmat("data/citeulike-a/mult_nor.mat")
+# data = variables['X']
+variables = load_npz(dir + "/mult-nor.npz")
+data = variables.toarray()
 idx = np.random.rand(data.shape[0]) < 0.8
 train_X = data[idx]
 test_X = data[~idx]

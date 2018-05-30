@@ -24,7 +24,7 @@ tf.set_random_seed(0)
 
 # variables = sio.loadmat("data/citeulike-a/mult_nor.mat")
 # data = variables['X']
-variables = load_npz(os.path.join(dir, "mult_nor-small.npz"))
+variables = load_npz(os.path.join(dir, "mult-nor.npz"))
 data = variables.toarray()
 idx = np.random.rand(data.shape[0]) < 0.8
 train_X = data[idx]

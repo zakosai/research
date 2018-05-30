@@ -125,7 +125,7 @@ class cf_vae_extend:
                 x_im = conv2d(x_im, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
                 x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
                 x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
-                x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
+                # x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
 
                 # num_blocks = 3
                 # is_training = True
@@ -166,7 +166,7 @@ class cf_vae_extend:
                 # y_im = conv2d_transpose(y_im, self.channel, scope="dec_layer"+"%s" %(self.num_conv-1) , kernel_size=(2,2),
                 #                          strides=(2,2), activation=tf.nn.relu)
                         # if last_layer_nonelinear: depth_gen -1
-                y_im = conv2d_transpose(y_im, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer0", activation=tf.nn.relu)
+                # y_im = conv2d_transpose(y_im, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer0", activation=tf.nn.relu)
                 y_im = conv2d_transpose(y_im, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer1", activation=tf.nn.relu)
                 y_im = conv2d_transpose(y_im, 256, kernel_size=(3,3), strides=(2,2), scope="dec_layer2", activation=tf.nn.relu)
                 y_im = conv2d_transpose(y_im, 128, kernel_size=(3,3), strides=(2,2), scope="dec_layer3", activation=tf.nn.relu)
@@ -201,7 +201,7 @@ class cf_vae_extend:
 
             else:
                 loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z), 1))
-                self.loss_e_step = loss_recons + loss_v 
+                self.loss_e_step = loss_recons + loss_v
 
         train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss_e_step)
 
@@ -486,15 +486,14 @@ class cf_vae_extend:
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
             for i in range(len(user_all)):
-                top_M = list(np.argsort(-pred_all[i])[0:(m +1)])
-                if train_users[i] in top_M:
-                    top_M.remove(train_users[i])
-                else:
-                    top_M = top_M[:-1]
+                train = train_users[i]
+                top_M = list(np.argsort(-pred_all[i])[0:(m +len(train))])
+                for u in train:
+                    if u in top_M:
+                        top_M.remove(u)
+                top_M = top_M[:m]
                 if len(top_M) != m:
                     print(top_M, train_users[i])
-                if len(train_users[i]) != 1:
-                    print(i)
                 hits = set(top_M) & set(user_all[i])   # item idex from 0
                 hits_num = len(hits)
                 try:
