@@ -317,6 +317,9 @@ class cf_vae_extend:
                     if self.model == 1:
                         likelihood += -0.5 * self.V[j,:].dot(B).dot((self.V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:])[:,np.newaxis])
                         ep = self.V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:]
+                    elif self.model == 2:
+                        likelihood += -0.5 * self.V[j,:].dot(B).dot((self.V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:] - self.exp_z_s[j,:])[:,np.newaxis])
+                        ep = self.V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:] - self.exp_z_s[j, :]
                     elif self.model != 6:
                         likelihood += -0.5 * self.V[j,:].dot(B).dot((self.V[j,:] - self.exp_z[j,:])[:,np.newaxis])
                         ep = self.V[j,:] - self.exp_z[j,:]
@@ -329,6 +332,8 @@ class cf_vae_extend:
                     A += np.eye(self.z_dim) * params.lambda_v
                     if self.model == 1:
                         x = params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
+                    elif self.model == 2:
+                         x = params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:] + self.exp_z_s[j,:])
                     elif self.model != 6:
                         x = params.lambda_v * self.exp_z[j,:]
                     else:
@@ -337,6 +342,8 @@ class cf_vae_extend:
 
                     if self.model == 1:
                         ep = self.V[j,:] - self.exp_z[j,:]- self.exp_z_im[j,:]
+                    elif self.model == 2:
+                        ep = self.V[j,:] - self.exp_z[j,:]- self.exp_z_im[j,:] - self.exp_z_s[j, :]
                     elif self.model != 6:
                         ep = self.V[j,:] - self.exp_z[j,:]
                     else:
