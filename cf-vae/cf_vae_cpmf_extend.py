@@ -75,7 +75,7 @@ class cf_vae_extend:
         print "e_step finetuning"
         tf.reset_default_graph()
         self.x_ = placeholder((None, self.input_dim))  # we need these global nodes
-        self.x_s_ = placeholder((None, 8000))
+        self.x_s_ = placeholder((None, 4526))
         self.v_ = placeholder((None, self.num_factors))
         self.x_im_ = placeholder((None, self.input_width, self.input_height, self.channel))
 
@@ -133,8 +133,9 @@ class cf_vae_extend:
 
                 # generative process
                 depth_gen = len(self.decoding_dims_str)
+                y_s = z_s
                 for i in range(depth_gen):
-                    y_s = dense(z_s, self.decoding_dims_str[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    y_s = dense(y_s, self.decoding_dims_str[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
                     # if last_layer_nonelinear: depth_gen -1
 
                 x_s_recons = y_s
@@ -237,7 +238,7 @@ class cf_vae_extend:
 
             elif self.model != 6:
                 loss_im_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_im_), K.flatten(x_im_recons))
-                loss_im_kl = 0.5 * tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1)
+                loss_im_kl = 0.5 * tf.reduce_sum(tf.square(z_im_mu) + tf.exp(z_im_log_sigma_sq) - z_im_log_sigma_sq - 1, 1)
                 loss_s_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_s_, x_s_recons), axis=1))
                 loss_s_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_s_mu) + tf.exp(z_s_log_sigma_sq) - z_s_log_sigma_sq - 1, 1))
                 loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z  - z_s - z_im), 1))
@@ -359,6 +360,9 @@ class cf_vae_extend:
                     if self.model == 1:
                         likelihood += -0.5 * self.V[j,:].dot(B).dot((self.V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:])[:,np.newaxis])
                         ep = self.V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:]
+                    elif self.model == 2:
+                        likelihood += -0.5 * self.V[j,:].dot(B).dot((self.V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:] - self.exp_z_s[j,:])[:,np.newaxis])
+                        ep = self.V[j,:] - self.exp_z[j,:] - self.exp_z_im[j,:] - self.exp_z_s
                     elif self.model != 6:
                         likelihood += -0.5 * self.V[j,:].dot(B).dot((self.V[j,:] - self.exp_z[j,:])[:,np.newaxis])
                         ep = self.V[j,:] - self.exp_z[j,:]
@@ -371,6 +375,8 @@ class cf_vae_extend:
                     A += np.eye(self.z_dim) * params.lambda_v
                     if self.model == 1:
                         x = params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
+                    elif self.model == 2:
+                         x = params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:] + self.exp_z_s)
                     elif self.model != 6:
                         x = params.lambda_v * self.exp_z[j,:]
                     else:
@@ -379,6 +385,8 @@ class cf_vae_extend:
 
                     if self.model == 1:
                         ep = self.V[j,:] - self.exp_z[j,:]- self.exp_z_im[j,:]
+                    elif self.model == 2:
+                         ep = self.V[j,:] - self.exp_z[j,:]- self.exp_z_im[j,:] - self.exp_z_s
                     elif self.model != 6:
                         ep = self.V[j,:] - self.exp_z[j,:]
                     else:
