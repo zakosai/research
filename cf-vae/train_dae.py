@@ -4,6 +4,7 @@ from dae import vanilla_vae
 import scipy.io as sio
 from scipy.sparse import load_npz
 import argparse
+import os
 
 np.random.seed(0)
 tf.set_random_seed(0)
