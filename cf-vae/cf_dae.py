@@ -69,7 +69,7 @@ class cf_vae_extend:
         tf.reset_default_graph()
         self.x_ = placeholder((None, self.input_dim))  # we need these global nodes
         # self.x_s_ = placeholder((None, 1863))
-        self.x_s_ = placeholder((None, self.input_dim))
+        self.x_s_ = placeholder((None, 4562))
         self.v_ = placeholder((None, self.num_factors))
 
         # inference process
