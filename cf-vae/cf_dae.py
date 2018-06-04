@@ -109,7 +109,7 @@ class cf_vae_extend:
                 depth_gen = len(self.decoding_dims_str)
                 y_s = z_s
                 for i in range(depth_gen):
-                    y_s = dense(z_s, self.decoding_dims_str[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    y_s = dense(y_s, self.decoding_dims_str[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
                     # if last_layer_nonelinear: depth_gen -1
 
                 x_s_recons = y_s
