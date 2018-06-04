@@ -376,7 +376,7 @@ class cf_vae_extend:
                     if self.model == 1:
                         x = params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
                     elif self.model == 2:
-                         x = params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:] + self.exp_z_s)
+                         x = params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:] + self.exp_z_s[j, :])
                     elif self.model != 6:
                         x = params.lambda_v * self.exp_z[j,:]
                     else:
@@ -386,7 +386,7 @@ class cf_vae_extend:
                     if self.model == 1:
                         ep = self.V[j,:] - self.exp_z[j,:]- self.exp_z_im[j,:]
                     elif self.model == 2:
-                         ep = self.V[j,:] - self.exp_z[j,:]- self.exp_z_im[j,:] - self.exp_z_s
+                         ep = self.V[j,:] - self.exp_z[j,:]- self.exp_z_im[j,:] - self.exp_z_s[j, :]
                     elif self.model != 6:
                         ep = self.V[j,:] - self.exp_z[j,:]
                     else:
