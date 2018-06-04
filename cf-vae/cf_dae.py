@@ -54,8 +54,8 @@ class cf_vae_extend:
         self.eps = eps
         self.initial = True
 
-        self.input_width = 64
-        self.input_height = 64
+        self.input_width = 32
+        self.input_height = 32
         self.channel = 3
         self.num_conv = 4
         self.intermediate_dim = 256
