@@ -24,14 +24,14 @@ extend_file =args.mat_file
 
 def load_cvae_data(data_dir):
   data = {}
-  variables = scipy.io.loadmat(data_dir + "mult_nor.mat")
-  data["content"] = variables['X']
-  # variables = load_npz(os.path.join(data_dir, "mult_nor-small.npz"))
-  # data["content"] = variables.toarray()
-  data["train_users"] = load_rating(os.path.join(data_dir + "cf-train-1-users.dat"))
-  data["train_items"] = load_rating(os.path.join(data_dir + "cf-train-1-items.dat"))
-  data["test_users"] = load_rating(os.path.join(data_dir + "cf-test-1-users.dat"))
-  data["test_items"] = load_rating(os.path.join(data_dir + "cf-test-1-items.dat"))
+  # variables = scipy.io.loadmat(data_dir + "mult_nor.mat")
+  # data["content"] = variables['X']
+  variables = load_npz(os.path.join(data_dir, "mult-nor.npz"))
+  data["content"] = variables.toarray()
+  data["train_users"] = load_rating(os.path.join(data_dir + "cf-train-5-users.dat"))
+  data["train_items"] = load_rating(os.path.join(data_dir + "cf-train-5-items.dat"))
+  data["test_users"] = load_rating(os.path.join(data_dir + "cf-test-5-users.dat"))
+  data["test_items"] = load_rating(os.path.join(data_dir + "cf-test-5-items.dat"))
 
   return data
 
@@ -142,4 +142,4 @@ for j in [0, 1, 3]:
                 f.close()
                 print(u, v, r)
                 i += 1
-                
+
