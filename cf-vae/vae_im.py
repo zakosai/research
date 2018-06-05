@@ -85,7 +85,7 @@ class vanilla_vae:
             #                      strides=2, is_training=is_training, name='block_layer5', data_format=data_format)
             # x = block_layer(inputs=x, filters=512, block_fn=building_block, blocks=num_blocks,
             #                      strides=2, is_training=is_training, name='block_layer5', data_format=data_format)
-            h_encode = tf.contrib.keras.backend.batch_flatten(x)
+            h_encode = tf.keras.backend.batch_flatten(x)
             print(h_encode.shape)
             # h_encode = Dense(self.intermediate_dim, activation='relu')(flat)
             z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
