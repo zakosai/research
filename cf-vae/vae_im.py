@@ -3,7 +3,7 @@ from tensorbayes.layers import dense, placeholder, conv2d, conv2d_transpose, max
 from tensorbayes.utils import progbar
 from tensorbayes.tfutils import softmax_cross_entropy_with_two_logits
 from keras.metrics import binary_crossentropy
-from keras.layers import Input, Dense, Lambda, Flatten, Reshape, Batch
+from keras.layers import Input, Dense, Lambda, Flatten, Reshape
 from keras.layers import Conv2D, Conv2DTranspose
 from keras.models import Model
 from keras import backend as K
