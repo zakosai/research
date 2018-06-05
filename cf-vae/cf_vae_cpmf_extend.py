@@ -149,64 +149,35 @@ class cf_vae_extend:
                 # for i in range(self.num_conv):
                 #     x_im = conv2d(x_im, self.filter * np.power(2, i),kernel_size=(2,2), strides=(2,2), scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
 
-                x_im = conv2d(x_im, 64,kernel_size=(3,3), strides=(2,2), scope="enc_layer0", activation=tf.nn.relu)
-                x_im = conv2d(x_im, 128,kernel_size=(3,3), strides=(2,2), scope="enc_layer1", activation=tf.nn.relu)
-                x_im = conv2d(x_im, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
-                x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
-                x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
+                x_im = conv2d(x_im, 32,kernel_size=(3,3), strides=(2,2), scope="enc_layer0", activation=tf.nn.relu)
+                x_im = conv2d(x_im, 64,kernel_size=(3,3), strides=(2,2), scope="enc_layer1", activation=tf.nn.relu)
+                x_im = conv2d(x_im, 128,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
+                x_im = conv2d(x_im, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
+                # x_im = conv2d(x_im, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
                 # x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
                 # x_im = max_pool(x_im, kernel_size=(3,3), strides=(2,2))
 
-
-                # num_blocks = 3
-                # is_training = True
-                # data_format = 'channels_last'
-                # x_im = conv2d_fixed_padding( inputs=x_im, filters=64, kernel_size=3, strides=1,
-                #                                data_format=data_format)
-                # x_im = tf.identity(x_im, 'initial_conv')
-                #
-                # x_im = block_layer(inputs=x_im, filters=64, block_fn=building_block, blocks=num_blocks,
-                #                      strides=2, is_training=is_training, name='block_layer1', data_format=data_format)
-                #
-                # x_im = block_layer(inputs=x_im, filters=128, block_fn=building_block, blocks=num_blocks,
-                #                      strides=2, is_training=is_training, name='block_layer2', data_format=data_format)
-                #
-                # x_im = block_layer(inputs=x_im, filters=256, block_fn=building_block, blocks=num_blocks,
-                #                     strides=2, is_training=is_training, name='block_layer3',data_format=data_format)
-                #
-                # x_im = block_layer(inputs=x_im, filters=512, block_fn=building_block, blocks=num_blocks,
-                #                      strides=2, is_training=is_training, name='block_layer4', data_format=data_format)
-                # x_im = block_layer(inputs=x_im, filters=512, block_fn=building_block, blocks=num_blocks,
-                #                      strides=2, is_training=is_training, name='block_layer5', data_format=data_format)
-                # x_im = block_layer(inputs=x_im, filters=512, block_fn=building_block, blocks=num_blocks,
-                #                      strides=2, is_training=is_training, name='block_layer6', data_format=data_format)
-                flat = Flatten()(x_im)
-                h_im_encode = Dense(self.intermediate_dim, activation='relu')(flat)
+                h_im_encode = tf.reshape(x_im, [-1, 1024])
                 z_im_mu = dense(h_im_encode, self.z_dim, scope="mu_layer")
                 z_im_log_sigma_sq = dense(h_im_encode, self.z_dim, scope = "sigma_layer")
                 e_im = tf.random_normal(tf.shape(z_im_mu))
                 z_im = z_im_mu + tf.sqrt(tf.maximum(tf.exp(z_im_log_sigma_sq), self.eps)) * e_im
 
                 # generative process
-                h_decode = dense(z_im, self.intermediate_dim, activation=tf.nn.relu)
-                h_upsample = dense(h_decode, 512, activation=tf.nn.relu)
-                y_im = Reshape((1,1,512))(h_upsample)
+                # h_decode = dense(z_im, self.intermediate_dim, activation=tf.nn.relu)
+                h_upsample = dense(z, 1024, activation=tf.nn.relu)
+                y_im = Reshape((2,2,256))(h_upsample)
 
-                # for i in range(self.num_conv-1):
-                #     y_im = conv2d_transpose(y_im, self.filter*np.power(2,self.num_conv-2-i), kernel_size=(2,2),
-                #                          strides=(2,2), scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
-                #
-                # y_im = conv2d_transpose(y_im, self.channel, scope="dec_layer"+"%s" %(self.num_conv-1) , kernel_size=(2,2),
-                #                          strides=(2,2), activation=tf.nn.relu)
-                        # if last_layer_nonelinear: depth_gen -1
                 # y_im = conv2d_transpose(y_im, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer0", activation=tf.nn.relu)
-                y_im = conv2d_transpose(y_im, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer1", activation=tf.nn.relu)
-                y_im = conv2d_transpose(y_im, 256, kernel_size=(3,3), strides=(2,2), scope="dec_layer2", activation=tf.nn.relu)
-                y_im = conv2d_transpose(y_im, 128, kernel_size=(3,3), strides=(2,2), scope="dec_layer3", activation=tf.nn.relu)
-                y_im= conv2d_transpose(y_im, 64, kernel_size=(3,3), strides=(2,2), scope="dec_layer4", activation=tf.nn.relu)
+                # y_im = conv2d_transpose(y_im, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer1", activation=tf.nn.relu)
+                y_im = conv2d_transpose(y_im, 128, kernel_size=(3,3), strides=(2,2), scope="dec_layer2", activation=tf.nn.relu)
+                y_im = conv2d_transpose(y_im, 64, kernel_size=(3,3), strides=(2,2), scope="dec_layer3", activation=tf.nn.relu)
+                y_im= conv2d_transpose(y_im, 32, kernel_size=(3,3), strides=(2,2), scope="dec_layer4", activation=tf.nn.relu)
                 y_im = conv2d_transpose(y_im, 3, kernel_size=(3,3), strides=(2,2), scope="dec_layer5", activation=tf.nn.relu)
 
                 x_im_recons = y_im
+                m = tf.reshape(x_im_, [-1, self.input_width*self.input_height, self.channel])
+                n = tf.reshape(x_im_recons, [-1, self.input_width*self.input_height, self.channel])
 
         if self.loss_type == "cross_entropy":
             if self.model != 6:
@@ -215,20 +186,24 @@ class cf_vae_extend:
                 loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq)
             - z_log_sigma_sq - 1, 1))
             else:
-                loss_im_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_im_), K.flatten(x_im_recons))
-                loss_im_kl = 0.5 * tf.reduce_sum(tf.square(z_im_mu) + tf.exp(z_im_log_sigma_sq) - z_im_log_sigma_sq - 1, 1)
+                loss_im_recons = -tf.reduce_mean(tf.reduce_sum(m * tf.log(tf.maximum(n, 1e-10)) + (1-m) * tf.log(tf.maximum(1 - n, 1e-10)),1))
+                loss_im_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
                 loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_  - z_im), 1))
-                self.loss_e_step = loss_v + K.mean(loss_im_recons + loss_im_kl)
+                self.loss_e_step = loss_v + loss_im_kl + loss_im_recons
 
             if self.model == 0:
                 loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z), 1))
                 self.loss_e_step = loss_recons + loss_kl + loss_v + 2e-4*reg_loss
 
             elif self.model == 1:
-                loss_im_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_im_), K.flatten(x_im_recons))
-                loss_im_kl = 0.5 * tf.reduce_sum(tf.square(z_im_mu) + tf.exp(z_im_log_sigma_sq) - z_im_log_sigma_sq - 1, 1)
-                loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z  - z_im), 1))
-                self.loss_e_step = loss_recons + loss_kl + loss_v + K.mean(loss_im_recons + loss_im_kl)
+                # loss_im_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_im_), K.flatten(x_im_recons))
+                # loss_im_kl = 0.5 * tf.reduce_sum(tf.square(z_im_mu) + tf.exp(z_im_log_sigma_sq) - z_im_log_sigma_sq - 1, 1)
+                # loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z  - z_im), 1))
+                # self.loss_e_step = loss_recons + loss_kl + loss_v + K.mean(loss_im_recons + loss_im_kl)
+                loss_im_recons = -tf.reduce_mean(tf.reduce_sum(m * tf.log(tf.maximum(n, 1e-10)) + (1-m) * tf.log(tf.maximum(1 - n, 1e-10)),1))
+                loss_im_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
+                loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z - z_im), 1))
+                self.loss_e_step = loss_v + loss_im_kl + loss_im_recons + loss_kl + loss_recons
 
             elif self.model == 3:
                 loss_s_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_s_, x_s_recons), axis=1))
