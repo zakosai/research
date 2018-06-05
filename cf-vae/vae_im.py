@@ -89,6 +89,7 @@ class vanilla_vae:
             # print(flat.get_shape())
             # h_encode = Dense(self.intermediate_dim, activation='relu')(flat)
             h_encode = tf.reshape(x, [-1, 1024])
+            print(h_encode.shape)
             z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
             print(z_mu.shape)
             z_log_sigma_sq = dense(h_encode, self.z_dim, scope = "sigma_layer")
@@ -114,8 +115,8 @@ class vanilla_vae:
             y = conv2d_transpose(y, 32, kernel_size=(3,3), strides=(2,2), scope="dec_layer4", activation=tf.nn.relu)
             y = conv2d_transpose(y, 3, kernel_size=(3,3), strides=(2,2), scope="dec_layer5", activation=tf.nn.relu)
             x_recons = y
-        m = K.batch_flatten(x_)
-        n = K.batch_flatten(x_recons)
+        m = tf.reshape(x_, [-1, self.input_height*self.input_width*self.channel])
+        n = tf.reshape(x_recons, [-1, self.input_height*self.input_width*self.channel])
         print(m.shape, n.shape)
         # loss_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_), K.flatten(x_recons))
         loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(m, n), axis=1))
