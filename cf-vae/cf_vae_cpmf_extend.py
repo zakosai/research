@@ -211,7 +211,7 @@ class cf_vae_extend:
                 loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z  - z_s), 1))
                 self.loss_e_step = loss_recons + loss_kl + loss_s_recons + loss_s_kl + loss_v
 
-            elif self.model != 6:
+            elif self.model == 2:
                 print("abc")
                 loss_im_recons = -tf.reduce_mean(tf.reduce_sum(m * tf.log(tf.maximum(n, 1e-10)) + (1-m) * tf.log(tf.maximum(1 - n, 1e-10)),1))
                 loss_im_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_im_mu) + tf.exp(z_im_log_sigma_sq) - z_im_log_sigma_sq - 1, 1))
