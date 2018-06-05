@@ -3,7 +3,7 @@ from tensorbayes.layers import dense, placeholder, conv2d, conv2d_transpose, max
 from tensorbayes.utils import progbar
 from tensorbayes.tfutils import softmax_cross_entropy_with_two_logits
 from keras.metrics import binary_crossentropy
-from keras.layers import Input, Dense, Lambda, Flatten, Reshape
+from keras.layers import Input, Dense, Lambda, Flatten, Reshape, Batch
 from keras.layers import Conv2D, Conv2DTranspose
 from keras.models import Model
 from keras import backend as K
@@ -85,7 +85,7 @@ class vanilla_vae:
             #                      strides=2, is_training=is_training, name='block_layer5', data_format=data_format)
             # x = block_layer(inputs=x, filters=512, block_fn=building_block, blocks=num_blocks,
             #                      strides=2, is_training=is_training, name='block_layer5', data_format=data_format)
-            h_encode = Flatten()(x)
+            h_encode = Lambda(lambda v: K.batch_flatten(v))(x)
             print(h_encode.shape)
             # h_encode = Dense(self.intermediate_dim, activation='relu')(flat)
             z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
@@ -113,10 +113,11 @@ class vanilla_vae:
             y = conv2d_transpose(y, 32, kernel_size=(3,3), strides=(2,2), scope="dec_layer4", activation=tf.nn.relu)
             y = conv2d_transpose(y, 3, kernel_size=(3,3), strides=(2,2), scope="dec_layer5", activation=tf.nn.relu)
             x_recons = y
-        m = Flatten()(x)
-        n = binary_crossentropy(Flatten()(x_), Flatten()(x_recons))
+        m = Lambda(lambda v: K.batch_flatten(v))(x_)
+        n = Lambda(lambda v: K.batch_flatten(v))(x_recons)
         print(m.shape, n.shape)
-        loss_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_), K.flatten(x_recons))
+        # loss_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_), K.flatten(x_recons))
+        loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(m, n), axis=1))
         loss_kl = 0.5 * tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1)
         # loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
         loss = K.mean(loss_recons + loss_kl)
