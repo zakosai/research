@@ -456,7 +456,7 @@ class cf_vae_extend:
             self.e_step(x_data, im_data, str_data)
             self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
 
-            if i%500 == 400:
+            if i%10 == 9:
                 file = open(os.path.join(self.ckpt_model, "result_%d.txt"%self.model), 'a')
                 file.write("---------iter %d--------\n"%i)
                 pred_all = self.predict_all(self.U)
