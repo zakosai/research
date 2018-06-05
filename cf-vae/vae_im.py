@@ -56,11 +56,11 @@ class vanilla_vae:
             #x = tf.layers.dropout(x, rate=0.3)
             # for i in range(self.num_conv):
             #     x = conv2d(x, self.filter * np.power(2, i),kernel_size=(2,2), strides=(2,2), scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
-            x = conv2d(x, 64,kernel_size=(3,3), strides=(2,2), scope="enc_layer0", activation=tf.nn.relu)
-            x = conv2d(x, 128,kernel_size=(3,3), strides=(2,2), scope="enc_layer1", activation=tf.nn.relu)
-            x = conv2d(x, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
-            x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
-            x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
+            x = conv2d(x, 32,kernel_size=(3,3), strides=(2,2), scope="enc_layer0", activation=tf.nn.relu)
+            x = conv2d(x, 64,kernel_size=(3,3), strides=(2,2), scope="enc_layer1", activation=tf.nn.relu)
+            x = conv2d(x, 128,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
+            # x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
+            # x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
             # x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
             # x = max_pool(x, kernel_size=(3,3), strides=(2,2))
             # num_blocks = 3
@@ -96,8 +96,8 @@ class vanilla_vae:
 
             # generative process
             h_decode = dense(z, self.intermediate_dim, activation=tf.nn.relu)
-            h_upsample = dense(h_decode, 512, activation=tf.nn.relu)
-            y = Reshape((1,1,512))(h_upsample)
+            h_upsample = dense(h_decode, 128, activation=tf.nn.relu)
+            y = Reshape((4,4,128))(h_upsample)
 
             # for i in range(self.num_conv-1):
             #     y = conv2d_transpose(y, self.filter*np.power(2,self.num_conv-2-i), kernel_size=(2,2),
@@ -107,10 +107,10 @@ class vanilla_vae:
             #                          strides=(2,2), activation=tf.nn.relu)
                     # if last_layer_nonelinear: depth_gen -1
             # y = conv2d_transpose(y, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer0", activation=tf.nn.relu)
-            y = conv2d_transpose(y, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer1", activation=tf.nn.relu)
-            y = conv2d_transpose(y, 256, kernel_size=(3,3), strides=(2,2), scope="dec_layer2", activation=tf.nn.relu)
-            y = conv2d_transpose(y, 128, kernel_size=(3,3), strides=(2,2), scope="dec_layer3", activation=tf.nn.relu)
-            y = conv2d_transpose(y, 64, kernel_size=(3,3), strides=(2,2), scope="dec_layer4", activation=tf.nn.relu)
+            # y = conv2d_transpose(y, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer1", activation=tf.nn.relu)
+            # y = conv2d_transpose(y, 256, kernel_size=(3,3), strides=(2,2), scope="dec_layer2", activation=tf.nn.relu)
+            y = conv2d_transpose(y, 64, kernel_size=(3,3), strides=(2,2), scope="dec_layer3", activation=tf.nn.relu)
+            y = conv2d_transpose(y, 32, kernel_size=(3,3), strides=(2,2), scope="dec_layer4", activation=tf.nn.relu)
             y = conv2d_transpose(y, 3, kernel_size=(3,3), strides=(2,2), scope="dec_layer5", activation=tf.nn.relu)
             x_recons = y
         m = Flatten()(x)
