@@ -76,6 +76,9 @@ class vanilla_vae:
             y = conv2d_transpose(y, 32, kernel_size=(3,3), strides=(2,2), scope="dec_layer4", activation=tf.nn.relu)
             y = conv2d_transpose(y, 3, kernel_size=(3,3), strides=(2,2), scope="dec_layer5", activation=tf.nn.relu)
             x_recons = y
+        t1 = tf.shape(x_)
+        t2 = tf.shape(x_recons)
+        print(t1, t2)
         m = tf.reshape(x_, [-1, self.input_height*self.input_width*self.channel])
         n = tf.reshape(x_recons, [-1, self.input_height*self.input_width*self.channel])
         # loss_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_), K.flatten(x_recons))
