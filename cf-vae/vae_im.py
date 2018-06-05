@@ -85,7 +85,7 @@ class vanilla_vae:
             #                      strides=2, is_training=is_training, name='block_layer5', data_format=data_format)
             # x = block_layer(inputs=x, filters=512, block_fn=building_block, blocks=num_blocks,
             #                      strides=2, is_training=is_training, name='block_layer5', data_format=data_format)
-            h_encode = Lambda(lambda v: K.batch_flatten(v))(x)
+            h_encode = K.batch_flatten(x)
             print(h_encode.shape)
             # h_encode = Dense(self.intermediate_dim, activation='relu')(flat)
             z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
@@ -113,8 +113,8 @@ class vanilla_vae:
             y = conv2d_transpose(y, 32, kernel_size=(3,3), strides=(2,2), scope="dec_layer4", activation=tf.nn.relu)
             y = conv2d_transpose(y, 3, kernel_size=(3,3), strides=(2,2), scope="dec_layer5", activation=tf.nn.relu)
             x_recons = y
-        m = Lambda(lambda v: K.batch_flatten(v))(x_)
-        n = Lambda(lambda v: K.batch_flatten(v))(x_recons)
+        m = K.batch_flatten(x_)
+        n = K.batch_flatten(x_recons)
         print(m.shape, n.shape)
         # loss_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_), K.flatten(x_recons))
         loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(m, n), axis=1))
