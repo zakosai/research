@@ -187,7 +187,7 @@ class cf_vae_extend:
             - z_log_sigma_sq - 1, 1))
             else:
                 loss_im_recons = -tf.reduce_mean(tf.reduce_sum(m * tf.log(tf.maximum(n, 1e-10)) + (1-m) * tf.log(tf.maximum(1 - n, 1e-10)),1))
-                loss_im_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
+                loss_im_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_im_mu) + tf.exp(z_im_log_sigma_sq) - z_im_log_sigma_sq - 1, 1))
                 loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_  - z_im), 1))
                 self.loss_e_step = loss_v + loss_im_kl + loss_im_recons
 
@@ -201,7 +201,7 @@ class cf_vae_extend:
                 # loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z  - z_im), 1))
                 # self.loss_e_step = loss_recons + loss_kl + loss_v + K.mean(loss_im_recons + loss_im_kl)
                 loss_im_recons = -tf.reduce_mean(tf.reduce_sum(m * tf.log(tf.maximum(n, 1e-10)) + (1-m) * tf.log(tf.maximum(1 - n, 1e-10)),1))
-                loss_im_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
+                loss_im_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_im_mu) + tf.exp(z_im_log_sigma_sq) - z_im_log_sigma_sq - 1, 1))
                 loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z - z_im), 1))
                 self.loss_e_step = loss_v + loss_im_kl + loss_im_recons + loss_kl + loss_recons
 
@@ -212,12 +212,13 @@ class cf_vae_extend:
                 self.loss_e_step = loss_recons + loss_kl + loss_s_recons + loss_s_kl + loss_v
 
             elif self.model != 6:
-                loss_im_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_im_), K.flatten(x_im_recons))
-                loss_im_kl = 0.5 * tf.reduce_sum(tf.square(z_im_mu) + tf.exp(z_im_log_sigma_sq) - z_im_log_sigma_sq - 1, 1)
+                loss_im_recons = -tf.reduce_mean(tf.reduce_sum(m * tf.log(tf.maximum(n, 1e-10)) + (1-m) * tf.log(tf.maximum(1 - n, 1e-10)),1))
+                loss_im_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_im_mu) + tf.exp(z_im_log_sigma_sq) - z_im_log_sigma_sq - 1, 1))
+
                 loss_s_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_s_, x_s_recons), axis=1))
                 loss_s_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_s_mu) + tf.exp(z_s_log_sigma_sq) - z_s_log_sigma_sq - 1, 1))
                 loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z  - z_s - z_im), 1))
-                self.loss_e_step = loss_recons + loss_kl + loss_s_recons + loss_s_kl + loss_v + K.mean(loss_im_recons +loss_im_kl)
+                self.loss_e_step = loss_recons + loss_kl + loss_s_recons + loss_s_kl + loss_v + loss_im_recons + loss_im_kl
 
         train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss_e_step)
 
