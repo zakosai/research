@@ -85,9 +85,9 @@ class vanilla_vae:
             #                      strides=2, is_training=is_training, name='block_layer5', data_format=data_format)
             # x = block_layer(inputs=x, filters=512, block_fn=building_block, blocks=num_blocks,
             #                      strides=2, is_training=is_training, name='block_layer5', data_format=data_format)
-            h_encode = tf.keras.backend.batch_flatten(x)
-            print(h_encode.get_shape())
-            # h_encode = Dense(self.intermediate_dim, activation='relu')(flat)
+            flat = tf.keras.backend.batch_flatten(x)
+            print(flat.get_shape())
+            h_encode = Dense(self.intermediate_dim, activation='relu')(flat)
             z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
             print(z_mu.shape)
             z_log_sigma_sq = dense(h_encode, self.z_dim, scope = "sigma_layer")
@@ -95,9 +95,9 @@ class vanilla_vae:
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
 
             # generative process
-            # h_decode = dense(z, self.intermediate_dim, activation=tf.nn.relu)
-            h_upsample = dense(z, 256, activation=tf.nn.relu)
-            y = Reshape((1,1,256))(h_upsample)
+            h_decode = dense(z, self.intermediate_dim, activation=tf.nn.relu)
+            h_upsample = dense(h_decode, 1024, activation=tf.nn.relu)
+            y = Reshape((2,2,256))(h_upsample)
 
             # for i in range(self.num_conv-1):
             #     y = conv2d_transpose(y, self.filter*np.power(2,self.num_conv-2-i), kernel_size=(2,2),
@@ -107,7 +107,7 @@ class vanilla_vae:
             #                          strides=(2,2), activation=tf.nn.relu)
                     # if last_layer_nonelinear: depth_gen -1
             # y = conv2d_transpose(y, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer0", activation=tf.nn.relu)
-            y = conv2d_transpose(y, 256, kernel_size=(3,3), strides=(2,2), scope="dec_layer1", activation=tf.nn.relu)
+            # y = conv2d_transpose(y, 256, kernel_size=(3,3), strides=(2,2), scope="dec_layer1", activation=tf.nn.relu)
             y = conv2d_transpose(y, 128, kernel_size=(3,3), strides=(2,2), scope="dec_layer2", activation=tf.nn.relu)
             y = conv2d_transpose(y, 64, kernel_size=(3,3), strides=(2,2), scope="dec_layer3", activation=tf.nn.relu)
             y = conv2d_transpose(y, 32, kernel_size=(3,3), strides=(2,2), scope="dec_layer4", activation=tf.nn.relu)
