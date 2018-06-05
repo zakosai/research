@@ -111,6 +111,7 @@ class vanilla_vae:
             y = conv2d_transpose(y, 32, kernel_size=(3,3), strides=(2,2), scope="dec_layer4", activation=tf.nn.relu)
             y = conv2d_transpose(y, 3, kernel_size=(3,3), strides=(2,2), scope="dec_layer5", activation=tf.nn.relu)
             x_recons = y
+        print(x_recons.shape)
         m = tf.reshape(x_, [-1, self.input_height*self.input_width*self.channel])
         n = tf.reshape(x_recons, [-1, self.input_height*self.input_width*self.channel])
         print(m.shape, n.shape)
