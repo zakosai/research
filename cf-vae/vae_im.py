@@ -53,10 +53,10 @@ class vanilla_vae:
             x = conv2d(x, 64,kernel_size=(3,3), strides=(2,2), scope="enc_layer1", activation=tf.nn.relu)
             x = conv2d(x, 128,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
             x = conv2d(x, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
-            # x = conv2d(x, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
+            x = conv2d(x, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
             # x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
 
-            h_encode = tf.reshape(x, [-1, 1024])
+            h_encode = tf.reshape(x, [-1, 256])
             print(h_encode.shape)
             z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
             print(z_mu.shape)
@@ -66,11 +66,11 @@ class vanilla_vae:
 
             # generative process
             # h_decode = dense(z, self.intermediate_dim, activation=tf.nn.relu)
-            h_upsample = dense(z, 1024, activation=tf.nn.relu)
-            y = tf.reshape(h_upsample, [-1, 2, 2, 256])
+            h_upsample = dense(z, 256, activation=tf.nn.relu)
+            y = tf.reshape(h_upsample, [-1, 1, 1, 256])
 
             # y = conv2d_transpose(y, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer0", activation=tf.nn.relu)
-            # y = conv2d_transpose(y, 256, kernel_size=(3,3), strides=(2,2), scope="dec_layer1", activation=tf.nn.relu)
+            y = conv2d_transpose(y, 256, kernel_size=(3,3), strides=(2,2), scope="dec_layer1", activation=tf.nn.relu)
             y = conv2d_transpose(y, 128, kernel_size=(3,3), strides=(2,2), scope="dec_layer2", activation=tf.nn.relu)
             y = conv2d_transpose(y, 64, kernel_size=(3,3), strides=(2,2), scope="dec_layer3", activation=tf.nn.relu)
             y = conv2d_transpose(y, 32, kernel_size=(3,3), strides=(2,2), scope="dec_layer4", activation=tf.nn.relu)

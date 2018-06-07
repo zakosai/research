@@ -154,11 +154,11 @@ class cf_vae_extend:
                 x_im = conv2d(x_im, 64,kernel_size=(3,3), strides=(2,2), scope="enc_layer1", activation=tf.nn.relu)
                 x_im = conv2d(x_im, 128,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
                 x_im = conv2d(x_im, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
-                # x_im = conv2d(x_im, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
+                x_im = conv2d(x_im, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
                 # x_im = conv2d(x_im, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
                 # x_im = max_pool(x_im, kernel_size=(3,3), strides=(2,2))
 
-                h_im_encode = tf.reshape(x_im, [-1, 1024])
+                h_im_encode = tf.reshape(x_im, [-1, 256])
                 z_im_mu = dense(h_im_encode, self.z_dim, scope="mu_layer")
                 z_im_log_sigma_sq = dense(h_im_encode, self.z_dim, scope = "sigma_layer")
                 e_im = tf.random_normal(tf.shape(z_im_mu))
@@ -166,11 +166,11 @@ class cf_vae_extend:
 
                 # generative process
                 # h_decode = dense(z_im, self.intermediate_dim, activation=tf.nn.relu)
-                h_upsample = dense(z_im, 1024, activation=tf.nn.relu)
-                y_im = tf.reshape(h_upsample, [-1, 2, 2, 256])
+                h_upsample = dense(z_im, 256, activation=tf.nn.relu)
+                y_im = tf.reshape(h_upsample, [-1, 1, 1, 256])
 
                 # y_im = conv2d_transpose(y_im, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer0", activation=tf.nn.relu)
-                # y_im = conv2d_transpose(y_im, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer1", activation=tf.nn.relu)
+                y_im = conv2d_transpose(y_im, 256, kernel_size=(3,3), strides=(2,2), scope="dec_layer1", activation=tf.nn.relu)
                 y_im = conv2d_transpose(y_im, 128, kernel_size=(3,3), strides=(2,2), scope="dec_layer2", activation=tf.nn.relu)
                 y_im = conv2d_transpose(y_im, 64, kernel_size=(3,3), strides=(2,2), scope="dec_layer3", activation=tf.nn.relu)
                 y_im= conv2d_transpose(y_im, 32, kernel_size=(3,3), strides=(2,2), scope="dec_layer4", activation=tf.nn.relu)
