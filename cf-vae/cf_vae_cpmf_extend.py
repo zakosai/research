@@ -35,7 +35,7 @@ class params:
         self.weight_decay = 2e-4
 
 class cf_vae_extend:
-    def __init__(self, num_users, num_items, num_factors, params, input_dim, encoding_dims, z_dim, decoding_dims,
+    def __init__(self, num_users, num_items, num_factors, params, input_dim, encoding_dims, z_dim, decoding_dims, encoding_dims_str,
                  decoding_dims_str, loss_type="cross_entropy", useTranse = False, eps = 1e-10, model=0, ckpt_folder='pre_model', initial=True, model_mat=None):
         self.num_users = num_users
         self.num_items = num_items
@@ -51,6 +51,7 @@ class cf_vae_extend:
         self.z_dim = z_dim
         self.encoding_dims = encoding_dims
         self.decoding_dims = decoding_dims
+        self.encoding_dims_str = encoding_dims_str
         self.decoding_dims_str = decoding_dims_str
         self.loss_type = loss_type
         self.useTranse = useTranse
@@ -121,9 +122,9 @@ class cf_vae_extend:
 
             with tf.variable_scope("structure"):
                 x_s = self.x_s_
-                depth_inf = len(self.encoding_dims)
+                depth_inf = len(self.encoding_dims_str)
                 for i in range(depth_inf):
-                    x_s = dense(x_s, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    x_s = dense(x_s, self.encoding_dims_str[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
                     # print("enc_layer0/weights:0".graph)
                 h_s_encode = x_s
                 z_s_mu = dense(h_s_encode, self.z_dim, scope="mu_layer")
