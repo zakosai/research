@@ -42,6 +42,7 @@ class vanilla_vae:
         self.learning_rate = learning_rate
         self.batch_size = batch_size
         self.print_size = print_size
+        keep_prob = 0.8
 
         self.g = tf.Graph()
         # inference process
@@ -49,14 +50,18 @@ class vanilla_vae:
         with tf.variable_scope(scope):
             x_ = placeholder((None, self.input_width, self.input_height, self.channel))
             x = x_
-            x = conv2d(x, 64,kernel_size=(3,3), strides=(2,2), scope="enc_layer0", activation=tf.nn.relu)
-            x = conv2d(x, 128,kernel_size=(3,3), strides=(2,2), scope="enc_layer1", activation=tf.nn.relu)
-            x = conv2d(x, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
-            x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
-            x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
+            x = conv2d(x, 32,kernel_size=(3,3), strides=(2,2), scope="enc_layer0", activation=tf.nn.relu)
+            x = tf.nn.dropout(x, keep_prob)
+            x = conv2d(x, 64,kernel_size=(3,3), strides=(2,2), scope="enc_layer1", activation=tf.nn.relu)
+            x = tf.nn.dropout(x, keep_prob)
+            x = conv2d(x, 128,kernel_size=(3,3), strides=(2,2), scope="enc_layer2", activation=tf.nn.relu)
+            x = tf.nn.dropout(x, keep_prob)
+            x = conv2d(x, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer3", activation=tf.nn.relu)
+            x = tf.nn.dropout(x, keep_prob)
+            x = conv2d(x, 256,kernel_size=(3,3), strides=(2,2), scope="enc_layer4", activation=tf.nn.relu)
             # x = conv2d(x, 512,kernel_size=(3,3), strides=(2,2), scope="enc_layer5", activation=tf.nn.relu)
 
-            h_encode = tf.reshape(x, [-1, 512])
+            h_encode = tf.reshape(x, [-1, 256])
             print(h_encode.shape)
             z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
             print(z_mu.shape)
@@ -66,14 +71,18 @@ class vanilla_vae:
 
             # generative process
             # h_decode = dense(z, self.intermediate_dim, activation=tf.nn.relu)
-            h_upsample = dense(z, 512, activation=tf.nn.relu)
-            y = tf.reshape(h_upsample, [-1, 1, 1, 512])
+            h_upsample = dense(z, 256, activation=tf.nn.relu)
+            y = tf.reshape(h_upsample, [-1, 1, 1, 256])
 
             # y = conv2d_transpose(y, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer0", activation=tf.nn.relu)
-            y = conv2d_transpose(y, 512, kernel_size=(3,3), strides=(2,2), scope="dec_layer1", activation=tf.nn.relu)
-            y = conv2d_transpose(y, 256, kernel_size=(3,3), strides=(2,2), scope="dec_layer2", activation=tf.nn.relu)
-            y = conv2d_transpose(y, 128, kernel_size=(3,3), strides=(2,2), scope="dec_layer3", activation=tf.nn.relu)
-            y = conv2d_transpose(y, 64, kernel_size=(3,3), strides=(2,2), scope="dec_layer4", activation=tf.nn.relu)
+            y = conv2d_transpose(y, 256, kernel_size=(3,3), strides=(2,2), scope="dec_layer1", activation=tf.nn.relu)
+            y = tf.nn.dropout(y, keep_prob)
+            y = conv2d_transpose(y, 128, kernel_size=(3,3), strides=(2,2), scope="dec_layer2", activation=tf.nn.relu)
+            y = tf.nn.dropout(y, keep_prob)
+            y = conv2d_transpose(y, 64, kernel_size=(3,3), strides=(2,2), scope="dec_layer3", activation=tf.nn.relu)
+            y = tf.nn.dropout(y, keep_prob)
+            y = conv2d_transpose(y, 32, kernel_size=(3,3), strides=(2,2), scope="dec_layer4", activation=tf.nn.relu)
+            y = tf.nn.dropout(y, keep_prob)
             y = conv2d_transpose(y, 3, kernel_size=(3,3), strides=(2,2), scope="dec_layer5", activation=tf.nn.relu)
             x_recons = y
         t1 = tf.shape(x_)
