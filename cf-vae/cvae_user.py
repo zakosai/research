@@ -94,14 +94,6 @@ class cf_vae_extend:
                 reg_loss = 0
                 for i in range(depth_inf):
                     x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
-                    # x = slim.fully_connected(x, self.encoding_dims[i], activation_fn=tf.nn.sigmoid, scope="enc_layer%s"%i)
-
-                    # print("enc_layer0/weights:0".graph)
-                # h_encode = x
-                # z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
-                # z_log_sigma_sq = dense(h_encode, self.z_dim, scope = "sigma_layer")
-                # e = tf.random_normal(tf.shape(z_mu))
-                # z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
 
                 h_encode = x
                 z_mu = slim.fully_connected(h_encode, self.z_dim, scope="mu_layer")
@@ -114,9 +106,7 @@ class cf_vae_extend:
                 y = z
                 for i in range(depth_gen):
                     y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
-                    # y = slim.fully_connected(y, self.decoding_dims[i], activation_fn=tf.nn.sigmoid,
-                    #                          scope="dec_layer%s"%i)
-                    # if last_layer_nonelinear: depth_gen -1
+
 
 
                 x_recons = y
@@ -313,18 +303,22 @@ class cf_vae_extend:
             v_batch = self.V[idx]
             img_batch = im_data[idx]
             str_batch = str_data[idx]
-            _, l = self.sess.run((train_op, self.loss_e_step),
-                                 feed_dict={self.x_:x_batch, self.v_:v_batch, self.x_s_:str_batch, self.x_im_:img_batch})
+            idu = np.random.choice(self.num_users, self.params.batch_size, replace=False)
+            x_u_batch = u_data[idu]
+            u_batch = self.U[idu]
+            _, _,l, lu = self.sess.run((train_op, train_op_u, self.loss_e_step, self.loss_e_step_u),
+                                 feed_dict={self.x_:x_batch, self.v_:v_batch, self.x_s_:str_batch, self.x_im_:img_batch,
+                                            self.x_u_: x_u_batch, self.u_:u_batch})
             if i % 50 == 0:
-               print("epoches: %d\t loss: %f\t time: %d s"%(i, l, time.time()-start))
-        for i in range(self.params.num_iter):
-            idx = np.random.choice(self.num_users, self.params.batch_size, replace=False)
-            x_u_batch = u_data[idx]
-            u_batch = self.U[idx]
-            _, l = self.sess.run((train_op_u, self.loss_e_step_u), feed_dict={self.x_u_: x_u_batch, self.u_:u_batch})
-
-            if i % 50 == 0:
-               print("epoches: %d\t loss: %f\t time: %d s"%(i, l, time.time()-start))
+               print("epoches: %d\t loss e: %f\t loss u: %f\t time: %d s"%(i, l,lu, time.time()-start))
+        # for i in range(self.params.num_iter):
+        #     idx = np.random.choice(self.num_users, self.params.batch_size, replace=False)
+        #     x_u_batch = u_data[idx]
+        #     u_batch = self.U[idx]
+        #     _, l = self.sess.run((train_op_u, self.loss_e_step_u), feed_dict={self.x_u_: x_u_batch, self.u_:u_batch})
+        #
+        #     if i % 50 == 0:
+        #        print("epoches: %d\t loss: %f\t time: %d s"%(i, l, time.time()-start))
 
         if self.model != 6:
             self.z_mu = z_mu
