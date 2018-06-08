@@ -30,7 +30,7 @@ data = np.load(os.path.join(dir, "user_info.npy"))
 idx = np.random.rand(data.shape[0]) < 0.8
 train_X = data[idx]
 test_X = data[~idx]
-
+print(train_X[0])
 #
 # images = np.fromfile("data/amazon/images.bin")
 # images = images.reshape((16000, 3072))
