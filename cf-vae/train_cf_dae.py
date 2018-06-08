@@ -38,10 +38,10 @@ def load_cvae_data(data_dir):
   data["content"] = variables.toarray()
   structure = np.load(os.path.join(data_dir, "structure.npy"))
   data["structure"] = structure
-  data["train_users"] = load_rating(data_dir + "cf-train-5-users.dat")
-  data["train_items"] = load_rating(data_dir + "cf-train-5-items.dat")
-  data["test_users"] = load_rating(data_dir + "cf-test-5-users.dat")
-  data["test_items"] = load_rating(data_dir + "cf-test-5-items.dat")
+  data["train_users"] = load_rating(data_dir + "cf-train-1-users.dat")
+  data["train_items"] = load_rating(data_dir + "cf-train-1-items.dat")
+  data["test_users"] = load_rating(data_dir + "cf-test-1-users.dat")
+  data["test_items"] = load_rating(data_dir + "cf-test-1-items.dat")
 
   return data
 
@@ -98,7 +98,7 @@ for u in [0.01, 0.1, 1]:
             model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params, data["test_users"])
             model.save_model(os.path.join(ckpt,"cf_dae_%d_%d.mat"%(model_type, i)))
             # model.load_model("cf_vae.mat")
-            f = open(os.path.join(ckpt, "result_%d.txt"%model_type), 'a')
+            f = open(os.path.join(ckpt, "result_dae_%d.txt"%model_type), 'a')
             f.write("-----------%f----------%f----------%f\n"%(u,v,r))
             pred_all = model.predict_all()
             model.predict_val(pred_all, data["train_users"], data["test_users"], f)
