@@ -80,6 +80,7 @@ class cf_vae_extend:
         self.v_ = placeholder((None, self.num_factors))
         self.x_im_ = placeholder((None, self.input_width, self.input_height, self.channel))
         self.x_u_ = placeholder((None, 742))  # we need these global nodes
+        self.u_ = placeholder((None, self.num_factors))
 
 
         # inference process
@@ -318,8 +319,9 @@ class cf_vae_extend:
                print("epoches: %d\t loss: %f\t time: %d s"%(i, l, time.time()-start))
         for i in range(self.params.num_iter):
             idx = np.random.choice(self.num_users, self.params.batch_size, replace=False)
-            u_batch = u_data[idx]
-            _, l = self.sess.run((train_op_u, self.loss_e_step_u), feed_dict={self.x_u_: u_batch})
+            x_u_batch = u_data[idx]
+            u_batch = self.U[idx]
+            _, l = self.sess.run((train_op_u, self.loss_e_step_u), feed_dict={self.x_u_: x_u_batch, self.u_:u_batch})
 
             if i % 50 == 0:
                print("epoches: %d\t loss: %f\t time: %d s"%(i, l, time.time()-start))
