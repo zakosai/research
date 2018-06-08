@@ -210,7 +210,7 @@ class cf_vae_extend:
         loss_u_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_u_mu) + tf.exp(z_u_log_sigma_sq)
             - z_u_log_sigma_sq - 1, 1))
         loss_u = 1.0*self.params.lambda_u/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.u_ - z_u), 1))
-        self.loss_e_step_u = loss_u_recons, loss_u_kl +loss_u
+        self.loss_e_step_u = loss_u_recons+ loss_u_kl +loss_u
 
         if self.loss_type == "cross_entropy":
             if self.model != 6:
