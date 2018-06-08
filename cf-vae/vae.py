@@ -91,9 +91,9 @@ class vanilla_vae:
             for i in range(epochs):
                 idx = np.random.choice(x_input.shape[0], batch_size, replace=False)
                 x_batch = x_input[idx]
-                _, l = sess.run((train_op, loss), feed_dict={x_:x_batch})
+                _, l, lr, lk = sess.run((train_op, loss, loss_recons, loss_kl), feed_dict={x_:x_batch})
                 if i % self.print_size == 0:
-                    print("epoches: %d\t loss: %f\t time: %d s"%(i, l, time.time()-start))
+                    print("epoches: %d\t loss: %f\t loss recons: %f\t loss kl: %f\t time: %d s"%(i, l,lr, lk, time.time()-start))
 
             saver.save(sess, ckpt_file)
         else:
