@@ -515,15 +515,14 @@ class cf_vae_extend:
             recall_vals = []
             apk_vals = []
             for i in range(len(user_all)):
-                top_M = list(np.argsort(-pred_all[i])[0:(m +1)])
-                if train_users[i] in top_M:
-                    top_M.remove(train_users[i])
-                else:
-                    top_M = top_M[:-1]
+                train = train_users[i]
+                top_M = list(np.argsort(-pred_all[i])[0:(m +len(train))])
+                for u in train:
+                    if u in top_M:
+                        top_M.remove(u)
+                top_M = top_M[:m]
                 if len(top_M) != m:
                     print(top_M, train_users[i])
-                if len(train_users[i]) != 1:
-                    print(i)
                 hits = set(top_M) & set(user_all[i])   # item idex from 0
                 hits_num = len(hits)
                 try:
@@ -533,8 +532,6 @@ class cf_vae_extend:
                 recall_vals.append(recall_val)
                 # precision = float(hits_num) / float(m)
                 # precision_vals.append(precision)
-                apk_vals.append( ml_metrics.apk(top_M, user_all[i], m))
-
             recall_avg = np.mean(np.array(recall_vals))
             # precision_avg = np.mean(np.array(precision_vals))
             # # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
