@@ -61,7 +61,7 @@ class vanilla_vae:
                 y = z
                 for i in range(depth_gen):
                     y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
-                    
+
                     # if last_layer_nonelinear: depth_gen -1
 
             else:
@@ -71,7 +71,8 @@ class vanilla_vae:
             x_recons = y
 
         if self.loss == "cross_entropy":
-            loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(x_, x_recons), axis=1))
+            loss_recons = -tf.reduce_mean(tf.reduce_sum(x_ * tf.log(tf.maximum(x_recons, 1e-10))
+                + (1-x_) * tf.log(tf.maximum(1 - x_recons, 1e-10)),1))
         elif self.loss == "l2":
             loss_recons = tf.reduce_mean(tf.nn.l2_loss(x_- x_recons))
         loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
