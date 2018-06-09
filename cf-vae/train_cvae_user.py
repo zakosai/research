@@ -46,12 +46,12 @@ def load_cvae_data(data_dir):
   data["content"] = variables.toarray()
   variables = np.load(os.path.join(data_dir, "structure.npy"))
   data["structure"] = variables
-  user = np.load(os.path.join(data_dir, "user_info.npy"))
+  user = np.load(os.path.join(data_dir, "user_info_5.npy"))
   data["user"] = user
-  data["train_users"] = load_rating(data_dir + "cf-train-1-users.dat")
-  data["train_items"] = load_rating(data_dir + "cf-train-1-items.dat")
-  data["test_users"] = load_rating(data_dir + "cf-test-1-users.dat")
-  data["test_items"] = load_rating(data_dir + "cf-test-1-items.dat")
+  data["train_users"] = load_rating(data_dir + "cf-train-5-users.dat")
+  data["train_items"] = load_rating(data_dir + "cf-train-5-items.dat")
+  data["test_users"] = load_rating(data_dir + "cf-test-5-users.dat")
+  data["test_items"] = load_rating(data_dir + "cf-test-5-items.dat")
 
   return data
 
