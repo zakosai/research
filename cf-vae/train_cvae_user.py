@@ -46,12 +46,12 @@ def load_cvae_data(data_dir):
   data["content"] = variables.toarray()
   variables = np.load(os.path.join(data_dir, "structure.npy"))
   data["structure"] = variables
-  user = np.load(os.path.join(data_dir, "user_info_8.npy"))
+  user = np.load(os.path.join(data_dir, "user_info_52.npy"))
   data["user"] = user
-  data["train_users"] = load_rating(data_dir + "cf-train-8-users2.dat")
-  data["train_items"] = load_rating(data_dir + "cf-train-8-items2.dat")
-  data["test_users"] = load_rating(data_dir + "cf-test-8-users2.dat")
-  data["test_items"] = load_rating(data_dir + "cf-test-8-items2.dat")
+  data["train_users"] = load_rating(data_dir + "cf-train-5-users2.dat")
+  data["train_items"] = load_rating(data_dir + "cf-train-5-items2.dat")
+  data["test_users"] = load_rating(data_dir + "cf-test-5-users2.dat")
+  data["test_items"] = load_rating(data_dir + "cf-test-5-items2.dat")
 
   return data
 
@@ -126,7 +126,7 @@ else:
                           encoding_dims_str=[500, 200], decoding_dims_str=[200, 500, 4526], loss_type='cross_entropy',
                           model = model_type, ckpt_folder=ckpt, initial=initial)
     model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params, data["test_users"], data["user"])
-    model.save_model(os.path.join(ckpt,"cf_vae_%d.mat"%(model_type)))
+    model.save_model(os.path.join(ckpt,"cvae_user_%d.mat"%(model_type)))
     # model.load_model("cf_vae.mat")
     pred = model.predict_all()
     model.predict_val(pred, data["train_users"], data["test_users"])
