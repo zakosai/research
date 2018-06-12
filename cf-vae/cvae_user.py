@@ -76,9 +76,7 @@ class cf_vae_extend:
         print "e_step finetuning"
         tf.reset_default_graph()
         self.x_ = placeholder((None, self.input_dim))  # we need these global nodes
-        self.x_s_ = placeholder((None, 4526))
         self.v_ = placeholder((None, self.num_factors))
-        self.x_im_ = placeholder((None, self.input_width, self.input_height, self.channel))
         self.x_u_ = placeholder((None, 896))  # we need these global nodes
         self.u_ = placeholder((None, self.num_factors))
 
@@ -112,6 +110,8 @@ class cf_vae_extend:
                 x_recons = y
 
         if self.model == 2 or self.model == 3:
+            self.x_im_ = placeholder((None, self.input_width, self.input_height, self.channel))
+            self.x_s_ = placeholder((None, 4526))
 
             with tf.variable_scope("structure"):
                 x_s = self.x_s_
@@ -302,14 +302,20 @@ class cf_vae_extend:
             idx = np.random.choice(self.num_items, self.params.batch_size, replace=False)
             x_batch = x_data[idx]
             v_batch = self.V[idx]
-            img_batch = im_data[idx]
-            str_batch = str_data[idx]
+
             idu = np.random.choice(self.num_users, self.params.batch_size, replace=False)
             x_u_batch = u_data[idu]
             u_batch = self.U[idu]
-            _, _,l, lu = self.sess.run((train_op, train_op_u, self.loss_e_step, self.loss_e_step_u),
-                                 feed_dict={self.x_:x_batch, self.v_:v_batch, self.x_s_:str_batch, self.x_im_:img_batch,
-                                            self.x_u_: x_u_batch, self.u_:u_batch})
+            if self.model != 0:
+                img_batch = im_data[idx]
+                str_batch = str_data[idx]
+                _, _,l, lu = self.sess.run((train_op, train_op_u, self.loss_e_step, self.loss_e_step_u),
+                                     feed_dict={self.x_:x_batch, self.v_:v_batch, self.x_s_:str_batch, self.x_im_:img_batch,
+                                                self.x_u_: x_u_batch, self.u_:u_batch})
+            else:
+                _, _,l, lu = self.sess.run((train_op, train_op_u, self.loss_e_step, self.loss_e_step_u),
+                                     feed_dict={self.x_:x_batch, self.v_:v_batch,
+                                                self.x_u_: x_u_batch, self.u_:u_batch})
             if i % 50 == 0:
                print("epoches: %d\t loss e: %f\t loss u: %f\t time: %d s"%(i, l,lu, time.time()-start))
         # for i in range(self.params.num_iter):
