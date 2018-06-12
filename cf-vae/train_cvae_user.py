@@ -42,16 +42,16 @@ def load_cvae_data(data_dir):
   data = {}
   # variables = scipy.io.loadmat(data_dir + "mult_nor.mat")
   # data["content"] = variables['X']
-  variables = load_npz(os.path.join(data_dir,"mult-nor.npz"))
+  variables = load_npz(os.path.join(data_dir,"mult_nor.npz"))
   data["content"] = variables.toarray()
   variables = np.load(os.path.join(data_dir, "structure.npy"))
   data["structure"] = variables
-  user = np.load(os.path.join(data_dir, "user_info_52.npy"))
+  user = np.load(os.path.join(data_dir, "user_info_1.npy"))
   data["user"] = user
-  data["train_users"] = load_rating(data_dir + "cf-train-5-users2.dat")
-  data["train_items"] = load_rating(data_dir + "cf-train-5-items2.dat")
-  data["test_users"] = load_rating(data_dir + "cf-test-5-users2.dat")
-  data["test_items"] = load_rating(data_dir + "cf-test-5-items2.dat")
+  data["train_users"] = load_rating(data_dir + "cf-train-1-users.dat")
+  data["train_items"] = load_rating(data_dir + "cf-train-1-items.dat")
+  data["test_users"] = load_rating(data_dir + "cf-test-1-users.dat")
+  data["test_items"] = load_rating(data_dir + "cf-test-1-items.dat")
 
   return data
 
@@ -105,7 +105,7 @@ if gs == 1:
             for r in [0.1, 1, 10]:
                 params.lambda_r = r
                 if i > -1:
-                    model = cf_vae_extend(num_users=5584, num_items=13790, num_factors=num_factors, params=params,
+                    model = cf_vae_extend(num_users=7981, num_items=19184, num_factors=num_factors, params=params,
                                           input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000],
                                           encoding_dims_str=[200], decoding_dims_str=[200, 4526], loss_type='cross_entropy',
                                           model = model_type, ckpt_folder=ckpt, initial=initial)
@@ -121,7 +121,7 @@ if gs == 1:
                     print(u, v, r)
                 i += 1
 else:
-    model = cf_vae_extend(num_users=5584, num_items=13790, num_factors=num_factors, params=params,
+    model = cf_vae_extend(num_users=7981, num_items=19184, num_factors=num_factors, params=params,
                           input_dim=8000, encoding_dims=[200, 100], z_dim = zdim, decoding_dims=[100, 200, 8000],
                           encoding_dims_str=[500, 200], decoding_dims_str=[200, 500, 4526], loss_type='cross_entropy',
                           model = model_type, ckpt_folder=ckpt, initial=initial)
