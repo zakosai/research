@@ -22,7 +22,7 @@ dir = args.data_dir
 
 # variables = sio.loadmat("data/citeulike-a/mult_nor.mat")
 # data = variables['X']
-variables = load_npz(os.path.join(dir, "mult-nor.npz"))
+variables = load_npz(os.path.join(dir, "mult_nor.npz"))
 data = variables.toarray()
 # data = np.load(os.path.join(dir, "structure.npy"))
 
