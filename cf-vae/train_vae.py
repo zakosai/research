@@ -27,7 +27,7 @@ tf.set_random_seed(0)
 # variables = load_npz(os.path.join(dir, "mult-nor.npz"))
 # data = variables.toarray()
 data = np.load(os.path.join(dir, "user_info_1.npy"))
-data = data[:, :7] + data[:,12:]
+data = np.delete(data, [7,8,9,10,11], axis=1)
 idx = np.random.rand(data.shape[0]) < 0.8
 train_X = data[idx]
 test_X = data[~idx]

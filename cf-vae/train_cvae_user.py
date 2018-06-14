@@ -47,7 +47,7 @@ def load_cvae_data(data_dir):
   variables = np.load(os.path.join(data_dir, "structure.npy"))
   data["structure"] = variables
   user = np.load(os.path.join(data_dir, "user_info_1.npy"))
-  user = user[:,:7] + user[:,12:]
+  user = np.delete(user, [7,8,9,10,11], axis=1)
   data["user"] = user
   data["train_users"] = load_rating(data_dir + "cf-train-1-users.dat")
   data["train_items"] = load_rating(data_dir + "cf-train-1-items.dat")
