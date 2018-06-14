@@ -77,7 +77,7 @@ class cf_vae_extend:
         tf.reset_default_graph()
         self.x_ = placeholder((None, self.input_dim))  # we need these global nodes
         self.v_ = placeholder((None, self.num_factors))
-        self.x_u_ = placeholder((None, 896))  # we need these global nodes
+        self.x_u_ = placeholder((None, 891))  # we need these global nodes
         self.u_ = placeholder((None, self.num_factors))
 
 
@@ -185,7 +185,7 @@ class cf_vae_extend:
 
         with tf.variable_scope("user"):
             encoding_dims = [100]
-            decoding_dims = [100, 896]
+            decoding_dims = [100, 891]
 
             x_u = self.x_u_
             depth_inf = len(encoding_dims)
@@ -346,11 +346,11 @@ class cf_vae_extend:
     def e_step_u(self):
         print "e_step finetuning for user"
         tf.reset_default_graph()
-        self.x_u_ = placeholder((None, 896))  # we need these global nodes
+        self.x_u_ = placeholder((None, 891))  # we need these global nodes
 
         # inference process
         encoding_dims = [100]
-        decoding_dims = [100, 896]
+        decoding_dims = [100, 891]
         with tf.variable_scope("user"):
             x_u = self.x_u_
             depth_inf = len(encoding_dims)

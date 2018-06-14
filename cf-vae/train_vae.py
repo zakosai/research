@@ -26,7 +26,8 @@ tf.set_random_seed(0)
 # data = variables['X']
 # variables = load_npz(os.path.join(dir, "mult-nor.npz"))
 # data = variables.toarray()
-data = np.load(os.path.join(dir, "user_info_8.npy"))
+data = np.load(os.path.join(dir, "user_info_1.npy"))
+data = data[:, :7] + data[:,12:]
 idx = np.random.rand(data.shape[0]) < 0.8
 train_X = data[idx]
 test_X = data[~idx]
@@ -37,7 +38,7 @@ test_X = data[~idx]
 # train_img = images[idx]
 # test_img = images[~idx]
 
-model = vanilla_vae(input_dim=896, encoding_dims=[100], z_dim=zdim, decoding_dims=[100, 896], loss='cross_entropy', ckpt_folder=ckpt)
+model = vanilla_vae(input_dim=891, encoding_dims=[100], z_dim=zdim, decoding_dims=[100, 891], loss='cross_entropy', ckpt_folder=ckpt)
 # As there will be an additional layer from 100 to 50 in the encoder. in decoder, we also take this layer
                     # lr=0.01, batch_size=128, print_step=50)
 print('fitting data starts...')
