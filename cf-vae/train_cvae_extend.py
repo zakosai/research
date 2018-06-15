@@ -28,6 +28,8 @@ parser.add_argument('--zdim',  type=int, default=50,
                    help='where model is stored')
 parser.add_argument('--gridsearch',  type=int, default=0,
                    help='gridsearch or not')
+parser.add_argument('--data_type',  type=str, default='5',
+                   help='gridsearch or not')
 args = parser.parse_args()
 model_type = args.model
 ckpt = args.ckpt_folder
@@ -46,10 +48,10 @@ def load_cvae_data(data_dir):
   data["content"] = variables.toarray()
   variables = np.load(os.path.join(data_dir, "structure.npy"))
   data["structure"] = variables
-  data["train_users"] = load_rating(data_dir + "cf-train-8-users.dat")
-  data["train_items"] = load_rating(data_dir + "cf-train-8-items.dat")
-  data["test_users"] = load_rating(data_dir + "cf-test-8-users.dat")
-  data["test_items"] = load_rating(data_dir + "cf-test-8-items.dat")
+  data["train_users"] = load_rating(data_dir + "cf-train-%s-users.dat"%args.data_type)
+  data["train_items"] = load_rating(data_dir + "cf-train-%s-items.dat"%args.data_type)
+  data["test_users"] = load_rating(data_dir + "cf-test-%s-users.dat"%args.data_type)
+  data["test_items"] = load_rating(data_dir + "cf-test-%s-items.dat"%args.data_type)
 
   return data
 
@@ -103,7 +105,7 @@ if gs == 1:
             for r in [0.1, 1, 10]:
                 params.lambda_r = r
                 if i > 2:
-                    model = cf_vae_extend(num_users=7981, num_items=19184, num_factors=num_factors, params=params,
+                    model = cf_vae_extend(num_users=6040, num_items=3883, num_factors=num_factors, params=params,
                                           input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000],
                                           encoding_dims_str=[200], decoding_dims_str=[200, 4526], loss_type='cross_entropy',
                                           model = model_type, ckpt_folder=ckpt, initial=initial)
