@@ -29,6 +29,7 @@ data = variables.toarray()
 # data = np.load(os.path.join(dir, "user_info_70p.npy"))
 # data = np.delete(data, [7,8,9,10,11], axis=1)
 idx = np.random.rand(data.shape[0]) < 0.8
+print(data.shape)
 train_X = data[idx]
 test_X = data[~idx]
 # print(train_X[0])
