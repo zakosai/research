@@ -28,10 +28,10 @@ def load_cvae_data(data_dir):
   # data["content"] = variables['X']
   variables = load_npz(os.path.join(data_dir, "mult-nor.npz"))
   data["content"] = variables.toarray()
-  data["train_users"] = load_rating(os.path.join(data_dir + "cf-train-5-users2.dat"))
-  data["train_items"] = load_rating(os.path.join(data_dir + "cf-train-5-items2.dat"))
-  data["test_users"] = load_rating(os.path.join(data_dir + "cf-test-5-users2.dat"))
-  data["test_items"] = load_rating(os.path.join(data_dir + "cf-test-5-items2.dat"))
+  data["train_users"] = load_rating(os.path.join(data_dir + "cf-train-70p-users.dat"))
+  data["train_items"] = load_rating(os.path.join(data_dir + "cf-train-70p-items.dat"))
+  data["test_users"] = load_rating(os.path.join(data_dir + "cf-test-70p-users.dat"))
+  data["test_items"] = load_rating(os.path.join(data_dir + "cf-test-70p-items.dat"))
 
   return data
 
