@@ -60,13 +60,10 @@ num_factors = 50
 model = cf_vae_extend(num_users=5584, num_items=13790, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000], decoding_dims_str=[100,200, 1863],
     loss_type='cross_entropy', encoding_dims_str=[200,100])
-model.load_model(os.path.join(ckpt, "dae.mat"))
-# model.load_model("cf_vae.mat")
-pred = model.predict_all()
-recalls, mapks= model.predict(pred, data['train_users'], data['test_users'], 100)
 
 
-model.load_model(os.path.join(ckpt, "vae"))
+
+model.load_model(os.path.join(ckpt, "vae.mat"))
 pred = model.predict_all()
 recalls_1, mapks_1 = model.predict(pred, data['train_users'], data['test_users'], 100)
 
@@ -74,6 +71,10 @@ model.load_model(os.path.join(ckpt, "vae_user.mat"))
 pred = model.predict_all()
 recalls_2, mapks_2 = model.predict(pred, data['train_users'], data['test_users'], 100)
 
+model.load_model(os.path.join(ckpt, "dae.mat"))
+# model.load_model("cf_vae.mat")
+pred = model.predict_all()
+recalls, mapks= model.predict(pred, data['train_users'], data['test_users'], 100)
 
 plt.figure()
 plt.ylabel("Recall@M")
