@@ -77,7 +77,7 @@ class cf_vae_extend:
         tf.reset_default_graph()
         self.x_ = placeholder((None, self.input_dim))  # we need these global nodes
         self.v_ = placeholder((None, self.num_factors))
-        self.x_u_ = placeholder((None, 891))  # we need these global nodes
+        self.x_u_ = placeholder((None, 737))  # we need these global nodes
         self.u_ = placeholder((None, self.num_factors))
 
 
