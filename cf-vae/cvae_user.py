@@ -36,7 +36,8 @@ class params:
 
 class cf_vae_extend:
     def __init__(self, num_users, num_items, num_factors, params, input_dim, encoding_dims, z_dim, decoding_dims, encoding_dims_str,
-                 decoding_dims_str, loss_type="cross_entropy", useTranse = False, eps = 1e-10, model=0, ckpt_folder='pre_model', initial=True, model_mat=None):
+                 decoding_dims_str, loss_type="cross_entropy", useTranse = False, eps = 1e-10, model=0, ckpt_folder='pre_model',
+                 initial=True, model_mat=None, user_dim=9975):
         self.num_users = num_users
         self.num_items = num_items
         self.num_factors = num_factors
@@ -66,6 +67,7 @@ class cf_vae_extend:
         self.filter = 64
         self.model = model
         self.ckpt_model = ckpt_folder
+        self.user_dim = user_dim
         print(self.params.EM_iter)
         if self.initial == False:
             self.load_model(model_mat)
@@ -77,7 +79,7 @@ class cf_vae_extend:
         tf.reset_default_graph()
         self.x_ = placeholder((None, self.input_dim))  # we need these global nodes
         self.v_ = placeholder((None, self.num_factors))
-        self.x_u_ = placeholder((None, 737))  # we need these global nodes
+        self.x_u_ = placeholder((None, self.user_dim))  # we need these global nodes
         self.u_ = placeholder((None, self.num_factors))
 
 
@@ -185,7 +187,7 @@ class cf_vae_extend:
 
         with tf.variable_scope("user"):
             encoding_dims = [100]
-            decoding_dims = [100, 737]
+            decoding_dims = [100, self.user_dim]
 
             x_u = self.x_u_
             depth_inf = len(encoding_dims)
@@ -346,11 +348,11 @@ class cf_vae_extend:
     def e_step_u(self):
         print "e_step finetuning for user"
         tf.reset_default_graph()
-        self.x_u_ = placeholder((None, 737))  # we need these global nodes
+        self.x_u_ = placeholder((None, self.user_dim))  # we need these global nodes
 
         # inference process
         encoding_dims = [100]
-        decoding_dims = [100, 737]
+        decoding_dims = [100, self.user_dim]
         with tf.variable_scope("user"):
             x_u = self.x_u_
             depth_inf = len(encoding_dims)

@@ -30,6 +30,12 @@ parser.add_argument('--gridsearch',  type=int, default=0,
                    help='gridsearch or not')
 parser.add_argument('--data_type',  type=str, default='5',
                    help='gridsearch or not')
+parser.add_argument('--user_dim',  type=int, default=9975,
+                   help='gridsearch or not')
+parser.add_argument('--user_no',  type=int, default=6040,
+                   help='gridsearch or not')
+parser.add_argument('--item_no',  type=int, default=3883,
+                   help='gridsearch or not')
 args = parser.parse_args()
 model_type = args.model
 ckpt = args.ckpt_folder
@@ -49,13 +55,13 @@ def load_cvae_data(data_dir):
   data["content"] = variables.toarray()
   variables = np.load(os.path.join(data_dir, "structure.npy"))
   data["structure"] = variables
-  user = np.load(os.path.join(data_dir, "user_info_%s2.npy"%data_type))
-  user = np.delete(user, [7,8,9,10,11], axis=1)
+  user = np.load(os.path.join(data_dir, "user_info_%s4.npy"%data_type))
+  # user = np.delete(user, [7,8,9,10,11], axis=1)
   data["user"] = user
-  data["train_users"] = load_rating(data_dir + "cf-train-%s-users2.dat"%data_type)
-  data["train_items"] = load_rating(data_dir + "cf-train-%s-items2.dat"%data_type)
-  data["test_users"] = load_rating(data_dir + "cf-test-%s-users2.dat"%data_type)
-  data["test_items"] = load_rating(data_dir + "cf-test-%s-items2.dat"%data_type)
+  data["train_users"] = load_rating(data_dir + "cf-train-%s-users.dat"%data_type)
+  data["train_items"] = load_rating(data_dir + "cf-train-%s-items.dat"%data_type)
+  data["test_users"] = load_rating(data_dir + "cf-test-%s-users.dat"%data_type)
+  data["test_items"] = load_rating(data_dir + "cf-test-%s-items.dat"%data_type)
 
   return data
 
@@ -109,14 +115,14 @@ if gs == 1:
             for r in [0.1, 1, 10]:
                 params.lambda_r = r
                 if i > -1:
-                    model = cf_vae_extend(num_users=5584, num_items=13790, num_factors=num_factors, params=params,
+                    model = cf_vae_extend(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,
                                           input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000],
                                           encoding_dims_str=[200], decoding_dims_str=[200, 4526], loss_type='cross_entropy',
-                                          model = model_type, ckpt_folder=ckpt, initial=initial)
+                                          model = model_type, ckpt_folder=ckpt, initial=initial, user_dim=args.user_dim)
                     model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params, data["test_users"], data["user"])
-                    model.save_model(os.path.join(ckpt,"cvae_user_%d_%d.mat"%(model_type, i)))
+                    model.save_model(os.path.join(ckpt,"cvae_user2_%d_%d.mat"%(model_type, i)))
                     # model.load_model("cf_vae.mat")
-                    f = open(os.path.join(ckpt, "result_user_%d.txt"%model_type), 'a')
+                    f = open(os.path.join(ckpt, "result_user2_%d.txt"%model_type), 'a')
                     f.write("-----------%f----------%f----------%f\n"%(u,v,r))
                     pred_all = model.predict_all()
                     model.predict_val(pred_all, data["train_users"], data["test_users"], f)

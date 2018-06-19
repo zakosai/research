@@ -16,6 +16,8 @@ parser.add_argument('--zdim',  type=int, default=50,
                    help='where model is stored')
 parser.add_argument('--data_type',  type=str, default='5',
                    help='where model is stored')
+parser.add_argument('--user_dim',  type=int, default=9975,
+                   help='where model is stored')
 args = parser.parse_args()
 ckpt = args.ckpt_folder
 dir = args.data_dir
@@ -29,8 +31,8 @@ tf.set_random_seed(0)
 # data = variables['X']
 # variables = load_npz(os.path.join(dir, "mult_nor.npz"))
 # data = variables.toarray()
-data = np.load(os.path.join(dir, "user_info_%s2.npy"%data_type))
-data = np.delete(data, [7,8,9,10,11], axis=1)
+data = np.load(os.path.join(dir, "user_info_%s4.npy"%data_type))
+# data = np.delete(data, [7,8,9,10,11], axis=1)
 idx = np.random.rand(data.shape[0]) < 0.8
 train_X = data[idx]
 test_X = data[~idx]
@@ -41,7 +43,7 @@ test_X = data[~idx]
 # train_img = images[idx]
 # test_img = images[~idx]
 
-model = vanilla_vae(input_dim=737, encoding_dims=[100], z_dim=zdim, decoding_dims=[100, 737], loss='cross_entropy', ckpt_folder=ckpt)
+model = vanilla_vae(input_dim=args.user_dim, encoding_dims=[100], z_dim=zdim, decoding_dims=[100, args.user_dim], loss='cross_entropy', ckpt_folder=ckpt)
 # As there will be an additional layer from 100 to 50 in the encoder. in decoder, we also take this layer
                     # lr=0.01, batch_size=128, print_step=50)
 print('fitting data starts...')
