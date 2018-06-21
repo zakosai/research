@@ -114,8 +114,20 @@ images = np.fromfile(os.path.join(data_dir,"images.bin"), dtype=np.uint8)
 img = images.reshape((13791, 32, 32, 3))
 img = img.astype(np.float32)/255
 num_factors = zdim
-
-model = PMF(num_feat=50, maxepoch=50, num_batches=43)
-model.fit(data["train_vec"], data["val_vec"], train_users=data["train_users"], test_users=data["test_users"])
+i = 0
+for e in [0.1, 1, 10]:
+    for l in [0.01, 0.1, 1]:
+        for m in [0.08, 0.8, 8]:
+            model = PMF(epsilon=e, _lambda=l, momentum=m, num_feat=50, maxepoch=40, num_batches=43)
+            model.fit(data["train_vec"], data["val_vec"], train_users=data["train_users"], test_users=data["test_users"])
+            model.save_model(os.path.join(ckpt,"pmf_%d.mat"%(i)))
+                    # model.load_model("cf_vae.mat")
+            f = open(os.path.join(ckpt, "result_pmf_%d.txt"%model_type), 'a')
+            f.write("-----------%f----------%f----------%f\n"%(e,l,m))
+            model.predict_val(data["train_users"], data["test_users"], f)
+            f.write("\n")
+            f.close()
+            print(e, l, m)
+            i += 1
 
 

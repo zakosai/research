@@ -38,8 +38,7 @@ class PMF:
             
             self.w_C_inc = np.zeros((num_com, self.num_feat))
             self.w_I_inc = np.zeros((num_inv, self.num_feat))
-        
-        
+
         while self.epoch < self.maxepoch:
             self.epoch += 1
 
@@ -108,7 +107,6 @@ class PMF:
                     self.err_val.append(LA.norm(rawErr)/np.sqrt(pairs_va))
 
                 # Print info
-            self.predict_val(train_users, test_users)
 
                 #if batch == self.num_batches - 1:
                 #    print 'Training RMSE: %f, Test RMSE %f' % (self.err_train[-1], self.err_val[-1])
