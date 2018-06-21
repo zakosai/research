@@ -105,7 +105,9 @@ class PMF:
                                         axis=1) # mean_inv subtracted
                     rawErr = pred_out - val_vec[:, 2] + self.mean_inv
                     self.err_val.append(LA.norm(rawErr)/np.sqrt(pairs_va))
-
+            if self.epoch%20 == 0:
+                print(self.epoch)
+                self.predict_val(train_users, test_users)
                 # Print info
 
                 #if batch == self.num_batches - 1:
@@ -128,7 +130,6 @@ class PMF:
     def predict_val(self, train_users, test_users, file=None):
         user_all = test_users
         ground_tr_num = [len(user) for user in user_all]
-
 
 
         recall_avgs = []
