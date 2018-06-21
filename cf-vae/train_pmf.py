@@ -118,14 +118,14 @@ i = 0
 e = 3
 l = 0.03
 m = 0.2
-for e in [0.3, 1, 3]:
-    for l in [0.03, 0.1, 0.3]:
-        for m in [0.2, 0.8, 2.4]:
+for e in [0.01, 0.03, 0.1, 1, 3, 10, 30, 100]:
+    for l in [0.01, 0.03, 0.1, 1, 3, 10, 30, 100]:
+        for m in [0.01, 0.03, 0.1, 1, 3, 10, 30, 100]:
             model = PMF(epsilon=e, _lambda=l, momentum=m, num_feat=50, maxepoch=50, num_batches=43)
             model.fit(data["train_vec"], data["val_vec"], train_users=data["train_users"], test_users=data["test_users"])
             # model.save_model(os.path.join(ckpt,"pmf_%d.mat"%(i)))
                     # model.load_model("cf_vae.mat")
-            f = open(os.path.join(ckpt, "result_pmf_%d.txt"%model_type), 'a')
+            f = open(os.path.join(ckpt, "result_pmf_%d.txt"%model_type), 'w')
             f.write("-----------%f----------%f----------%f\n"%(e,l,m))
             model.predict_val(data["train_users"], data["test_users"], f)
             f.write("\n")
