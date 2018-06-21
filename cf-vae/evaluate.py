@@ -16,6 +16,8 @@ parser.add_argument('--data_dir',  type=str, default='data/amazon',
                    help='where model is stored')
 parser.add_argument('--mat_file',  type=str, default='cf_vae_1.mat',
                    help='where model is stored')
+parser.add_argument('--type',  type=str, default=15,
+                   help='where model is stored')
 
 args = parser.parse_args()
 ckpt = args.ckpt_folder
@@ -28,10 +30,10 @@ def load_cvae_data(data_dir):
   # data["content"] = variables['X']
   variables = load_npz(os.path.join(data_dir, "mult_nor.npz"))
   data["content"] = variables.toarray()
-  data["train_users"] = load_rating(os.path.join(data_dir,"cf-train-15-users.dat"))
-  data["train_items"] = load_rating(os.path.join(data_dir,"cf-train-15-items.dat"))
-  data["test_users"] = load_rating(os.path.join(data_dir,"cf-test-15-users.dat"))
-  data["test_items"] = load_rating(os.path.join(data_dir ,"cf-test-15-items.dat"))
+  data["train_users"] = load_rating(os.path.join(data_dir,"cf-train-%s-users.dat"%args.type))
+  data["train_items"] = load_rating(os.path.join(data_dir,"cf-train-%s-items.dat"%args.type))
+  data["test_users"] = load_rating(os.path.join(data_dir,"cf-test-%s-users.dat"%args.type))
+  data["test_items"] = load_rating(os.path.join(data_dir ,"cf-test-%s-items.dat"%args.type))
 
   return data
 
