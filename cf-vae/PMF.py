@@ -108,10 +108,10 @@ class PMF:
                     rawErr = pred_out - val_vec[:, 2] + self.mean_inv
                     self.err_val.append(LA.norm(rawErr)/np.sqrt(pairs_va))
 
-            recall = self.predict_val(train_users, test_users)
-            if recall > m:
-                m = recall
-                e_m = self.epoch
+            # recall = self.predict_val(train_users, test_users)
+            # if recall > m:
+            #     m = recall
+            #     e_m = self.epoch
 
         print("max recall: %f in epoch %d"%(m, e_m))
                 # Print info
@@ -168,7 +168,7 @@ class PMF:
             # precision_avg = np.mean(np.array(precision_vals))
             # # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
             # #                        [u for u in user_all if len(u)!=0], m)
-            # print recall_avg
+            print recall_avg
             if file != None:
                 file.write("m = %d, recall = %f\t"%(m, recall_avg))
         return recall_avg

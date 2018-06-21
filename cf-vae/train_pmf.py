@@ -125,11 +125,11 @@ for e in [0.3, 1, 3]:
             model.fit(data["train_vec"], data["val_vec"], train_users=data["train_users"], test_users=data["test_users"])
             # model.save_model(os.path.join(ckpt,"pmf_%d.mat"%(i)))
                     # model.load_model("cf_vae.mat")
-            # f = open(os.path.join(ckpt, "result_pmf_%d.txt"%model_type), 'a')
-            # f.write("-----------%f----------%f----------%f\n"%(e,l,m))
-            # model.predict_val(data["train_users"], data["test_users"], f)
-            # f.write("\n")
-            # f.close()
+            f = open(os.path.join(ckpt, "result_pmf_%d.txt"%model_type), 'a')
+            f.write("-----------%f----------%f----------%f\n"%(e,l,m))
+            model.predict_val(data["train_users"], data["test_users"], f)
+            f.write("\n")
+            f.close()
             print(e, l, m)
             i += 1
 
