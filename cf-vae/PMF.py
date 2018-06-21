@@ -168,7 +168,7 @@ class PMF:
             # precision_avg = np.mean(np.array(precision_vals))
             # # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
             # #                        [u for u in user_all if len(u)!=0], m)
-            print recall_avg
+            # print recall_avg
             if file != None:
                 file.write("m = %d, recall = %f\t"%(m, recall_avg))
         return recall_avg
