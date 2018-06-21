@@ -20,6 +20,8 @@ class PMF:
         
     def fit(self, train_vec, val_vec, train_users, test_users):
         # mean subtraction
+        m = 0
+        e_m = 0
         self.mean_inv = np.mean(train_vec[:,2])
         
         pairs_tr = train_vec.shape[0]
@@ -105,9 +107,13 @@ class PMF:
                                         axis=1) # mean_inv subtracted
                     rawErr = pred_out - val_vec[:, 2] + self.mean_inv
                     self.err_val.append(LA.norm(rawErr)/np.sqrt(pairs_va))
-            if self.epoch%20 == 0:
-                print(self.epoch)
-                self.predict_val(train_users, test_users)
+
+            recall = self.predict_val(train_users, test_users)
+            if recall > m:
+                m = recall
+                e_m = self.epoch
+
+        print("max recall: %f in epoch %d"%(m, e_m))
                 # Print info
 
                 #if batch == self.num_batches - 1:
@@ -135,7 +141,7 @@ class PMF:
         recall_avgs = []
         precision_avgs = []
         mapk_avgs = []
-        for m in [10, 100]:
+        for m in [100, 10]:
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
             for i in range(len(user_all)):
@@ -165,6 +171,7 @@ class PMF:
             print recall_avg
             if file != None:
                 file.write("m = %d, recall = %f\t"%(m, recall_avg))
+        return recall_avg
         
     def set_params(self, parameters):
         if isinstance(parameters, dict):
