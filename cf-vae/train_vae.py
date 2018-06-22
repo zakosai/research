@@ -33,7 +33,7 @@ tf.set_random_seed(0)
 # data = variables.toarray()
 data = np.load(os.path.join(dir, "user_info_%s2.npy"%data_type))
 # data = np.delete(data, [7,8,9,10,11], axis=1)
-data = data[:, :30]
+data = data[:, 7:30]
 idx = np.random.rand(data.shape[0]) < 0.8
 train_X = data[idx]
 test_X = data[~idx]
