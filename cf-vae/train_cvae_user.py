@@ -120,7 +120,8 @@ if gs == 1:
                                           input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000],
                                           encoding_dims_str=[200], decoding_dims_str=[200, 4526], loss_type='cross_entropy',
                                           model = model_type, ckpt_folder=ckpt, initial=initial, user_dim=args.user_dim)
-                    model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params, data["test_users"], data["user"])
+                    model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params,
+                              data["test_users"], data["user"], data["train_users_rating"], data["train_items_rating"])
                     model.save_model(os.path.join(ckpt,"cvae_user2_%d_%d.mat"%(model_type, i)))
                     # model.load_model("cf_vae.mat")
                     f = open(os.path.join(ckpt, "result_user2_%d.txt"%model_type), 'a')
