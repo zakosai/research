@@ -380,7 +380,7 @@ class cf_vae_extend:
         loss_v = 1.0*self.params.lambda_u/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.u_ - z_u), 1))
         #self.loss_e_step = loss_recons + loss_kl + loss_v
 
-    def pmf_estimate(self, users, items, params):
+    def pmf_estimate(self, users, items, user_ratings, item_ratings, params):
         """
         users: list of list
         """
@@ -406,7 +406,7 @@ class cf_vae_extend:
                 if n > 0:
                     A = np.copy(XX)
                     A += np.dot(self.V[item_ids, :].T, self.V[item_ids,:])*a_minus_b
-                    x = params.C_a * np.sum(self.V[item_ids, :], axis=0) + params.lambda_u * self.exp_z_u[i, :]
+                    x = (params.C_a * self.V[item_ids, :]*(np.tile(user_ratings[i], (self.z_dim, 1)).T)).sum(0) + params.lambda_u * self.exp_z_u[i, :]
                     self.U[i, :] = scipy.linalg.solve(A, x)
 
                     likelihood += -0.5 * params.lambda_u * np.sum(self.U[i]*self.U[i])
@@ -426,7 +426,7 @@ class cf_vae_extend:
                     if self.model == 1:
                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
                     elif self.model != 6:
-                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z[j,:]
+                         x = (params.C_a * self.U[user_ids, :]*(np.tile(item_ratings[j], (self.z_dim, 1)).T)).sum(0) + params.lambda_v * self.exp_z[j,:]
                     else:
                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z_im[j,:]
                     self.V[j, :] = scipy.linalg.solve(A, x)
@@ -547,14 +547,14 @@ class cf_vae_extend:
         self.exp_z_u = self.sess.run(self.z_u_mu, feed_dict={self.x_u_:u_data})
         return self.exp_z, self.exp_z_im, self.exp_z_s, self.exp_z_u
 
-    def fit(self, users, items, x_data, im_data, str_data, params, test_users, u_data):
+    def fit(self, users, items, x_data, im_data, str_data, params, test_users, u_data, user_ratings, item_ratings):
         start = time.time()
         self.e_step(x_data, im_data, str_data, u_data)
         self.exp_z, self.exp_z_im, self.exp_z_s, self.exp_z_u = self.get_exp_hidden(x_data, im_data, str_data, u_data)
         for i in range(params.EM_iter):
             print("iter: %d"%i)
 
-            self.pmf_estimate(users, items, params)
+            self.pmf_estimate(users, items, user_ratings, item_ratings, params)
             self.e_step(x_data, im_data, str_data, u_data)
             self.exp_z, self.exp_z_im, self.exp_z_s, self.exp_z_u = self.get_exp_hidden(x_data, im_data, str_data, u_data)
 
