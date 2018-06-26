@@ -87,9 +87,9 @@ tf.set_random_seed(0)
 
 num_factors = 50
 
-i = 27
+i = 0
 recalls = []
-for u in [10]:
+for u in [0.1, 1, 10]:
     params.lambda_u = u
     for v in [1, 10, 100]:
         params.lambda_v = v
