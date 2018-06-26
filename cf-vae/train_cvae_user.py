@@ -53,17 +53,17 @@ def load_cvae_data(data_dir):
   # data["content"] = variables['X']
   variables = load_npz(os.path.join(data_dir,"mult_nor.npz"))
   data["content"] = variables.toarray()
-  variables = np.load(os.path.join(data_dir, "structure.npy"))
-  data["structure"] = variables
-  user = np.load(os.path.join(data_dir, "user_info_%s2.npy"%data_type))
+  # variables = np.load(os.path.join(data_dir, "structure.npy"))
+  # data["structure"] = variables
+  user = np.load(os.path.join(data_dir, "user_info_%s.npy"%data_type))
   # user = user[:, 7:30]
   data["user"] = user
-  data["train_users"] = load_rating(data_dir + "cf-train-%s-users.dat"%data_type)
-  data["train_items"] = load_rating(data_dir + "cf-train-%s-items.dat"%data_type)
-  data["test_users"] = load_rating(data_dir + "cf-test-%s-users.dat"%data_type)
-  data["test_items"] = load_rating(data_dir + "cf-test-%s-items.dat"%data_type)
-  data["train_users_rating"] = load_rating(data_dir + "train-%s-users-rating.dat"%data_type)
-  data["train_items_rating"] = load_rating(data_dir + "train-%s-items-rating.dat"%data_type)
+  data["train_users"] = load_rating(data_dir + "cf-train-%sp-users.dat"%data_type)
+  data["train_items"] = load_rating(data_dir + "cf-train-%sp-items.dat"%data_type)
+  data["test_users"] = load_rating(data_dir + "cf-test-%sp-users.dat"%data_type)
+  data["test_items"] = load_rating(data_dir + "cf-test-%sp-items.dat"%data_type)
+  # data["train_users_rating"] = load_rating(data_dir + "train-%s-users-rating.dat"%data_type)
+  # data["train_items_rating"] = load_rating(data_dir + "train-%s-items-rating.dat"%data_type)
   return data
 
 def load_rating(path):
@@ -101,9 +101,9 @@ data = load_cvae_data(data_dir)
 np.random.seed(0)
 tf.set_random_seed(0)
 
-images = np.fromfile(os.path.join(data_dir,"images.bin"), dtype=np.uint8)
-img = images.reshape((13791, 32, 32, 3))
-img = img.astype(np.float32)/255
+# images = np.fromfile(os.path.join(data_dir,"images.bin"), dtype=np.uint8)
+# img = images.reshape((13791, 32, 32, 3))
+# img = img.astype(np.float32)/255
 num_factors = zdim
 
 if gs == 1:
@@ -120,11 +120,11 @@ if gs == 1:
                                           input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000],
                                           encoding_dims_str=[200], decoding_dims_str=[200, 4526], loss_type='cross_entropy',
                                           model = model_type, ckpt_folder=ckpt, initial=initial, user_dim=args.user_dim)
-                    model.fit(data["train_users"], data["train_items"], data["content"],img, data["structure"], params,
-                              data["test_users"], data["user"], data["train_users_rating"], data["train_items_rating"])
-                    model.save_model(os.path.join(ckpt,"cvae_user2_%d_%d.mat"%(model_type, i)))
+                    model.fit(data["train_users"], data["train_items"], data["content"], params,
+                              data["test_users"], data["user"])
+                    model.save_model(os.path.join(ckpt,"cvae_user_%d_%d.mat"%(model_type, i)))
                     # model.load_model("cf_vae.mat")
-                    f = open(os.path.join(ckpt, "result_user2_%d.txt"%model_type), 'a')
+                    f = open(os.path.join(ckpt, "result_user_%d.txt"%model_type), 'a')
                     f.write("-----------%f----------%f----------%f\n"%(u,v,r))
                     pred_all = model.predict_all()
                     model.predict_val(pred_all, data["train_users"], data["test_users"], f)

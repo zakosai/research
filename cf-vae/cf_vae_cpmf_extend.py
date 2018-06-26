@@ -461,7 +461,7 @@ class cf_vae_extend:
             self.exp_z_s = 0
         return self.exp_z, self.exp_z_im, self.exp_z_s
 
-    def fit(self, users, items, x_data, im_data, str_data, params, test_users):
+    def fit(self, users, items, x_data, params, test_users, im_data=None, str_data=None, ):
         start = time.time()
         self.e_step(x_data, im_data, str_data)
         self.exp_z, self.exp_z_im, self.exp_z_s = self.get_exp_hidden(x_data, im_data, str_data)
