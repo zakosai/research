@@ -1,11 +1,21 @@
-python train_vae.py --ckpt_folder=ml/5 --data_dir=data/ml-1m/ --zdim=50 --data_type=5 --user_dim=9975
-python train_cvae_user.py --model=0 --ckpt_folder=ml/5 --data_dir=data/ml-1m/ --iter=50 --zdim=50 --gridsearch=1 --data_type=5 --user_dim=9975
+folders='Ourdoor Toy Tool Beauty Electronics TV'
+for f in $folders
+do
+    mkdir -p $f/20
+    mkdir $f/80
+    python train_vae.py --ckpt_folder=$f/20 --data_dir=data/$f/ --zdim=50 --data_type=8 --user_dim=742
+    cp $f/20/vae* $f/80/
 
-python train_vae.py --ckpt_folder=ml/15 --data_dir=data/ml-1m/ --zdim=50 --data_type=15 --user_dim=9975
-python train_cvae_user.py --model=0 --ckpt_folder=ml/15 --data_dir=data/ml-1m/ --iter=50 --zdim=50 --gridsearch=1 --data_type=15 --user_dim=9975
+done
 
-python train_vae.py --ckpt_folder=ml/70p --data_dir=data/ml-1m/ --zdim=50 --data_type=70p --user_dim=9975
-python train_cvae_user.py --model=0 --ckpt_folder=ml/70p --data_dir=data/ml-1m/ --iter=50 --zdim=50 --gridsearch=1 --data_type=70p --user_dim=9975
+#python train_vae.py --ckpt_folder=sport/8n --data_dir=data/sport/ --zdim=50 --data_type=8 --user_dim=742
+#python train_cvae_user.py --model=0 --ckpt_folder=sport/8n --data_dir=data/sport/ --iter=50 --zdim=50 --gridsearch=1 --data_type=5 --user_dim=742 --user_no=5584 --item_no=13790
+#
+#python train_vae.py --ckpt_folder=ml/15 --data_dir=data/ml-1m/ --zdim=50 --data_type=15 --user_dim=9975
+#python train_cvae_user.py --model=0 --ckpt_folder=ml/15 --data_dir=data/ml-1m/ --iter=50 --zdim=50 --gridsearch=1 --data_type=15 --user_dim=9975
+#
+#python train_vae.py --ckpt_folder=ml/70p --data_dir=data/ml-1m/ --zdim=50 --data_type=70p --user_dim=30
+#python train_cvae_user.py --model=0 --ckpt_folder=ml/70p --data_dir=data/ml-1m/ --iter=50 --zdim=50 --data_type=70p --user_dim=30
 
 #python train_vae.py --ckpt_folder=sport/8n --data_dir=data/sport/ --zdim=50 --data_type=8 --user_dim=742
 #python train_vae.py --ckpt_folder=sport/8n --data_dir=data/sport/ --zdim=50 --data_type=8
