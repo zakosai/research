@@ -310,7 +310,7 @@ class cf_vae_extend:
                 if n > 0:
                     A = np.copy(XX)
                     A += np.dot(self.V[item_ids, :].T, self.V[item_ids,:])*a_minus_b
-                    x = params.C_a * np.sum(self.V[item_ids, :], axis=0) + params.lamdba_u * self.exp_z_u[i,:]
+                    x = params.C_a * np.sum(self.V[item_ids, :], axis=0) + params.lambda_u * self.exp_z_u[i,:]
                     self.U[i, :] = scipy.linalg.solve(A, x)
 
                     likelihood += -0.5 * n * params.C_a
