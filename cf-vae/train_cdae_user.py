@@ -122,9 +122,9 @@ if gs == 1:
                                           model = model_type, ckpt_folder=ckpt, initial=initial, user_dim=args.user_dim)
                     model.fit(data["train_users"], data["train_items"], data["content"], params,
                               data["test_users"], data["user"])
-                    model.save_model(os.path.join(ckpt,"cvae_user_%d_%d.mat"%(model_type, i)))
+                    model.save_model(os.path.join(ckpt,"cdae_user_%d_%d.mat"%(model_type, i)))
                     # model.load_model("cf_vae.mat")
-                    f = open(os.path.join(ckpt, "result_user_%d.txt"%model_type), 'a')
+                    f = open(os.path.join(ckpt, "result_cdae_user_%d.txt"%model_type), 'a')
                     f.write("-----------%f----------%f----------%f\n"%(u,v,r))
                     pred_all = model.predict_all()
                     model.predict_val(pred_all, data["train_users"], data["test_users"], f)
