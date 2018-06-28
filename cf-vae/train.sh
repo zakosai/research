@@ -1,5 +1,5 @@
-folders='Toy Tool Beauty Electronics TV'
-rate='20 80'
+folders='Toy'
+rate='1 8 80'
 #for f in $folders
 #do
 #    python train_dae.py --ckpt_folder=$f/20 --data_dir=data/$f/ --zdim=50 --data_type=8 --user_dim=742
