@@ -1,7 +1,7 @@
 folders='Toy'
 rate='1 8 80'
-python train_dae.py --ckpt_folder=sport/1nn --data_dir=data/sport/ --zdim=50 --data_type=1 --user_dim=742
-python train_vae.py --ckpt_folder=sport/1nn --data_dir=data/sport/ --zdim=50 --data_type=1 --user_dim=742
+#python train_dae.py --ckpt_folder=sport/1nn --data_dir=data/sport/ --zdim=50 --data_type=1 --user_dim=742
+#python train_vae.py --ckpt_folder=sport/1nn --data_dir=data/sport/ --zdim=50 --data_type=1 --user_dim=742
 python train_cf_dae.py --model=0 --ckpt_folder=sport/1nn --data_dir=data/sport/ --iter=50 --data_type=1 --user_no=5584 --item_no=13790
 
 python train_cvae_extend.py --model=0 --ckpt_folder=sport/1nn --data_dir=data/sport/ --iter=50 --zdim=50 --gridsearch=1 --data_type=1 --user_no=5584 --item_no=13790
