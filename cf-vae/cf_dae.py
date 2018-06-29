@@ -204,7 +204,7 @@ class cf_vae_extend:
 
             else:
                 loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z), 1))
-                self.loss_e_step = loss_recons + loss_v + sparsity_loss
+                self.loss_e_step = loss_recons + loss_v + sparsity_loss*sparsity_weight
 
         train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss_e_step)
 
