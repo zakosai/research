@@ -130,7 +130,7 @@ else:
                           model = model_type, ckpt_folder=ckpt)
     #model.fit(data["train_users"], data["train_items"], data["content"],params, data["test_users"])
     #model.save_model(os.path.join(ckpt,"cf_dae_%d.mat"%(model_type)))
-    model.load_model("cf_vae.mat")
+    model.load_model("cf_dae_0.mat")
     pred = model.predict_all()
     model.predict_val(pred, data["train_users"], data["test_users"])
 
