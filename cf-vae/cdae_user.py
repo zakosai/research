@@ -173,8 +173,7 @@ class cf_vae_extend:
                 y_u = dense(y_u, decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
             x_u_recons = y_u
-        loss_u_recons = -tf.reduce_mean(tf.reduce_sum(self.x_u_ * tf.log(tf.maximum(x_u_recons, 1e-10))
-                + (1-self.x_u_) * tf.log(tf.maximum(1 - x_u_recons, 1e-10)),1))
+        loss_u_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_u_, x_u_recons), axis=1))
         loss_u = 1.0*self.params.lambda_u/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.u_ - z_u), 1))
         self.loss_e_step_u = loss_u_recons +loss_u
         sparsity_weight = 0.2
