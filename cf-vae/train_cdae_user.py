@@ -80,7 +80,7 @@ def load_rating(path):
 
 
 params = params()
-params.lambda_u = 1
+params.lambda_u = 0.1
 params.lambda_v = 1
 params.lambda_r = 10
 params.C_a = 1
@@ -137,8 +137,8 @@ else:
                           input_dim=8000, encoding_dims=[200, 100], z_dim = zdim, decoding_dims=[100, 200, 8000],
                           encoding_dims_str=[500, 200], decoding_dims_str=[200, 500, 4526], loss_type='cross_entropy',
                           model = model_type, ckpt_folder=ckpt, initial=initial, user_dim=args.user_dim)
-    #model.fit(data["train_users"], data["train_items"], data["content"], params, data["test_users"], data["user"])
-    #model.save_model(os.path.join(ckpt,"cdae_user_%d.mat"%(model_type)))
-    model.load_model(os.path.join(ckpt, "cdae_user_0.mat"))
+    model.fit(data["train_users"], data["train_items"], data["content"], params, data["test_users"], data["user"])
+    model.save_model(os.path.join(ckpt,"cdae_user_%d.mat"%(model_type)))
+    #model.load_model(os.path.join(ckpt, "cdae_user_0.mat"))
     pred = model.predict_all()
     model.predict_val(pred, data["train_users"], data["test_users"])
