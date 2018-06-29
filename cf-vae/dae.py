@@ -79,9 +79,9 @@ class vanilla_vae:
         # loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
         z_mean = tf.reduce_mean(z, axis=0)
         sparsity_loss = tf.reduce_sum(kl_divergence(z_mean, sparsity_target))
-        loss = loss_recons + sparsity_weight * sparsity_loss
+        # loss = loss_recons + sparsity_weight * sparsity_loss
         # other cases not finished yet
-        train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(loss)
+        train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_recons)
 
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
