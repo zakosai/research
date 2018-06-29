@@ -207,8 +207,7 @@ class cf_vae_extend:
                 y_u = dense(y_u, decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
             x_u_recons = y_u
 
-        loss_u_recons = -tf.reduce_mean(tf.reduce_sum(self.x_u_ * tf.log(tf.maximum(x_u_recons, 1e-10))
-                + (1-self.x_u_) * tf.log(tf.maximum(1 - x_u_recons, 1e-10)),1))
+        loss_u_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_u_, x_u_recons), axis=1))
         loss_u_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_u_mu) + tf.exp(z_u_log_sigma_sq)
             - z_u_log_sigma_sq - 1, 1))
         loss_u = 1.0*self.params.lambda_u/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.u_ - z_u), 1))
@@ -216,8 +215,7 @@ class cf_vae_extend:
 
         if self.loss_type == "cross_entropy":
             if self.model != 6:
-                loss_recons = -tf.reduce_mean(tf.reduce_sum(self.x_ * tf.log(tf.maximum(x_recons, 1e-10))
-                + (1-self.x_) * tf.log(tf.maximum(1 - x_recons, 1e-10)),1))
+                loss_recons =tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_, x_recons), axis=1))
                 loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq)
             - z_log_sigma_sq - 1, 1))
             else:
@@ -228,7 +226,7 @@ class cf_vae_extend:
 
             if self.model == 0:
                 loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z), 1))
-                self.loss_e_step = loss_recons + loss_kl + loss_v + 2e-4*reg_loss
+                self.loss_e_step = loss_recons + loss_kl + loss_v 
 
             elif self.model == 1:
                 # loss_im_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_im_), K.flatten(x_im_recons))
