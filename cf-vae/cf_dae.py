@@ -489,7 +489,7 @@ class cf_vae_extend:
             recall_avgs.append(recall_avg)
         return recall_avgs
 
-    def predict_val(self, pred_all, train_users, test_users, file):
+    def predict_val(self, pred_all, train_users, test_users, file=None):
         user_all = test_users
         ground_tr_num = [len(user) for user in user_all]
 
@@ -523,7 +523,8 @@ class cf_vae_extend:
             # # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
             # #                        [u for u in user_all if len(u)!=0], m)
             print recall_avg
-            file.write("m = %d, recall = %f"%(m, recall_avg))
+            if file!= None:
+                file.write("m = %d, recall = %f"%(m, recall_avg))
 
     def predict_all(self):
         return np.dot(self.U, (self.V.T))
