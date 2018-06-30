@@ -11,6 +11,7 @@ rate='20 80'
 #
 #done
 
+
 for f in $folders
 do
     for r in $rate
@@ -18,7 +19,7 @@ do
         dim="$(sed -n '3p' data2/$f/info.txt)"
         user_no="$(sed -n '1p' data2/$f/info.txt)"
         item_no="$(sed -n '2p' data2/$f/info.txt)"
-        python train_vae.py --ckpt_folder=$f/$r --data_dir=data2/$f/ --zdim=50 --data_type=$r --user_dim=$dim --type=text
+       # python train_vae.py --ckpt_folder=$f/$r --data_dir=data2/$f/ --zdim=50 --data_type=$r --user_dim=$dim --type=text
         python train_vae.py --ckpt_folder=$f/$r --data_dir=data2/$f/ --zdim=50 --data_type=$r --user_dim=$dim --type=user
 
         python train_cvae_extend.py --model=0 --ckpt_folder=$f/$r --data_dir=data2/$f/ --iter=50 --zdim=50 --gridsearch=1 --data_type=$r --user_no=$user_no --item_no=$item_no
