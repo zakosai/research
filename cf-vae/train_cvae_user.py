@@ -58,10 +58,10 @@ def load_cvae_data(data_dir):
   user = np.load(os.path.join(data_dir, "user_info_%s.npy"%data_type))
   # user = user[:, 7:30]
   data["user"] = user
-  data["train_users"] = load_rating(data_dir + "cf-train-%s-users.dat"%data_type)
-  data["train_items"] = load_rating(data_dir + "cf-train-%s-items.dat"%data_type)
-  data["test_users"] = load_rating(data_dir + "cf-test-%s-users.dat"%data_type)
-  data["test_items"] = load_rating(data_dir + "cf-test-%s-items.dat"%data_type)
+  data["train_users"] = load_rating(data_dir + "cf-train-%sp-users.dat"%data_type)
+  data["train_items"] = load_rating(data_dir + "cf-train-%sp-items.dat"%data_type)
+  data["test_users"] = load_rating(data_dir + "cf-test-%sp-users.dat"%data_type)
+  data["test_items"] = load_rating(data_dir + "cf-test-%sp-items.dat"%data_type)
   # data["train_users_rating"] = load_rating(data_dir + "train-%s-users-rating.dat"%data_type)
   # data["train_items_rating"] = load_rating(data_dir + "train-%s-items-rating.dat"%data_type)
   return data
