@@ -1,5 +1,5 @@
 folders='Outdoor'
-rate='20 80'
+rate='1 8'
 #python train_dae.py --ckpt_folder=sport/1nn --data_dir=data/sport/ --zdim=50 --data_type=1 --user_dim=742
 #python train_vae.py --ckpt_folder=sport/1nn --data_dir=data/sport/ --zdim=50 --data_type=1 --user_dim=742
 
