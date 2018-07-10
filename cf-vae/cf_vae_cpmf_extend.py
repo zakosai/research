@@ -17,6 +17,7 @@ from resnet_model import conv2d_fixed_padding, building_block, block_layer
 import ml_metrics
 import math
 import tensorflow.contrib.layers as slim
+from sklearn.metrics import ndcg_score
 
 class params:
     def __init__(self):
@@ -514,7 +515,7 @@ class cf_vae_extend:
         recall_avgs = []
         precision_avgs = []
         mapk_avgs = []
-        for m in range(10, M, 10):
+        for m in range(10, 10, 10):
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
             apk_vals = []
@@ -561,6 +562,7 @@ class cf_vae_extend:
         for m in [10]:
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
+            ndcg = []
             hit = 0
             for i in range(len(user_all)):
                 train = train_users[i]
@@ -580,6 +582,8 @@ class cf_vae_extend:
                 except:
                     recall_val = 1
                 recall_vals.append(recall_val)
+                pred = np.array(pred_all[i])
+                ndcg.append(ndcg_score(np.ones(m), pred[top_M], k=m))
                 # precision = float(hits_num) / float(m)
                 # precision_vals.append(precision)
 
@@ -587,7 +591,8 @@ class cf_vae_extend:
             # precision_avg = np.mean(np.array(precision_vals))
             mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
                                    [u for u in user_all if len(u)!=0], m)
-            print("MAP: %f, recall %f, hit: %f"%(mapk, recall_avg, float(hit)/len(user_all)))
+
+            print("MAP: %f, recall %f, hit: %f, NDCG: %f"%(mapk, recall_avg, float(hit)/len(user_all), np.mean(ndcg_score)))
             #print recall_avg
             if file != None:
                 file.write("m = %d, recall = %f\t"%(m, recall_avg))
