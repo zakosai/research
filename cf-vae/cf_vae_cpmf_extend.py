@@ -17,7 +17,6 @@ from resnet_model import conv2d_fixed_padding, building_block, block_layer
 import ml_metrics
 import math
 import tensorflow.contrib.layers as slim
-from sklearn.metrics import ndcg_score
 
 class params:
     def __init__(self):
