@@ -35,7 +35,7 @@ if args.type == "text":
     variables = load_npz(os.path.join(dir, "mult_nor.npz"))
     data = variables.toarray()
 else:
-    data = np.load(os.path.join(dir, "user_info_%s.npy"%data_type))
+    data = np.load(os.path.join(dir, "user_info_%s2.npy"%data_type))
 # data = np.delete(data, [7,8,9,10,11], axis=1)
 idx = np.random.rand(data.shape[0]) < 0.8
 train_X = data[idx]
