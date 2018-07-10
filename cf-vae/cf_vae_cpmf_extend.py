@@ -590,10 +590,10 @@ class cf_vae_extend:
 
             recall_avg = np.mean(np.array(recall_vals))
             # precision_avg = np.mean(np.array(precision_vals))
-            mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
-                                   [u for u in user_all if len(u)!=0], m)
+            # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
+            #                        [u for u in user_all if len(u)!=0], m)
 
-            print("MAP: %f, recall %f, hit: %f, NDCG: %f"%(mapk, recall_avg, float(hit)/len(user_all), np.mean(ndcg)))
+            print("recall %f, hit: %f, NDCG: %f"%(recall_avg, float(hit)/len(user_all), np.mean(ndcg)))
             #print recall_avg
             if file != None:
                 file.write("m = %d, recall = %f\t"%(m, recall_avg))
