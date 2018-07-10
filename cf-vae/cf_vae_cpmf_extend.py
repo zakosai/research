@@ -590,6 +590,7 @@ class cf_vae_extend:
                         score.append(0)
                 actual = self.dcg_score(score, pred[top_M], m)
                 best = self.dcg_score(score, score, m)
+                print(actual, best)
                 ndcg.append(float(actual)/best)
                 # precision = float(hits_num) / float(m)
                 # precision_vals.append(precision)
