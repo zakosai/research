@@ -191,8 +191,7 @@ class cf_vae_extend:
 
         if self.loss_type == "cross_entropy":
             if self.model != 6:
-                loss_recons = -tf.reduce_mean(tf.reduce_sum(self.x_ * tf.log(tf.maximum(x_recons, 1e-10))
-                + (1-self.x_) * tf.log(tf.maximum(1 - x_recons, 1e-10)),1))
+                loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_, x_recons), axis=1))
                 loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq)
             - z_log_sigma_sq - 1, 1))
             else:
@@ -559,9 +558,10 @@ class cf_vae_extend:
         recall_avgs = []
         precision_avgs = []
         mapk_avgs = []
-        for m in [10, 100]:
+        for m in [10]:
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
+            hit = 0
             for i in range(len(user_all)):
                 train = train_users[i]
                 top_M = list(np.argsort(-pred_all[i])[0:(m +len(train))])
@@ -573,6 +573,8 @@ class cf_vae_extend:
                     print(top_M, train_users[i])
                 hits = set(top_M) & set(user_all[i])   # item idex from 0
                 hits_num = len(hits)
+                if hits_num > 0:
+                    hit += 1
                 try:
                     recall_val = float(hits_num) / float(ground_tr_num[i])
                 except:
@@ -583,9 +585,10 @@ class cf_vae_extend:
 
             recall_avg = np.mean(np.array(recall_vals))
             # precision_avg = np.mean(np.array(precision_vals))
-            # # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
-            # #                        [u for u in user_all if len(u)!=0], m)
-            print recall_avg
+            mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
+                                   [u for u in user_all if len(u)!=0], m)
+            print("MAP: %f, recall %f, hit: %f"%(mapk, recall_avg, float(hit)/len(user_all)))
+            #print recall_avg
             if file != None:
                 file.write("m = %d, recall = %f\t"%(m, recall_avg))
             # precision_avgs.append(precision_avg)

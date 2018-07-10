@@ -78,21 +78,21 @@ model.load_model(os.path.join(ckpt, "dae.mat"))
 # model.load_model("cf_vae.mat")
 pred = model.predict_all()
 recalls, mapks= model.predict(pred, data['train_users'], data['test_users'], 100)
-
-plt.figure()
-plt.ylabel("Recall@M")
-plt.xlabel("M")
-plt.plot(np.arange(10, 100, 10), recalls_2, '-r', label="our model")
-plt.plot(np.arange(10, 100, 10),recalls_1, '-b', label="CVAE")
-plt.plot(np.arange(10,100, 10), recalls, '-g', label="CDL")
-
-# plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="zdim=500")
-
-plt.legend(loc='upper left')
-data_dir = data_dir.split("/")[1]
-ckpt = ckpt.split("/")[-1]
-plt.savefig("result/recall_10_%s_%s.png"%(data_dir, ckpt))
-plt.close()
+#
+# plt.figure()
+# plt.ylabel("Recall@M")
+# plt.xlabel("M")
+# plt.plot(np.arange(10, 100, 10), recalls_2, '-r', label="our model")
+# plt.plot(np.arange(10, 100, 10),recalls_1, '-b', label="CVAE")
+# plt.plot(np.arange(10,100, 10), recalls, '-g', label="CDL")
+#
+# # plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="zdim=500")
+#
+# plt.legend(loc='upper left')
+# data_dir = data_dir.split("/")[1]
+# ckpt = ckpt.split("/")[-1]
+# plt.savefig("result/recall_10_%s_%s.png"%(data_dir, ckpt))
+# plt.close()
 
 # plt.figure()
 # plt.ylabel("Precision@M")
