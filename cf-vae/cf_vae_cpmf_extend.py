@@ -586,7 +586,7 @@ class cf_vae_extend:
                 for k in range(m):
                     if top_M[k] in hits:
                         score.append(1)
-                    else
+                    else:
                         score.append(0)
                 actual = self.dcg_score(score, pred[top_M], m)
                 best = self.dcg_score(score, score, m)
