@@ -582,8 +582,14 @@ class cf_vae_extend:
                     recall_val = 1
                 recall_vals.append(recall_val)
                 pred = np.array(pred_all[i])
-                actual = self.dcg_score(np.ones(m), pred[top_M], m)
-                best = self.dcg_score(np.ones(m), np.ones(m), m)
+                score = []
+                for k in range(m):
+                    if top_M[k] in hits:
+                        score.append(1)
+                    else
+                        score.append(0)
+                actual = self.dcg_score(score, pred[top_M], m)
+                best = self.dcg_score(score, score, m)
                 ndcg.append(float(actual)/best)
                 # precision = float(hits_num) / float(m)
                 # precision_vals.append(precision)
