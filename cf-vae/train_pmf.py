@@ -57,10 +57,10 @@ def load_cvae_data(data_dir):
   # user = np.load(os.path.join(data_dir, "user_info_%s.npy"%data_type))
   # user = np.delete(user, [7,8,9,10,11], axis=1)
   #data["user"] = user
-  data["train_users"] = load_rating(data_dir + "cf-train-%sp-users.dat"%data_type)
-  data["train_items"] = load_rating(data_dir + "cf-train-%sp-items.dat"%data_type)
-  data["test_users"] = load_rating(data_dir + "cf-test-%sp-users.dat"%data_type)
-  data["test_items"] = load_rating(data_dir + "cf-test-%sp-items.dat"%data_type)
+  data["train_users"] = load_rating(data_dir + "cf-train-%s-users.dat"%data_type)
+  data["train_items"] = load_rating(data_dir + "cf-train-%s-items.dat"%data_type)
+  data["test_users"] = load_rating(data_dir + "cf-test-%s-users.dat"%data_type)
+  data["test_items"] = load_rating(data_dir + "cf-test-%s-items.dat"%data_type)
 
   data["train_vec"] = load_rating2(os.path.join(data_dir, "train-%s.csv"%data_type))
   data["val_vec"] =load_rating2(os.path.join(data_dir, "val-%s.csv"%data_type))
@@ -132,6 +132,7 @@ m = 0.1
 
 model = PMF(epsilon=e, _lambda=l, momentum=m, num_feat=50, maxepoch=50, num_batches=43)
 model.fit(data["train_vec"], data["val_vec"], train_users=data["train_users"], test_users=data["test_users"])
+
 model.predict_val(data["train_users"], data["test_users"])
 model.save_model(os.path.join(ckpt,"pmf.mat"))
 
