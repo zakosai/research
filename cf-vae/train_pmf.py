@@ -112,8 +112,8 @@ tf.set_random_seed(0)
 num_factors = zdim
 i = 0
 e = 1
-l = 0.1
-m = 0.8
+l = 0.01
+m = 0.1
 # for e in [0.1, 0.3, 1, 3, 10 ]:
 #     for l in [0.01, 0.03, 0.1, 1, 3, 10]:
 #         for m in [0.01, 0.03, 0.1, 1, 3, 10]:
@@ -132,5 +132,5 @@ m = 0.8
 model = PMF(epsilon=e, _lambda=l, momentum=m, num_feat=50, maxepoch=50, num_batches=43)
 model.fit(data["train_vec"], data["val_vec"], train_users=data["train_users"], test_users=data["test_users"])
 model.predict_val(data["train_users"], data["test_users"])
-model.save_model(os.path.join(ckpt,"pmf_%d.mat"%(i)))
+model.save_model(os.path.join(ckpt,"pmf.mat"))
 
