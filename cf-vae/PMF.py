@@ -133,12 +133,10 @@ class PMF:
     def predict(self, invID): 
         return np.dot(self.w_C, self.w_I[invID,:]) + self.mean_inv
 
-    def predict_val(self, pred_all, train_users, test_users, file=None):
+    def predict_val(self, train_users, test_users, file=None):
         user_all = test_users
         ground_tr_num = [len(user) for user in user_all]
 
-
-        pred_all = list(pred_all)
 
         recall_avgs = []
         precision_avgs = []
@@ -150,7 +148,8 @@ class PMF:
             hit = 0
             for i in range(len(user_all)):
                 train = train_users[i]
-                top_M = list(np.argsort(-pred_all[i])[0:(m +len(train))])
+                pred = self.predict(i)
+                top_M = list(np.argsort(-pred)[0:(m +len(train))])
                 for u in train:
                     if u in top_M:
                         top_M.remove(u)
@@ -166,7 +165,6 @@ class PMF:
                 except:
                     recall_val = 1
                 recall_vals.append(recall_val)
-                pred = np.array(pred_all[i])
                 score = []
                 for k in range(m):
                     if top_M[k] in hits:
@@ -191,7 +189,6 @@ class PMF:
             #print recall_avg
             if file != None:
                 file.write("m = %d, recall = %f\t"%(m, recall_avg))
-            # precision_avgs.append(precision_avg)
     def dcg_score(self, y_true, y_score, k=5):
         """Discounted cumulative gain (DCG) at rank K.
 
