@@ -53,8 +53,7 @@ def load_cvae_data(data_dir):
   # data["content"] = variables['X']
   variables = load_npz(os.path.join(data_dir,"mult_nor.npz"))
   data["content"] = variables.toarray()
-  variables = np.load(os.path.join(data_dir, "structure.npy"))
-  data["structure"] = variables
+
   user = np.load(os.path.join(data_dir, "user_info_%s.npy"%data_type))
   # user = np.delete(user, [7,8,9,10,11], axis=1)
   data["user"] = user
@@ -110,9 +109,6 @@ data = load_cvae_data(data_dir)
 np.random.seed(0)
 tf.set_random_seed(0)
 
-images = np.fromfile(os.path.join(data_dir,"images.bin"), dtype=np.uint8)
-img = images.reshape((13791, 32, 32, 3))
-img = img.astype(np.float32)/255
 num_factors = zdim
 i = 0
 e = 3
