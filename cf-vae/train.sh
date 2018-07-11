@@ -31,12 +31,23 @@
 
 #done
 
-dim='20 100 150'
-for d in $dim
-do
-    #python train_vae.py --ckpt_folder=Tool/1_$d --data_dir=data2/Tool/ --zdim=$d --data_type=1 --user_dim=830 --type=text
-    #python train_vae.py --ckpt_folder=Tool/1_$d --data_dir=data2/Tool/ --zdim=$d --data_type=1 --user_dim=830 --type=user
-    python train_cvae_user.py --model=0 --ckpt_folder=Tool/1_$d --data_dir=data2/Tool/ --iter=50 --data_type=1 --user_no=2118 --item_no=7780 --gridsearch=1 --zdim=$d --user_dim=830
+#dim='20 100 150'
+#for d in $dim
+#do
+#    #python train_vae.py --ckpt_folder=Tool/1_$d --data_dir=data2/Tool/ --zdim=$d --data_type=1 --user_dim=830 --type=text
+#    #python train_vae.py --ckpt_folder=Tool/1_$d --data_dir=data2/Tool/ --zdim=$d --data_type=1 --user_dim=830 --type=user
+#    python train_cvae_user.py --model=0 --ckpt_folder=Tool/1_$d --data_dir=data2/Tool/ --iter=50 --data_type=1 --user_no=2118 --item_no=7780 --gridsearch=1 --zdim=$d --user_dim=830
+#
+#
+#done
 
+folder='Tool Outdoor sport'
+rate='1 8'
+for fo in $folder
+do
+    for r in $rate
+    do
+        train_pmf.py --ckpt_folder=$fo/$r --data_dir=data2/$fo
+    done
 
 done

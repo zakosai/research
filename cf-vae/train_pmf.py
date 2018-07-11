@@ -55,7 +55,7 @@ def load_cvae_data(data_dir):
   data["content"] = variables.toarray()
   variables = np.load(os.path.join(data_dir, "structure.npy"))
   data["structure"] = variables
-  user = np.load(os.path.join(data_dir, "user_info_%s4.npy"%data_type))
+  user = np.load(os.path.join(data_dir, "user_info_%s.npy"%data_type))
   # user = np.delete(user, [7,8,9,10,11], axis=1)
   data["user"] = user
   data["train_users"] = load_rating(data_dir + "cf-train-%s-users.dat"%data_type)
@@ -118,9 +118,9 @@ i = 0
 e = 3
 l = 0.03
 m = 0.2
-for e in [0.01, 0.03, 0.1, 1, 3, 10, 30, 100]:
-    for l in [0.01, 0.03, 0.1, 1, 3, 10, 30, 100]:
-        for m in [0.01, 0.03, 0.1, 1, 3, 10, 30, 100]:
+for e in [0.1, 0.3, 1, 3, 10 ]:
+    for l in [0.01, 0.03, 0.1, 1, 3, 10]:
+        for m in [0.01, 0.03, 0.1, 1, 3, 10]:
             model = PMF(epsilon=e, _lambda=l, momentum=m, num_feat=50, maxepoch=50, num_batches=43)
             model.fit(data["train_vec"], data["val_vec"], train_users=data["train_users"], test_users=data["test_users"])
             # model.save_model(os.path.join(ckpt,"pmf_%d.mat"%(i)))
@@ -129,9 +129,9 @@ for e in [0.01, 0.03, 0.1, 1, 3, 10, 30, 100]:
             f.write("-----------%f----------%f----------%f\n"%(e,l,m))
             model.predict_val(data["train_users"], data["test_users"], f)
             f.write("\n")
-            f.close()
             print(e, l, m)
             i += 1
+f.close()
 
 # model = PMF(epsilon=e, _lambda=l, momentum=m, num_feat=50, maxepoch=100, num_batches=43)
 # model.fit(data["train_vec"], data["val_vec"], train_users=data["train_users"], test_users=data["test_users"])
