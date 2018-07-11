@@ -47,7 +47,7 @@ for fo in $folder
 do
     for r in $rate
     do
-        train_pmf.py --ckpt_folder=$fo/$r --data_dir=data2/$fo
+        python train_pmf.py --ckpt_folder=$fo/$r --data_dir=data2/$fo
     done
 
 done
