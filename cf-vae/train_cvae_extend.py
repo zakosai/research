@@ -125,7 +125,7 @@ if gs == 1:
                     print(u, v, r)
                 i += 1
 else:
-    model = cf_vae_extend(num_users=7981, num_items=19184, num_factors=num_factors, params=params,
+    model = cf_vae_extend(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,
                           input_dim=8000, encoding_dims=[200], z_dim = zdim, decoding_dims=[200, 8000],
                           encoding_dims_str=[500, 200], decoding_dims_str=[200, 500, 4526], loss_type='cross_entropy',
                           model = model_type, ckpt_folder=ckpt, initial=initial)
