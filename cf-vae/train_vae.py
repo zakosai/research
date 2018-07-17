@@ -56,6 +56,6 @@ if args.type == "text":
     model.fit(train_X, epochs=10000,learning_rate=0.001, batch_size=500, print_size=50, train=True, scope="text")
 
 else:
-    model = vanilla_vae(input_dim=args.user_dim, encoding_dims=[100], z_dim=zdim, decoding_dims=[100,args.user_dim], loss='cross_entropy', ckpt_folder=ckpt)
+    model = vanilla_vae(input_dim=args.user_dim, encoding_dims=[100, 100], z_dim=zdim, decoding_dims=[100, 100,args.user_dim], loss='cross_entropy', ckpt_folder=ckpt)
     print('fitting data starts...')
     model.fit(train_X, epochs=10000,learning_rate=0.001, batch_size=500, print_size=50, train=True, scope="user")
