@@ -84,7 +84,7 @@ class cf_vae_extend:
 
 
         # inference process
-        if self.model != 6:
+        if self.model != 6 and self.model != 7:
             with tf.variable_scope("text"):
                 x = self.x_
                 depth_inf = len(self.encoding_dims)
@@ -93,7 +93,7 @@ class cf_vae_extend:
                 # x = x + noisy_level*tf.random_normal(tf.shape(x))
                 reg_loss = 0
                 for i in range(depth_inf):
-                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.tanh)
+                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
                 h_encode = x
                 z_mu = slim.fully_connected(h_encode, self.z_dim, scope="mu_layer")
@@ -105,7 +105,7 @@ class cf_vae_extend:
                 depth_gen = len(self.decoding_dims)
                 y = z
                 for i in range(depth_gen):
-                    y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.tanh)
+                    y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
 
 
@@ -193,7 +193,7 @@ class cf_vae_extend:
             depth_inf = len(encoding_dims)
 
             for i in range(depth_inf):
-                x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.tanh)
+                x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
             h_u_encode = x_u
             z_u_mu = slim.fully_connected(h_u_encode, self.z_dim, scope="mu_layer")
@@ -204,7 +204,7 @@ class cf_vae_extend:
             depth_gen = len( decoding_dims)
             y_u = z_u
             for i in range(depth_gen):
-                y_u = dense(y_u, decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.tanh)
+                y_u = dense(y_u, decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
             x_u_recons = y_u
 
         loss_u_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_u_, x_u_recons), axis=1))
@@ -309,7 +309,7 @@ class cf_vae_extend:
             if self.model != 0:
                 img_batch = im_data[idx]
                 str_batch = str_data[idx]
-                _, _,l, lu = self.sess.run((train_op, train_op_u, self.loss_e_step, self.loss_e_step_u),
+                _, lu = self.sess.run((train_op_u, self.loss_e_step_u),
                                      feed_dict={self.x_:x_batch, self.v_:v_batch, self.x_s_:str_batch, self.x_im_:img_batch,
                                                 self.x_u_: x_u_batch, self.u_:u_batch})
             else:
@@ -317,7 +317,7 @@ class cf_vae_extend:
                                      feed_dict={self.x_:x_batch, self.v_:v_batch,
                                                 self.x_u_: x_u_batch, self.u_:u_batch})
             if i % 50 == 0:
-               print("epoches: %d\t loss e: %f\t loss u: %f\t time: %d s"%(i, l,lu, time.time()-start))
+               print("epoches: %d\t loss u: %f\t time: %d s"%(i,lu, time.time()-start))
         # for i in range(self.params.num_iter):
         #     idx = np.random.choice(self.num_users, self.params.batch_size, replace=False)
         #     x_u_batch = u_data[idx]
@@ -327,9 +327,9 @@ class cf_vae_extend:
         #     if i % 50 == 0:
         #        print("epoches: %d\t loss: %f\t time: %d s"%(i, l, time.time()-start))
 
-        if self.model != 6:
-            self.z_mu = z_mu
-            self.x_recons = x_recons
+        # if self.model != 6:
+        #     self.z_mu = z_mu
+        #     self.x_recons = x_recons
 
         if self.model == 1 or self.model == 2:
             self.z_im_mu = z_im_mu
@@ -424,7 +424,8 @@ class cf_vae_extend:
                     if self.model == 1:
                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
                     elif self.model != 6:
-                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z[j,:]
+                        # x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z[j,:]
+                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0)
                     else:
                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z_im[j,:]
                     self.V[j, :] = scipy.linalg.solve(A, x)
@@ -525,7 +526,8 @@ class cf_vae_extend:
 
     def get_exp_hidden(self, x_data, im_data, str_data, u_data):
         if self.model != 6:
-            self.exp_z = self.sess.run(self.z_mu, feed_dict={self.x_: x_data})
+           # self.exp_z = self.sess.run(self.z_mu, feed_dict={self.x_: x_data})
+            self.exp_z = 0
         else:
             self.exp_z = 0
         if self.model == 1 or self.model == 2 or self.model == 6:
