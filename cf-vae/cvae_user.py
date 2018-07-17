@@ -93,7 +93,7 @@ class cf_vae_extend:
                 # x = x + noisy_level*tf.random_normal(tf.shape(x))
                 reg_loss = 0
                 for i in range(depth_inf):
-                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
+                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.tanh)
 
                 h_encode = x
                 z_mu = slim.fully_connected(h_encode, self.z_dim, scope="mu_layer")
@@ -105,7 +105,7 @@ class cf_vae_extend:
                 depth_gen = len(self.decoding_dims)
                 y = z
                 for i in range(depth_gen):
-                    y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
+                    y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.tanh)
 
 
 
@@ -193,7 +193,7 @@ class cf_vae_extend:
             depth_inf = len(encoding_dims)
 
             for i in range(depth_inf):
-                x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
+                x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.tanh)
 
             h_u_encode = x_u
             z_u_mu = slim.fully_connected(h_u_encode, self.z_dim, scope="mu_layer")
@@ -204,7 +204,7 @@ class cf_vae_extend:
             depth_gen = len( decoding_dims)
             y_u = z_u
             for i in range(depth_gen):
-                y_u = dense(y_u, decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
+                y_u = dense(y_u, decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.tanh)
             x_u_recons = y_u
 
         loss_u_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_u_, x_u_recons), axis=1))
@@ -357,7 +357,7 @@ class cf_vae_extend:
 
             reg_loss = 0
             for i in range(depth_inf):
-                x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.tanh)
 
             h_u_encode = x_u
             z_u_mu = slim.fully_connected(h_u_encode, self.z_dim, scope="mu_layer")
@@ -368,7 +368,7 @@ class cf_vae_extend:
             depth_gen = len( decoding_dims)
             y_u = z_u
             for i in range(depth_gen):
-                y_u = dense(y_u, decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                y_u = dense(y_u, decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.tanh)
             x_u_recons = y_u
 
         loss_u_recons = -tf.reduce_mean(tf.reduce_sum(self.x_u_ * tf.log(tf.maximum(x_u_recons, 1e-10))
