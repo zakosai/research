@@ -42,12 +42,11 @@ class vanilla_vae:
             x_ = placeholder((None, self.input_dim))
             x = x_
             depth_inf = len(self.encoding_dims)
-            reg_loss = 0
 
             # noisy_level = 1
             # x = x + noisy_level*tf.random_normal(tf.shape(x))
             for i in range(depth_inf):
-                x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
 
             h_encode = x
             z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
@@ -60,19 +59,13 @@ class vanilla_vae:
                 depth_gen = len(self.decoding_dims)
                 y = z
                 for i in range(depth_gen):
-                    y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
 
-                    # if last_layer_nonelinear: depth_gen -1
-
-            else:
-                depth_gen = depth_inf
-                ## haven't finnished yet...
 
             x_recons = y
 
         if self.loss == "cross_entropy":
-            loss_recons = -tf.reduce_mean(tf.reduce_sum(x_ * tf.log(tf.maximum(x_recons, 1e-10))
-                + (1-x_) * tf.log(tf.maximum(1 - x_recons, 1e-10)),1))
+            loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(x_, x_recons), axis=1))
         elif self.loss == "l2":
             loss_recons = tf.reduce_mean(tf.nn.l2_loss(x_- x_recons))
         loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq) - z_log_sigma_sq - 1, 1))
