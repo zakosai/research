@@ -138,7 +138,7 @@ else:
                           encoding_dims_str=[500, 200], decoding_dims_str=[200, 500, 4526], loss_type='cross_entropy',
                           model = model_type, ckpt_folder=ckpt, initial=initial, user_dim=args.user_dim)
     model.fit(data["train_users"], data["train_items"], data["content"], params, data["test_users"], data["user"])
-    model.save_model(os.path.join(ckpt,"cvae_user_%d_relu.mat"%(model_type)))
-    # model.load_model("cf_vae.mat")
+    #model.save_model(os.path.join(ckpt,"cvae_user_%d_relu.mat"%(model_type)))
+    model.load_model("cf_user_0_relu.mat")
     pred = model.predict_all()
     model.predict_val(pred, data["train_users"], data["test_users"])
