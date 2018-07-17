@@ -93,7 +93,7 @@ class cf_vae_extend:
                 # x = x + noisy_level*tf.random_normal(tf.shape(x))
                 reg_loss = 0
                 for i in range(depth_inf):
-                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
 
                 h_encode = x
                 z_mu = slim.fully_connected(h_encode, self.z_dim, scope="mu_layer")
@@ -105,7 +105,7 @@ class cf_vae_extend:
                 depth_gen = len(self.decoding_dims)
                 y = z
                 for i in range(depth_gen):
-                    y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
 
 
 
@@ -186,14 +186,14 @@ class cf_vae_extend:
 
 
         with tf.variable_scope("user"):
-            encoding_dims = [100, 100]
-            decoding_dims = [100,100,self.user_dim]
+            encoding_dims = [100]
+            decoding_dims = [100,self.user_dim]
 
             x_u = self.x_u_
             depth_inf = len(encoding_dims)
 
             for i in range(depth_inf):
-                x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
 
             h_u_encode = x_u
             z_u_mu = slim.fully_connected(h_u_encode, self.z_dim, scope="mu_layer")
@@ -204,7 +204,7 @@ class cf_vae_extend:
             depth_gen = len( decoding_dims)
             y_u = z_u
             for i in range(depth_gen):
-                y_u = dense(y_u, decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                y_u = dense(y_u, decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
             x_u_recons = y_u
 
         loss_u_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_u_, x_u_recons), axis=1))
