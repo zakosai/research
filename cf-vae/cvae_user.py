@@ -186,8 +186,8 @@ class cf_vae_extend:
 
 
         with tf.variable_scope("user"):
-            encoding_dims = [100]
-            decoding_dims = [100, self.user_dim]
+            encoding_dims = []
+            decoding_dims = [self.user_dim]
 
             x_u = self.x_u_
             depth_inf = len(encoding_dims)
@@ -226,7 +226,7 @@ class cf_vae_extend:
 
             if self.model == 0:
                 loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z), 1))
-                self.loss_e_step = loss_recons + loss_kl + loss_v 
+                self.loss_e_step = loss_recons + loss_kl + loss_v
 
             elif self.model == 1:
                 # loss_im_recons = self.input_width * self.input_height * metrics.binary_crossentropy(K.flatten(x_im_), K.flatten(x_im_recons))
