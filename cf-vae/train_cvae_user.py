@@ -139,6 +139,6 @@ else:
                           model = model_type, ckpt_folder=ckpt, initial=initial, user_dim=args.user_dim)
     #model.fit(data["train_users"], data["train_items"], data["content"], params, data["test_users"], data["user"])
     #model.save_model(os.path.join(ckpt,"cvae_user_%d_relu.mat"%(model_type)))
-    model.load_model(os.path.join(ckpt, "cvae_user_0_relu.mat"))
+    model.load_model(os.path.join(ckpt, "vae_user.mat"))
     pred = model.predict_all()
     model.predict_val(pred, data["train_users"], data["test_users"])
