@@ -73,7 +73,7 @@ class neuVAE:
         self.x_ = placeholder((None, self.input_dim))  # we need these global nodes
         self.x_u_ = placeholder((None, self.user_dim))  # we need these global nodes
         if train:
-            self.rating_ = placeholder((None,1))
+            self.rating_ = placeholder((None))
 
         # inference process
         with tf.variable_scope("text"):
