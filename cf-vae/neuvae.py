@@ -75,7 +75,6 @@ class neuVAE:
         if train:
             self.rating_ = placeholder((None))
 
-        print("abc")
 
         # inference process
         with tf.variable_scope("text"):
@@ -118,7 +117,6 @@ class neuVAE:
 
         with tf.variable_scope("neuCF"):
             em = tf.concat([self.z, self.z_u], 1)
-            print(em.shape)
             layers = [50]
 
             for i in range(len(layers)):
@@ -184,7 +182,7 @@ class neuVAE:
             for id in range(self.num_users):
                 users = (np.ones(self.num_items) * id).astype(np.int32)
                 items = np.array(range(self.num_items))
-                rating = []
+                rat = []
 
                 for i in range(0, int(self.num_items) / self.params.batch_size + 1):
                     idx = min(self.num_items, (i + 1) * self.params.batch_size)
@@ -193,9 +191,9 @@ class neuVAE:
 
                     r = self.sess.run(rating, feed_dict={self.x_: x_batch, self.x_u_: u_batch})
                     print(len(r))
-                    rating += r
+                    rat += r
 
-                pred_all.append(rating)
+                pred_all.append(rat)
             pred_all = np.array(pred_all).reshape(self.num_users, self.num_items)
             return pred_all
         return None
