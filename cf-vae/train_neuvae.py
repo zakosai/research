@@ -61,7 +61,7 @@ def load_cvae_data(data_dir):
   rating = [r.strip() for r in rating]
   rating = [r.split(",") for r in rating]
   rating = [[int(i) for i in r] for r in rating]
-  data["rating"] = rating
+  data["rating"] = np.array(rating)
   return data
 
 def load_rating(path):
