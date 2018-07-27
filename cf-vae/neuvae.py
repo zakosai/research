@@ -190,8 +190,8 @@ class neuVAE:
                     x_batch = x_data[items[i * self.params.batch_size:idx]]
 
                     r = self.sess.run(rating, feed_dict={self.x_: x_batch, self.x_u_: u_batch})
-                    print(len(r))
-                    rat += r
+
+                    rat += r.tolist()
 
                 pred_all.append(rat)
             pred_all = np.array(pred_all).reshape(self.num_users, self.num_items)
