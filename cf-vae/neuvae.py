@@ -118,6 +118,7 @@ class neuVAE:
 
         with tf.variable_scope("neuCF"):
             em = tf.concat([self.z, self.z_u], 1)
+            print(em.shape)
             layers = [50]
 
             for i in range(len(layers)):
