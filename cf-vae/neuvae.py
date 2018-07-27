@@ -195,7 +195,7 @@ class neuVAE:
 
             r = self.sess.run(rating, feed_dict={self.x_:x_batch, self.x_u_:u_batch})
             rating += r
-
+        print(len(rating))
         return np.array(rating)
 
     def predict(self, train_users, test_users, x_data, u_data, M=10):
