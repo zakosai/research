@@ -28,7 +28,7 @@ class params:
         self.max_iter_m = 1
 
         # for updating W and b in vae
-        self.learning_rate = 0.01
+        self.learning_rate = 0.0001
         self.batch_size = 500
         self.num_iter = 300   # used in the e_step
         self.EM_iter = 30
@@ -124,6 +124,8 @@ class neuVAE:
                 em = dense(em, layers[i], scope="neuCF_layer%s"%i, activation=tf.nn.relu)
 
             rating = dense(em, 1, scope="neuCF_lastlayer", activation=tf.nn.softmax)
+
+            print(rating.shape)
 
         if train:
             loss_u_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_u_, x_u_recons), axis=1))
