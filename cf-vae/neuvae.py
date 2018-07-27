@@ -168,7 +168,7 @@ class neuVAE:
             rating = data[idx,2]
 
             _, l = self.sess.run((train_op, self.loss),
-                                 feed_dict={self.x_:x_batch, self.u_:u_batch,
+                                 feed_dict={self.x_:x_batch, self.x_u_:u_batch,
                                             self.rating_: rating})
             if i % 50 == 0:
                print("epoches: %d\t loss: %f\t time: %d s"%(i,l, time.time()-start))
@@ -192,7 +192,7 @@ class neuVAE:
             u_batch = u_data[users[i*self.params.batch_size:idx]]
             x_batch = x_data[items[i*self.params.batch_size:idx]]
 
-            r = self.sess.run(rating, feed_dict={x_batch:x_batch, u_batch:u_batch})
+            r = self.sess.run(rating, feed_dict={self.x_:x_batch, self.x_u_:u_batch})
             rating += r
 
         return np.array(rating)
