@@ -7,6 +7,7 @@ from scipy.sparse import load_npz
 import argparse
 import os
 import csv
+import random
 
 
 np.random.seed(0)
@@ -57,10 +58,15 @@ def load_cvae_data(data_dir):
   data["train_items"] = load_rating(data_dir + "cf-train-%sp-items.dat"%data_type)
   data["test_users"] = load_rating(data_dir + "cf-test-%sp-users.dat"%data_type)
   data["test_items"] = load_rating(data_dir + "cf-test-%sp-items.dat"%data_type)
-  rating = list(open(data_dir + "train-%s.csv"%data_type))
-  rating = [r.strip() for r in rating]
-  rating = [r.split(",") for r in rating]
-  rating = [[int(i) for i in r] for r in rating]
+
+  rating = []
+  for i in range(args.user_no):
+      positive_items = data["train_users"][i] + data["test_users"][i]
+      negative_item = list(set(range(args.item_no)) - set(positive_items))
+      for j in range(int(data_type)):
+          rating.append([i, positive_items[j], 1])
+          idx = random.randint(0, len(negative_item)-1)
+          rating.append([i, negative_item[idx], 0])
   data["rating"] = np.array(rating)
   return data
 
