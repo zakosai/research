@@ -125,16 +125,17 @@ class neuVAE:
 
             rating = dense(em, 1, scope="neuCF_lastlayer", activation=tf.nn.softmax)
 
-        loss_u_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_u_, x_u_recons), axis=1))
-        loss_u_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_u_mu) + tf.exp(z_u_log_sigma_sq)
-                                                       - z_u_log_sigma_sq - 1, 1))
-        loss_i_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_, x_recons), axis=1))
-        loss_i_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq)
-                                                       - z_log_sigma_sq - 1, 1))
+        if train:
+            loss_u_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_u_, x_u_recons), axis=1))
+            loss_u_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_u_mu) + tf.exp(z_u_log_sigma_sq)
+                                                           - z_u_log_sigma_sq - 1, 1))
+            loss_i_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_, x_recons), axis=1))
+            loss_i_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq)
+                                                           - z_log_sigma_sq - 1, 1))
 
-        loss_rating = tf.reduce_mean(binary_crossentropy(self.rating_, rating))
-        self.loss = loss_rating + loss_i_kl + loss_i_recons + loss_u_kl + loss_u_recons
-        train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss)
+            loss_rating = tf.reduce_mean(binary_crossentropy(self.rating_, rating))
+            self.loss = loss_rating + loss_i_kl + loss_i_recons + loss_u_kl + loss_u_recons
+            train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss)
 
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
