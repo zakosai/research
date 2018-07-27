@@ -199,7 +199,7 @@ class neuVAE:
 
     def fit(self, data, x_data, u_data):
         start = time.time()
-        self.e_step(data, x_data, u_data)
+        self.e_step(x_data, u_data, data)
         print("time: %d"%(time.time()-start))
         return None
 
