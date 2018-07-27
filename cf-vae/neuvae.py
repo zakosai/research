@@ -163,8 +163,8 @@ class neuVAE:
         start = time.time()
         for i in range(self.params.num_iter):
             idx = np.random.choice(len(data), self.params.batch_size, replace=False)
-            x_batch = x_data[data[idx,1]]
-            u_batch = u_data[data[idx, 0]]
+            x_batch = x_data[data[idx,1], :]
+            u_batch = u_data[data[idx, 0], :]
             rating = data[idx,2]
 
             _, l = self.sess.run((train_op, self.loss),
