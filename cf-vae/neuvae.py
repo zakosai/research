@@ -161,8 +161,6 @@ class neuVAE:
             self.saver = tf.train.Saver()
             self.saver.restore(self.sess, ckpt)
 
-        if not train:
-            return None
         if train:
             start = time.time()
             for i in range(self.params.num_iter):
@@ -209,6 +207,7 @@ class neuVAE:
         user_all = test_users
         ground_tr_num = [len(user) for user in user_all]
         pred_all = self.e_step(x_data, u_data, train=False)
+        print(pred_all.shape)
 
         recall_avgs = []
         precision_avgs = []
