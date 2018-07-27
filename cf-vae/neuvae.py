@@ -67,7 +67,7 @@ class neuVAE:
         self.user_dim = user_dim
         print(self.params.EM_iter)
 
-    def e_step(self, data, x_data, u_data, train=True):
+    def e_step(self, x_data, u_data, data=None, train=True):
         print "e_step finetuning"
         tf.reset_default_graph()
         self.x_ = placeholder((None, self.input_dim))  # we need these global nodes
@@ -162,21 +162,39 @@ class neuVAE:
 
         if not train:
             return None
+        if train:
+            start = time.time()
+            for i in range(self.params.num_iter):
+                idx = np.random.choice(len(data), self.params.batch_size, replace=False)
+                x_batch = x_data[data[idx,1], :]
+                u_batch = u_data[data[idx, 0], :]
+                rating = data[idx,2]
 
-        start = time.time()
-        for i in range(self.params.num_iter):
-            idx = np.random.choice(len(data), self.params.batch_size, replace=False)
-            x_batch = x_data[data[idx,1], :]
-            u_batch = u_data[data[idx, 0], :]
-            rating = data[idx,2]
+                _, l, lr, lue, luk, lie, lik = self.sess.run((train_op, self.loss, loss_rating, loss_u_recons, loss_u_kl, loss_i_recons, loss_i_kl),
+                                     feed_dict={self.x_:x_batch, self.x_u_:u_batch,
+                                                self.rating_: rating})
+                if i % 50 == 0:
+                   print("epoches: %d\t loss: %f\t loss r: %f\t loss ue: %f\t loss uk: %f\t time: %d s"%(i,l, lr, lue, luk, time.time()-start))
 
-            _, l, lr, lue, luk, lie, lik = self.sess.run((train_op, self.loss, loss_rating, loss_u_recons, loss_u_kl, loss_i_recons, loss_i_kl),
-                                 feed_dict={self.x_:x_batch, self.x_u_:u_batch,
-                                            self.rating_: rating})
-            if i % 50 == 0:
-               print("epoches: %d\t loss: %f\t loss r: %f\t loss ue: %f\t loss uk: %f\t time: %d s"%(i,l, lr, lue, luk, time.time()-start))
+            self.saver.save(self.sess, ckpt)
+        else:
+            pred_all = []
+            for id in range(self.num_users):
+                users = (np.ones(self.num_items) * id).astype(np.int32)
+                items = np.array(range(self.num_items))
+                rating = []
 
-        self.saver.save(self.sess, ckpt)
+                for i in range(0, int(self.num_items) / self.params.batch_size + 1):
+                    idx = min(self.num_items, (i + 1) * self.params.batch_size)
+                    u_batch = u_data[users[i * self.params.batch_size:idx]]
+                    x_batch = x_data[items[i * self.params.batch_size:idx]]
+
+                    r = self.sess.run(rating, feed_dict={self.x_: x_batch, self.x_u_: u_batch})
+                    rating += r
+
+                pred_all.append(rating)
+            pred_all = np.array(pred_all).reshape(self.num_users, self.num_items)
+            return pred_all
         return None
 
     def fit(self, data, x_data, u_data):
@@ -185,25 +203,11 @@ class neuVAE:
         print("time: %d"%(time.time()-start))
         return None
 
-    def predict_one(self, user_id, x_data, u_data):
-        users = (np.ones(self.num_items)*user_id).astype(np.int32)
-        items = np.array(range(self.num_items))
-        rating = []
-
-        for i in range(0, int(self.num_items)/self.params.batch_size+1):
-            idx = min(self.num_items, (i+1)*self.params.batch_size)
-            u_batch = u_data[users[i*self.params.batch_size:idx]]
-            x_batch = x_data[items[i*self.params.batch_size:idx]]
-
-            r = self.sess.run(rating, feed_dict={self.x_:x_batch, self.x_u_:u_batch})
-            rating += r
-        print(len(rating))
-        return np.array(rating)
-
     def predict(self, train_users, test_users, x_data, u_data, M=10):
 
         user_all = test_users
         ground_tr_num = [len(user) for user in user_all]
+        pred_all = self.e_step(x_data, u_data, train=False)
 
         recall_avgs = []
         precision_avgs = []
@@ -213,9 +217,8 @@ class neuVAE:
             recall_vals = []
             apk_vals = []
             for i in range(self.num_users):
-                pred = self.predict_one(i,x_data, u_data)
                 train = train_users[i]
-                top_M = list(np.argsort(-pred)[0:(m + len(train))])
+                top_M = list(np.argsort(-pred_all[i])[0:(m + len(train))])
                 for u in train:
                     if u in top_M:
                         top_M.remove(u)
