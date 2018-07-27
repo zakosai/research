@@ -118,7 +118,7 @@ class neuVAE:
             em = tf.concat([self.z, self.z_u], 1)
             layers = [50]
 
-            for i in layers:
+            for i in range(len(layers)):
                 em = dense(em, layers[i], scope="neuCF_layer%s"%i, activation=tf.nn.relu)
 
             rating = dense(em, 1, scope="neuCF_lastlayer", activation=tf.nn.softmax)
