@@ -28,7 +28,7 @@ class params:
         self.max_iter_m = 1
 
         # for updating W and b in vae
-        self.learning_rate = 0.001
+        self.learning_rate = 0.01
         self.batch_size = 500
         self.num_iter = 300   # used in the e_step
         self.EM_iter = 30
@@ -212,16 +212,15 @@ class neuVAE:
             apk_vals = []
             for i in range(self.num_users):
                 pred = self.predict_one(i,x_data, u_data)
-                top_M = list(np.argsort(-pred)[0:(m +1)])
-                if train_users[i] in top_M:
-                    top_M.remove(train_users[i])
-                else:
-                    top_M = top_M[:-1]
+                train = train_users[i]
+                top_M = list(np.argsort(-pred)[0:(m + len(train))])
+                for u in train:
+                    if u in top_M:
+                        top_M.remove(u)
+                top_M = top_M[:m]
                 if len(top_M) != m:
                     print(top_M, train_users[i])
-                if len(train_users[i]) != 1:
-                    print(i)
-                hits = set(top_M) & set(user_all[i])   # item idex from 0
+                hits = set(top_M) & set(user_all[i])  # item idex from 0
                 hits_num = len(hits)
                 try:
                     recall_val = float(hits_num) / float(ground_tr_num[i])
