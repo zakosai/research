@@ -85,7 +85,7 @@ params.C_a = 1
 params.C_b = 0.01
 params.max_iter_m = 1
 params.EM_iter = args.iter
-params.num_iter = 150
+params.num_iter = args.iter
 
 
 data = load_cvae_data(data_dir)
@@ -96,7 +96,7 @@ num_factors = zdim
 
 
 model = neuVAE(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,
-                      input_dim=8000, encoding_dims=[200, 100], z_dim = zdim, decoding_dims=[100, 200, 8000],
+                      input_dim=8000, encoding_dims=[200, 100], z_dim=zdim, decoding_dims=[100, 200, 8000],
                       loss_type='cross_entropy',
                       model = model_type, ckpt_folder=ckpt, initial=initial, user_dim=args.user_dim)
 model.fit(data["rating"], data["content"], data["user"])
