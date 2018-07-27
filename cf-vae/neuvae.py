@@ -75,6 +75,8 @@ class neuVAE:
         if train:
             self.rating_ = placeholder((None))
 
+        print("abc")
+
         # inference process
         with tf.variable_scope("text"):
             x = self.x_
@@ -218,8 +220,8 @@ class neuVAE:
                     if u in top_M:
                         top_M.remove(u)
                 top_M = top_M[:m]
-                if len(top_M) != m:
-                    print(top_M, train_users[i])
+                # if len(top_M) != m:
+                #     print(top_M, train_users[i])
                 hits = set(top_M) & set(user_all[i])  # item idex from 0
                 hits_num = len(hits)
                 try:
