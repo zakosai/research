@@ -57,7 +57,7 @@ def load_cvae_data(data_dir):
   data["train_items"] = load_rating(data_dir + "cf-train-%sp-items.dat"%data_type)
   data["test_users"] = load_rating(data_dir + "cf-test-%sp-users.dat"%data_type)
   data["test_items"] = load_rating(data_dir + "cf-test-%sp-items.dat"%data_type)
-  rating = list(open(data_dir + "train_%d.csv"%data_type))
+  rating = list(open(data_dir + "train-%d.csv"%data_type))
   rating = [r.strip() for r in rating]
   rating = [r.split(",") for r in rating]
   rating = [[int(i) for i in r] for r in rating]
