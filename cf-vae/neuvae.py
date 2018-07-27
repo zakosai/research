@@ -116,7 +116,7 @@ class neuVAE:
 
         with tf.variable_scope("neuCF"):
             em = tf.concat([self.z, self.z_u], 1)
-            layers = [200]
+            layers = [50]
 
             for i in layers:
                 em = dense(em, layers[i], scope="neuCF_layer%s"%i, activation=tf.nn.relu)
