@@ -109,15 +109,15 @@ class neuVAE:
             self.z_u = z_u_mu + tf.sqrt(tf.maximum(tf.exp(z_u_log_sigma_sq), self.eps)) * e_u
 
             # generative process
-            depth_gen = len( decoding_dims)
+            depth_gen = len(decoding_dims)
             y_u = self.z_u
             for i in range(depth_gen):
                 y_u = dense(y_u, decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
             x_u_recons = y_u
 
         with tf.variable_scope("neuCF"):
-            em = tf.concat([self.z, self.z_u], 1)
-            layers = [50]
+            em = tf.concat([self.z, self.z_u], 0)
+            layers = [100, 50]
 
             for i in range(len(layers)):
                 em = dense(em, layers[i], scope="neuCF_layer%s"%i, activation=tf.nn.relu)
@@ -136,7 +136,7 @@ class neuVAE:
 
             loss_rating = tf.reduce_mean(binary_crossentropy(self.rating_, rating_))
             self.loss = loss_rating + loss_i_kl + loss_i_recons + loss_u_kl + loss_u_recons
-            #train_op_rating = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss_rating)
+            # train_op_rating = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss_rating)
             train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss)
 
         self.sess = tf.Session()
