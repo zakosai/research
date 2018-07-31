@@ -191,7 +191,6 @@ class neuVAE:
                     x_batch = x_data[items[i * self.params.batch_size:idx]]
 
                     r = self.sess.run(rating_, feed_dict={self.x_: x_batch, self.x_u_: u_batch})
-                    print(len(r))
 
                     rat += r.tolist()
 
