@@ -135,9 +135,9 @@ class neuVAE:
                                                            - z_log_sigma_sq - 1, 1))
 
             loss_rating = tf.reduce_mean(binary_crossentropy(self.rating_, rating_))
-            self.loss = loss_i_kl + loss_i_recons + loss_u_kl + loss_u_recons
+            self.loss = loss_rating + loss_i_kl + loss_i_recons + loss_u_kl + loss_u_recons
+            #train_op_rating = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss_rating)
             train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss)
-            train_op_rating = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss_rating)
 
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
@@ -171,7 +171,7 @@ class neuVAE:
                 u_batch = u_data[data[idx, 0], :]
                 rating = data[idx,2]
 
-                _,_, l, lr, lue, luk, lie, lik = self.sess.run((train_op, train_op_rating, self.loss, loss_rating, loss_u_recons, loss_u_kl, loss_i_recons, loss_i_kl),
+                _, l, lr, lue, luk, lie, lik = self.sess.run((train_op, self.loss, loss_rating, loss_u_recons, loss_u_kl, loss_i_recons, loss_i_kl),
                                      feed_dict={self.x_:x_batch, self.x_u_:u_batch,
                                                 self.rating_: rating})
                 if i % 50 == 0:
@@ -190,7 +190,7 @@ class neuVAE:
                     u_batch = u_data[users[i * self.params.batch_size:idx]]
                     x_batch = x_data[items[i * self.params.batch_size:idx]]
 
-                    r = self.sess.run(rating, feed_dict={self.x_: x_batch, self.x_u_: u_batch})
+                    r = self.sess.run(rating_, feed_dict={self.x_: x_batch, self.x_u_: u_batch})
 
                     rat += r.tolist()
 
