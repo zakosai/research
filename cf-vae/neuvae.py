@@ -319,3 +319,26 @@ class neuVAE:
                 file.write("m = %d, recall = %f\t"%(m, recall_avg))
             # precision_avgs.append(precision_avg)
 
+    def dcg_score(self, y_true, y_score, k=5):
+        """Discounted cumulative gain (DCG) at rank K.
+
+        Parameters
+        ----------
+        y_true : array, shape = [n_samples]
+            Ground truth (true relevance labels).
+        y_score : array, shape = [n_samples, n_classes]
+            Predicted scores.
+        k : int
+            Rank.
+
+        Returns
+        -------
+        score : float
+        """
+        order = np.argsort(y_score)[::-1]
+        y_true = np.take(y_true, order[:k])
+
+        gain = 2 ** y_true - 1
+
+        discounts = np.log2(np.arange(len(y_true)) + 2)
+        return np.sum(gain / discounts)
