@@ -135,8 +135,9 @@ class neuVAE:
                                                            - z_log_sigma_sq - 1, 1))
 
             loss_rating = tf.reduce_mean(binary_crossentropy(self.rating_, rating))
-            self.loss = loss_rating + loss_i_kl + loss_i_recons + loss_u_kl + loss_u_recons
+            self.loss = loss_i_kl + loss_i_recons + loss_u_kl + loss_u_recons
             train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss)
+            train_op_rating = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss_rating)
 
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
@@ -170,9 +171,13 @@ class neuVAE:
                 u_batch = u_data[data[idx, 0], :]
                 rating = data[idx,2]
 
-                _, l, lr, lue, luk, lie, lik = self.sess.run((train_op, self.loss, loss_rating, loss_u_recons, loss_u_kl, loss_i_recons, loss_i_kl),
+                _, l, lue, luk, lie, lik = self.sess.run((train_op, self.loss, loss_u_recons, loss_u_kl, loss_i_recons, loss_i_kl),
                                      feed_dict={self.x_:x_batch, self.x_u_:u_batch,
                                                 self.rating_: rating})
+                _, lr = self.sess.run(
+                    (train_op_rating, loss_rating),
+                    feed_dict={self.x_: x_batch, self.x_u_: u_batch,
+                               self.rating_: rating})
                 if i % 50 == 0:
                    print("epoches: %d\t loss: %f\t loss r: %f\t loss ue: %f\t loss uk: %f\t time: %d s"%(i,l, lr, lue, luk, time.time()-start))
 
