@@ -96,8 +96,8 @@ class neuVAE:
             x_recons = y
 
         with tf.variable_scope("user"):
-            encoding_dims = [100]
-            decoding_dims = [100,self.user_dim]
+            encoding_dims = [400]
+            decoding_dims = [400,self.user_dim]
             x_u = self.x_u_
             depth_inf = len(encoding_dims)
             for i in range(depth_inf):
@@ -136,7 +136,7 @@ class neuVAE:
 
             loss_rating = tf.reduce_mean(binary_crossentropy(self.rating_, rating))
             self.loss = loss_rating + loss_i_kl + loss_i_recons + loss_u_kl + loss_u_recons
-            train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss)
+            train_op = tf.train.AdagradOptimizer(self.params.learning_rate).minimize(self.loss)
 
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
