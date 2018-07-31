@@ -136,7 +136,7 @@ class neuVAE:
 
             loss_rating = tf.reduce_mean(binary_crossentropy(self.rating_, rating))
             self.loss = loss_rating + loss_i_kl + loss_i_recons + loss_u_kl + loss_u_recons
-            train_op = tf.train.AdagradOptimizer(self.params.learning_rate).minimize(self.loss)
+            train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss)
 
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
