@@ -211,12 +211,11 @@ class neuVAE:
         pred_all = self.e_step(x_data, u_data, train=False)
         print(pred_all.shape)
 
-        recall_avgs = []
-        precision_avgs = []
-        mapk_avgs = []
         for m in range(10, 11, 1):
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
+            ndcg = []
+            hit = 0
             apk_vals = []
             for i in range(self.num_users):
                 train = train_users[i]
@@ -225,27 +224,41 @@ class neuVAE:
                     if u in top_M:
                         top_M.remove(u)
                 top_M = top_M[:m]
-                # if len(top_M) != m:
-                #     print(top_M, train_users[i])
+                if len(top_M) != m:
+                    print(top_M, train_users[i])
                 hits = set(top_M) & set(user_all[i])  # item idex from 0
                 hits_num = len(hits)
+                if hits_num > 0:
+                    hit += 1
                 try:
                     recall_val = float(hits_num) / float(ground_tr_num[i])
                 except:
                     recall_val = 1
                 recall_vals.append(recall_val)
-
-                apk_vals.append( ml_metrics.apk(top_M, user_all[i], m))
+                pred = np.array(pred_all[i])
+                score = []
+                for k in range(m):
+                    if top_M[k] in hits:
+                        score.append(1)
+                    else:
+                        score.append(0)
+                actual = self.dcg_score(score, pred[top_M], m)
+                best = self.dcg_score(score, score, m)
+                if best == 0:
+                    ndcg.append(0)
+                else:
+                    ndcg.append(float(actual) / best)
+                # precision = float(hits_num) / float(m)
+                # precision_vals.append(precision)
 
             recall_avg = np.mean(np.array(recall_vals))
+            # precision_avg = np.mean(np.array(precision_vals))
+            # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
+            #                        [u for u in user_all if len(u)!=0], m)
 
-            mapk = np.mean(np.array(apk_vals))
-            print recall_avg
-            recall_avgs.append(recall_avg)
-            # precision_avgs.append(precision_avg)
-            mapk_avgs.append(mapk)
-
-        return recall_avgs, mapk_avgs
+            print("recall %f, hit: %f, NDCG: %f" % (recall_avg, float(hit) / len(user_all), np.mean(ndcg)))
+            if file != None:
+                file.write("m = %d, recall = %f\t" % (m, recall_avg))
 
     def predict_val(self, pred_all, train_users, test_users, file=None):
         user_all = test_users
