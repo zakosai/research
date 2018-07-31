@@ -28,7 +28,7 @@ class params:
         self.max_iter_m = 1
 
         # for updating W and b in vae
-        self.learning_rate = 1e-5
+        self.learning_rate = 1e-2
         self.batch_size = 500
         self.num_iter = 300   # used in the e_step
         self.EM_iter = 30
@@ -135,8 +135,8 @@ class neuVAE:
                                                            - z_log_sigma_sq - 1, 1))
 
             loss_rating = tf.reduce_mean(binary_crossentropy(self.rating_, rating_))
-            self.loss = loss_rating + loss_i_kl + loss_i_recons + loss_u_kl + loss_u_recons
-            # train_op_rating = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss_rating)
+            self.loss = loss_i_kl + loss_i_recons + loss_u_kl + loss_u_recons
+            train_op_rating = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss_rating)
             train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss)
 
         self.sess = tf.Session()
@@ -171,7 +171,7 @@ class neuVAE:
                 u_batch = u_data[data[idx, 0], :]
                 rating = data[idx,2]
 
-                _, l, lr, lue, luk, lie, lik = self.sess.run((train_op, self.loss, loss_rating, loss_u_recons, loss_u_kl, loss_i_recons, loss_i_kl),
+                _,_, l, lr, lue, luk, lie, lik = self.sess.run((train_op, train_op_rating, self.loss, loss_rating, loss_u_recons, loss_u_kl, loss_i_recons, loss_i_kl),
                                      feed_dict={self.x_:x_batch, self.x_u_:u_batch,
                                                 self.rating_: rating})
                 if i % 50 == 0:
