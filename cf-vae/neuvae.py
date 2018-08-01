@@ -123,6 +123,7 @@ class neuVAE:
                 em = dense(em, layers[i], scope="neuCF_layer%s"%i, activation=tf.nn.relu)
 
             rating_ = dense(em, 2, scope="neuCF_lastlayer", activation=tf.nn.softmax)
+            self.rating_ = tf.cast(self.rating_, tf.uint8)
             self.rating_ = tf.one_hot(self.rating_, 2)
 
             print(rating_.shape)
