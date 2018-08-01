@@ -102,7 +102,7 @@ num_factors = zdim
 
 
 model = neuVAE(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,
-                      input_dim=8000, encoding_dims=[200, 100], z_dim=zdim, decoding_dims=[100, 200, 8000],
+                      input_dim=8000, encoding_dims=[1000, 500], z_dim=zdim, decoding_dims=[500, 1000, 8000],
                       loss_type='cross_entropy',
                       model = model_type, ckpt_folder=ckpt, initial=initial, user_dim=args.user_dim)
 model.fit(data["rating"], data["content"], data["user"])

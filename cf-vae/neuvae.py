@@ -98,8 +98,8 @@ class neuVAE:
             x_recons = y
 
         with tf.variable_scope("user"):
-            encoding_dims = [100]
-            decoding_dims = [100,self.user_dim]
+            encoding_dims = [400]
+            decoding_dims = [400,self.user_dim]
             x_u = self.x_u_
             # if train:
             #     x_u = tf.layers.dropout(x_u, rate=0.7)
@@ -121,7 +121,7 @@ class neuVAE:
 
         with tf.variable_scope("neuCF"):
             em = tf.concat([z_mu, z_u_mu], 1)
-            layers = [50]
+            layers = [100, 50]
             # if train:
             #     em = tf.layers.dropout(em, rate=0.7)
 
@@ -144,8 +144,9 @@ class neuVAE:
                                                            - z_log_sigma_sq - 1, 1))
 
             loss_rating = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(label, rating_), axis=1))
-            self.loss = loss_rating
+            self.loss = loss_i_recons + loss_u_recons + loss_i_kl + loss_u_kl
             train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss)
+            train_op_rating = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss_rating)
 
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
@@ -182,7 +183,7 @@ class neuVAE:
                     u_batch = u_data[data[idx, 0], :]
                     rating = np.array(data[idx,2]).astype(np.int8)
 
-                    _, l,lr = self.sess.run((train_op, self.loss, loss_rating),
+                    _, _, l,lr = self.sess.run((train_op, train_op_rating, self.loss, loss_rating),
                                          feed_dict={self.x_:x_batch, self.x_u_:u_batch, self.rating_: rating})
 
                 print("epoches: %d\t loss: %f\t loss r: %f\t time: %d s"%(i,l, lr, time.time()-start))
