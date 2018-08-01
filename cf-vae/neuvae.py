@@ -123,7 +123,6 @@ class neuVAE:
                 em = dense(em, layers[i], scope="neuCF_layer%s"%i, activation=tf.nn.relu)
 
             rating_ = dense(em, 2, scope="neuCF_lastlayer", activation=tf.nn.softmax)
-            self.rating_ = tf.cast(self.rating_, tf.uint8)
             self.rating_ = tf.one_hot(self.rating_, 2)
             print(self.rating_.shape)
 
@@ -174,7 +173,7 @@ class neuVAE:
                     idx = idx_list[(j*self.params.batch_size) : id]
                     x_batch = x_data[data[idx,1], :]
                     u_batch = u_data[data[idx, 0], :]
-                    rating = data[idx,2]
+                    rating = np.array(data[idx,2]).astype(np.int8)
 
                     _, l,lr = self.sess.run((train_op, self.loss, loss_rating),
                                          feed_dict={self.x_:x_batch, self.x_u_:u_batch, self.rating_: rating})
