@@ -172,7 +172,6 @@ class neuVAE:
                     x_batch = x_data[data[idx,1], :]
                     u_batch = u_data[data[idx, 0], :]
                     rating = data[idx,2]
-                    print(rating)
 
                     _, l,lr = self.sess.run((train_op, self.loss, loss_rating),
                                          feed_dict={self.x_:x_batch, self.x_u_:u_batch, self.rating_: rating})
