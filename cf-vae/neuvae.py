@@ -145,8 +145,13 @@ class neuVAE:
 
             loss_rating = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(label, rating_), axis=1))
             self.loss = loss_i_recons + loss_u_recons + loss_i_kl + loss_u_kl
-            train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss)
-            train_op_rating = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss_rating)
+
+            neuCF_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="neuCF")
+            text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
+            user_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="user")
+
+            train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss, var_list=text_varlist+user_varlist)
+            train_op_rating = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss_rating, var_list=neuCF_varlist)
 
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
@@ -154,13 +159,11 @@ class neuVAE:
         ckpt = os.path.join(self.ckpt_model, "neuvae_%d.ckpt"%self.model)
         if self.initial:
             ckpt_file = os.path.join(self.ckpt_model, "vae_text.ckpt")
-            text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
             text_saver = tf.train.Saver(var_list=text_varlist)
             # if init == True:
             text_saver.restore(self.sess, ckpt_file)
 
             ckpt_file = os.path.join(self.ckpt_model, "vae_user.ckpt")
-            user_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="user")
             user_saver = tf.train.Saver(var_list=user_varlist)
             # if init == True:
             user_saver.restore(self.sess, ckpt_file)
