@@ -137,7 +137,7 @@ class neuVAE:
                                                            - z_log_sigma_sq - 1, 1))
 
             loss_rating = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(label, rating_), axis=1))
-            self.loss = 30*loss_rating + loss_i_kl + loss_u_recons + loss_u_kl + loss_i_recons
+            self.loss = loss_rating
             train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss)
 
         self.sess = tf.Session()
@@ -179,6 +179,8 @@ class neuVAE:
                                          feed_dict={self.x_:x_batch, self.x_u_:u_batch, self.rating_: rating})
 
                 print("epoches: %d\t loss: %f\t loss r: %f\t time: %d s"%(i,l, lr, time.time()-start))
+                if i%10 == 9:
+                    self.params.learning_rate /= 2
 
             self.saver.save(self.sess, ckpt)
         else:
