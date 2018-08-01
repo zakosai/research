@@ -122,7 +122,7 @@ class neuVAE:
             for i in range(len(layers)):
                 em = dense(em, layers[i], scope="neuCF_layer%s"%i, activation=tf.nn.relu)
 
-            rating_ = dense(em, 1, scope="neuCF_lastlayer", activation=tf.nn.softmax)
+            rating_ = dense(em, 2, scope="neuCF_lastlayer", activation=tf.nn.softmax)
 
             print(rating_.shape)
 
