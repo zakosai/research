@@ -121,7 +121,7 @@ class neuVAE:
 
         with tf.variable_scope("neuCF"):
             em = tf.concat([z_mu, z_u_mu], 1)
-            layers = [50]
+            layers = [100, 50]
             # if train:
             #     em = tf.layers.dropout(em, rate=0.7)
 
@@ -144,7 +144,7 @@ class neuVAE:
 
             loss_rating = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(label, rating_), axis=1))
             self.loss = loss_rating
-            train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss)
+            train_op = tf.train.AdagradOptimizer(self.params.learning_rate).minimize(self.loss)
 
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
