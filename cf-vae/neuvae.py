@@ -185,8 +185,8 @@ class neuVAE:
                                          feed_dict={self.x_:x_batch, self.x_u_:u_batch, self.rating_: rating})
 
                 print("epoches: %d\t loss: %f\t loss r: %f\t time: %d s"%(i,l, lr, time.time()-start))
-                if i%10 == 9:
-                    self.params.learning_rate /= 2
+                # if i%10 == 9:
+                #     self.params.learning_rate /= 2
 
             self.saver.save(self.sess, ckpt)
         else:
