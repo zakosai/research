@@ -28,7 +28,7 @@ class params:
         self.max_iter_m = 1
 
         # for updating W and b in vae
-        self.learning_rate = 1e-2
+        self.learning_rate = 1e-5
         self.batch_size = 500
         self.num_iter = 300   # used in the e_step
         self.EM_iter = 30
