@@ -94,7 +94,7 @@ class neuVAE:
             depth_gen = len(self.decoding_dims)
             y = self.z
             for i in range(depth_gen):
-                y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
+                y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
             x_recons = y
 
         with tf.variable_scope("user"):
@@ -105,7 +105,7 @@ class neuVAE:
             #     x_u = tf.layers.dropout(x_u, rate=0.7)
             depth_inf = len(encoding_dims)
             for i in range(depth_inf):
-                x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
+                x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
             h_u_encode = x_u
             z_u_mu = slim.fully_connected(h_u_encode, self.z_dim, scope="mu_layer")
             z_u_log_sigma_sq = slim.fully_connected(h_u_encode, self.z_dim, scope="sigma_layer")
@@ -116,7 +116,7 @@ class neuVAE:
             depth_gen = len(decoding_dims)
             y_u = self.z_u
             for i in range(depth_gen):
-                y_u = dense(y_u, decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
+                y_u = dense(y_u, decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
             x_u_recons = y_u
 
         with tf.variable_scope("neuCF"):
@@ -144,14 +144,16 @@ class neuVAE:
                                                            - z_log_sigma_sq - 1, 1))
 
             loss_rating = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(label, rating_), axis=1))
-            self.loss = loss_i_recons + loss_u_recons + loss_i_kl + loss_u_kl
-
-            neuCF_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="neuCF")
-            text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
-            user_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="user")
-
-            train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss, var_list=text_varlist+user_varlist)
-            train_op_rating = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss_rating, var_list=neuCF_varlist)
+            # self.loss = loss_i_recons + loss_u_recons + loss_i_kl + loss_u_kl
+            #
+            # neuCF_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="neuCF")
+            # text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
+            # user_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="user")
+            #
+            # train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss, var_list=text_varlist+user_varlist)
+            # train_op_rating = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss_rating, var_list=neuCF_varlist)
+            self.loss = loss_rating
+            train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss)
 
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
@@ -186,11 +188,11 @@ class neuVAE:
                     u_batch = u_data[data[idx, 0], :]
                     rating = np.array(data[idx,2]).astype(np.int8)
 
-                    _, l = self.sess.run((train_op, self.loss),
+                    _, l, lr = self.sess.run((train_op, self.loss, loss_rating),
                                          feed_dict={self.x_:x_batch, self.x_u_:u_batch, self.rating_: rating})
 
-                    _, lr = self.sess.run((train_op_rating, loss_rating),
-                                          feed_dict={self.x_: x_batch, self.x_u_: u_batch, self.rating_: rating})
+                    # _, lr = self.sess.run((train_op_rating, loss_rating),
+                    #                       feed_dict={self.x_: x_batch, self.x_u_: u_batch, self.rating_: rating})
                 print("epoches: %d\t loss: %f\t loss r: %f\t time: %d s"%(i,l, lr, time.time()-start))
                 # if i%10 == 9:
                 #     self.params.learning_rate /= 2
