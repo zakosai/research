@@ -165,17 +165,19 @@ class neuVAE:
         if train:
             start = time.time()
             for i in range(self.params.num_iter):
-                idx = np.random.choice(len(data), self.params.batch_size, replace=False)
-                x_batch = x_data[data[idx,1], :]
-                u_batch = u_data[data[idx, 0], :]
-                rating = data[idx,2]
+                idx_list = np.random.permutation(len(data))
+                for j in range(0, len(data) / self.params.batch_size + 1):
+                    id = min((j+1)*self.params.batch_size, len(data))
+                    idx = idx_list[j*self.params.batch_size : id]
+                    x_batch = x_data[data[idx,1], :]
+                    u_batch = u_data[data[idx, 0], :]
+                    rating = data[idx,2]
 
-                _, l,lr, lue, luk, lie, lik = self.sess.run((train_op, self.loss,loss_rating, loss_u_recons, loss_u_kl, loss_i_recons, loss_i_kl),
-                                     feed_dict={self.x_:x_batch, self.x_u_:u_batch,
-                                                self.rating_: rating})
+                    _, l,lr, lue, luk, lie, lik = self.sess.run((train_op, self.loss,loss_rating),
+                                         feed_dict={self.x_:x_batch, self.x_u_:u_batch,
+                                                    self.rating_: rating})
 
-                if i % 50 == 0:
-                   print("epoches: %d\t loss: %f\t loss r: %f\t loss ue: %f\t loss uk: %f\t time: %d s"%(i,l, lr, lue, luk, time.time()-start))
+                print("epoches: %d\t loss: %f\t loss r: %f\t loss ue: %f\t loss uk: %f\t time: %d s"%(i,l, lr, lue, luk, time.time()-start))
 
             self.saver.save(self.sess, ckpt)
         else:
