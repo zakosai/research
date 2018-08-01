@@ -137,7 +137,7 @@ class neuVAE:
                                                            - z_log_sigma_sq - 1, 1))
 
             loss_rating = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(label, rating_), axis=1))
-            self.loss = loss_rating + loss_i_kl + loss_u_recons + loss_u_kl + loss_i_recons
+            self.loss = 30*loss_rating + loss_i_kl + loss_u_recons + loss_u_kl + loss_i_recons
             train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss)
 
         self.sess = tf.Session()
