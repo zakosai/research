@@ -46,7 +46,7 @@ class vanilla_vae:
             # noisy_level = 1
             # x = x + noisy_level*tf.random_normal(tf.shape(x))
             for i in range(depth_inf):
-                x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
 
             h_encode = x
             z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
@@ -59,7 +59,7 @@ class vanilla_vae:
                 depth_gen = len(self.decoding_dims)
                 y = z
                 for i in range(depth_gen):
-                    y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
 
 
             x_recons = y
