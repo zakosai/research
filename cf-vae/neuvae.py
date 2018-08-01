@@ -176,7 +176,7 @@ class neuVAE:
                     _, l,lr = self.sess.run((train_op, self.loss, loss_rating),
                                          feed_dict={self.x_:x_batch, self.x_u_:u_batch, self.rating_: rating})
 
-                print("epoches: %d\t loss: %f\t loss r: %f\t loss ue: %f\t loss uk: %f\t time: %d s"%(i,l, lr, lue, luk, time.time()-start))
+                print("epoches: %d\t loss: %f\t loss r: %f\t time: %d s"%(i,l, lr, time.time()-start))
 
             self.saver.save(self.sess, ckpt)
         else:
