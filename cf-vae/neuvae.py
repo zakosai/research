@@ -168,7 +168,7 @@ class neuVAE:
                 idx_list = np.random.permutation(len(data))
                 for j in range(0, len(data) / self.params.batch_size + 1):
                     id = min((j+1)*self.params.batch_size, len(data))
-                    idx = idx_list[j*self.params.batch_size : id]
+                    idx = idx_list[(j*self.params.batch_size) : id]
                     x_batch = x_data[data[idx,1], :]
                     u_batch = u_data[data[idx, 0], :]
                     rating = data[idx,2]
