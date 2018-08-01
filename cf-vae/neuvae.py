@@ -83,7 +83,7 @@ class neuVAE:
             #     x = tf.layers.dropout(x, rate=0.7)
             depth_inf = len(self.encoding_dims)
             for i in range(depth_inf):
-                x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
+                x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.tanh)
             h_encode = x
             z_mu = slim.fully_connected(h_encode, self.z_dim, scope="mu_layer")
             z_log_sigma_sq = slim.fully_connected(h_encode, self.z_dim, scope="sigma_layer")
@@ -94,7 +94,7 @@ class neuVAE:
             depth_gen = len(self.decoding_dims)
             y = self.z
             for i in range(depth_gen):
-                y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
+                y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.tanh)
             x_recons = y
 
         with tf.variable_scope("user"):
@@ -105,7 +105,7 @@ class neuVAE:
             #     x_u = tf.layers.dropout(x_u, rate=0.7)
             depth_inf = len(encoding_dims)
             for i in range(depth_inf):
-                x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
+                x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.tanh)
             h_u_encode = x_u
             z_u_mu = slim.fully_connected(h_u_encode, self.z_dim, scope="mu_layer")
             z_u_log_sigma_sq = slim.fully_connected(h_u_encode, self.z_dim, scope="sigma_layer")
@@ -116,7 +116,7 @@ class neuVAE:
             depth_gen = len(decoding_dims)
             y_u = self.z_u
             for i in range(depth_gen):
-                y_u = dense(y_u, decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
+                y_u = dense(y_u, decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.tanh)
             x_u_recons = y_u
 
         with tf.variable_scope("neuCF"):
@@ -126,7 +126,7 @@ class neuVAE:
             #     em = tf.layers.dropout(em, rate=0.7)
 
             for i in range(len(layers)):
-                em = dense(em, layers[i], scope="neuCF_layer%s"%i, activation=tf.nn.relu)
+                em = dense(em, layers[i], scope="neuCF_layer%s"%i, activation=tf.nn.tanh)
 
             rating_ = dense(em, 2, scope="neuCF_lastlayer", activation=tf.nn.softmax)
             label = tf.one_hot(self.rating_, 2)
