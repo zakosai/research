@@ -173,8 +173,9 @@ class neuVAE:
                     u_batch = u_data[data[idx, 0], :]
                     rating = data[idx,2]
 
-                    _, l,lr = self.sess.run((train_op, self.loss, loss_rating),
+                    _, l,lr = self.sess.run((train_op, self.loss, rating_),
                                          feed_dict={self.x_:x_batch, self.x_u_:u_batch, self.rating_: rating})
+                    print(lr)
 
                 print("epoches: %d\t loss: %f\t loss r: %f\t time: %d s"%(i,l, lr, time.time()-start))
 
