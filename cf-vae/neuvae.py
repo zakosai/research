@@ -79,8 +79,8 @@ class neuVAE:
         # inference process
         with tf.variable_scope("text"):
             x = self.x_
-            # if train:
-            #     x = tf.layers.dropout(x, rate=0.7)
+            if train:
+                x = tf.layers.dropout(x, rate=0.7)
             depth_inf = len(self.encoding_dims)
             for i in range(depth_inf):
                 x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.tanh)
@@ -101,8 +101,8 @@ class neuVAE:
             encoding_dims = [400]
             decoding_dims = [400,self.user_dim]
             x_u = self.x_u_
-            # if train:
-            #     x_u = tf.layers.dropout(x_u, rate=0.7)
+            if train:
+                x_u = tf.layers.dropout(x_u, rate=0.7)
             depth_inf = len(encoding_dims)
             for i in range(depth_inf):
                 x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.tanh)
@@ -122,11 +122,11 @@ class neuVAE:
         with tf.variable_scope("neuCF"):
             em = tf.concat([z_mu, z_u_mu], 1)
             layers = [100, 50]
-            # if train:
-            #     em = tf.layers.dropout(em, rate=0.7)
+            if train:
+                em = tf.layers.dropout(em, rate=0.7)
 
             for i in range(len(layers)):
-                em = dense(em, layers[i], scope="neuCF_layer%s"%i, activation=tf.nn.tanh)
+                em = dense(em, layers[i], scope="neuCF_layer%s"%i, activation=tf.nn.relu)
 
             rating_ = dense(em, 2, scope="neuCF_lastlayer", activation=tf.nn.softmax)
             label = tf.one_hot(self.rating_, 2)
