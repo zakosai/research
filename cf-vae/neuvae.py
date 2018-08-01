@@ -147,8 +147,8 @@ class neuVAE:
             # self.loss = loss_i_recons + loss_u_recons + loss_i_kl + loss_u_kl
             #
             # neuCF_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="neuCF")
-            # text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
-            # user_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="user")
+            text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
+            user_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="user")
             #
             # train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss, var_list=text_varlist+user_varlist)
             # train_op_rating = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss_rating, var_list=neuCF_varlist)
