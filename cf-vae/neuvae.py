@@ -211,6 +211,7 @@ class neuVAE:
         user_all = test_users
         ground_tr_num = [len(user) for user in user_all]
         pred_all = self.e_step(x_data, u_data, train=False)
+        print(self.initial)
         print(pred_all.shape)
 
         for m in range(10, 11, 1):
