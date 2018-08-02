@@ -120,8 +120,8 @@ class neuVAE:
             x_u_recons = y_u
 
         with tf.variable_scope("neuCF"):
-            em = tf.concat([z_mu, z_u_mu], 1)
-            layers = [200, 50]
+            em = tf.concat([self.z, self.z_u], 1)
+            layers = [100, 50]
             # if train:
             #     em = tf.layers.dropout(em, rate=0.7)
 
@@ -144,17 +144,17 @@ class neuVAE:
                                                            - z_log_sigma_sq - 1, 1))
 
             loss_rating = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(label, rating_), axis=1))
-            self.loss = loss_i_recons + loss_u_recons + loss_i_kl + loss_u_kl
+            #self.loss = loss_i_recons + loss_u_recons + loss_i_kl + loss_u_kl
             #
             text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
             user_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="user")
             neuCF_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="neuCF")
 
             #
-            train_op = tf.train.AdamOptimizer(1e-4).minimize(self.loss, var_list=text_varlist+user_varlist)
-            train_op_rating = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss_rating, var_list=neuCF_varlist+text_varlist+user_varlist)
-            # self.loss = loss_rating
-            # train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss)
+           # train_op = tf.train.AdamOptimizer(1e-4).minimize(self.loss, var_list=text_varlist+user_varlist)
+            #train_op_rating = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss_rating, var_list=neuCF_varlist+text_varlist+user_varlist)
+            self.loss = loss_rating
+            train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss)
 
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
@@ -193,9 +193,9 @@ class neuVAE:
                     _, l = self.sess.run((train_op, self.loss),
                                          feed_dict={self.x_:x_batch, self.x_u_:u_batch, self.rating_: rating})
 
-                    _, lr = self.sess.run((train_op_rating, loss_rating),
-                                          feed_dict={self.x_: x_batch, self.x_u_: u_batch, self.rating_: rating})
-                print("epoches: %d\t loss: %f\t loss r: %f\t time: %d s"%(i,l, lr, time.time()-start))
+                    # _, lr = self.sess.run((train_op_rating, loss_rating),
+                    #                       feed_dict={self.x_: x_batch, self.x_u_: u_batch, self.rating_: rating})
+                print("epoches: %d\t loss: %f\t time: %d s"%(i,l, time.time()-start))
                 # if i%10 == 9:
                 #     self.params.learning_rate /= 2
 
