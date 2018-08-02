@@ -83,7 +83,7 @@ class neuVAE:
                 x = tf.layers.dropout(x, rate=0.7)
             depth_inf = len(self.encoding_dims)
             for i in range(depth_inf):
-                x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
+                x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
             h_encode = x
             z_mu = slim.fully_connected(h_encode, self.z_dim, scope="mu_layer")
             z_log_sigma_sq = slim.fully_connected(h_encode, self.z_dim, scope="sigma_layer")
@@ -105,7 +105,7 @@ class neuVAE:
                 x_u = tf.layers.dropout(x_u, rate=0.7)
             depth_inf = len(encoding_dims)
             for i in range(depth_inf):
-                x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
+                x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
             h_u_encode = x_u
             z_u_mu = slim.fully_connected(h_u_encode, self.z_dim, scope="mu_layer")
             z_u_log_sigma_sq = slim.fully_connected(h_u_encode, self.z_dim, scope="sigma_layer")
