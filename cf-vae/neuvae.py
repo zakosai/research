@@ -94,7 +94,7 @@ class neuVAE:
             depth_gen = len(self.decoding_dims)
             y = self.z
             for i in range(depth_gen):
-                y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.tanh)
+                y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
             x_recons = y
 
         with tf.variable_scope("user"):
@@ -116,12 +116,12 @@ class neuVAE:
             depth_gen = len(decoding_dims)
             y_u = self.z_u
             for i in range(depth_gen):
-                y_u = dense(y_u, decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.tanh)
+                y_u = dense(y_u, decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.relu)
             x_u_recons = y_u
 
         with tf.variable_scope("neuCF"):
             em = tf.concat([z_mu, z_u_mu], 1)
-            layers = [100, 50]
+            layers = [200, 50]
             # if train:
             #     em = tf.layers.dropout(em, rate=0.7)
 
