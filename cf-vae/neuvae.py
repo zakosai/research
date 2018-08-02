@@ -144,23 +144,24 @@ class neuVAE:
                                                            - z_log_sigma_sq - 1, 1))
 
             loss_rating = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(label, rating_), axis=1))
-            # self.loss = loss_i_recons + loss_u_recons + loss_i_kl + loss_u_kl
+            self.loss = loss_i_recons + loss_u_recons + loss_i_kl + loss_u_kl
             #
-            # neuCF_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="neuCF")
+            text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
+            user_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="user")
+            neuCF_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="neuCF")
 
             #
-            # train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss, var_list=text_varlist+user_varlist)
-            # train_op_rating = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss_rating, var_list=neuCF_varlist)
-            self.loss = loss_rating
-            train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss)
+            train_op = tf.train.AdamOptimizer(1e-4).minimize(self.loss, var_list=text_varlist+user_varlist)
+            train_op_rating = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss_rating, var_list=neuCF_varlist+text_varlist+user_varlist)
+            # self.loss = loss_rating
+            # train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss)
 
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
         # LOAD TEXT#
         ckpt = os.path.join(self.ckpt_model, "neuvae_%d.ckpt"%self.model)
         if self.initial:
-            text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
-            user_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="user")
+
             ckpt_file = os.path.join(self.ckpt_model, "vae_text.ckpt")
             text_saver = tf.train.Saver(var_list=text_varlist)
             # if init == True:
@@ -189,11 +190,11 @@ class neuVAE:
                     u_batch = u_data[data[idx, 0], :]
                     rating = np.array(data[idx,2]).astype(np.int8)
 
-                    _, l, lr = self.sess.run((train_op, self.loss, loss_rating),
+                    _, l = self.sess.run((train_op, self.loss),
                                          feed_dict={self.x_:x_batch, self.x_u_:u_batch, self.rating_: rating})
 
-                    # _, lr = self.sess.run((train_op_rating, loss_rating),
-                    #                       feed_dict={self.x_: x_batch, self.x_u_: u_batch, self.rating_: rating})
+                    _, lr = self.sess.run((train_op_rating, loss_rating),
+                                          feed_dict={self.x_: x_batch, self.x_u_: u_batch, self.rating_: rating})
                 print("epoches: %d\t loss: %f\t loss r: %f\t time: %d s"%(i,l, lr, time.time()-start))
                 # if i%10 == 9:
                 #     self.params.learning_rate /= 2
