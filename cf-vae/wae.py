@@ -56,7 +56,7 @@ class vanilla_vae:
 
         self.g = tf.Graph()
         # inference process
-        z_fake = placeholder(None, (self.batch_size, self.z_dim))
+        z_fake = placeholder((None, self.z_dim))
         ########TEXT###################
         with tf.variable_scope(scope):
             x_ = placeholder((None, self.input_dim))
