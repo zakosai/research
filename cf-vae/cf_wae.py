@@ -339,13 +339,13 @@ class cf_vae_extend:
 
     def fit(self, users, items, x_data, params, test_users, im_data=None, str_data=None, ):
         start = time.time()
-        self.e_step(x_data, im_data, str_data)
+        self.e_step(x_data)
         self.exp_z = self.get_exp_hidden(x_data)
         for i in range(params.EM_iter):
             print("iter: %d"%i)
 
             self.pmf_estimate(users, items, params)
-            self.e_step(x_data, im_data, str_data)
+            self.e_step(x_data)
             self.exp_z= self.get_exp_hidden(x_data)
 
             if i%100 == 90:
