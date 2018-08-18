@@ -127,7 +127,7 @@ class DeepCoNN(object):
             net = slim.batch_norm(net, scope='block2_bn2')
             net = slim.max_pool2d(net, [3,3], stride=2, padding='same', scope='block2_max_pool')#-->115x24x128
             net = tf.add(net, residual, name='block2_add') #--> 115x24x256
-            residual = slim.conv2d(net, 728, [1,1], stride=2, scope='block2_res_conv')
+            residual = slim.conv2d(net, 256, [1,1], stride=2, scope='block2_res_conv')
             residual = slim.batch_norm(residual, scope='block2_res_bn')
             #
             #Block 3 /2
