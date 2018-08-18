@@ -83,7 +83,7 @@ class vanilla_vae:
 
             self.wae_lambda = 0.5
             self.loss_gan, self.penalty = self.gan_penalty(z_fake, z)
-            self.loss_reconstruct = tf.reduce_mean(tf.nn.l2_loss(x_- self.reconstructed))
+            self.loss_reconstruct = self.reconstruction_loss(x_, self.reconstructed)
             self.wae_objective = self.loss_reconstruct + \
                                  self.wae_lambda * self.penalty
 
@@ -123,6 +123,7 @@ class vanilla_vae:
             y = z
             for i in range(depth_gen):
                 y = dense(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.sigmoid)
+        return y
 
     def reconstruction_loss(self, real, reconstr):
         loss = tf.reduce_sum(tf.square(real - reconstr), axis=[1, 2, 3])
