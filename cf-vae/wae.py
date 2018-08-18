@@ -111,7 +111,7 @@ class vanilla_vae:
                 _, l, lr, lk = sess.run((ae_opt, self.wae_objective, self.penalty, self.loss_reconstruct), feed_dict={x_:x_batch})
                 _, lg = sess.run((z_adv_opt, self.loss_gan), feed_dict={x_:x_batch})
                 if i % self.print_size == 0:
-                    print("epoches: %d\t loss: %f\t loss penalty: %f\t loss res: %f\t loss gan: %f \t time: %d s"%(i, l,lr, lk, lg, time.time()-start))
+                    print("epoches: %d\t loss: %f\t loss penalty: %f\t loss res: %f\t loss gan: %f \t time: %d s"%(i, l,lr, lk, lg[0], time.time()-start))
 
             saver.save(sess, ckpt_file)
         else:
