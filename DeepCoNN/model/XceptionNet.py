@@ -45,10 +45,12 @@ class DeepCoNN(object):
 
         self.h_pool_u = self.Xception("user_conv", self.embedded_users)
         _, width, height, channel = self.h_pool_u.get_shape().as_list()
-        self.h_pool_flat_u = tf.reshape(self.h_pool_u, [-1, width*height*channel])
+        filter_u = width * height * channel
+        self.h_pool_flat_u = tf.reshape(self.h_pool_u, [-1, filter_u])
 
         self.h_pool_i = self.Xception("item_conv", self.embedded_items)
         _, width, height, channel = self.h_pool_i.get_shape().as_list()
+        filter_i = width * height * channel
         self.h_pool_flat_i = tf.reshape(self.h_pool_i, [-1, width * height*channel])
 
 
@@ -58,14 +60,14 @@ class DeepCoNN(object):
         with tf.name_scope("get_fea"):
             Wu = tf.get_variable(
                 "Wu",
-                shape=[num_filters_total, n_latent],
+                shape=[filter_u, n_latent],
                 initializer=tf.contrib.layers.xavier_initializer())
             bu = tf.Variable(tf.constant(0.1, shape=[n_latent]), name="bu")
             self.u_fea = tf.matmul(self.h_drop_u, Wu) + bu
             # self.u_fea = tf.nn.dropout(self.u_fea,self.dropout_keep_prob)
             Wi = tf.get_variable(
                 "Wi",
-                shape=[num_filters_total, n_latent],
+                shape=[filter_i, n_latent],
                 initializer=tf.contrib.layers.xavier_initializer())
             bi = tf.Variable(tf.constant(0.1, shape=[n_latent]), name="bi")
             self.i_fea = tf.matmul(self.h_drop_i, Wi) + bi
