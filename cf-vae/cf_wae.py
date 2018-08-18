@@ -80,8 +80,7 @@ class cf_vae_extend:
 
         # inference process
         with tf.variable_scope("text"):
-            x_ = placeholder((None, self.input_dim))
-            x = x_
+            x = self.x_
             depth_inf = len(self.encoding_dims)
 
             # noisy_level = 1
@@ -124,12 +123,11 @@ class cf_vae_extend:
         # LOAD TEXT#
         ckpt = os.path.join(self.ckpt_model, "cwae_%d.ckpt"%self.model)
         if self.initial:
-            if self.model != 6:
-                ckpt_file = os.path.join(self.ckpt_model, "wae_text.ckpt")
-                text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
-                text_saver = tf.train.Saver(var_list=text_varlist)
-                # if init == True:
-                text_saver.restore(self.sess, ckpt_file)
+            ckpt_file = os.path.join(self.ckpt_model, "wae_text.ckpt")
+            text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
+            text_saver = tf.train.Saver(var_list=text_varlist)
+            # if init == True:
+            text_saver.restore(self.sess, ckpt_file)
 
 
             self.initial = False
