@@ -120,7 +120,7 @@ if __name__ == '__main__':
         session_conf.gpu_options.allow_growth = True
         sess = tf.Session(config=session_conf)
         with sess.as_default():
-            deep = DeepCoNN.DeepCoNN(
+            deep = XceptionNet.DeepCoNN(
                 user_num=user_num,
                 item_num=item_num,
                 user_length=user_length,
