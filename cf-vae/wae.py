@@ -159,7 +159,7 @@ class vanilla_vae:
             hi = inputs
             for i in xrange(num_layers):
                 hi = dense(hi, num_units, scope='hi_%d'%i)
-                hi = tf.nn.relu(hi)
+                hi = tf.nn.sigmoid(hi)
             hi = dense(hi, 1, scope='hfinal_lin')
             # if nowozin_trick:
             #     # We are doing GAN between our model Qz and the true Pz.
