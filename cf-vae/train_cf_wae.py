@@ -110,13 +110,13 @@ if gs == 1:
                 params.lambda_r = r
                 if i > -1:
                     model = cf_vae_extend(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,
-                                          input_dim=8000, encoding_dims=[200], z_dim = 50, decoding_dims=[200,8000],
+                                          input_dim=8000, encoding_dims=[200,100], z_dim = 50, decoding_dims=[100,200,8000],
                                           encoding_dims_str=[200], decoding_dims_str=[200, 4526], loss_type='cross_entropy',
                                           model = model_type, ckpt_folder=ckpt, initial=initial)
                     model.fit(data["train_users"], data["train_items"], data["content"], params, data["test_users"])
-                    model.save_model(os.path.join(ckpt,"cf_vae_%d_%d.mat"%(model_type, i)))
+                    model.save_model(os.path.join(ckpt,"cf_wae_%d_%d.mat"%(model_type, i)))
                     # model.load_model("cf_vae.mat")
-                    f = open(os.path.join(ckpt, "result_cvae_%d.txt"%model_type), 'a')
+                    f = open(os.path.join(ckpt, "result_cwae_%d.txt"%model_type), 'a')
                     f.write("%d-----------%f----------%f----------%f\n"%(i, u,v,r))
                     pred_all = model.predict_all()
                     model.predict_val(pred_all, data["train_users"], data["test_users"], f)
