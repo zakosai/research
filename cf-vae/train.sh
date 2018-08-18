@@ -1,5 +1,5 @@
 #folders='Toy Tool Beauty Electronics TV'
-#rate='1 8'
+#rate='1'
 #
 #
 #for f in $folders
@@ -51,19 +51,22 @@
 #    done
 #
 #done
-f=Tool
-r=1
-dim=830
-user_no=2118
-item_no=7780
+#f=Tool
+#r=1
+#dim=830
+#user_no=2118
+#item_no=7780
+#
+#
+#        python train_vae.py --ckpt_folder=$f/0_layer --data_dir=data2/$f/ --zdim=50 --data_type=$r --user_dim=$dim --type=text
+#        python train_vae.py --ckpt_folder=$f/0_layer --data_dir=data2/$f/ --zdim=50 --data_type=$r --user_dim=$dim --type=user
+#
+#
+#        #python train_vae.py --ckpt_folder=$f/$r2 --data_dir=data2/$f/ --zdim=50 --data_type=$r --user_dim=$dim
+#
+#        #python train_cf_dae.py --model=0 --ckpt_folder=$f/0_layer --data_dir=data2/$f/ --iter=50 --data_type=$r --user_no=$user_no --item_no=$item_no --zdim=50
+#        #python train_cvae_user.py --model=0 --ckpt_folder=$f/0_layer --data_dir=data2/$f/ --iter=50 --zdim=50 --data_type=$r --user_dim=$dim --user_no=$user_no --item_no=$item_no
+#        python train_cvae_extend.py --model=0 --ckpt_folder=$f/0_layer --data_dir=data2/$f/ --iter=50 --zdim=50 --data_type=$r --user_no=$user_no --item_no=$item_no
 
-
-        #python train_vae.py --ckpt_folder=$f/0_layer --data_dir=data2/$f/ --zdim=50 --data_type=$r --user_dim=$dim --type=text
-        #python train_vae.py --ckpt_folder=$f/0_layer --data_dir=data2/$f/ --zdim=50 --data_type=$r --user_dim=$dim --type=user
-
-
-        #python train_vae.py --ckpt_folder=$f/$r2 --data_dir=data2/$f/ --zdim=50 --data_type=$r --user_dim=$dim
-
-        #python train_cf_dae.py --model=0 --ckpt_folder=$f/0_layer --data_dir=data2/$f/ --iter=50 --data_type=$r --user_no=$user_no --item_no=$item_no --zdim=50
-        #python train_cvae_user.py --model=0 --ckpt_folder=$f/0_layer --data_dir=data2/$f/ --iter=50 --zdim=50 --data_type=$r --user_dim=$dim --user_no=$user_no --item_no=$item_no
-        python train_cvae_extend.py --model=0 --ckpt_folder=$f/0_layer --data_dir=data2/$f/ --iter=50 --zdim=50 --data_type=$r --user_no=$user_no --item_no=$item_no
+python train_cf_wae.py --model=0 --ckpt_folder=Tool/8_50_wae --data_dir=data2/Tool/ --iter=50 --zdim=50 --gridsearch=1 --data_type=8 --user_dim=830 --user_no=2118 --item_no=7780
+python train_cf_wae.py --model=0 --ckpt_folder=Tool/1_50_wae --data_dir=data2/Tool/ --iter=50 --zdim=50 --gridsearch=1 --data_type=1 --user_dim=830 --user_no=2118 --item_no=7780
