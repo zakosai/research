@@ -87,9 +87,9 @@ class vanilla_vae:
             self.wae_objective = self.loss_reconstruct + \
                                  self.wae_lambda * self.penalty
 
-        z_adv_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='z_adversary')
-        encoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='encode')
-        decoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='decode')
+        z_adv_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=scope+'/z_adversary')
+        encoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=scope+'/encode')
+        decoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=scope+'/decode')
         ae_vars = encoder_vars + decoder_vars
 
         ae_opt = tf.train.AdamOptimizer(self.learning_rate).minimize(loss=self.wae_objective,
