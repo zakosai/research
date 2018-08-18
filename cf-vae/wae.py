@@ -130,10 +130,9 @@ class vanilla_vae:
         return loss
 
     def gan_penalty(self, sample_qz, sample_pz):
-        opts = self.opts
         # Pz = Qz test based on GAN in the Z space
-        logits_Pz = self.z_adversary(opts, sample_pz)
-        logits_Qz = self.z_adversary(opts, sample_qz, reuse=True)
+        logits_Pz = self.z_adversary(sample_pz)
+        logits_Qz = self.z_adversary(sample_qz, reuse=True)
         loss_Pz = tf.reduce_mean(
             tf.nn.sigmoid_cross_entropy_with_logits(
                 logits=logits_Pz, labels=tf.ones_like(logits_Pz)))
