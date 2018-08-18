@@ -77,6 +77,7 @@ class cf_vae_extend:
         tf.reset_default_graph()
         self.x_ = placeholder((None, self.input_dim))  # we need these global nodes
         self.v_ = placeholder((None, self.num_factors))
+        z_fake = placeholder((None, self.z_dim))
 
         # inference process
         with tf.variable_scope("text"):
@@ -99,7 +100,6 @@ class cf_vae_extend:
             y_true = self.decode(z)
             self.reconstructed = y_true
 
-            z_fake = tf.random_normal(tf.shape(z_mu))
             y_fake = self.decode(z_fake, reuse=True)
 
             self.wae_lambda = 0.5
@@ -142,10 +142,11 @@ class cf_vae_extend:
             idx = np.random.choice(self.num_items, self.params.batch_size, replace=False)
             x_batch = x_data[idx]
             v_batch = self.V[idx]
+            sample_noise = self.sample_pz('normal')
             _, l = self.sess.run((ae_opt, self.wae_objective),
-                                 feed_dict={self.x_:x_batch, self.v_:v_batch})
+                                 feed_dict={self.x_:x_batch, self.v_:v_batch, z_fake:sample_noise})
             _, lg = self.sess.run((z_adv_opt, self.loss_gan[0]),
-                                 feed_dict={self.x_:x_batch, self.v_:v_batch})
+                                 feed_dict={self.x_:x_batch, self.v_:v_batch, z_fake:sample_noise})
 
             if i % 50 == 0:
                print("epoches: %d\t loss: %f\t loss adv: %f\t time: %d s"%(i, l, lg, time.time()-start))
@@ -155,6 +156,20 @@ class cf_vae_extend:
         self.saver.save(self.sess, ckpt)
 
         return None
+    def sample_pz(self, distr):
+        noise = None
+        if distr == 'uniform':
+            noise = np.random.uniform(
+                -1, 1, [self.params.batch_size, self.params.z_dim]).astype(np.float32)
+        elif distr in ('normal', 'sphere'):
+            mean = np.zeros(self.params.z_dim)
+            cov = np.identity(self.params.batch_size)
+            noise = np.random.multivariate_normal(
+                mean, cov, self.params.batch_size).astype(np.float32)
+            if distr == 'sphere':
+                noise = noise / np.sqrt(
+                    np.sum(noise * noise, axis=1))[:, np.newaxis]
+        return noise
 
     def decode(self, z, reuse=False):
         with tf.variable_scope("decode", reuse=reuse):
