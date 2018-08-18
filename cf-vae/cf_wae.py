@@ -160,10 +160,10 @@ class cf_vae_extend:
         noise = None
         if distr == 'uniform':
             noise = np.random.uniform(
-                -1, 1, [self.params.batch_size, self.params.z_dim]).astype(np.float32)
+                -1, 1, [self.params.batch_size, self.z_dim]).astype(np.float32)
         elif distr in ('normal', 'sphere'):
-            mean = np.zeros(self.params.z_dim)
-            cov = np.identity(self.params.z_dim)
+            mean = np.zeros(self.z_dim)
+            cov = np.identity(self.z_dim)
             noise = np.random.multivariate_normal(
                 mean, cov, self.params.batch_size).astype(np.float32)
             if distr == 'sphere':
