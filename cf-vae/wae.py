@@ -78,12 +78,12 @@ class vanilla_vae:
             y_true = self.decode(z)
             self.reconstructed = y_true
 
-            z_fake = tf.random_uniform(tf.shape(z_mu), -1, 1)
+            z_fake = tf.random_normal(tf.shape(z_mu))
             y_fake = self.decode(z_fake, reuse=True)
 
             self.wae_lambda = 0.5
             self.loss_gan, self.penalty = self.gan_penalty(z_fake, z)
-            self.loss_reconstruct = tf.reduce_mean(tf.nn.l2_loss(x_- self.reconstructed))
+            self.loss_reconstruct = 0.2*tf.reduce_mean(tf.nn.l2_loss(x_- self.reconstructed))
             self.wae_objective = self.loss_reconstruct + \
                                  self.wae_lambda * self.penalty
 
