@@ -112,10 +112,10 @@ class DeepCoNN(object):
         with tf.variable_scope(scope):
             #===========ENTRY FLOW==============
             #Block 1 /2
-            net = slim.conv2d(x, 32, [3,3], stride=2, padding='valid', scope='block1_conv1')
+            net = slim.conv2d(x, 32, [3,3], stride=2, padding='VALID', scope='block1_conv1')
             net = slim.batch_norm(net, scope='block1_bn1')
             net = tf.nn.relu(net, name='block1_relu1')
-            net = slim.conv2d(net, 64, [3,3], padding='valid', scope='block1_conv2')
+            net = slim.conv2d(net, 64, [3,3], padding='VALID', scope='block1_conv2')
             net = slim.batch_norm(net, scope='block1_bn2')
             net = tf.nn.relu(net, name='block1_relu2')
             residual = slim.conv2d(net, 128, [1,1], stride=2, scope='block1_res_conv') # -->115x24x128
@@ -127,7 +127,7 @@ class DeepCoNN(object):
             net = tf.nn.relu(net, name='block2_relu1')
             net = slim.separable_conv2d(net, 128, [3,3], scope='block2_dws_conv2', depth_multiplier=1)
             net = slim.batch_norm(net, scope='block2_bn2')
-            net = slim.max_pool2d(net, [3,3], stride=2, padding='same', scope='block2_max_pool')#-->115x24x128
+            net = slim.max_pool2d(net, [3,3], stride=2, padding='SAME', scope='block2_max_pool')#-->115x24x128
             net = tf.add(net, residual, name='block2_add') #--> 115x24x256
             residual = slim.conv2d(net, 256, [1,1], stride=2, scope='block2_res_conv')
             residual = slim.batch_norm(residual, scope='block2_res_bn')
@@ -139,7 +139,7 @@ class DeepCoNN(object):
             net = tf.nn.relu(net, name='block3_relu2')
             net = slim.separable_conv2d(net, 256, [3,3], scope='block3_dws_conv2', depth_multiplier=1)
             net = slim.batch_norm(net, scope='block3_bn2')
-            net = slim.max_pool2d(net, [3,3], stride=2, padding='same', scope='block3_max_pool')
+            net = slim.max_pool2d(net, [3,3], stride=2, padding='SAME', scope='block3_max_pool')
             net = tf.add(net, residual, name='block3_add')
             residual = slim.conv2d(net, 728, [1,1], stride=2, scope='block3_res_conv')
             residual = slim.batch_norm(residual, scope='block3_res_bn')
@@ -151,7 +151,7 @@ class DeepCoNN(object):
             net = tf.nn.relu(net, name='block4_relu2')
             net = slim.separable_conv2d(net, 728, [3,3], scope='block4_dws_conv2', depth_multiplier=1)
             net = slim.batch_norm(net, scope='block4_bn2')
-            net = slim.max_pool2d(net, [3,3], stride=2, padding='same', scope='block4_max_pool')
+            net = slim.max_pool2d(net, [3,3], stride=2, padding='SAME', scope='block4_max_pool')
             net = tf.add(net, residual, name='block4_add')
 
             #===========MIDDLE FLOW===============
@@ -181,7 +181,7 @@ class DeepCoNN(object):
             net = tf.nn.relu(net, name='block13_relu2')
             net = slim.separable_conv2d(net, 1024, [3,3], scope='block13_dws_conv2', depth_multiplier=1)
             net = slim.batch_norm(net, scope='block13_bn2')
-            net = slim.max_pool2d(net, [3,3], stride=2, padding='same', scope='block13_max_pool')
+            net = slim.max_pool2d(net, [3,3], stride=2, padding='SAME', scope='block13_max_pool')
             net = tf.add(net, residual, name='block13_add')
 
             net = slim.separable_conv2d(net, 1536, [3,3], scope='block14_dws_conv1', depth_multiplier=1)
