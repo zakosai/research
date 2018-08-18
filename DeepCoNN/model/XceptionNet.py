@@ -141,53 +141,41 @@ class DeepCoNN(object):
             net = slim.batch_norm(net, scope='block3_bn2')
             net = slim.max_pool2d(net, [3,3], stride=2, padding='SAME', scope='block3_max_pool')
             net = tf.add(net, residual, name='block3_add')
-            residual = slim.conv2d(net, 728, [1,1], stride=2, scope='block3_res_conv')
-            residual = slim.batch_norm(residual, scope='block3_res_bn')
-
-            #Block 4 /2
-            net = tf.nn.relu(net, name='block4_relu1')
-            net = slim.separable_conv2d(net, 728, [3,3], scope='block4_dws_conv1', depth_multiplier=1)
-            net = slim.batch_norm(net, scope='block4_bn1')
-            net = tf.nn.relu(net, name='block4_relu2')
-            net = slim.separable_conv2d(net, 728, [3,3], scope='block4_dws_conv2', depth_multiplier=1)
-            net = slim.batch_norm(net, scope='block4_bn2')
-            net = slim.max_pool2d(net, [3,3], stride=2, padding='SAME', scope='block4_max_pool')
-            net = tf.add(net, residual, name='block4_add')
 
             #===========MIDDLE FLOW===============
-            for i in range(5):
+            for i in range(3):
                 block_prefix = 'block%s_' % (str(i + 5))
 
                 residual = net
                 net = tf.nn.relu(net, name=block_prefix+'relu1')
-                net = slim.separable_conv2d(net, 728, [3,3], scope=block_prefix+'dws_conv1', depth_multiplier=1)
+                net = slim.separable_conv2d(net, 256, [3,3], scope=block_prefix+'dws_conv1', depth_multiplier=1)
                 net = slim.batch_norm(net, scope=block_prefix+'bn1')
                 net = tf.nn.relu(net, name=block_prefix+'relu2')
-                net = slim.separable_conv2d(net, 728, [3,3], scope=block_prefix+'dws_conv2', depth_multiplier=1)
+                net = slim.separable_conv2d(net, 256, [3,3], scope=block_prefix+'dws_conv2', depth_multiplier=1)
                 net = slim.batch_norm(net, scope=block_prefix+'bn2')
                 net = tf.nn.relu(net, name=block_prefix+'relu3')
-                net = slim.separable_conv2d(net, 728, [3,3], scope=block_prefix+'dws_conv3', depth_multiplier=1)
+                net = slim.separable_conv2d(net, 256, [3,3], scope=block_prefix+'dws_conv3', depth_multiplier=1)
                 net = slim.batch_norm(net, scope=block_prefix+'bn3')
                 net = tf.add(net, residual, name=block_prefix+'add')
 
 
             #========EXIT FLOW============
             #/2
-            residual = slim.conv2d(net, 1024, [1,1], stride=2, scope='block12_res_conv')
+            residual = slim.conv2d(net, 400, [1,1], stride=2, scope='block12_res_conv')
             residual = slim.batch_norm(residual, scope='block12_res_bn')
             net = tf.nn.relu(net, name='block13_relu1')
-            net = slim.separable_conv2d(net, 728, [3,3], scope='block13_dws_conv1', depth_multiplier=1)
+            net = slim.separable_conv2d(net, 256, [3,3], scope='block13_dws_conv1', depth_multiplier=1)
             net = slim.batch_norm(net, scope='block13_bn1')
             net = tf.nn.relu(net, name='block13_relu2')
-            net = slim.separable_conv2d(net, 1024, [3,3], scope='block13_dws_conv2', depth_multiplier=1)
+            net = slim.separable_conv2d(net, 400, [3,3], scope='block13_dws_conv2', depth_multiplier=1)
             net = slim.batch_norm(net, scope='block13_bn2')
             net = slim.max_pool2d(net, [3,3], stride=2, padding='SAME', scope='block13_max_pool')
             net = tf.add(net, residual, name='block13_add')
 
-            net = slim.separable_conv2d(net, 1536, [3,3], scope='block14_dws_conv1', depth_multiplier=1)
+            net = slim.separable_conv2d(net, 512, [3,3], scope='block14_dws_conv1', depth_multiplier=1)
             net = slim.batch_norm(net, scope='block14_bn1')
             net = tf.nn.relu(net, name='block14_relu1')
-            net = slim.separable_conv2d(net, 2048, [3,3], scope='block14_dws_conv2', depth_multiplier=1)
+            net = slim.separable_conv2d(net, 512, [3,3], scope='block14_dws_conv2', depth_multiplier=1)
             net = slim.batch_norm(net, scope='block14_bn2')
             net = tf.nn.relu(net, name='block14_relu2')
 
