@@ -72,7 +72,7 @@ class cf_vae_extend:
 
 
     # def e_step(self, x_data, reuse = None):
-    def e_step(self, x_data, im_data, str_data):
+    def e_step(self, x_data):
         print "e_step finetuning"
         tf.reset_default_graph()
         self.x_ = placeholder((None, self.input_dim))  # we need these global nodes
@@ -150,9 +150,9 @@ class cf_vae_extend:
             if i % 50 == 0:
                print("epoches: %d\t loss: %f\t loss adv: %f\t time: %d s"%(i, l, lg, time.time()-start))
 
-        if self.model != 6:
-            self.z_mu = z_mu
-            self.x_recons = self.reconstructed
+        self.z_mu = z_mu
+        self.x_recons = self.reconstructed
+        self.saver.save(self.sess, ckpt)
 
         return None
 
