@@ -185,7 +185,7 @@ class vanilla_vae:
                 -1, 1, [self.batch_size, self.z_dim]).astype(np.float32)
         elif distr in ('normal', 'sphere'):
             mean = np.zeros(self.z_dim)
-            cov = np.identity(self.batch_size)
+            cov = np.identity(self.z_dim)
             noise = np.random.multivariate_normal(
                 mean, cov, self.batch_size).astype(np.float32)
             if distr == 'sphere':
