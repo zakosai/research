@@ -216,12 +216,12 @@ class DeepCoNN(object):
         if shortcut:
             residual = Conv1D(filters=filters, kernel_size=1, strides=2, name='shortcut_conv1d_%d' % stage)(inputs)
             residual = BatchNormalization(name='shortcut_batch_normalization_%d' % stage)(residual)
-            out = downsample(out, pool_type=pool_type, sorted=sorted, stage=stage)
+            out = self.downsample(out, pool_type=pool_type, sorted=sorted, stage=stage)
             out = Add()([out, residual])
             out = Activation('relu')(out)
         else:
             out = Activation('relu')(out)
-            out = downsample(out, pool_type=pool_type, sorted=sorted, stage=stage)
+            out = self.downsample(out, pool_type=pool_type, sorted=sorted, stage=stage)
         if pool_type is not None:
             out = Conv1D(filters=2 * filters, kernel_size=1, strides=1, padding='same', name='1_1_conv_%d' % stage)(out)
             out = BatchNormalization(name='1_1_batch_normalization_%d' % stage)(out)
