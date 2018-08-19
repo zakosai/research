@@ -83,8 +83,8 @@ class DeepCoNN(object):
         #     self.i_fea = tf.matmul(self.h_drop_i, Wi) + bi
         #     # self.i_fea=tf.nn.dropout(self.i_fea,self.dropout_keep_prob)
 
-        self.u_fea = self.VDCNN(self.embedded_user, n_latent)
-        self.i_fea = self.VDCNN(self.embedded_item, n_latent)
+        self.u_fea = self.VDCNN(self.embedded_user, n_latent, 17)
+        self.i_fea = self.VDCNN(self.embedded_item, n_latent, 17)
 
         with tf.name_scope('fm'):
             self.z = tf.nn.relu(tf.concat(1, [self.u_fea, self.i_fea]))
@@ -120,79 +120,6 @@ class DeepCoNN(object):
         with tf.name_scope("accuracy"):
             self.mae = tf.reduce_mean(tf.abs(tf.subtract(self.predictions, self.input_y)))
             self.accuracy = tf.sqrt(tf.reduce_mean(tf.square(tf.subtract(self.predictions, self.input_y))))
-
-    def Xception(self, scope, x):
-        with tf.variable_scope(scope):
-            #===========ENTRY FLOW==============
-            #Block 1 /2
-            net = slim.conv2d(x, 32, [3,3], stride=2, padding='VALID', scope='block1_conv1')
-            net = slim.batch_norm(net, scope='block1_bn1')
-            net = tf.nn.relu(net, name='block1_relu1')
-            net = slim.conv2d(net, 64, [3,3], padding='VALID', scope='block1_conv2')
-            net = slim.batch_norm(net, scope='block1_bn2')
-            net = tf.nn.relu(net, name='block1_relu2')
-            residual = slim.conv2d(net, 128, [1,1], stride=2, scope='block1_res_conv') # -->115x24x128
-            residual = slim.batch_norm(residual, scope='block1_res_bn')
-
-            #Block 2 /2
-            net = slim.separable_conv2d(net, 128, [3,3], scope='block2_dws_conv1', depth_multiplier=1)
-            net = slim.batch_norm(net, scope='block2_bn1')
-            net = tf.nn.relu(net, name='block2_relu1')
-            net = slim.separable_conv2d(net, 128, [3,3], scope='block2_dws_conv2', depth_multiplier=1)
-            net = slim.batch_norm(net, scope='block2_bn2')
-            net = slim.max_pool2d(net, [3,3], stride=2, padding='SAME', scope='block2_max_pool')#-->115x24x128
-            net = tf.add(net, residual, name='block2_add') #--> 115x24x256
-            residual = slim.conv2d(net, 256, [1,1], stride=2, scope='block2_res_conv')
-            residual = slim.batch_norm(residual, scope='block2_res_bn')
-            #
-            #Block 3 /2
-            net = tf.nn.relu(net, name='block3_relu1')
-            net = slim.separable_conv2d(net, 256, [3,3], scope='block3_dws_conv1', depth_multiplier=1)
-            net = slim.batch_norm(net, scope='block3_bn1')
-            net = tf.nn.relu(net, name='block3_relu2')
-            net = slim.separable_conv2d(net, 256, [3,3], scope='block3_dws_conv2', depth_multiplier=1)
-            net = slim.batch_norm(net, scope='block3_bn2')
-            net = slim.max_pool2d(net, [3,3], stride=2, padding='SAME', scope='block3_max_pool')
-            net = tf.add(net, residual, name='block3_add')
-
-            #===========MIDDLE FLOW===============
-            for i in range(3):
-                block_prefix = 'block%s_' % (str(i + 5))
-
-                residual = net
-                net = tf.nn.relu(net, name=block_prefix+'relu1')
-                net = slim.separable_conv2d(net, 256, [3,3], scope=block_prefix+'dws_conv1', depth_multiplier=1)
-                net = slim.batch_norm(net, scope=block_prefix+'bn1')
-                net = tf.nn.relu(net, name=block_prefix+'relu2')
-                net = slim.separable_conv2d(net, 256, [3,3], scope=block_prefix+'dws_conv2', depth_multiplier=1)
-                net = slim.batch_norm(net, scope=block_prefix+'bn2')
-                net = tf.nn.relu(net, name=block_prefix+'relu3')
-                net = slim.separable_conv2d(net, 256, [3,3], scope=block_prefix+'dws_conv3', depth_multiplier=1)
-                net = slim.batch_norm(net, scope=block_prefix+'bn3')
-                net = tf.add(net, residual, name=block_prefix+'add')
-
-
-            #========EXIT FLOW============
-            #/2
-            residual = slim.conv2d(net, 400, [1,1], stride=2, scope='block12_res_conv')
-            residual = slim.batch_norm(residual, scope='block12_res_bn')
-            net = tf.nn.relu(net, name='block13_relu1')
-            net = slim.separable_conv2d(net, 256, [3,3], scope='block13_dws_conv1', depth_multiplier=1)
-            net = slim.batch_norm(net, scope='block13_bn1')
-            net = tf.nn.relu(net, name='block13_relu2')
-            net = slim.separable_conv2d(net, 400, [3,3], scope='block13_dws_conv2', depth_multiplier=1)
-            net = slim.batch_norm(net, scope='block13_bn2')
-            net = slim.max_pool2d(net, [3,3], stride=2, padding='SAME', scope='block13_max_pool')
-            net = tf.add(net, residual, name='block13_add')
-
-            net = slim.separable_conv2d(net, 512, [3,3], scope='block14_dws_conv1', depth_multiplier=1)
-            net = slim.batch_norm(net, scope='block14_bn1')
-            net = tf.nn.relu(net, name='block14_relu1')
-            net = slim.separable_conv2d(net, 512, [3,3], scope='block14_dws_conv2', depth_multiplier=1)
-            net = slim.batch_norm(net, scope='block14_bn2')
-            net = tf.nn.relu(net, name='block14_relu2')
-
-        return net
 
     def identity_block(self, inputs, filters, kernel_size=3, use_bias=False, shortcut=False):
         conv1 = Conv1D(filters=filters, kernel_size=kernel_size, strides=1, padding='same')(inputs)
@@ -276,17 +203,17 @@ class DeepCoNN(object):
         out = self.conv_block(out, filters=128, kernel_size=3, use_bias=use_bias, shortcut=shortcut,
                          pool_type=pool_type, sorted=sorted, stage=3)
 
-        # Convolutional Block 512
-        for _ in range(num_conv_blocks[3] - 1):
-            out = self.identity_block(out, filters=256, kernel_size=3, use_bias=use_bias, shortcut=shortcut)
-        out = self.conv_block(out, filters=256, kernel_size=3, use_bias=use_bias, shortcut=False,
-                         pool_type=None, stage=4)
+        # # Convolutional Block 512
+        # for _ in range(num_conv_blocks[3] - 1):
+        #     out = self.identity_block(out, filters=256, kernel_size=3, use_bias=use_bias, shortcut=shortcut)
+        # out = self.conv_block(out, filters=256, kernel_size=3, use_bias=use_bias, shortcut=False,
+        #                  pool_type=None, stage=4)
 
         # k-max pooling with k = 8
         out = KMaxPooling(k=8, sorted=True)(out)
         out = Flatten()(out)
 
         # Dense Layers
-        out = Dense(1024, activation='relu')(out)
+        out = Dense(512, activation='relu')(out)
         out = Dense(n_latent)(out)
         return out

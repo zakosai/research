@@ -146,6 +146,7 @@ if __name__ == '__main__':
             train_op = optimizer  # .apply_gradients(grads_and_vars, global_step=global_step)
 
             sess.run(tf.initialize_all_variables())
+            saver = tf.train.Saver(max_to_keep=100)
 
             if FLAGS.word2vec:
                 # initial matrix with random uniform
@@ -318,6 +319,8 @@ if __name__ == '__main__':
                 print ("loss_valid {:g}, rmse_valid {:g}, mae_valid {:g}".format(loss_s / test_length,
                                                                                  np.sqrt(accuracy_s / test_length),
                                                                                  mae_s / test_length))
+                saver.save(sess, os.path.join('logs/VDCNN/rs-17'),
+                           global_step=epoch)
                 rmse = np.sqrt(accuracy_s / test_length)
                 mae = mae_s / test_length
                 if best_rmse > rmse:
