@@ -52,8 +52,8 @@ class DeepCoNN(object):
             self.embedded_item = tf.nn.embedding_lookup(self.W2, self.input_i)
             self.embedded_items = tf.expand_dims(self.embedded_item, -1)
 
-        print(self.embedded_items.shape)
-        print(self.embedded_users.shape)
+        print(self.embedded_items.get_shape())
+        print(self.embedded_users.get_shape())
 
         # self.h_pool_u = self.Xception("user_conv", self.embedded_users)
         # _, width, height, channel = self.h_pool_u.get_shape().as_list()
