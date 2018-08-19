@@ -193,7 +193,7 @@ class DeepCoNN(object):
 
         # Convolutional Block 128
         for _ in range(num_conv_blocks[1] - 1):
-            out = self.dentity_block(out, filters=64, kernel_size=3, use_bias=use_bias, shortcut=shortcut)
+            out = self.identity_block(out, filters=64, kernel_size=3, use_bias=use_bias, shortcut=shortcut)
         out = self.conv_block(out, filters=64, kernel_size=3, use_bias=use_bias, shortcut=shortcut,
                          pool_type=pool_type, sorted=sorted, stage=2)
 
