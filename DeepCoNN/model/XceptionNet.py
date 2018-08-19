@@ -12,6 +12,9 @@ In WSDM. ACM, 425-434.
 
 import tensorflow as tf
 from tensorflow.contrib import slim
+from keras.layers import Input, Embedding, Conv1D, BatchNormalization, Activation, Add, MaxPooling1D, Dense, Flatten
+from k_maxpooling import *
+
 # from tensor2tensor.layers import common_attention
 # from tensor2tensor.layers import common_hparams
 # from tensor2tensor.layers import common_layers
