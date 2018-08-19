@@ -83,8 +83,8 @@ class DeepCoNN(object):
         #     self.i_fea = tf.matmul(self.h_drop_i, Wi) + bi
         #     # self.i_fea=tf.nn.dropout(self.i_fea,self.dropout_keep_prob)
 
-        self.u_fea = self.VDCNN(self.embedded_user, n_latent, 17)
-        self.i_fea = self.VDCNN(self.embedded_item, n_latent, 17)
+        self.u_fea = self.VDCNN(self.embedded_user, n_latent, 9)
+        self.i_fea = self.VDCNN(self.embedded_item, n_latent, 9)
 
         with tf.name_scope('fm'):
             self.z = tf.nn.relu(tf.concat(1, [self.u_fea, self.i_fea]))
