@@ -8,7 +8,7 @@ class KMaxPooling(Layer):
     TensorFlow backend.
     """
     def __init__(self, k=1, sorted=True, **kwargs):
-        super().__init__(**kwargs)
+        super(KMaxPooling, self).__init__(**kwargs)
         self.input_spec = InputSpec(ndim=3)
         self.k = k
         self.sorted = sorted
