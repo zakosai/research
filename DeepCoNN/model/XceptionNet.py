@@ -52,8 +52,6 @@ class DeepCoNN(object):
             self.embedded_item = tf.nn.embedding_lookup(self.W2, self.input_i)
             self.embedded_items = tf.expand_dims(self.embedded_item, -1)
 
-        print(self.embedded_items.get_shape())
-        print(self.embedded_users.get_shape())
 
         # self.h_pool_u = self.Xception("user_conv", self.embedded_users)
         # _, width, height, channel = self.h_pool_u.get_shape().as_list()
@@ -85,8 +83,8 @@ class DeepCoNN(object):
         #     self.i_fea = tf.matmul(self.h_drop_i, Wi) + bi
         #     # self.i_fea=tf.nn.dropout(self.i_fea,self.dropout_keep_prob)
 
-        self.u_fea = self.VDCNN(self.embedded_users, n_latent)
-        self.i_fea = self.VDCNN(self.embedded_items, n_latent)
+        self.u_fea = self.VDCNN(self.embedded_user, n_latent)
+        self.i_fea = self.VDCNN(self.embedded_item, n_latent)
 
         with tf.name_scope('fm'):
             self.z = tf.nn.relu(tf.concat(1, [self.u_fea, self.i_fea]))
