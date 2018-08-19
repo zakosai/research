@@ -18,6 +18,7 @@ import datetime
 
 import pickle
 import XceptionNet
+import DeepCoNN
 
 tf.app.flags.DEFINE_string("word2vec", "../data/google.bin", "Word2vec file with pre-trained embeddings (default: None)")
 tf.app.flags.DEFINE_string("valid_data","../data/music/music.valid", " Data for validation")
@@ -120,7 +121,7 @@ if __name__ == '__main__':
         session_conf.gpu_options.allow_growth = True
         sess = tf.Session(config=session_conf)
         with sess.as_default():
-            deep = XceptionNet.DeepCoNN(
+            deep = DeepCoNN.DeepCoNN(
                 user_num=user_num,
                 item_num=item_num,
                 user_length=user_length,
