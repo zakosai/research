@@ -12,12 +12,12 @@ In WSDM. ACM, 425-434.
 
 import tensorflow as tf
 from tensorflow.contrib import slim
-from tensor2tensor.layers import common_attention
-from tensor2tensor.layers import common_hparams
-from tensor2tensor.layers import common_layers
-from tensor2tensor.utils import registry
-from tensor2tensor.utils import t2t_model
-from tensor2tensor.models import slicenet
+# from tensor2tensor.layers import common_attention
+# from tensor2tensor.layers import common_hparams
+# from tensor2tensor.layers import common_layers
+# from tensor2tensor.utils import registry
+# from tensor2tensor.utils import t2t_model
+# from tensor2tensor.models import slicenet
 
 
 
