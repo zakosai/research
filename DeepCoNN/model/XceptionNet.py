@@ -12,6 +12,12 @@ In WSDM. ACM, 425-434.
 
 import tensorflow as tf
 from tensorflow.contrib import slim
+from tensor2tensor.layers import common_attention
+from tensor2tensor.layers import common_hparams
+from tensor2tensor.layers import common_layers
+from tensor2tensor.utils import registry
+from tensor2tensor.utils import t2t_model
+from tensor2tensor.models import slicenet
 
 
 
@@ -43,35 +49,38 @@ class DeepCoNN(object):
             self.embedded_item = tf.nn.embedding_lookup(self.W2, self.input_i)
             self.embedded_items = tf.expand_dims(self.embedded_item, -1)
 
-        self.h_pool_u = self.Xception("user_conv", self.embedded_users)
-        _, width, height, channel = self.h_pool_u.get_shape().as_list()
-        filter_u = width * height * channel
-        self.h_pool_flat_u = tf.reshape(self.h_pool_u, [-1, filter_u])
+        # self.h_pool_u = self.Xception("user_conv", self.embedded_users)
+        # _, width, height, channel = self.h_pool_u.get_shape().as_list()
+        # filter_u = width * height * channel
+        # self.h_pool_flat_u = tf.reshape(self.h_pool_u, [-1, filter_u])
+        #
+        # self.h_pool_i = self.Xception("item_conv", self.embedded_items)
+        # _, width, height, channel = self.h_pool_i.get_shape().as_list()
+        # filter_i = width * height * channel
+        # self.h_pool_flat_i = tf.reshape(self.h_pool_i, [-1, width * height*channel])
+        #
+        #
+        # with tf.name_scope("dropout"):
+        #     self.h_drop_u = tf.nn.dropout(self.h_pool_flat_u, 1.0)
+        #     self.h_drop_i = tf.nn.dropout(self.h_pool_flat_i, 1.0)
+        # with tf.name_scope("get_fea"):
+        #     Wu = tf.get_variable(
+        #         "Wu",
+        #         shape=[filter_u, n_latent],
+        #         initializer=tf.contrib.layers.xavier_initializer())
+        #     bu = tf.Variable(tf.constant(0.1, shape=[n_latent]), name="bu")
+        #     self.u_fea = tf.matmul(self.h_drop_u, Wu) + bu
+        #     # self.u_fea = tf.nn.dropout(self.u_fea,self.dropout_keep_prob)
+        #     Wi = tf.get_variable(
+        #         "Wi",
+        #         shape=[filter_i, n_latent],
+        #         initializer=tf.contrib.layers.xavier_initializer())
+        #     bi = tf.Variable(tf.constant(0.1, shape=[n_latent]), name="bi")
+        #     self.i_fea = tf.matmul(self.h_drop_i, Wi) + bi
+        #     # self.i_fea=tf.nn.dropout(self.i_fea,self.dropout_keep_prob)
 
-        self.h_pool_i = self.Xception("item_conv", self.embedded_items)
-        _, width, height, channel = self.h_pool_i.get_shape().as_list()
-        filter_i = width * height * channel
-        self.h_pool_flat_i = tf.reshape(self.h_pool_i, [-1, width * height*channel])
-
-
-        with tf.name_scope("dropout"):
-            self.h_drop_u = tf.nn.dropout(self.h_pool_flat_u, 1.0)
-            self.h_drop_i = tf.nn.dropout(self.h_pool_flat_i, 1.0)
-        with tf.name_scope("get_fea"):
-            Wu = tf.get_variable(
-                "Wu",
-                shape=[filter_u, n_latent],
-                initializer=tf.contrib.layers.xavier_initializer())
-            bu = tf.Variable(tf.constant(0.1, shape=[n_latent]), name="bu")
-            self.u_fea = tf.matmul(self.h_drop_u, Wu) + bu
-            # self.u_fea = tf.nn.dropout(self.u_fea,self.dropout_keep_prob)
-            Wi = tf.get_variable(
-                "Wi",
-                shape=[filter_i, n_latent],
-                initializer=tf.contrib.layers.xavier_initializer())
-            bi = tf.Variable(tf.constant(0.1, shape=[n_latent]), name="bi")
-            self.i_fea = tf.matmul(self.h_drop_i, Wi) + bi
-            # self.i_fea=tf.nn.dropout(self.i_fea,self.dropout_keep_prob)
+        self.u_fea = self.VDCNN(self.embedded_users, n_latent)
+        self.i_fea = self.VDCNN(self.embedded_items, n_latent)
 
         with tf.name_scope('fm'):
             self.z = tf.nn.relu(tf.concat(1, [self.u_fea, self.i_fea]))
@@ -180,3 +189,100 @@ class DeepCoNN(object):
             net = tf.nn.relu(net, name='block14_relu2')
 
         return net
+
+    def identity_block(self, inputs, filters, kernel_size=3, use_bias=False, shortcut=False):
+        conv1 = Conv1D(filters=filters, kernel_size=kernel_size, strides=1, padding='same')(inputs)
+        bn1 = BatchNormalization()(conv1)
+        relu = Activation('relu')(bn1)
+        conv2 = Conv1D(filters=filters, kernel_size=kernel_size, strides=1, padding='same')(relu)
+        out = BatchNormalization()(conv2)
+        if shortcut:
+            out = Add()([out, inputs])
+        return Activation('relu')(out)
+
+    def conv_block(self,inputs, filters, kernel_size=3, use_bias=False, shortcut=False,
+                   pool_type='max', sorted=True, stage=1):
+        conv1 = Conv1D(filters=filters, kernel_size=kernel_size, strides=1, padding='same')(inputs)
+        bn1 = BatchNormalization()(conv1)
+        relu1 = Activation('relu')(bn1)
+
+        conv2 = Conv1D(filters=filters, kernel_size=kernel_size, strides=1, padding='same')(relu1)
+        out = BatchNormalization()(conv2)
+
+        if shortcut:
+            residual = Conv1D(filters=filters, kernel_size=1, strides=2, name='shortcut_conv1d_%d' % stage)(inputs)
+            residual = BatchNormalization(name='shortcut_batch_normalization_%d' % stage)(residual)
+            out = downsample(out, pool_type=pool_type, sorted=sorted, stage=stage)
+            out = Add()([out, residual])
+            out = Activation('relu')(out)
+        else:
+            out = Activation('relu')(out)
+            out = downsample(out, pool_type=pool_type, sorted=sorted, stage=stage)
+        if pool_type is not None:
+            out = Conv1D(filters=2 * filters, kernel_size=1, strides=1, padding='same', name='1_1_conv_%d' % stage)(out)
+            out = BatchNormalization(name='1_1_batch_normalization_%d' % stage)(out)
+        return out
+
+    def downsample(self, inputs, pool_type='max', sorted=True, stage=1):
+        if pool_type == 'max':
+            out = MaxPooling1D(pool_size=3, strides=2, padding='same', name='pool_%d' % stage)(inputs)
+        elif pool_type == 'k_max':
+            k = int(inputs._keras_shape[1] / 2)
+            out = KMaxPooling(k=k, sorted=sorted, name='pool_%d' % stage)(inputs)
+        elif pool_type == 'conv':
+            out = Conv1D(filters=inputs._keras_shape[-1], kernel_size=3, strides=2, padding='same',
+                         name='pool_%d' % stage)(inputs)
+            out = BatchNormalization()(out)
+        elif pool_type is None:
+            out = inputs
+        else:
+            raise ValueError('unsupported pooling type!')
+        return out
+
+    def VDCNN(self, embedded_chars, n_latent, depth=9, sequence_length=1024, embedding_dim=16,
+              shortcut=False, pool_type='max', sorted=True, use_bias=False, input_tensor=None):
+        if depth == 9:
+            num_conv_blocks = (1, 1, 1, 1)
+        elif depth == 17:
+            num_conv_blocks = (2, 2, 2, 2)
+        elif depth == 29:
+            num_conv_blocks = (5, 5, 2, 2)
+        elif depth == 49:
+            num_conv_blocks = (8, 8, 5, 3)
+        else:
+            raise ValueError('unsupported depth for VDCNN.')
+
+        out = Conv1D(filters=64, kernel_size=3, strides=1, padding='same', name='temp_conv')(embedded_chars)
+
+        # Convolutional Block 64
+        for _ in range(num_conv_blocks[0] - 1):
+            out = identity_block(out, filters=64, kernel_size=3, use_bias=use_bias, shortcut=shortcut)
+        out = conv_block(out, filters=64, kernel_size=3, use_bias=use_bias, shortcut=shortcut,
+                         pool_type=pool_type, sorted=sorted, stage=1)
+
+        # Convolutional Block 128
+        for _ in range(num_conv_blocks[1] - 1):
+            out = identity_block(out, filters=128, kernel_size=3, use_bias=use_bias, shortcut=shortcut)
+        out = conv_block(out, filters=128, kernel_size=3, use_bias=use_bias, shortcut=shortcut,
+                         pool_type=pool_type, sorted=sorted, stage=2)
+
+        # Convolutional Block 256
+        for _ in range(num_conv_blocks[2] - 1):
+            out = identity_block(out, filters=256, kernel_size=3, use_bias=use_bias, shortcut=shortcut)
+        out = conv_block(out, filters=256, kernel_size=3, use_bias=use_bias, shortcut=shortcut,
+                         pool_type=pool_type, sorted=sorted, stage=3)
+
+        # Convolutional Block 512
+        for _ in range(num_conv_blocks[3] - 1):
+            out = identity_block(out, filters=512, kernel_size=3, use_bias=use_bias, shortcut=shortcut)
+        out = conv_block(out, filters=512, kernel_size=3, use_bias=use_bias, shortcut=False,
+                         pool_type=None, stage=4)
+
+        # k-max pooling with k = 8
+        out = KMaxPooling(k=8, sorted=True)(out)
+        out = Flatten()(out)
+
+        # Dense Layers
+        out = Dense(2048, activation='relu')(out)
+        out = Dense(n_latent)(out)
+        return out
