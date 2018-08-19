@@ -260,26 +260,26 @@ class DeepCoNN(object):
 
         # Convolutional Block 64
         for _ in range(num_conv_blocks[0] - 1):
-            out = self.identity_block(out, filters=64, kernel_size=3, use_bias=use_bias, shortcut=shortcut)
-        out = self.conv_block(out, filters=64, kernel_size=3, use_bias=use_bias, shortcut=shortcut,
+            out = self.identity_block(out, filters=32, kernel_size=3, use_bias=use_bias, shortcut=shortcut)
+        out = self.conv_block(out, filters=32, kernel_size=3, use_bias=use_bias, shortcut=shortcut,
                          pool_type=pool_type, sorted=sorted, stage=1)
 
         # Convolutional Block 128
         for _ in range(num_conv_blocks[1] - 1):
-            out = self.dentity_block(out, filters=128, kernel_size=3, use_bias=use_bias, shortcut=shortcut)
-        out = self.conv_block(out, filters=128, kernel_size=3, use_bias=use_bias, shortcut=shortcut,
+            out = self.dentity_block(out, filters=64, kernel_size=3, use_bias=use_bias, shortcut=shortcut)
+        out = self.conv_block(out, filters=64, kernel_size=3, use_bias=use_bias, shortcut=shortcut,
                          pool_type=pool_type, sorted=sorted, stage=2)
 
         # Convolutional Block 256
         for _ in range(num_conv_blocks[2] - 1):
-            out = self.identity_block(out, filters=256, kernel_size=3, use_bias=use_bias, shortcut=shortcut)
-        out = self.conv_block(out, filters=256, kernel_size=3, use_bias=use_bias, shortcut=shortcut,
+            out = self.identity_block(out, filters=128, kernel_size=3, use_bias=use_bias, shortcut=shortcut)
+        out = self.conv_block(out, filters=128, kernel_size=3, use_bias=use_bias, shortcut=shortcut,
                          pool_type=pool_type, sorted=sorted, stage=3)
 
         # Convolutional Block 512
         for _ in range(num_conv_blocks[3] - 1):
-            out = self.identity_block(out, filters=512, kernel_size=3, use_bias=use_bias, shortcut=shortcut)
-        out = self.conv_block(out, filters=512, kernel_size=3, use_bias=use_bias, shortcut=False,
+            out = self.identity_block(out, filters=256, kernel_size=3, use_bias=use_bias, shortcut=shortcut)
+        out = self.conv_block(out, filters=256, kernel_size=3, use_bias=use_bias, shortcut=False,
                          pool_type=None, stage=4)
 
         # k-max pooling with k = 8
@@ -287,6 +287,6 @@ class DeepCoNN(object):
         out = Flatten()(out)
 
         # Dense Layers
-        out = Dense(2048, activation='relu')(out)
+        out = Dense(1024, activation='relu')(out)
         out = Dense(n_latent)(out)
         return out
