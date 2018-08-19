@@ -320,7 +320,7 @@ if __name__ == '__main__':
                 print ("loss_valid {:g}, rmse_valid {:g}, mae_valid {:g}".format(loss_s / test_length,
                                                                                  np.sqrt(accuracy_s / test_length),
                                                                                  mae_s / test_length))
-                saver.save(sess,'logs/VDCNN/rs-9',
+                saver.save(sess,'logs/DeepCoNN/rs-9',
                            global_step=epoch)
                 rmse = np.sqrt(accuracy_s / test_length)
                 mae = mae_s / test_length
