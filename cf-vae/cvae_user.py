@@ -416,7 +416,7 @@ class cf_vae_extend:
             # update V
             ids = np.array([len(x) for x in users]) > 0
             u = self.U[ids]
-            XX = np.dot(u.T, u) * params.C_b
+            XX = np.dot(u.T, u) * params.C_b + np.eye(self.z_dim) * params.lambda_v
             for j in xrange(self.num_items):
                 user_ids = items[j]
                 m = len(user_ids)
