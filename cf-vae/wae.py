@@ -191,6 +191,7 @@ class vanilla_vae:
             if distr == 'sphere':
                 noise = noise / np.sqrt(
                     np.sum(noise * noise, axis=1))[:, np.newaxis]
+            print(noise[0])
         return 0.45*noise +0.45
 
 
