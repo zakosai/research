@@ -183,7 +183,7 @@ class DeepCoNN(object):
         else:
             raise ValueError('unsupported depth for VDCNN.')
 
-        out = Conv1D(filters=64, kernel_size=3, strides=1, padding='same', name='temp_conv')(embedded_chars)
+        out = Conv1D(filters=32, kernel_size=3, strides=1, padding='same', name='temp_conv')(embedded_chars)
 
         # Convolutional Block 64
         for _ in range(num_conv_blocks[0] - 1):

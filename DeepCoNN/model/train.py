@@ -63,7 +63,7 @@ def train_step(u_batch, i_batch, uid, iid, y_batch, batch_num):
     time_str = datetime.datetime.now().isoformat()
 
     # print("{}: step {}, loss {:g}, rmse {:g},mae {:g}".format(time_str, batch_num, loss, accuracy, mae))
-    return accuracy, mae
+    return loss, accuracy, mae
 
 
 def dev_step(u_batch, i_batch, uid, iid, y_batch, writer=None):
@@ -121,7 +121,7 @@ if __name__ == '__main__':
         session_conf.gpu_options.allow_growth = True
         sess = tf.Session(config=session_conf)
         with sess.as_default():
-            deep = DeepCoNN.DeepCoNN(
+            deep = XceptionNet.DeepCoNN(
                 user_num=user_num,
                 item_num=item_num,
                 user_length=user_length,
@@ -251,7 +251,7 @@ if __name__ == '__main__':
                     u_batch = np.array(u_batch)
                     i_batch = np.array(i_batch)
 
-                    t_rmse, t_mae = train_step(u_batch, i_batch, uid, iid, y_batch, batch_num)
+                    loss, t_rmse, t_mae = train_step(u_batch, i_batch, uid, iid, y_batch, batch_num)
                     current_step = tf.train.global_step(sess, global_step)
                     train_rmse += t_rmse
                     train_mae += t_mae
@@ -290,7 +290,7 @@ if __name__ == '__main__':
 
                 print str(epoch) + ':\n'
                 print("\nEvaluation:")
-                print "train:rmse,mae:", train_rmse / ll, train_mae / ll
+                print "train:loss, rmse,mae:", loss, train_rmse / ll, train_mae / ll
                 train_rmse = 0
                 train_mae = 0
 
@@ -320,7 +320,7 @@ if __name__ == '__main__':
                 print ("loss_valid {:g}, rmse_valid {:g}, mae_valid {:g}".format(loss_s / test_length,
                                                                                  np.sqrt(accuracy_s / test_length),
                                                                                  mae_s / test_length))
-                saver.save(sess,'logs/DeepCoNN/rs-9',
+                saver.save(sess,'logs/VDCNN/rs-9',
                            global_step=epoch)
                 rmse = np.sqrt(accuracy_s / test_length)
                 mae = mae_s / test_length
