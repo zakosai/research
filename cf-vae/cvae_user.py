@@ -428,8 +428,8 @@ class cf_vae_extend:
                     if self.model == 1:
                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
                     elif self.model != 6:
-                        # x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z[j,:]
-                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0)
+                        x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z[j,:]
+                        #x = params.C_a * np.sum(self.U[user_ids, :], axis=0)
                     else:
                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z_im[j,:]
                     self.V[j, :] = scipy.linalg.solve(A, x)
