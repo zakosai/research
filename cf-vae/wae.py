@@ -67,7 +67,7 @@ class vanilla_vae:
             # x = x + noisy_level*tf.random_normal(tf.shape(x))
             with tf.variable_scope("encode"):
                 for i in range(depth_inf):
-                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
+                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
                 h_encode = x
                 z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
@@ -127,7 +127,7 @@ class vanilla_vae:
             depth_gen = len(self.decoding_dims)
             y = z
             for i in range(depth_gen):
-                y = dense(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.relu)
+                y = dense(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.sigmoid)
         return y
 
     def reconstruction_loss(self, real, reconstr):
@@ -162,7 +162,7 @@ class vanilla_vae:
             hi = inputs
             for i in xrange(num_layers):
                 hi = dense(hi, num_units, scope='hi_%d'%i)
-                hi = tf.nn.relu(hi)
+                hi = tf.nn.sigmoid(hi)
             hi = dense(hi, 1, scope='hfinal_lin')
             if nowozin_trick:
                 # We are doing GAN between our model Qz and the true Pz.
@@ -234,7 +234,7 @@ if __name__ == '__main__':
     # As there will be an additional layer from 100 to 50 in the encoder. in decoder, we also take this layer
                         # lr=0.01, batch_size=128, print_step=50)
         print('fitting data starts...')
-        model.fit(train_X, epochs=10000,learning_rate=0.001, batch_size=500, print_size=50, train=True, scope="text")
+        model.fit(train_X, epochs=1000,learning_rate=0.001, batch_size=500, print_size=50, train=True, scope="text")
 
     else:
         model = vanilla_vae(input_dim=args.user_dim, encoding_dims=[200], z_dim=zdim, decoding_dims=[200,args.user_dim], loss='cross_entropy', ckpt_folder=ckpt)
