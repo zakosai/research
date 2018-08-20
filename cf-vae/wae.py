@@ -153,7 +153,7 @@ class vanilla_vae:
     def z_adversary(self, inputs, reuse=False):
         num_units = 100
         num_layers = 1
-        nowozin_trick = 1
+        nowozin_trick = 0
         # No convolutions as GAN happens in the latent space
         with tf.variable_scope('z_adversary', reuse=reuse):
             hi = inputs
