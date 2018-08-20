@@ -69,7 +69,8 @@
 #        python train_cvae_extend.py --model=0 --ckpt_folder=$f/0_layer --data_dir=data2/$f/ --iter=50 --zdim=50 --data_type=$r --user_no=$user_no --item_no=$item_no
 
 python wae.py --ckpt_folder=Tool/8_100_wae --data_dir=data2/Tool/ --zdim=100 --data_type=8
-python wae.py --ckpt_folder=Tool/1_100_wae --data_dir=data2/Tool/ --zdim=100 --data_type=1
 
 python train_cf_wae.py --model=0 --ckpt_folder=Tool/8_100_wae --data_dir=data2/Tool/ --iter=50 --zdim=100 --gridsearch=1 --data_type=8  --user_no=2118 --item_no=7780
+python wae.py --ckpt_folder=Tool/1_100_wae --data_dir=data2/Tool/ --zdim=100 --data_type=1
+
 python train_cf_wae.py --model=0 --ckpt_folder=Tool/1_100_wae --data_dir=data2/Tool/ --iter=50 --zdim=100 --gridsearch=1 --data_type=1  --user_no=2118 --item_no=7780
