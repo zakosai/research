@@ -95,6 +95,7 @@ class cf_vae_extend:
                     x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
                 h_encode = x
+                print(x.shape)
                 z_mu = slim.fully_connected(h_encode, self.z_dim, scope="mu_layer")
                 z_log_sigma_sq = slim.fully_connected(h_encode, self.z_dim, scope="sigma_layer")
                 e = tf.random_normal(tf.shape(z_mu))
