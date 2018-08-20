@@ -4,16 +4,13 @@ from tensorbayes.layers import dense, placeholder, conv2d, conv2d_transpose, max
 from tensorbayes.utils import progbar
 from tensorbayes.tfutils import softmax_cross_entropy_with_two_logits
 from keras.backend import binary_crossentropy
-from keras.layers import Input, Dense, Lambda, Flatten, Reshape
-from keras import metrics
-from keras import backend as K
+from keras.layers import merge
 import numpy as np
 import time
 from vae import vanilla_vae
 import scipy
 import scipy.io as sio
-from operator import add
-from resnet_model import conv2d_fixed_padding, building_block, block_layer
+
 import ml_metrics
 import math
 import tensorflow.contrib.layers as slim
@@ -92,6 +89,8 @@ class cf_vae_extend:
                 # noisy_level = 1
                 # x = x + noisy_level*tf.random_normal(tf.shape(x))
                 reg_loss = 0
+                attention = dense(x, self.input_dim, scope='att_layer', activation=tf.nn.sigmoid)
+                x = merge([x, attention], output_shape=self.input_dim, name='attention_mul', mode='mul')
                 for i in range(depth_inf):
                     x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
@@ -186,12 +185,14 @@ class cf_vae_extend:
 
 
         with tf.variable_scope("user"):
-            encoding_dims = [100]
-            decoding_dims = [100,self.user_dim]
+            encoding_dims = [200]
+            decoding_dims = [200,self.user_dim]
 
             x_u = self.x_u_
             depth_inf = len(encoding_dims)
 
+            attention = dense(x_u, self.user_dim, scope='att_layer', activation=tf.nn.sigmoid)
+            x_u = merge([x_u, attention], output_shape=self.user_dim, name='attention_mul', mode='mul')
             for i in range(depth_inf):
                 x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
@@ -254,8 +255,9 @@ class cf_vae_extend:
                 loss_v = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z  - z_s - z_im), 1))
                 self.loss_e_step = loss_recons + loss_kl + loss_s_recons + loss_s_kl + loss_v + loss_im_recons + loss_im_kl
 
-        train_op_u = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss_e_step_u)
-        train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss_e_step)
+        with tf.variable_scope("loss"):
+            train_op_u = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss_e_step_u)
+            train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss_e_step)
 
 
         self.sess = tf.Session()
@@ -453,7 +455,8 @@ class cf_vae_extend:
                     elif self.model == 2:
                          x = params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:] + self.exp_z_s[j, :])
                     elif self.model != 6:
-                        x = params.lambda_v * self.exp_z[j,:]
+                        #x = params.lambda_v * self.exp_z[j,:]
+                        x = 0
                     else:
                         x = params.lambda_v * self.exp_z_im[j,:]
                     self.V[j, :] = scipy.linalg.solve(A, x)
