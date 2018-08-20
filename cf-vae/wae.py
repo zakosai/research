@@ -108,7 +108,7 @@ class vanilla_vae:
             for i in range(epochs):
                 idx = np.random.choice(x_input.shape[0], batch_size, replace=False)
                 x_batch = x_input[idx]
-                sample_noise = self.sample_pz('normal')
+                sample_noise = self.sample_pz('normal', x_batch)
                 _, l, lr, lk = sess.run((ae_opt, self.wae_objective, self.penalty, self.loss_reconstruct),
                                         feed_dict={x_:x_batch, z_fake:sample_noise})
                 _, lg = sess.run((z_adv_opt, self.loss_gan), feed_dict={x_:x_batch, z_fake:sample_noise})
@@ -178,21 +178,22 @@ class vanilla_vae:
                      - 0.5 * self.z_dim * np.log(sigma2_p)
         return hi
 
-    def sample_pz(self, distr):
+    def sample_pz(self, distr, x):
         noise = None
         if distr == 'uniform':
             noise = np.random.uniform(
                 -1, 1, [self.batch_size, self.z_dim]).astype(np.float32)
         elif distr in ('normal', 'sphere'):
-            mean = np.zeros(self.z_dim)
-            cov = np.identity(self.z_dim) * 1e-5
+            # mean = np.zeros(self.z_dim)
+            # cov = np.identity(self.z_dim) * 1e-5
+            mean = np.mean(x)
+            cov = np.cov(x)
             noise = np.random.multivariate_normal(
                 mean, cov, self.batch_size).astype(np.float32)
             if distr == 'sphere':
                 noise = noise / np.sqrt(
                     np.sum(noise * noise, axis=1))[:, np.newaxis]
             print(noise[0])
-            noise = noise + 1e-5
         return noise
 
 
