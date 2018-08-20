@@ -331,9 +331,8 @@ class cf_vae_extend:
         #     if i % 50 == 0:
         #        print("epoches: %d\t loss: %f\t time: %d s"%(i, l, time.time()-start))
 
-        if self.model != 6:
-            self.z_mu = z_mu
-            self.x_recons = x_recons
+        self.z_mu = z_mu
+        self.x_recons = x_recons
 
         if self.model == 1 or self.model == 2:
             self.z_im_mu = z_im_mu
@@ -347,40 +346,6 @@ class cf_vae_extend:
         self.x_u_recons = x_u_recons
         self.saver.save(self.sess, ckpt)
         return None
-    def e_step_u(self):
-        print "e_step finetuning for user"
-        tf.reset_default_graph()
-        self.x_u_ = placeholder((None, self.user_dim))  # we need these global nodes
-
-        # inference process
-        encoding_dims = [100]
-        decoding_dims = [100, self.user_dim]
-        with tf.variable_scope("user"):
-            x_u = self.x_u_
-            depth_inf = len(encoding_dims)
-
-            reg_loss = 0
-            for i in range(depth_inf):
-                x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.tanh)
-
-            h_u_encode = x_u
-            z_u_mu = slim.fully_connected(h_u_encode, self.z_dim, scope="mu_layer")
-            z_u_log_sigma_sq = slim.fully_connected(h_u_encode, self.z_dim, scope="sigma_layer")
-            e_u = tf.random_normal(tf.shape(z_u_mu))
-            z_u = z_u_mu + tf.sqrt(tf.maximum(tf.exp(z_u_log_sigma_sq), self.eps)) * e_u
-            # generative process
-            depth_gen = len( decoding_dims)
-            y_u = z_u
-            for i in range(depth_gen):
-                y_u = dense(y_u, decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.tanh)
-            x_u_recons = y_u
-
-        loss_u_recons = -tf.reduce_mean(tf.reduce_sum(self.x_u_ * tf.log(tf.maximum(x_u_recons, 1e-10))
-                + (1-self.x_u_) * tf.log(tf.maximum(1 - x_u_recons, 1e-10)),1))
-        loss_u_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_u_mu) + tf.exp(z_u_log_sigma_sq)
-            - z_u_log_sigma_sq - 1, 1))
-        loss_v = 1.0*self.params.lambda_u/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.u_ - z_u), 1))
-        #self.loss_e_step = loss_recons + loss_kl + loss_v
 
     def pmf_estimate(self, users, items, params):
         """
@@ -430,9 +395,9 @@ class cf_vae_extend:
                     elif self.model != 6:
                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z[j, :]
                         print(A.shape, x.shape)
-                        #x = params.C_a * np.sum(self.U[user_ids, :], axis=0)
                     else:
                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z_im[j,:]
+
                     self.V[j, :] = scipy.linalg.solve(A, x)
 
                     likelihood += -0.5 * m * params.C_a
@@ -491,44 +456,6 @@ class cf_vae_extend:
             print("[iter=%04d], likelihood=%.5f, converge=%.10f" % (it, likelihood, converge))
 
         return likelihood
-
-    def m_step(self, users, items, params):
-        num_users = len(users)
-        num_items = len(items)
-        print("M-step")
-        start =time.time()
-        for i in range(params.max_iter_m):
-            likelihood = 0
-
-            for u in range(num_users):
-
-                idx_a = np.ones(num_items) < 0
-                idx_a[users[u]] = True   # pick those rated ids
-                Lambda_inv = params.C_a * np.dot(self.V[idx_a].T, self.V[idx_a]) + \
-                             params.C_b * np.dot(self.V[~idx_a].T, self.V[~idx_a]) + \
-                             np.eye(self.num_factors) * params.lambda_u
-
-                rx = params.C_a * np.sum(self.V[users[u], :], axis=0)
-                self.U[u, :] = scipy.linalg.solve(Lambda_inv, rx, check_finite=True)
-
-                likelihood += -0.5 * params.lambda_u * np.sum(self.U[u] * self.U[u])
-
-            for v in range(num_items):
-                idx_a = np.ones(num_users) < 0
-                idx_a[items[v]] = True
-                Lambda_inv = params.C_a * np.dot(self.U[idx_a].T, self.U[idx_a]) + \
-                             params.C_b * np.dot(self.U[~idx_a].T, self.U[~idx_a]) + \
-                             np.eye(self.num_factors) * params.lambda_v
-                if self.model == 1:
-                    rx = params.C_a * np.sum(self.U[items[v], :], axis=0) + params.lambda_v * (self.exp_z[v, :] + self.exp_z_im[v, :])
-                elif self.model != 6:
-                    rx = params.C_a * np.sum(self.U[items[v], :], axis=0) + params.lambda_v * self.exp_z[v, :]
-                else:
-                    rx = params.C_a * np.sum(self.U[items[v], :], axis=0) + params.lambda_v * self.exp_z_im[v, :]
-                self.V[v, :] = scipy.linalg.solve(Lambda_inv, rx, check_finite=True)
-
-            print("iter: %d\t time:%d" %(i, time.time()-start))
-        return None
 
     def get_exp_hidden(self, x_data, im_data, str_data, u_data):
         if self.model != 6:
