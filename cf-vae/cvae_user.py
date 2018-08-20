@@ -531,7 +531,7 @@ class cf_vae_extend:
 
     def get_exp_hidden(self, x_data, im_data, str_data, u_data):
         if self.model != 6:
-           # self.exp_z = self.sess.run(self.z_mu, feed_dict={self.x_: x_data})
+            self.exp_z = self.sess.run(self.z_mu, feed_dict={self.x_: x_data})
             self.exp_z = 0
         else:
             self.exp_z = 0
