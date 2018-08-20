@@ -151,14 +151,14 @@ class vanilla_vae:
         return (loss_adversary, logits_Pz, logits_Qz), loss_match
 
     def z_adversary(self, inputs, reuse=False):
-        num_units = 100
-        num_layers = 2
+        num_units = self.decoding_dims
+        num_layers = len(self.decoding_dims)
         nowozin_trick = 1
         # No convolutions as GAN happens in the latent space
         with tf.variable_scope('z_adversary', reuse=reuse):
             hi = inputs
             for i in xrange(num_layers):
-                hi = dense(hi, num_units, scope='hi_%d'%i)
+                hi = dense(hi, num_units[i], scope='hi_%d'%i)
                 hi = tf.nn.relu(hi)
             hi = dense(hi, 1, scope='hfinal_lin')
             if nowozin_trick:
