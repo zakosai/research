@@ -169,7 +169,7 @@ class cf_vae_extend:
             if distr == 'sphere':
                 noise = noise / np.sqrt(
                     np.sum(noise * noise, axis=1))[:, np.newaxis]
-        return noise
+        return 0.5*noise
 
     def decode(self, z, reuse=False):
         with tf.variable_scope("decode", reuse=reuse):
@@ -204,8 +204,8 @@ class cf_vae_extend:
 
     def z_adversary(self, inputs, reuse=False):
         num_units = 100
-        num_layers = 2
-        nowozin_trick = 1
+        num_layers = 1
+        nowozin_trick = 0
         # No convolutions as GAN happens in the latent space
         with tf.variable_scope('z_adversary', reuse=reuse):
             hi = inputs
