@@ -416,7 +416,7 @@ class cf_vae_extend:
             # update V
             ids = np.array([len(x) for x in users]) > 0
             u = self.U[ids]
-            XX = np.dot(u.T, u) * params.C_b + np.eye(self.z_dim) * params.lambda_v
+            XX = np.dot(u.T, u) * params.C_b 
             for j in xrange(self.num_items):
                 user_ids = items[j]
                 m = len(user_ids)
@@ -428,7 +428,7 @@ class cf_vae_extend:
                     if self.model == 1:
                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
                     elif self.model != 6:
-                        x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z[j,:]
+                        x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z[j, :]
                         #x = params.C_a * np.sum(self.U[user_ids, :], axis=0)
                     else:
                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z_im[j,:]
