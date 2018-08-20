@@ -40,6 +40,7 @@ class vanilla_vae:
         # inference process
         ########TEXT###################
         with tf.variable_scope(scope):
+            print(self.encoding_dims, self.decoding_dims)
             x_ = placeholder((None, self.input_dim))
             x = x_
             depth_inf = len(self.encoding_dims)
@@ -53,7 +54,7 @@ class vanilla_vae:
 
             h_encode = x
             z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
-            z_log_sigma_sq = dense(h_encode, self.z_dim, scope = "sigma_layer")
+            z_log_sigma_sq = dense(h_encode, self.z_dim, scope="sigma_layer")
             e = tf.random_normal(tf.shape(z_mu))
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
 
