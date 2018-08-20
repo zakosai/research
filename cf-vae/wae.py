@@ -186,13 +186,13 @@ class vanilla_vae:
         elif distr in ('normal', 'sphere'):
             mean = np.zeros(self.z_dim)
             cov = np.identity(self.z_dim) * 1e-5
+            print(cov)
             noise = np.random.multivariate_normal(
                 mean, cov, self.batch_size).astype(np.float32)
             if distr == 'sphere':
                 noise = noise / np.sqrt(
                     np.sum(noise * noise, axis=1))[:, np.newaxis]
             noise = noise + 1e-5
-            print(noise[0])
         return noise
 
 
