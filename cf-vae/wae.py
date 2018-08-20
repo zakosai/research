@@ -67,7 +67,7 @@ class vanilla_vae:
             # x = x + noisy_level*tf.random_normal(tf.shape(x))
             with tf.variable_scope("encode"):
                 for i in range(depth_inf):
-                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
 
                 h_encode = x
                 z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
@@ -124,7 +124,7 @@ class vanilla_vae:
             depth_gen = len(self.decoding_dims)
             y = z
             for i in range(depth_gen):
-                y = dense(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.sigmoid)
+                y = dense(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.relu)
         return y
 
     def reconstruction_loss(self, real, reconstr):
@@ -159,23 +159,23 @@ class vanilla_vae:
             hi = inputs
             for i in xrange(num_layers):
                 hi = dense(hi, num_units, scope='hi_%d'%i)
-                hi = tf.nn.sigmoid(hi)
+                hi = tf.nn.relu(hi)
             hi = dense(hi, 1, scope='hfinal_lin')
-            # if nowozin_trick:
-            #     # We are doing GAN between our model Qz and the true Pz.
-            #     # Imagine we know analytical form of the true Pz.
-            #     # The optimal discriminator for D_JS(Pz, Qz) is given by:
-            #     # Dopt(x) = log dPz(x) - log dQz(x)
-            #     # And we know exactly dPz(x). So add log dPz(x) explicitly
-            #     # to the discriminator and let it learn only the remaining
-            #     # dQz(x) term. This appeared in the AVB paper.
-            #     assert opts['pz'] == 'normal', \
-            #         'The GAN Pz trick is currently available only for Gaussian Pz'
-            #     sigma2_p = float(opts['pz_scale']) ** 2
-            #     normsq = tf.reduce_sum(tf.square(inputs), 1)
-            #     hi = hi - normsq / 2. / sigma2_p \
-            #          - 0.5 * tf.log(2. * np.pi) \
-            #          - 0.5 * opts['zdim'] * np.log(sigma2_p)
+            if nowozin_trick:
+                # We are doing GAN between our model Qz and the true Pz.
+                # Imagine we know analytical form of the true Pz.
+                # The optimal discriminator for D_JS(Pz, Qz) is given by:
+                # Dopt(x) = log dPz(x) - log dQz(x)
+                # And we know exactly dPz(x). So add log dPz(x) explicitly
+                # to the discriminator and let it learn only the remaining
+                # dQz(x) term. This appeared in the AVB paper.
+                # assert opts['pz'] == 'normal', \
+                #     'The GAN Pz trick is currently available only for Gaussian Pz'
+                sigma2_p = float(0.9) ** 2
+                normsq = tf.reduce_sum(tf.square(inputs), 1)
+                hi = hi - normsq / 2. / sigma2_p \
+                     - 0.5 * tf.log(2. * np.pi) \
+                     - 0.5 * self.z_dim * np.log(sigma2_p)
         return hi
 
     def sample_pz(self, distr):
@@ -191,7 +191,7 @@ class vanilla_vae:
             if distr == 'sphere':
                 noise = noise / np.sqrt(
                     np.sum(noise * noise, axis=1))[:, np.newaxis]
-        return noise
+        return 0.9*noise
 
 
 if __name__ == '__main__':

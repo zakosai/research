@@ -88,7 +88,7 @@ class cf_vae_extend:
             # x = x + noisy_level*tf.random_normal(tf.shape(x))
             with tf.variable_scope("encode"):
                 for i in range(depth_inf):
-                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
 
                 h_encode = x
                 z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
@@ -176,7 +176,7 @@ class cf_vae_extend:
             depth_gen = len(self.decoding_dims)
             y = z
             for i in range(depth_gen):
-                y = dense(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.sigmoid)
+                y = dense(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.relu)
         return y
 
     def reconstruction_loss(self, real, reconstr):
