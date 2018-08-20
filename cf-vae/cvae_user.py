@@ -385,19 +385,18 @@ class cf_vae_extend:
             for j in xrange(self.num_items):
                 user_ids = items[j]
                 m = len(user_ids)
-                if m>0 :
+                if m > 0:
                     A = np.copy(XX)
-                    A += np.dot(self.U[user_ids,:].T, self.U[user_ids,:])*a_minus_b
+                    A += np.dot(self.U[user_ids, :].T, self.U[user_ids, :]) * a_minus_b
                     B = np.copy(A)
                     A += np.eye(self.z_dim) * params.lambda_v
                     if self.model == 1:
-                        x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:])
+                        x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * (
+                                    self.exp_z[j, :] + self.exp_z_im[j, :])
                     elif self.model != 6:
                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z[j, :]
-                        print(A.shape, x.shape)
                     else:
-                        x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z_im[j,:]
-
+                        x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z_im[j, :]
                     self.V[j, :] = scipy.linalg.solve(A, x)
 
                     likelihood += -0.5 * m * params.C_a
