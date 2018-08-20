@@ -101,6 +101,7 @@ class cf_vae_extend:
                 z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
 
                 # generative process
+                print(self.decoding_dims)
                 depth_gen = len(self.decoding_dims)
                 y = z
                 for i in range(depth_gen):
