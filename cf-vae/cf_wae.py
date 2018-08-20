@@ -88,7 +88,7 @@ class cf_vae_extend:
             # x = x + noisy_level*tf.random_normal(tf.shape(x))
             with tf.variable_scope("encode"):
                 for i in range(depth_inf):
-                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
+                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
                 h_encode = x
                 z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
@@ -102,7 +102,7 @@ class cf_vae_extend:
 
             y_fake = self.decode(z_fake, reuse=True)
 
-            self.wae_lambda = 0.5
+            self.wae_lambda = 0.2
             self.loss_gan, self.penalty = self.gan_penalty(z_fake, z)
             self.loss_reconstruct = 0.2*tf.reduce_mean(tf.nn.l2_loss(self.x_- self.reconstructed))
             self.wae_objective = self.loss_reconstruct + \
@@ -176,7 +176,7 @@ class cf_vae_extend:
             depth_gen = len(self.decoding_dims)
             y = z
             for i in range(depth_gen):
-                y = dense(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.relu)
+                y = dense(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.sigmoid)
         return y
 
     def reconstruction_loss(self, real, reconstr):
@@ -211,7 +211,7 @@ class cf_vae_extend:
             hi = inputs
             for i in xrange(num_layers):
                 hi = dense(hi, num_units, scope='hi_%d' % i)
-                hi = tf.nn.relu(hi)
+                hi = tf.nn.sigmoid(hi)
             hi = dense(hi, 1, scope='hfinal_lin')
             # if nowozin_trick:
             #     # We are doing GAN between our model Qz and the true Pz.
