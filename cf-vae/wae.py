@@ -76,6 +76,7 @@ class vanilla_vae:
                 z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
 
             # generative process
+            print(z[0])
             y_true = self.decode(z)
             self.reconstructed = y_true
 
@@ -184,10 +185,10 @@ class vanilla_vae:
             noise = np.random.uniform(
                 -1, 1, [self.batch_size, self.z_dim]).astype(np.float32)
         elif distr in ('normal', 'sphere'):
-            # mean = np.zeros(self.z_dim)
-            # cov = np.identity(self.z_dim) * 1e-5
-            mean = np.mean(x)
-            cov = np.cov(x)
+            mean = np.zeros(self.z_dim)
+            cov = np.identity(self.z_dim)
+            # mean = np.mean(x)
+            # cov = np.cov(x)
             noise = np.random.multivariate_normal(
                 mean, cov, self.batch_size).astype(np.float32)
             if distr == 'sphere':
