@@ -331,9 +331,9 @@ class cf_vae_extend:
         #     if i % 50 == 0:
         #        print("epoches: %d\t loss: %f\t time: %d s"%(i, l, time.time()-start))
 
-        # if self.model != 6:
-        #     self.z_mu = z_mu
-        #     self.x_recons = x_recons
+        if self.model != 6:
+            self.z_mu = z_mu
+            self.x_recons = x_recons
 
         if self.model == 1 or self.model == 2:
             self.z_im_mu = z_im_mu
