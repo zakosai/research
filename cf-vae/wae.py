@@ -158,7 +158,7 @@ class vanilla_vae:
         with tf.variable_scope('z_adversary', reuse=reuse):
             hi = inputs
             for i in xrange(num_layers):
-                hi = dense(hi, num_units[i], scope='hi_%d'%i)
+                hi = dense(hi, num_units, scope='hi_%d'%i)
                 hi = tf.nn.relu(hi)
             hi = dense(hi, 1, scope='hfinal_lin')
             if nowozin_trick:
