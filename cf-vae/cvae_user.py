@@ -397,7 +397,6 @@ class cf_vae_extend:
                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z[j, :]
                     else:
                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z_im[j, :]
-                    print(A.shape, x.shape)
 
                     self.V[j, :] = scipy.linalg.solve(A, x)
 
