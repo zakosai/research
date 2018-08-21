@@ -425,7 +425,6 @@ class cf_vae_extend:
                          x = params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:] + self.exp_z_s[j, :])
                     elif self.model != 6:
                         x = params.lambda_v * self.exp_z[j,:]
-                        #x = 0
                     else:
                         x = params.lambda_v * self.exp_z_im[j,:]
                     self.V[j, :] = scipy.linalg.solve(A, x)
