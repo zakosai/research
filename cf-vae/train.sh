@@ -21,7 +21,7 @@ do
     done
 
 
-#done
+done
 
 #dim='20 100 150'
 #for d in $dim
