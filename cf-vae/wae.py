@@ -65,6 +65,7 @@ class vanilla_vae:
 
             # noisy_level = 1
             # x = x + noisy_level*tf.random_normal(tf.shape(x))
+            x = tf.nn.dropout(x, keep_prob=0.7)
             with tf.variable_scope("encode"):
                 for i in range(depth_inf):
                     x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
@@ -154,8 +155,8 @@ class vanilla_vae:
         return (loss_adversary, logits_Pz, logits_Qz), loss_match
 
     def z_adversary(self, inputs, reuse=False):
-        num_units = 100
-        num_layers = 1
+        num_units = 200
+        num_layers = 2
         nowozin_trick = 0
         # No convolutions as GAN happens in the latent space
         with tf.variable_scope('z_adversary', reuse=reuse):
