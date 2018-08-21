@@ -89,8 +89,8 @@ class cf_vae_extend:
                 # noisy_level = 1
                 # x = x + noisy_level*tf.random_normal(tf.shape(x))
                 reg_loss = 0
-                attention = dense(x, self.input_dim, scope='att_layer', activation=tf.nn.sigmoid)
-                x = multiply([x, attention], name='attention_mul')
+                #attention = dense(x, self.input_dim, scope='att_layer', activation=tf.nn.sigmoid)
+                #x = multiply([x, attention], name='attention_mul')
                 for i in range(depth_inf):
                     x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
@@ -193,8 +193,8 @@ class cf_vae_extend:
             x_u = self.x_u_
             depth_inf = len(encoding_dims)
 
-            attention = dense(x_u, self.user_dim, scope='att_layer', activation=tf.nn.sigmoid)
-            x_u = multiply([x_u, attention],name='attention_mul')
+            #attention = dense(x_u, self.user_dim, scope='att_layer', activation=tf.nn.sigmoid)
+            #x_u = multiply([x_u, attention],name='attention_mul')
             for i in range(depth_inf):
                 x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
@@ -218,7 +218,7 @@ class cf_vae_extend:
 
         if self.loss_type == "cross_entropy":
             if self.model != 6:
-                loss_recons =tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_, x_recons), axis=1))
+                loss_recons = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.x_, x_recons), axis=1))
                 loss_kl = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(z_mu) + tf.exp(z_log_sigma_sq)
             - z_log_sigma_sq - 1, 1))
             else:
