@@ -89,8 +89,8 @@ class cf_vae_extend:
                 # noisy_level = 1
                 # x = x + noisy_level*tf.random_normal(tf.shape(x))
                 reg_loss = 0
-                #attention = dense(x, self.input_dim, scope='att_layer', activation=tf.nn.sigmoid)
-                #x = multiply([x, attention], name='attention_mul')
+                attention = dense(x, self.input_dim, scope='att_layer', activation=tf.nn.sigmoid)
+                x = multiply([x, attention], name='attention_mul')
                 for i in range(depth_inf):
                     x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
@@ -193,8 +193,8 @@ class cf_vae_extend:
             x_u = self.x_u_
             depth_inf = len(encoding_dims)
 
-            #attention = dense(x_u, self.user_dim, scope='att_layer', activation=tf.nn.sigmoid)
-            #x_u = multiply([x_u, attention],name='attention_mul')
+            attention = dense(x_u, self.user_dim, scope='att_layer', activation=tf.nn.sigmoid)
+            x_u = multiply([x_u, attention],name='attention_mul')
             for i in range(depth_inf):
                 x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
@@ -374,7 +374,6 @@ class cf_vae_extend:
                     A = np.copy(XX)
                     A += np.dot(self.V[item_ids, :].T, self.V[item_ids,:])*a_minus_b
                     x = params.C_a * np.sum(self.V[item_ids, :], axis=0) + params.lambda_u * self.exp_z_u[i, :]
-                    print(A.shape, x.shape)
                     self.U[i, :] = scipy.linalg.solve(A, x)
 
                     likelihood += -0.5 * params.lambda_u * np.sum(self.U[i]*self.U[i])
@@ -425,8 +424,8 @@ class cf_vae_extend:
                     elif self.model == 2:
                          x = params.lambda_v * (self.exp_z[j,:] + self.exp_z_im[j,:] + self.exp_z_s[j, :])
                     elif self.model != 6:
-                        #x = params.lambda_v * self.exp_z[j,:]
-                        x = 0
+                        x = params.lambda_v * self.exp_z[j,:]
+                        #x = 0
                     else:
                         x = params.lambda_v * self.exp_z_im[j,:]
                     self.V[j, :] = scipy.linalg.solve(A, x)
