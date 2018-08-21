@@ -4,7 +4,7 @@ from tensorbayes.layers import dense, placeholder, conv2d, conv2d_transpose, max
 from tensorbayes.utils import progbar
 from tensorbayes.tfutils import softmax_cross_entropy_with_two_logits
 from keras.backend import binary_crossentropy
-from keras.layers import merge
+from keras.layers import merge, multiply
 import numpy as np
 import time
 from vae import vanilla_vae
@@ -90,7 +90,7 @@ class cf_vae_extend:
                 # x = x + noisy_level*tf.random_normal(tf.shape(x))
                 reg_loss = 0
                 attention = dense(x, self.input_dim, scope='att_layer', activation=tf.nn.sigmoid)
-                x = merge([x, attention], output_shape=self.input_dim, name='attention_mul', mode='mul')
+                x = multiply([x, attention], name='attention_mul')
                 for i in range(depth_inf):
                     x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
@@ -194,7 +194,7 @@ class cf_vae_extend:
             depth_inf = len(encoding_dims)
 
             attention = dense(x_u, self.user_dim, scope='att_layer', activation=tf.nn.sigmoid)
-            x_u = merge([x_u, attention], output_shape=self.user_dim, name='attention_mul', mode='mul')
+            x_u = multiply([x_u, attention],name='attention_mul')
             for i in range(depth_inf):
                 x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
