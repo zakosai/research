@@ -65,7 +65,6 @@ class vanilla_vae:
 
             # noisy_level = 1
             # x = x + noisy_level*tf.random_normal(tf.shape(x))
-            x = tf.nn.dropout(x, keep_prob=0.7)
             with tf.variable_scope("encode"):
                 for i in range(depth_inf):
                     x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)

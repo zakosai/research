@@ -86,7 +86,6 @@ class cf_vae_extend:
 
             # noisy_level = 1
             # x = x + noisy_level*tf.random_normal(tf.shape(x))
-            x = tf.nn.dropout(x, keep_prob=0.7)
 
             with tf.variable_scope("encode"):
                 for i in range(depth_inf):
