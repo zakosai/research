@@ -6,12 +6,12 @@ for f in $folders
 do
     for r in $rate
     do
-        mkdir $f/$r_wae
+        mkdir $f/wae_$r
         dim="$(sed -n '3p' data2/$f/info.txt)"
         user_no="$(sed -n '1p' data2/$f/info.txt)"
         item_no="$(sed -n '2p' data2/$f/info.txt)"
-        python wae.py --ckpt_folder=$f/$r_wae --data_dir=data2/$f/ --zdim=100 --data_type=$r --user_dim=$dim --type=text
-        python train_cf_wae.py --model=0 --ckpt_folder=$f/$r_wae --data_dir=data2/$f/ --iter=50 --data_type=$r --user_no=$user_no --item_no=$item_no --gridsearch=1 --zdim=100
+        python wae.py --ckpt_folder=$f/wae_$r --data_dir=data2/$f/ --zdim=100 --data_type=$r --user_dim=$dim --type=text
+        python train_cf_wae.py --model=0 --ckpt_folder=$f/wae_$r --data_dir=data2/$f/ --iter=50 --data_type=$r --user_no=$user_no --item_no=$item_no --gridsearch=1 --zdim=100
 
         #python train_dae.py --ckpt_folder=$f/$r --data_dir=data2/$f/ --zdim=50 --data_type=$r --user_dim=$dim --type=user
         #python train_cdae_user.py --model=0 --ckpt_folder=$f/$r --data_dir=data2/$f/ --iter=50 --zdim=50 --gridsearch=1 --data_type=$r --user_dim=$dim --user_no=$user_no --item_no=$item_no
