@@ -374,6 +374,7 @@ class cf_vae_extend:
                     A = np.copy(XX)
                     A += np.dot(self.V[item_ids, :].T, self.V[item_ids,:])*a_minus_b
                     x = params.C_a * np.sum(self.V[item_ids, :], axis=0) + params.lambda_u * self.exp_z_u[i, :]
+                    print(A.shape, x.shape)
                     self.U[i, :] = scipy.linalg.solve(A, x)
 
                     likelihood += -0.5 * params.lambda_u * np.sum(self.U[i]*self.U[i])
@@ -397,6 +398,8 @@ class cf_vae_extend:
                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z[j, :]
                     else:
                         x = params.C_a * np.sum(self.U[user_ids, :], axis=0) + params.lambda_v * self.exp_z_im[j, :]
+                    print(A.shape, x.shape)
+
                     self.V[j, :] = scipy.linalg.solve(A, x)
 
                     likelihood += -0.5 * m * params.C_a
