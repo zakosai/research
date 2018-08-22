@@ -46,7 +46,7 @@ class vanilla_vae:
 
 
 
-    def fit(self, x_input, epochs = 1000, learning_rate = 0.002, batch_size = 100, print_size = 50, train=True, scope="text"):
+    def fit(self, x_input, epochs = 1000, learning_rate = 0.001, batch_size = 100, print_size = 50, train=True, scope="text"):
         # training setting
         self.DO_SHARE = False
         self.epochs = epochs
@@ -235,7 +235,7 @@ if __name__ == '__main__':
     # As there will be an additional layer from 100 to 50 in the encoder. in decoder, we also take this layer
                         # lr=0.01, batch_size=128, print_step=50)
         print('fitting data starts...')
-        model.fit(train_X, epochs=1000,learning_rate=0.001, batch_size=500, print_size=50, train=True, scope="text")
+        model.fit(train_X, epochs=1000,learning_rate=0.0001, batch_size=500, print_size=50, train=True, scope="text")
 
     else:
         model = vanilla_vae(input_dim=args.user_dim, encoding_dims=[200], z_dim=zdim, decoding_dims=[200,args.user_dim], loss='cross_entropy', ckpt_folder=ckpt)

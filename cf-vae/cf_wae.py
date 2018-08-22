@@ -103,20 +103,21 @@ class cf_vae_extend:
 
             y_fake = self.decode(z_fake, reuse=True)
 
-            self.wae_lambda = 5
+            self.wae_lambda = 0.5
             self.loss_gan, self.penalty = self.gan_penalty(z_fake, z)
             self.loss_reconstruct = 0.2*tf.reduce_mean(tf.nn.l2_loss(self.x_- self.reconstructed))
+            loss = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z), 1))
             self.wae_objective = self.loss_reconstruct + \
-                                 self.wae_lambda * self.penalty
+                                 self.wae_lambda * self.penalty + loss
 
         z_adv_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/z_adversary')
         encoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/encode')
         decoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/decode')
         ae_vars = encoder_vars + decoder_vars
 
-        ae_opt = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss=self.wae_objective,
+        ae_opt = tf.train.RMSPropOptimizer(self.params.learning_rate).minimize(loss=self.wae_objective,
                                    var_list=encoder_vars + decoder_vars)
-        z_adv_opt = tf.train.AdamOptimizer(self.params.learning_rate).minimize(
+        z_adv_opt = tf.train.RMSPropOptimizer(self.params.learning_rate).minimize(
             loss=self.loss_gan[0], var_list=z_adv_vars)
 
         self.sess = tf.Session()
@@ -144,13 +145,13 @@ class cf_vae_extend:
             x_batch = x_data[idx]
             v_batch = self.V[idx]
             sample_noise = self.sample_pz('normal')
-            _, l = self.sess.run((ae_opt, self.wae_objective),
+            _, l, lv = self.sess.run((ae_opt, self.wae_objective, loss),
                                  feed_dict={self.x_:x_batch, self.v_:v_batch, z_fake:sample_noise})
             _, lg = self.sess.run((z_adv_opt, self.loss_gan[0]),
                                  feed_dict={self.x_:x_batch, self.v_:v_batch, z_fake:sample_noise})
 
             if i % 50 == 0:
-               print("epoches: %d\t loss: %f\t loss adv: %f\t time: %d s"%(i, l, lg, time.time()-start))
+               print("epoches: %d\t loss: %f\t loss v:%f\t loss adv: %f\t time: %d s"%(i, l,lv, lg, time.time()-start))
 
         self.z_mu = z_mu
         self.x_recons = self.reconstructed
