@@ -93,9 +93,9 @@ class vanilla_vae:
         decoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=scope+'/decode')
         ae_vars = encoder_vars + decoder_vars
 
-        ae_opt = tf.train.AdagradOptimizer(self.learning_rate).minimize(loss=self.wae_objective,
+        ae_opt = tf.train.AdadeltaOptimizer().minimize(loss=self.wae_objective,
                                    var_list=encoder_vars + decoder_vars)
-        z_adv_opt = tf.train.AdagradOptimizer(self.learning_rate).minimize(
+        z_adv_opt = tf.train.AdadeltaOptimizer().minimize(
             loss=self.loss_gan[0], var_list=z_adv_vars)
 
         sess = tf.Session()
@@ -235,7 +235,7 @@ if __name__ == '__main__':
     # As there will be an additional layer from 100 to 50 in the encoder. in decoder, we also take this layer
                         # lr=0.01, batch_size=128, print_step=50)
         print('fitting data starts...')
-        model.fit(train_X, epochs=1000,learning_rate=0.0001, batch_size=500, print_size=50, train=True, scope="text")
+        model.fit(train_X, epochs=1000,learning_rate=0.001, batch_size=500, print_size=50, train=True, scope="text")
 
     else:
         model = vanilla_vae(input_dim=args.user_dim, encoding_dims=[200], z_dim=zdim, decoding_dims=[200,args.user_dim], loss='cross_entropy', ckpt_folder=ckpt)
