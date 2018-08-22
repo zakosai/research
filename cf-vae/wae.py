@@ -46,7 +46,7 @@ class vanilla_vae:
 
 
 
-    def fit(self, x_input, epochs = 1000, learning_rate = 0.001, batch_size = 100, print_size = 50, train=True, scope="text"):
+    def fit(self, x_input, epochs = 1000, learning_rate = 0.0001, batch_size = 100, print_size = 50, train=True, scope="text"):
         # training setting
         self.DO_SHARE = False
         self.epochs = epochs
@@ -82,7 +82,7 @@ class vanilla_vae:
 
             y_fake = self.decode(z_fake, reuse=True)
 
-            self.wae_lambda = 5
+            self.wae_lambda = 0.5
             self.loss_gan, self.penalty = self.gan_penalty(z_fake, z)
             self.loss_reconstruct = 0.2*tf.reduce_mean(tf.nn.l2_loss(x_- self.reconstructed))
             self.wae_objective = self.loss_reconstruct + \
@@ -93,7 +93,7 @@ class vanilla_vae:
         decoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=scope+'/decode')
         ae_vars = encoder_vars + decoder_vars
 
-        ae_opt = tf.train.RMSPropOptimizer(self.learning_rate).minimize(loss=self.wae_objective,
+        ae_opt = tf.train.RMSPropOptimizer(self.learning_rate*1e2).minimize(loss=self.wae_objective,
                                    var_list=encoder_vars + decoder_vars)
         z_adv_opt = tf.train.RMSPropOptimizer(self.learning_rate).minimize(
             loss=self.loss_gan[0], var_list=z_adv_vars)
