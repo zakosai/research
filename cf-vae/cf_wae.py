@@ -103,7 +103,7 @@ class cf_vae_extend:
 
             y_fake = self.decode(z_fake, reuse=True)
 
-            self.wae_lambda = 0.2
+            self.wae_lambda = 5
             self.loss_gan, self.penalty = self.gan_penalty(z_fake, z)
             self.loss_reconstruct = 0.2*tf.reduce_mean(tf.nn.l2_loss(self.x_- self.reconstructed))
             self.wae_objective = self.loss_reconstruct + \
@@ -204,8 +204,8 @@ class cf_vae_extend:
         return (loss_adversary, logits_Pz, logits_Qz), loss_match
 
     def z_adversary(self, inputs, reuse=False):
-        num_units = 200
-        num_layers = 2
+        num_units = 100
+        num_layers = 1
         nowozin_trick = 0
         # No convolutions as GAN happens in the latent space
         with tf.variable_scope('z_adversary', reuse=reuse):
