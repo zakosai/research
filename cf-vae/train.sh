@@ -1,5 +1,5 @@
-folders='Outdoor sport Toy'
-rate='8 80'
+folders='Outdoor sport Toy TV Tool Electronics Beauty'
+rate='1 8'
 
 
 for f in $folders
