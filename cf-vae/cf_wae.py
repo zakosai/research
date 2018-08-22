@@ -115,9 +115,9 @@ class cf_vae_extend:
         decoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/decode')
         ae_vars = encoder_vars + decoder_vars
 
-        ae_opt = tf.train.AdagradOptimizer(self.params.learning_rate).minimize(loss=self.wae_objective,
+        ae_opt = tf.train.AdadeltaOptimizer().minimize(loss=self.wae_objective,
                                    var_list=encoder_vars + decoder_vars)
-        z_adv_opt = tf.train.AdagradOptimizers(self.params.learning_rate).minimize(
+        z_adv_opt = tf.train.AdadeltaOptimizer().minimize(
             loss=self.loss_gan[0], var_list=z_adv_vars)
 
         self.sess = tf.Session()
