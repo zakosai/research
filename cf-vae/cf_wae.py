@@ -106,7 +106,7 @@ class cf_vae_extend:
             self.wae_lambda = 0.5
             self.loss_gan, self.penalty = self.gan_penalty(z_fake, z)
             self.loss_reconstruct = 0.2*tf.reduce_mean(tf.nn.l2_loss(self.x_- self.reconstructed))
-            loss = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean( tf.reduce_sum(tf.square(self.v_ - z), 1))
+            loss = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean(tf.reduce_sum(tf.square(self.v_ - z),1))
             self.wae_objective = self.loss_reconstruct + \
                                  self.wae_lambda * self.penalty + loss
 
@@ -115,9 +115,9 @@ class cf_vae_extend:
         decoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/decode')
         ae_vars = encoder_vars + decoder_vars
 
-        ae_opt = tf.train.RMSPropOptimizer(self.params.learning_rate).minimize(loss=self.wae_objective,
+        ae_opt = tf.train.AdagradOptimizer(self.params.learning_rate).minimize(loss=self.wae_objective,
                                    var_list=encoder_vars + decoder_vars)
-        z_adv_opt = tf.train.RMSPropOptimizer(self.params.learning_rate).minimize(
+        z_adv_opt = tf.train.AdagradOptimizers(self.params.learning_rate).minimize(
             loss=self.loss_gan[0], var_list=z_adv_vars)
 
         self.sess = tf.Session()
