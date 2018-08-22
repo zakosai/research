@@ -46,7 +46,7 @@ class vanilla_vae:
 
 
 
-    def fit(self, x_input, epochs = 1000, learning_rate = 0.0001, batch_size = 100, print_size = 50, train=True, scope="text"):
+    def fit(self, x_input, epochs = 1000, learning_rate = 0.002, batch_size = 100, print_size = 50, train=True, scope="text"):
         # training setting
         self.DO_SHARE = False
         self.epochs = epochs
@@ -112,7 +112,8 @@ class vanilla_vae:
                 sample_noise = self.sample_pz('normal', x_batch)
                 _, l, lr, lk = sess.run((ae_opt, self.wae_objective, self.penalty, self.loss_reconstruct),
                                         feed_dict={x_:x_batch, z_fake:sample_noise})
-                _, lg = sess.run((z_adv_opt, self.loss_gan), feed_dict={x_:x_batch, z_fake:sample_noise})
+                _, l, lr, lk = sess.run((ae_opt, self.wae_objective, self.penalty, self.loss_reconstruct),
+                                        feed_dict={x_: x_batch, z_fake: sample_noise})
                 _, lg = sess.run((z_adv_opt, self.loss_gan), feed_dict={x_:x_batch, z_fake:sample_noise})
 
                 if i % self.print_size == 0:
