@@ -93,7 +93,7 @@ class vanilla_vae:
         decoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=scope+'/decode')
         ae_vars = encoder_vars + decoder_vars
 
-        ae_opt = tf.train.RMSPropOptimizer(self.learning_rate*1e2).minimize(loss=self.wae_objective,
+        ae_opt = tf.train.RMSPropOptimizer(self.learning_rate).minimize(loss=self.wae_objective,
                                    var_list=encoder_vars + decoder_vars)
         z_adv_opt = tf.train.RMSPropOptimizer(self.learning_rate).minimize(
             loss=self.loss_gan[0], var_list=z_adv_vars)
