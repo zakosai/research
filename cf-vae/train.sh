@@ -7,7 +7,7 @@ for f in $folders
 do
     for r in $rate
     do
-        mkdir $f/80
+        mkdir -p $f/80
         #dim="$(sed -n '3p' data2/$f/info.txt)"
         user_no="$(sed -n '1p' data2/$f/info.txt)"
         item_no="$(sed -n '2p' data2/$f/info.txt)"
