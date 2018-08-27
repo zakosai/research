@@ -53,7 +53,7 @@ class cf_vae_extend:
         self.decoding_dims = decoding_dims
         self.encoding_dims_str = encoding_dims_str
         self.decoding_dims_str = decoding_dims_str
-        self.loss_type = loss_type
+        self.loss_type = 'gan'
         self.useTranse = useTranse
         self.eps = eps
         self.initial = initial
@@ -104,7 +104,6 @@ class cf_vae_extend:
             y_fake = self.decode(z_fake, reuse=True)
 
             self.wae_lambda = 0.5
-            print(self.loss_type)
             if self.loss_type == 'gan':
                 self.loss_gan, self.penalty = self.gan_penalty(z_fake, z)
                 z_adv_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/z_adversary')
