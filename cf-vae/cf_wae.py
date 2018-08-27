@@ -106,9 +106,6 @@ class cf_vae_extend:
             self.wae_lambda = 0.5
             if self.loss_type == 'gan':
                 self.loss_gan, self.penalty = self.gan_penalty(z_fake, z)
-                z_adv_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/z_adversary')
-                z_adv_opt = tf.train.AdamOptimizer(self.params.learning_rate).minimize(
-                    loss=self.loss_gan[0], var_list=z_adv_vars)
             elif self.loss_type =='mmd':
                 self.penalty = self.mmd_penalty(z_fake, z)
             self.loss_reconstruct = 0.2*tf.reduce_mean(tf.nn.l2_loss(self.x_- self.reconstructed))
@@ -119,6 +116,10 @@ class cf_vae_extend:
         encoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/encode')
         decoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/decode')
         ae_vars = encoder_vars + decoder_vars
+        if self.loss_type == 'gan':
+            z_adv_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/z_adversary')
+            z_adv_opt = tf.train.AdamOptimizer(self.params.learning_rate).minimize(
+                loss=self.loss_gan[0], var_list=z_adv_vars)
 
         ae_opt = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss=self.wae_objective,
                                    var_list=encoder_vars + decoder_vars)
