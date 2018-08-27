@@ -105,6 +105,7 @@ class cf_vae_extend:
 
             self.wae_lambda = 0.5
             if self.loss_type == 'gan':
+                print("abc")
                 self.loss_gan, self.penalty = self.gan_penalty(z_fake, z)
                 z_adv_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/z_adversary')
                 z_adv_opt = tf.train.AdamOptimizer(self.params.learning_rate).minimize(
