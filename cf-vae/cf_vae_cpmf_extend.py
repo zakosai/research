@@ -88,7 +88,8 @@ class cf_vae_extend:
                 # x = x + noisy_level*tf.random_normal(tf.shape(x))
                 reg_loss = 0
                 for i in range(depth_inf):
-                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                    x1 = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i)
+                    x = tf.nn.sigmoid(x+x1)
                     # x = slim.fully_connected(x, self.encoding_dims[i], activation_fn=tf.nn.sigmoid, scope="enc_layer%s"%i)
 
                     # print("enc_layer0/weights:0".graph)
@@ -607,6 +608,7 @@ class cf_vae_extend:
             if file != None:
                 file.write("m = %d, recall = %f\t"%(m, recall_avg))
             # precision_avgs.append(precision_avg)
+            return recall_avg
     def dcg_score(self, y_true, y_score, k=5):
         """Discounted cumulative gain (DCG) at rank K.
 

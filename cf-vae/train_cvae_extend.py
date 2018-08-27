@@ -98,7 +98,8 @@ tf.set_random_seed(0)
 # img = images.reshape((13791, 32, 32, 3))
 # img = img.astype(np.float32)/255
 num_factors = zdim
-
+best_recall = 0
+best_hyper = []
 if gs == 1:
     i = 0
     recalls = []
@@ -121,11 +122,17 @@ if gs == 1:
                     f = open(os.path.join(ckpt, "result_cvae_%d.txt"%model_type), 'a')
                     f.write("%d-----------%f----------%f----------%f\n"%(i, u,v,r))
                     pred_all = model.predict_all()
-                    model.predict_val(pred_all, data["train_users"], data["test_users"], f)
+                    recall = model.predict_val(pred_all, data["train_users"], data["test_users"], f)
                     f.write("\n")
                     f.close()
+                    if recall > best_recall:
+                        best_recall = recall
+                        best_hyper = [u, v, r]
                     print(u, v, r)
                 i += 1
+    f = open(os.path.join(ckpt, "result_sum.txt"), "a")
+    f.write("Best recall CVAE: %f at (%f, %f, %f)\n"%(best_recall, best_hyper[0], best_hyper[1], best_hyper[2]))
+    f.close()
 else:
     model = cf_vae_extend(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,
                           input_dim=8000, encoding_dims=[200, 100], z_dim = zdim, decoding_dims=[100, 200, 8000],

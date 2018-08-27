@@ -525,6 +525,7 @@ class cf_vae_extend:
             print recall_avg
             if file!= None:
                 file.write("m = %d, recall = %f"%(m, recall_avg))
+            return recall_avg
 
     def predict_all(self):
         return np.dot(self.U, (self.V.T))

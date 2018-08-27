@@ -36,7 +36,7 @@ class params:
 
 class cf_vae_extend:
     def __init__(self, num_users, num_items, num_factors, params, input_dim, encoding_dims, z_dim, decoding_dims, encoding_dims_str,
-                 decoding_dims_str, loss_type="cross_entropy", useTranse = False, eps = 1e-10, model=0, ckpt_folder='pre_model', initial=True, model_mat=None):
+                 decoding_dims_str, loss_type="gan", useTranse = False, eps = 1e-10, model=0, ckpt_folder='pre_model', initial=True, model_mat=None):
         self.num_users = num_users
         self.num_items = num_items
         self.num_factors = num_factors
@@ -104,21 +104,25 @@ class cf_vae_extend:
             y_fake = self.decode(z_fake, reuse=True)
 
             self.wae_lambda = 0.5
-            self.loss_gan, self.penalty = self.gan_penalty(z_fake, z)
+            if self.loss_type == 'gan':
+                self.loss_gan, self.penalty = self.gan_penalty(z_fake, z)
+                z_adv_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/z_adversary')
+                z_adv_opt = tf.train.AdamOptimizer(self.params.learning_rate).minimize(
+                    loss=self.loss_gan[0], var_list=z_adv_vars)
+            elif self.loss_type =='mmd':
+                self.penalty = self.mmd_penalty(z_fake, z)
             self.loss_reconstruct = 0.2*tf.reduce_mean(tf.nn.l2_loss(self.x_- self.reconstructed))
             loss = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean(tf.reduce_sum(tf.square(self.v_ - z),1))
             self.wae_objective = self.loss_reconstruct + \
                                  self.wae_lambda * self.penalty + loss
 
-        z_adv_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/z_adversary')
         encoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/encode')
         decoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/decode')
         ae_vars = encoder_vars + decoder_vars
 
         ae_opt = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss=self.wae_objective,
                                    var_list=encoder_vars + decoder_vars)
-        z_adv_opt = tf.train.AdamOptimizer(self.params.learning_rate).minimize(
-            loss=self.loss_gan[0], var_list=z_adv_vars)
+
 
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
@@ -145,19 +149,104 @@ class cf_vae_extend:
             x_batch = x_data[idx]
             v_batch = self.V[idx]
             sample_noise = self.sample_pz('normal')
+
             _, l, lv = self.sess.run((ae_opt, self.wae_objective, loss),
                                  feed_dict={self.x_:x_batch, self.v_:v_batch, z_fake:sample_noise})
-            _, lg = self.sess.run((z_adv_opt, self.loss_gan[0]),
+
+            if self.loss_type == 'gan':
+                _, lg = self.sess.run((z_adv_opt, self.loss_gan[0]),
                                  feed_dict={self.x_:x_batch, self.v_:v_batch, z_fake:sample_noise})
 
             if i % 50 == 0:
-               print("epoches: %d\t loss: %f\t loss v:%f\t loss adv: %f\t time: %d s"%(i, l,lv, lg, time.time()-start))
+               print("epoches: %d\t loss: %f\t loss v:%f\t time: %d s"%(i, l,lv, time.time()-start))
 
         self.z_mu = z_mu
         self.x_recons = self.reconstructed
         self.saver.save(self.sess, ckpt)
 
         return None
+
+
+    def mmd_penalty(self, sample_qz, sample_pz):
+        sigma2_p = 0.5 ** 2
+        kernel = 'RBF'
+        verbose = 1
+        n = self.params.batch_size
+        n = tf.cast(n, tf.int32)
+        nf = tf.cast(n, tf.float32)
+        half_size = (n * n - n) / 2
+
+        norms_pz = tf.reduce_sum(tf.square(sample_pz), axis=1, keep_dims=True)
+        dotprods_pz = tf.matmul(sample_pz, sample_pz, transpose_b=True)
+        distances_pz = norms_pz + tf.transpose(norms_pz) - 2. * dotprods_pz
+
+        norms_qz = tf.reduce_sum(tf.square(sample_qz), axis=1, keep_dims=True)
+        dotprods_qz = tf.matmul(sample_qz, sample_qz, transpose_b=True)
+        distances_qz = norms_qz + tf.transpose(norms_qz) - 2. * dotprods_qz
+
+        dotprods = tf.matmul(sample_qz, sample_pz, transpose_b=True)
+        distances = norms_qz + tf.transpose(norms_pz) - 2. * dotprods
+
+        # if opts['verbose']:
+        #     distances = tf.Print(
+        #         distances,
+        #         [tf.nn.top_k(tf.reshape(distances_qz, [-1]), 1).values[0]],
+        #         'Maximal Qz squared pairwise distance:')
+        #     distances = tf.Print(distances, [tf.reduce_mean(distances_qz)],
+        #                         'Average Qz squared pairwise distance:')
+
+        #     distances = tf.Print(
+        #         distances,
+        #         [tf.nn.top_k(tf.reshape(distances_pz, [-1]), 1).values[0]],
+        #         'Maximal Pz squared pairwise distance:')
+        #     distances = tf.Print(distances, [tf.reduce_mean(distances_pz)],
+        #                         'Average Pz squared pairwise distance:')
+
+        if kernel == 'RBF':
+            # Median heuristic for the sigma^2 of Gaussian kernel
+            sigma2_k = tf.nn.top_k(
+                tf.reshape(distances, [-1]), half_size).values[half_size - 1]
+            sigma2_k += tf.nn.top_k(
+                tf.reshape(distances_qz, [-1]), half_size).values[half_size - 1]
+            # Maximal heuristic for the sigma^2 of Gaussian kernel
+            # sigma2_k = tf.nn.top_k(tf.reshape(distances_qz, [-1]), 1).values[0]
+            # sigma2_k += tf.nn.top_k(tf.reshape(distances, [-1]), 1).values[0]
+            # sigma2_k = opts['latent_space_dim'] * sigma2_p
+            if verbose:
+                sigma2_k = tf.Print(sigma2_k, [sigma2_k], 'Kernel width:')
+            res1 = tf.exp(- distances_qz / 2. / sigma2_k)
+            res1 += tf.exp(- distances_pz / 2. / sigma2_k)
+            res1 = tf.multiply(res1, 1. - tf.eye(n))
+            res1 = tf.reduce_sum(res1) / (nf * nf - nf)
+            res2 = tf.exp(- distances / 2. / sigma2_k)
+            res2 = tf.reduce_sum(res2) * 2. / (nf * nf)
+            stat = res1 - res2
+        # elif kernel == 'IMQ':
+        #     # k(x, y) = C / (C + ||x - y||^2)
+        #     # C = tf.nn.top_k(tf.reshape(distances, [-1]), half_size).values[half_size - 1]
+        #     # C += tf.nn.top_k(tf.reshape(distances_qz, [-1]), half_size).values[half_size - 1]
+        #     if opts['pz'] == 'normal':
+        #         Cbase = 2. * opts['zdim'] * sigma2_p
+        #     elif opts['pz'] == 'sphere':
+        #         Cbase = 2.
+        #     elif opts['pz'] == 'uniform':
+        #         # E ||x - y||^2 = E[sum (xi - yi)^2]
+        #         #               = zdim E[(xi - yi)^2]
+        #         #               = const * zdim
+        #         Cbase = opts['zdim']
+        #     stat = 0.
+        #     for scale in [.1, .2, .5, 1., 2., 5., 10.]:
+        #         C = Cbase * scale
+        #         res1 = C / (C + distances_qz)
+        #         res1 += C / (C + distances_pz)
+        #         res1 = tf.multiply(res1, 1. - tf.eye(n))
+        #         res1 = tf.reduce_sum(res1) / (nf * nf - nf)
+        #         res2 = C / (C + distances)
+        #         res2 = tf.reduce_sum(res2) * 2. / (nf * nf)
+        #         stat += res1 - res2
+        return stat
+
+
     def sample_pz(self, distr):
         noise = None
         if distr == 'uniform':
@@ -500,6 +589,7 @@ class cf_vae_extend:
             if file != None:
                 file.write("m = %d, recall = %f\t"%(m, recall_avg))
             # precision_avgs.append(precision_avg)
+            return recall_avg
     def dcg_score(self, y_true, y_score, k=5):
         """Discounted cumulative gain (DCG) at rank K.
 
