@@ -11,7 +11,7 @@ do
         #dim="$(sed -n '3p' data2/$f/info.txt)"
         user_no="$(sed -n '1p' data2/$f/info.txt)"
         item_no="$(sed -n '2p' data2/$f/info.txt)"
-        python wae.py --ckpt_folder=$f/80 --data_dir=data2/$f/ --zdim=100 --data_type=$r --user_dim=$dim --type=text
+        python wae.py --ckpt_folder=$f/80 --data_dir=data2/$f/ --zdim=100 --data_type=$r --type=text
         python train_cf_wae.py --model=0 --ckpt_folder=$f/wae_$r --data_dir=data2/$f/ --iter=50 --data_type=$r --user_no=$user_no --item_no=$item_no --gridsearch=1 --zdim=100
         python train_vae.py --ckpt_folder=$f/80 --data_dir=data2/$f/ --zdim=100 --data_type=$r --type=text
         python train_cvae_extend.py --model=0 --ckpt_folder=$f/80 --data_dir=data2/$f/ --iter=50 --data_type=$r \
