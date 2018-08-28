@@ -131,7 +131,7 @@ if gs == 1:
                     print(u, v, r)
                 i += 1
     f = open(os.path.join(ckpt, "result_sum.txt"), "a")
-    f.write("Best recall CVAE: %f at (%f, %f, %f)\n" % (best_recall, best_hyper[0], best_hyper[1], best_hyper[2]))
+    f.write("Best recall CWAE: %f at (%f, %f, %f)\n" % (best_recall, best_hyper[0], best_hyper[1], best_hyper[2]))
     f.close()
 else:
     model = cf_vae_extend(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,
