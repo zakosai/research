@@ -108,6 +108,7 @@ class cf_vae_extend:
                 # generative process
                 depth_gen = len(self.decoding_dims)
                 y = z
+                print(self.decoding_dims)
                 for i in range(depth_gen):
                     y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
                     # y = slim.fully_connected(y, self.decoding_dims[i], activation_fn=tf.nn.sigmoid,
