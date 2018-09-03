@@ -98,8 +98,8 @@ class neuVAE:
             x_recons = y
 
         with tf.variable_scope("user"):
-            encoding_dims = [400]
-            decoding_dims = [400,self.user_dim]
+            encoding_dims = [200]
+            decoding_dims = [200,self.user_dim]
             x_u = self.x_u_
             # if train:
             #     x_u = tf.layers.dropout(x_u, rate=0.7)
