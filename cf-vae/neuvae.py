@@ -122,7 +122,7 @@ class neuVAE:
         with tf.variable_scope("neuCF"):
             em = tf.concat([self.z_mu, self.z_u_mu], 1)
             em = tf.nn.dropout(em, 0.5)
-            layers = [100, 50]
+            layers = [100, 100]
             # if train:
             #     em = tf.layers.dropout(em, rate=0.7)
 
