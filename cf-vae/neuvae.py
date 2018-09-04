@@ -120,7 +120,7 @@ class neuVAE:
             x_u_recons = y_u
 
         with tf.variable_scope("neuCF"):
-            em = tf.concat([z_mu, z_u_mu], 1)
+            em = tf.concat([self.z, self.z_u], 1)
             em = tf.nn.dropout(em, 0.5)
             layers = [100, 100]
             # if train:
@@ -192,8 +192,8 @@ class neuVAE:
                     u_batch = u_data[data[idx, 0], :]
                     rating = np.array(data[idx,2]).astype(np.int8)
 
-                    _, l = self.sess.run((train_op, self.loss),
-                                         feed_dict={self.x_:x_batch, self.x_u_:u_batch, self.rating_: rating})
+                    # _, l = self.sess.run((train_op, self.loss),
+                    #                      feed_dict={self.x_:x_batch, self.x_u_:u_batch, self.rating_: rating})
 
                     _, lr = self.sess.run((train_op_rating, loss_rating),
                                           feed_dict={self.x_: x_batch, self.x_u_: u_batch, self.rating_: rating})
