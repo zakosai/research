@@ -15,15 +15,15 @@ do
         item_no="$(sed -n '2p' data2/$f/info.txt)"
         ckpt=$f/sum_${r}_${zdim}
         mkdir -p $ckpt
-        python wae.py --ckpt_folder=$ckpt --data_dir=data2/$f/ --zdim=zdim --data_type=$r --type=text
+        python wae.py --ckpt_folder=$ckpt --data_dir=data2/$f/ --zdim=$zdim --data_type=$r --type=text
         python train_cf_wae.py --model=0 --ckpt_folder=$ckpt --data_dir=data2/$f/ --iter=50 --data_type=$r
-        --user_no=$user_no --item_no=$item_no --gridsearch=1 --zdim=zdim
-        python train_vae.py --ckpt_folder=$ckpt --data_dir=data2/$f/ --zdim=zdim --data_type=$r --type=text
+        --user_no=$user_no --item_no=$item_no --gridsearch=1 --zdim=$zdim
+        python train_vae.py --ckpt_folder=$ckpt --data_dir=data2/$f/ --zdim=$zdim --data_type=$r --type=text
         python train_cvae_extend.py --model=0 --ckpt_folder=$ckpt --data_dir=data2/$f/ --iter=50 --data_type=$r \
-        --user_no=$user_no --item_no=$item_no --gridsearch=1 --zdim=zdim
-        python train_dae.py --ckpt_folder=$ckpt --data_dir=data2/$f/ --zdim=zdim --data_type=$r --type=text
+        --user_no=$user_no --item_no=$item_no --gridsearch=1 --zdim=$zdim
+        python train_dae.py --ckpt_folder=$ckpt --data_dir=data2/$f/ --zdim=$zdim --data_type=$r --type=text
         python train_cf_dae.py --model=0 --ckpt_folder=$ckpt --data_dir=data2/$f/ --iter=50 --data_type=$r \
-        --user_no=$user_no --item_no=$item_no --gridsearch=1 --zdim=zdim
+        --user_no=$user_no --item_no=$item_no --gridsearch=1 --zdim=$zdim
 
         #python train_dae.py --ckpt_folder=$f/$r --data_dir=data2/$f/ --zdim=50 --data_type=$r --user_dim=$dim --type=user
         #python train_cdae_user.py --model=0 --ckpt_folder=$f/$r --data_dir=data2/$f/ --iter=50 --zdim=50 --gridsearch=1 --data_type=$r --user_dim=$dim --user_no=$user_no --item_no=$item_no
