@@ -197,7 +197,7 @@ class neuVAE:
 
                     _, lr = self.sess.run((train_op_rating, loss_rating),
                                           feed_dict={self.x_: x_batch, self.x_u_: u_batch, self.rating_: rating})
-                print("epoches: %d\t loss: %f\t time: %d s"%(i,l, time.time()-start))
+                print("epoches: %d\t loss: %f\t time: %d s"%(i,lr, time.time()-start))
                 # if i%10 == 9:
                 #     self.params.learning_rate /= 2
 
