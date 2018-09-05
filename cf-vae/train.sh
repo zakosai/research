@@ -1,9 +1,9 @@
-folders='Health Toy TV CD Tool Beauty Kitchen Office Grocery Baby Clothing Kindle Phone Video Pet Music Instrument
-Automotive Garden Electronics Books'
-#folders='CD Tool Beauty Kitchen Office Grocery Baby Clothing Kindle Phone Video Pet Music Instrument
+#folders='Health Toy TV CD Tool Beauty Kitchen Office Grocery Baby Clothing Kindle Phone Video Pet Music Instrument
 #Automotive Garden Electronics Books'
+folders='CD Tool Beauty Kitchen Office Grocery Baby Clothing Kindle Phone Video Pet Music Instrument
+Automotive Garden Electronics Books'
 rate='1 8'
-zdim=150
+zdim=50
 
 for f in $folders
 do
@@ -16,7 +16,7 @@ do
         ckpt=$f/sum_${r}_${zdim}
         mkdir -p $ckpt
         python wae.py --ckpt_folder=$ckpt --data_dir=data2/$f/ --zdim=$zdim --data_type=$r --type=text
-        python train_cf_wae.py --model=0 --ckpt_folder=$ckpt --data_dir=data2/$f/ --iter=50 --data_type=$r
+        python train_cf_wae.py --model=0 --ckpt_folder=$ckpt --data_dir=data2/$f/ --iter=50 --data_type=$r \
         --user_no=$user_no --item_no=$item_no --gridsearch=1 --zdim=$zdim
         python train_vae.py --ckpt_folder=$ckpt --data_dir=data2/$f/ --zdim=$zdim --data_type=$r --type=text
         python train_cvae_extend.py --model=0 --ckpt_folder=$ckpt --data_dir=data2/$f/ --iter=50 --data_type=$r \
