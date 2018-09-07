@@ -141,6 +141,8 @@ class Translation:
 
         self.loss_val_a = self.loss_reconstruct(x_A, y_BA)
         self.loss_val_b = self.loss_reconstruct(x_B, y_AB)
+        self.y_BA = y_BA
+        self.y_AB = y_AB
 
         self.loss_gen = loss_VAE_A + loss_VAE_B + loss_GAN_A + loss_GAN_B + loss_CC_A + loss_CC_B
         self.loss_dis = loss_GAN_A + loss_GAN_B
@@ -150,15 +152,13 @@ class Translation:
 
 
 def create_dataset(num_A, num_B):
+    dense_A = read_data("data/Health_Clothing/Health_user_product.txt")
+    user_A = one_hot_vector(dense_A, num_A)
 
+    dense_B = read_data("data/Health_Clothing/Clothing_user_product.txt")
+    user_B = one_hot_vector(dense_B, num_B)
 
-    file_A = read_data("data/Health_Clothing/Health_user_product.txt")
-    user_A = one_hot_vector(file_A, num_A)
-
-    file_B = read_data("data/Health_Clothing/Clothing_user_product.txt")
-    user_B = one_hot_vector(file_B, num_B)
-
-    return user_A, user_B
+    return user_A, user_B, dense_A, dense_B
 
 def read_data(filename):
     f = list(open(filename).readlines())
@@ -176,7 +176,7 @@ def one_hot_vector(A, num_product):
     return one_hot_A
 
 def main():
-    iter = 5000
+    iter = 200
     batch_size= 500
     clothing_num = 18226
     health_num = 16069
@@ -187,7 +187,7 @@ def main():
     z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
     checkpoint_dir = "translation/experiment/exp1/"
-    user_A, user_B = create_dataset(health_num, clothing_num)
+    user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num)
 
     assert len(user_A) == len(user_B)
     perm = np.random.permutation(len(user_A))
@@ -229,7 +229,7 @@ def main():
                                                                                 loss_vae, loss_gan, loss_cc))
 
         # Validation Process
-        if i%100 == 0:
+        if i%10 == 0:
             loss_val_a, loss_val_b = sess.run([model.loss_val_a, model.loss_val_b], feed_dict={model.x_A:user_A_test[:
                 200], model.x_B:user_B_test[:200]})
             print("Loss val a: %f, Loss val b: %f"%(loss_val_a, loss_val_b))
@@ -237,9 +237,30 @@ def main():
                 os.mkdir(checkpoint_dir)
             saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
 
-    loss_test_a, loss_test_b = sess.run([model.loss_val_a, model.loss_val_b], feed_dict={model.x_A: user_A_test[200:],
-                                                                                       model.x_B: user_B_test[200:]})
+    loss_test_a, loss_test_b, y_ab, y_ba = sess.run([model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
+                            feed_dict={model.x_A: user_A_test[200:],model.x_B: user_B_test[200:]})
     print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
+
+    pred_ab = np.argsort(y_ab)[:, 10:][::-1]
+    dense_A_test = dense_A[(train_size+200):]
+    dense_B_test = dense_B[(train_size+200):]
+
+    recall = []
+    for i in range(len(pred_ab)):
+        hits = set(dense_B_test[i]) & set(pred_ab[i])
+        recall_val = float(hits)/len(dense_B_test[i])
+        recall.append(recall_val)
+    print("recall B: %f"%(np.mean(np.array(recall))))
+
+    pred_ba = np.argsort(y_ba)[:, 10:][::-1]
+    recall = []
+    for i in range(len(pred_ba)):
+        hits = set(dense_A_test[i]) & set(pred_ab[i])
+        recall_val = float(hits) / len(dense_B_test[i])
+        recall.append(recall_val)
+    print("recall A: %f" % (np.mean(np.array(recall))))
+
+
 
 if __name__ == '__main__':
     main()
