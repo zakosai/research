@@ -176,7 +176,7 @@ def one_hot_vector(A, num_product):
     return one_hot_A
 
 def calc_recall(pred, test):
-    pred_ab = np.argsort(pred)[:, -10:][::-1]
+    pred_ab = np.argsort(pred)[:, -100:][::-1]
     recall = []
     for i in range(len(pred_ab)):
         hits = set(test[i]) & set(pred_ab[i])
@@ -185,7 +185,7 @@ def calc_recall(pred, test):
     return np.mean(np.array(recall))
 
 def main():
-    iter = 200
+    iter = 100
     batch_size= 500
     clothing_num = 18226
     health_num = 16069
