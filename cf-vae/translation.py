@@ -49,7 +49,7 @@ class Translation:
                 x_ = fully_connected(x_, adv_dim[i], softmax, scope="adv_%d" % i)
         return x_
 
-    def share_layer(self, x, scope, dim, reuse=False):
+    def share_layer_enc(self, x, scope, dim, reuse=False):
         x_ = x
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
@@ -71,8 +71,8 @@ class Translation:
         return z, z_mu, z_sigma
 
     def decode(self, x, scope, dim, reuse_dec, reuse_share):
-        y = self.share_layer(x, "decode", self.share_dim, reuse_dec)
-        y = self.dec(y, "decode_%s"%scope, dim, reuse_share)
+        y = self.share_layer(x, "decode", self.share_dim, reuse_share)
+        y = self.dec(y, "decode_%s"%scope, dim, reuse_dec)
         return y
 
     def loss_kl(self, mu, sigma):
