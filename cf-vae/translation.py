@@ -176,7 +176,7 @@ def one_hot_vector(A, num_product):
     return one_hot_A
 
 def calc_recall(pred, test):
-    pred_ab = np.argsort(pred)[:, 10:][::-1]
+    pred_ab = np.argsort(pred)[:, -10:][::-1]
     recall = []
     for i in range(len(pred_ab)):
         hits = set(test[i]) & set(pred_ab[i])
@@ -243,8 +243,9 @@ def main():
         if i%10 == 0:
             loss_val_a, loss_val_b, y_ab = sess.run([model.loss_val_a, model.loss_val_b, model.y_AB],
                                               feed_dict={model.x_A:user_A_test[:200], model.x_B:user_B_test[:200]})
-            print("Loss val a: %f, Loss val b: %f"%(loss_val_a, loss_val_b))
+
             recall = calc_recall(y_ab, user_B_val)
+            print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall))
             if recall > max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
@@ -255,25 +256,12 @@ def main():
                             feed_dict={model.x_A: user_A_test[200:],model.x_B: user_B_test[200:]})
     print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
 
-    pred_ab = np.argsort(y_ab)[:, 10:][::-1]
     dense_A_test = dense_A[(train_size+200):]
     dense_B_test = dense_B[(train_size+200):]
 
-    recall = []
-    for i in range(len(pred_ab)):
-        hits = set(dense_B_test[i]) & set(pred_ab[i])
-        recall_val = float(hits)/len(dense_B_test[i])
-        recall.append(recall_val)
-    print("recall B: %f"%(np.mean(np.array(recall))))
 
-    pred_ba = np.argsort(y_ba)[:, 10:][::-1]
-    recall = []
-    for i in range(len(pred_ba)):
-        hits = set(dense_A_test[i]) & set(pred_ab[i])
-        recall_val = float(hits) / len(dense_B_test[i])
-        recall.append(recall_val)
-    print("recall A: %f" % (np.mean(np.array(recall))))
-
+    print("recall B: %f"%(calc_recall(y_ab, dense_B_test)))
+    print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
 
 
 if __name__ == '__main__':
