@@ -33,34 +33,34 @@ class Translation:
         x_ = x
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = fully_connected(x_, encode_dim[i], sigmoid, scope="enc_%d"%i)
+                x_ = fully_connected(x_, encode_dim[i], tf.nn.relu, scope="enc_%d"%i)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                x_ = fully_connected(x_, decode_dim[i], sigmoid, scope="dec_%d" % i)
+                x_ = fully_connected(x_, decode_dim[i], tf.nn.relu, scope="dec_%d" % i)
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
         x_ = x
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(adv_dim)):
-                x_ = fully_connected(x_, adv_dim[i], sigmoid, scope="adv_%d" % i)
+                x_ = fully_connected(x_, adv_dim[i], tf.nn.relu, scope="adv_%d" % i)
         return x_
 
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
-                x_ = fully_connected(x_, dim[i], sigmoid, scope="share_%d"%i)
+                x_ = fully_connected(x_, dim[i], tf.nn.relu, scope="share_%d"%i)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
-            z_mu = fully_connected(h, self.z_dim, sigmoid, scope="z_mu")
-            z_sigma = fully_connected(h, self.z_dim, sigmoid, scope="z_sigma")
+            z_mu = fully_connected(h, self.z_dim, tf.nn.relu, scope="z_mu")
+            z_sigma = fully_connected(h, self.z_dim, tf.nn.relu, scope="z_sigma")
             e = tf.random_normal(tf.shape(z_mu))
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
         return z, z_mu, z_sigma
