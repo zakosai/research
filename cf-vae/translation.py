@@ -33,34 +33,34 @@ class Translation:
         x_ = x
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = fully_connected(x_, encode_dim[i], tf.nn.relu, scope="enc_%d"%i)
+                x_ = fully_connected(x_, encode_dim[i], tf.nn.sigmoid, scope="enc_%d"%i)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                x_ = fully_connected(x_, decode_dim[i], tf.nn.relu, scope="dec_%d" % i)
+                x_ = fully_connected(x_, decode_dim[i], tf.nn.sigmoid, scope="dec_%d" % i)
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
         x_ = x
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(adv_dim)):
-                x_ = fully_connected(x_, adv_dim[i], tf.nn.relu, scope="adv_%d" % i)
+                x_ = fully_connected(x_, adv_dim[i], tf.nn.sigmoid, scope="adv_%d" % i)
         return x_
 
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
-                x_ = fully_connected(x_, dim[i], tf.nn.relu, scope="share_%d"%i)
+                x_ = fully_connected(x_, dim[i], tf.nn.sigmoid, scope="share_%d"%i)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
-            z_mu = fully_connected(h, self.z_dim, tf.nn.relu, scope="z_mu")
-            z_sigma = fully_connected(h, self.z_dim, tf.nn.relu, scope="z_sigma")
+            z_mu = fully_connected(h, self.z_dim, tf.nn.sigmoid, scope="z_mu")
+            z_sigma = fully_connected(h, self.z_dim, tf.nn.sigmoid, scope="z_sigma")
             e = tf.random_normal(tf.shape(z_mu))
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
         return z, z_mu, z_sigma
@@ -172,8 +172,6 @@ def one_hot_vector(A, num_product):
     for i, row in enumerate(A):
         for j in row:
             one_hot_A[i,j] = 1
-        else:
-            one_hot_A[i,j] = 1e-10
     return one_hot_A
 
 def main():
@@ -214,7 +212,7 @@ def main():
     for i in range(iter):
         shuffle_idx = np.random.permutation(train_size)
         train_cost = 0
-        for j in range(int(train_size/batch_size) + 1):
+        for j in range(int(train_size/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             x_A = user_A_train[list_idx]
             x_B = user_B_train[list_idx]
@@ -226,7 +224,7 @@ def main():
                                                      model.loss_GAN, model.loss_CC], feed_dict=feed)
             _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
 
-            print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss gan %f, loss cc %f"%(loss_gen, loss_dis,
+        print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss gan %f, loss cc %f"%(loss_gen, loss_dis,
                                                                                 loss_vae, loss_gan, loss_cc))
 
         # Validation Process
