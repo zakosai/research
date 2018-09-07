@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.contrib.layers import softmax, fully_connected
+from tensorflow.contrib.layers import sigmoid, fully_connected
 import tensorflow.keras.backend as K
 import numpy as np
 import os
@@ -32,34 +32,34 @@ class Translation:
         x_ = x
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = fully_connected(x_, encode_dim[i], softmax, scope="enc_%d"%i)
+                x_ = fully_connected(x_, encode_dim[i], sigmoid, scope="enc_%d"%i)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                x_ = fully_connected(x_, decode_dim[i], softmax, scope="dec_%d" % i)
+                x_ = fully_connected(x_, decode_dim[i], sigmoid, scope="dec_%d" % i)
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
         x_ = x
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(adv_dim)):
-                x_ = fully_connected(x_, adv_dim[i], softmax, scope="adv_%d" % i)
+                x_ = fully_connected(x_, adv_dim[i], sigmoid, scope="adv_%d" % i)
         return x_
 
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
-                x_ = fully_connected(x_, dim[i], softmax, scope="share_%d"%i)
+                x_ = fully_connected(x_, dim[i], sigmoid, scope="share_%d"%i)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
-            z_mu = fully_connected(h, self.z_dim, softmax, scope="z_mu")
-            z_sigma = fully_connected(h, self.z_dim, softmax, scope="z_sigma")
+            z_mu = fully_connected(h, self.z_dim, sigmoid, scope="z_mu")
+            z_sigma = fully_connected(h, self.z_dim, sigmoid, scope="z_sigma")
             e = tf.random_normal(tf.shape(z_mu))
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
         return z, z_mu, z_sigma
@@ -122,16 +122,20 @@ class Translation:
         # Loss VAE
         loss_VAE_A = self.lambda_1 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_2 * self.loss_reconstruct(x_A, y_AA)
         loss_VAE_B = self.lambda_1 * self.loss_kl(z_mu_B, z_sigma_B) + self.lambda_2 * self.loss_reconstruct(x_B, y_BB)
+        self.loss_VAE = loss_VAE_A + loss_VAE_B
 
         # Loss GAN
         loss_GAN_A = self.lambda_0 * self.loss_GAN(adv_AA, adv_BA)
         loss_GAN_B = self.lambda_0 * self.loss_GAN(adv_BB, adv_AB)
+        self.loss_GAN = loss_GAN_A + loss_GAN_B
 
         # Loss cycle - consistency (CC)
         loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA)\
                     + self.lambda_4 * self.loss_reconstruct(x_A, y_ABA)
         loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_B, z_sigma_B) + self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB)\
                     + self.loss_reconstruct(x_B, y_BAB)
+
+        self.loss_CC = loss_CC_A + loss_CC_B
 
         self.loss_val_a = self.loss_reconstruct(x_A, y_BA)
         self.loss_val_b = self.loss_reconstruct(x_B, y_AB)
@@ -215,10 +219,12 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            _, loss_gen = sess.run([model.train_op_gen, model.loss_gen], feed_dict=feed)
+            _, loss_gen, loss_vae, loss_gan, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
+                                                     model.loss_GAN, model.loss_CC], feed_dict=feed)
             _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
 
-        print("Loss last batch: loss gen %f, loss dis %f"%(loss_gen, loss_dis))
+        print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss gan %f, loss cc %f"%(loss_gen, loss_dis,
+                                                                                loss_vae, loss_gan, loss_cc))
 
         # Validation Process
         if i%100 == 0:
