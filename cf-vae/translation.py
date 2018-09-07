@@ -9,7 +9,7 @@ import os
 class Translation:
     def __init__(self, batch_size, dim_A, dim_B, encode_dim_A, decode_dim_A, encode_dim_B, decode_dim_B, adv_dim_A,
                  adv_dim_B, z_dim, share_dim, eps=1e-10, lambda_0=10, lambda_1=0.1, lambda_2=100, lambda_3=0.1,
-                 lambda_4=100, learning_rate=1e-4):
+                 lambda_4=100, learning_rate=1e-10):
         self.batch_size = batch_size
         self.dim_A = dim_A
         self.dim_B = dim_B
@@ -220,7 +220,7 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            loss_gen, loss_vae, _, loss_gan, loss_cc, = sess.run([model.loss_gen, model.loss_VAE, model.train_op_gen,
+            _, loss_gen, loss_vae, loss_gan, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
                                                      model.loss_GAN, model.loss_CC], feed_dict=feed)
             _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
 
