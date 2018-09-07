@@ -202,7 +202,7 @@ def calc_recall(pred, test):
         recall.append(recall_val)
     return np.mean(np.array(recall))
 
-def rmse(pred, test):
+def calc_rmse(pred, test):
     idx = np.where(test != 0)
     pred = pred[idx]
     test = test[idx]
@@ -277,7 +277,7 @@ def main():
             #     saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
             pred = np.array(y_ab).flatten()
             test = np.array(user_B_val).flatten()
-            rmse = rmse(pred, test)
+            rmse = calc_rmse(pred, test)
             print("Loss val a: %f, Loss val b: %f, rmse %f" % (loss_val_a, loss_val_b, rmse))
             if rmse < max_recall:
                 max_recall = rmse
@@ -298,11 +298,11 @@ def main():
 
     pred_a = np.array(y_ba).flatten()
     test_a = np.array(user_A_test).flatten()
-    print("rmse A %f"%rmse(pred_a, test_a))
+    print("rmse A %f"%calc_rmse(pred_a, test_a))
 
     pred_a = np.array(y_ab).flatten()
     test_a = np.array(user_B_test).flatten()
-    print("rmse B %f" % rmse(pred_a, test_a))
+    print("rmse B %f" % calc_rmse(pred_a, test_a))
 
 
 if __name__ == '__main__':
