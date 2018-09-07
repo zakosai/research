@@ -201,7 +201,7 @@ def main():
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
-    saver = tf.train.Saver(tf.global_variables(), max_to_keep=100)
+    saver = tf.train.Saver(max_to_keep=3)
 
     for i in range(iter):
         shuffle_idx = np.random.permutation(train_size)
