@@ -153,11 +153,11 @@ class Translation:
 
 
 def create_dataset(num_A, num_B):
-    dense_A = read_data("data/Health_Clothing/Health_user_product.txt")
-    user_A = one_hot_vector(dense_A, num_A)
+    dense_A = read_data2("data/Health_Clothing/Health_review_info.txt")
+    user_A = one_hot_vector2(dense_A, num_A)
 
-    dense_B = read_data("data/Health_Clothing/Clothing_user_product.txt")
-    user_B = one_hot_vector(dense_B, num_B)
+    dense_B = read_data2("data/Health_Clothing/Clothing_review_info.txt")
+    user_B = one_hot_vector2(dense_B, num_B)
 
     return user_A, user_B, dense_A, dense_B
 
@@ -168,6 +168,15 @@ def read_data(filename):
     f = [i[1:] for i in f]
     return f
 
+def read_data2(filename):
+    data = list(open(filename).readline())
+    data = data[1:]
+    data = [d.strip() for d in data]
+    data = [d.split(", ") for d in data]
+    data = [d[:3] for d in data]
+    data = np.array(data).reshape(len(data), 3).astype(np.int32)
+    return data
+
 def one_hot_vector(A, num_product):
     one_hot_A = np.zeros((len(A), num_product))
 
@@ -175,6 +184,12 @@ def one_hot_vector(A, num_product):
         for j in row:
             one_hot_A[i,j] = 1
     return one_hot_A
+
+def one_hot_vector2(A, num_product):
+    one_hot = np.zeros((6557, num_product))
+    for i in A:
+        one_hot[i[0], i[1]] = i[2]
+    return one_hot
 
 def calc_recall(pred, test):
     pred_ab = np.argsort(pred)[:, -10:][::-1]
@@ -184,6 +199,12 @@ def calc_recall(pred, test):
         recall_val = float(len(hits)) / min(len(test[i]), 10)
         recall.append(recall_val)
     return np.mean(np.array(recall))
+
+def rmse(pred, test):
+    idx = np.where(test != 0)
+    pred = pred[idx]
+    test = test[idx]
+    return np.sqrt(np.mean((test-pred)**2))
 
 def main():
     iter = 100
@@ -209,8 +230,10 @@ def main():
     user_A_train = user_A[:train_size]
     user_B_train = user_B[:train_size]
 
-    user_A_test = user_A[train_size:]
-    user_B_test = user_B[train_size:]
+    user_A_val = user_A[train_size:train_size+200]
+    user_B_val = user_B[train_size:train_size+200]
+    user_A_test = user_A[train_size+200:]
+    user_B_test = user_B[train_size+200:]
 
     model = Translation(batch_size, health_num, clothing_num, encoding_dim_A, decoding_dim_A, encoding_dim_B,
                         decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim)
@@ -243,12 +266,19 @@ def main():
         # Validation Process
         if i%10 == 0:
             loss_val_a, loss_val_b, y_ab = sess.run([model.loss_val_a, model.loss_val_b, model.y_AB],
-                                              feed_dict={model.x_A:user_A_test[:200], model.x_B:user_B_test[:200]})
+                                              feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
 
-            recall = calc_recall(y_ab, dense_B_val)
-            print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall))
-            if recall > max_recall:
-                max_recall = recall
+            # recall = calc_recall(y_ab, dense_B_val)
+            # print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall))
+            # if recall > max_recall:
+            #     max_recall = recall
+            #     saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
+            pred = np.array(y_ab).flatten()
+            test = np.array(user_B_val).flatten()
+            rmse = rmse(pred, test)
+            print("Loss val a: %f, Loss val b: %f, rmse %f" % (loss_val_a, loss_val_b, rmse))
+            if rmse < max_recall:
+                max_recall = rmse
                 saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
 
     print(max_recall)
@@ -257,12 +287,20 @@ def main():
                             feed_dict={model.x_A: user_A_test[200:],model.x_B: user_B_test[200:]})
     print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
 
-    dense_A_test = dense_A[(train_size+200):]
-    dense_B_test = dense_B[(train_size+200):]
+    # dense_A_test = dense_A[(train_size+200):]
+    # dense_B_test = dense_B[(train_size+200):]
+    #
+    #
+    # print("recall B: %f"%(calc_recall(y_ab, dense_B_test)))
+    # print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
 
+    pred_a = np.array(y_ba).flatten()
+    test_a = np.array(user_A_test).flatten()
+    print("rmse A %f"%rmse(pred_a, test_a))
 
-    print("recall B: %f"%(calc_recall(y_ab, dense_B_test)))
-    print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
+    pred_a = np.array(y_ab).flatten()
+    test_a = np.array(user_B_test).flatten()
+    print("rmse B %f" % rmse(pred_a, test_a))
 
 
 if __name__ == '__main__':
