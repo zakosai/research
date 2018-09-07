@@ -64,7 +64,7 @@ class Translation:
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
         return z, z_mu, z_sigma
 
-    def encode(self, x, scope, dim, reuse_enc, reuse_share):
+    def encode(self, x, scope, dim, reuse_enc, reuse_share, reuse_z=False):
         h = self.enc(x, "encode_%s"%scope, dim, reuse_enc)
         h = self.share_layer(h, "encode", self.share_dim, reuse_share)
         z, z_mu, z_sigma = self.gen_z(h, "VAE_%s"%scope)
@@ -113,9 +113,9 @@ class Translation:
         adv_AB = self.adversal(y_AB, "adv_B", self.adv_dim_B, reuse=True)
 
         # Cycle - Consistency
-        z_ABA, z_mu_ABA, z_sigma_ABA = self.encode(y_AB, "B", self.encode_dim_B, True, True)
+        z_ABA, z_mu_ABA, z_sigma_ABA = self.encode(y_AB, "B", self.encode_dim_B, True, True, True)
         y_ABA = self.decode(z_ABA, "A", self.decode_dim_A, True, True)
-        z_BAB, z_mu_BAB, z_sigma_BAB = self.encode(y_BA, "A", self.encode_dim_A, True, True)
+        z_BAB, z_mu_BAB, z_sigma_BAB = self.encode(y_BA, "A", self.encode_dim_A, True, True, True)
         y_BAB = self.decode(z_BAB, "B", self.decode_dim_B, True, True)
 
 
