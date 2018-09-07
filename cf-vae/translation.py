@@ -175,8 +175,17 @@ def one_hot_vector(A, num_product):
             one_hot_A[i,j] = 1
     return one_hot_A
 
+def calc_recall(pred, test):
+    pred_ab = np.argsort(pred)[:, 10:][::-1]
+    recall = []
+    for i in range(len(pred_ab)):
+        hits = set(test[i]) & set(pred_ab[i])
+        recall_val = float(len(hits)) / len(test[i])
+        recall.append(recall_val)
+    return np.mean(np.array(recall))
+
 def main():
-    iter = 200
+    iter = 100
     batch_size= 500
     clothing_num = 18226
     health_num = 16069
@@ -208,7 +217,9 @@ def main():
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
-    saver = tf.train.Saver(max_to_keep=3)
+    saver = tf.train.Saver(max_to_keep=20)
+    max_recall = 0
+    user_B_val = user_B[train_size:train_size+200]
 
     for i in range(iter):
         shuffle_idx = np.random.permutation(train_size)
@@ -230,12 +241,15 @@ def main():
 
         # Validation Process
         if i%10 == 0:
-            loss_val_a, loss_val_b = sess.run([model.loss_val_a, model.loss_val_b], feed_dict={model.x_A:user_A_test[:
-                200], model.x_B:user_B_test[:200]})
+            loss_val_a, loss_val_b, y_ab = sess.run([model.loss_val_a, model.loss_val_b, model.y_AB],
+                                              feed_dict={model.x_A:user_A_test[:200], model.x_B:user_B_test[:200]})
             print("Loss val a: %f, Loss val b: %f"%(loss_val_a, loss_val_b))
-            if not os.path.isdir(checkpoint_dir):
-                os.mkdir(checkpoint_dir)
-            saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
+            recall = calc_recall(y_ab, user_B_val)
+            if recall > max_recall:
+                max_recall = recall
+                saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
+
+    print(max_recall)
 
     loss_test_a, loss_test_b, y_ab, y_ba = sess.run([model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
                             feed_dict={model.x_A: user_A_test[200:],model.x_B: user_B_test[200:]})
