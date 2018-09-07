@@ -72,7 +72,7 @@ class Translation:
 
     def decode(self, x, scope, dim, reuse_dec, reuse_share):
         y = self.share_layer(x, "decode", self.share_dim, reuse_dec)
-        y = self.decode(y, "decode_%s"%scope, dim, reuse_share)
+        y = self.dec(y, "decode_%s"%scope, dim, reuse_share)
         return y
 
     def loss_kl(self, mu, sigma):
