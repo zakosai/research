@@ -1,5 +1,6 @@
 import tensorflow as tf
-from tensorflow.contrib.layers import sigmoid, fully_connected
+from tensorflow.contrib.layers import fully_connected
+from tensorflow import sigmoid
 import tensorflow.keras.backend as K
 import numpy as np
 import os
