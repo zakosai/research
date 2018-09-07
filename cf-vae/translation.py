@@ -169,7 +169,7 @@ def read_data(filename):
     return f
 
 def read_data2(filename):
-    data = list(open(filename).readline())
+    data = list(open(filename).readlines())
     data = data[1:]
     n_data = len(data)
     print(len(data))
