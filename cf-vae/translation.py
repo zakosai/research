@@ -9,7 +9,7 @@ import os
 class Translation:
     def __init__(self, batch_size, dim_A, dim_B, encode_dim_A, decode_dim_A, encode_dim_B, decode_dim_B, adv_dim_A,
                  adv_dim_B, z_dim, share_dim, eps=1e-10, lambda_0=10, lambda_1=0.1, lambda_2=100, lambda_3=0.1,
-                 lambda_4=100, learning_rate=1e-10):
+                 lambda_4=100, learning_rate=1e-4):
         self.batch_size = batch_size
         self.dim_A = dim_A
         self.dim_B = dim_B
@@ -123,11 +123,13 @@ class Translation:
         # Loss VAE
         loss_VAE_A = self.lambda_1 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_2 * self.loss_reconstruct(x_A, y_AA)
         loss_VAE_B = self.lambda_1 * self.loss_kl(z_mu_B, z_sigma_B) + self.lambda_2 * self.loss_reconstruct(x_B, y_BB)
+        tf.verify_tensor_all_finite(self.loss_kl(z_mu_A, z_sigma_A), "kl")
         self.loss_VAE = loss_VAE_A + loss_VAE_B
 
         # Loss GAN
         loss_GAN_A = self.lambda_0 * self.loss_GAN(adv_AA, adv_BA)
         loss_GAN_B = self.lambda_0 * self.loss_GAN(adv_BB, adv_AB)
+        tf.verify_tensor_all_finite(adv_BA, "adv_BA")
         self.loss_GAN = loss_GAN_A + loss_GAN_B
 
         # Loss cycle - consistency (CC)
