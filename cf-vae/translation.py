@@ -49,7 +49,7 @@ class Translation:
                 x_ = fully_connected(x_, adv_dim[i], softmax, scope="adv_%d" % i)
         return x_
 
-    def share_layer_enc(self, x, scope, dim, reuse=False):
+    def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
