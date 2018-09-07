@@ -171,10 +171,12 @@ def read_data(filename):
 def read_data2(filename):
     data = list(open(filename).readline())
     data = data[1:]
+    n_data = len(data)
+    print(len(data))
     data = [d.strip() for d in data]
     data = [d.split(", ") for d in data]
     data = [d[:3] for d in data]
-    data = np.array(data).reshape(len(data), 3).astype(np.int32)
+    data = np.array(data).reshape(n_data, 3).astype(np.int32)
     return data
 
 def one_hot_vector(A, num_product):
