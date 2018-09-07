@@ -185,7 +185,7 @@ def calc_recall(pred, test):
     return np.mean(np.array(recall))
 
 def main():
-    iter = 1
+    iter = 100
     batch_size= 500
     clothing_num = 18226
     health_num = 16069
