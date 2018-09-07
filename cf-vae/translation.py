@@ -28,39 +28,40 @@ class Translation:
         self.lambda_3 = lambda_3
         self.lambda_4 = lambda_4
         self.learning_rate = learning_rate
+        self.active_function = tf.nn.tanh
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = fully_connected(x_, encode_dim[i], tf.nn.relu, scope="enc_%d"%i)
+                x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                x_ = fully_connected(x_, decode_dim[i], tf.nn.relu, scope="dec_%d" % i)
+                x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i)
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
         x_ = x
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(adv_dim)):
-                x_ = fully_connected(x_, adv_dim[i], tf.nn.relu, scope="adv_%d" % i)
+                x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
         return x_
 
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
-                x_ = fully_connected(x_, dim[i], tf.nn.relu, scope="share_%d"%i)
+                x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
-            z_mu = fully_connected(h, self.z_dim, tf.nn.relu, scope="z_mu")
-            z_sigma = fully_connected(h, self.z_dim, tf.nn.relu, scope="z_sigma")
+            z_mu = fully_connected(h, self.z_dim, self.active_function, scope="z_mu")
+            z_sigma = fully_connected(h, self.z_dim, self.active_function, scope="z_sigma")
             e = tf.random_normal(tf.shape(z_mu))
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
         return z, z_mu, z_sigma
