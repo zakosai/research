@@ -183,7 +183,7 @@ def main():
     checkpoint_dir = "translation/experiment/exp1/"
     user_A, user_B = create_dataset(health_num, clothing_num)
 
-    assert user_A == user_B
+    assert len(user_A) == len(user_B)
     perm = np.random.permutation(len(user_A))
     train_size = 6000
 
