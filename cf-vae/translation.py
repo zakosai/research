@@ -198,6 +198,7 @@ def main():
 
     model = Translation(batch_size, health_num, clothing_num, encoding_dim_A, decoding_dim_A, encoding_dim_B,
                         decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim)
+    model.build_model()
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
