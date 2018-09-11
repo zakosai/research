@@ -528,4 +528,4 @@ class cf_vae_extend:
             return recall_avg
 
     def predict_all(self):
-        return np.dot(self.U, (self.V.T))
+        return np.dot(self.U[:6000], (self.V.T))

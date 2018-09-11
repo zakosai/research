@@ -54,9 +54,9 @@ def load_cvae_data(data_dir):
   data["train_users"] = load_rating(data_dir + "cf-train-%sp-users.dat"%args.data_type)
   data["train_items"] = load_rating(data_dir + "cf-train-%sp-items.dat"%args.data_type)
   data["test_users"] = load_rating(data_dir + "cf-test-%sp-users.dat"%args.data_type)
-  data["test_items"] = load_rating(data_dir + "cf-test-%sp-items.dat"%args.data_type)
 
   return data
+
 
 def load_rating(path):
   arr = []
@@ -65,7 +65,7 @@ def load_rating(path):
     if a[0]==0:
       l = []
     else:
-      l = [int(x) for x in a[1:]]
+      l = [int(x) for x in a]
     arr.append(l)
   return arr
 
@@ -112,8 +112,7 @@ if gs == 1:
                 params.lambda_r = r
                 if i > -1:
                     model = cf_vae_extend(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,
-                                          input_dim=8000, encoding_dims=[400, 200], z_dim = zdim, decoding_dims=[
-                            200, 400,8000],
+                                          input_dim=8000, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200, 400,8000],
                                           decoding_dims_str=[200, 4526], loss_type='cross_entropy',
                                           model = model_type, ckpt_folder=ckpt)
                     model.fit(data["train_users"], data["train_items"], data["content"], params, data["test_users"])
