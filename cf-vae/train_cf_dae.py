@@ -62,7 +62,7 @@ def load_rating(path):
   arr = []
   for line in open(path):
     a = line.strip().split()
-    if a[0]==0:
+    if a == []:
       l = []
     else:
       l = [int(x) for x in a]
