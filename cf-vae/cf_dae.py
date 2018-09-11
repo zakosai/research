@@ -490,7 +490,7 @@ class cf_vae_extend:
         return recall_avgs
 
     def predict_val(self, pred_all, train_users, test_users, file=None):
-        user_all = test_users
+        user_all = test_users[:6000]
         ground_tr_num = [len(user) for user in user_all]
 
 
