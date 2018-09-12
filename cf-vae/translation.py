@@ -230,6 +230,8 @@ def main():
     checkpoint_dir = "translation/Grocery_Health/"
     user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num)
     z = np.load(os.path.join(checkpoint_dir, "text.npz"))
+    z = z.toarray()
+    print(z.shape)
     z_A = z[:health_num]
     z_B = z[health_num:]
     assert len(user_A) == len(user_B)
