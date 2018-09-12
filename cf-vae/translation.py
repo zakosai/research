@@ -219,19 +219,19 @@ def calc_rmse(pred, test):
 def main():
     iter = 100
     batch_size= 500
-    clothing_num = 18226
-    health_num = 16069
+    clothing_num = 8364
+    health_num = 15083
     encoding_dim_A = encoding_dim_B = [1000, 500]
     share_dim = [100]
     decoding_dim_A = [500, 1000, health_num]
     decoding_dim_B = [500, 1000, clothing_num]
     z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
-    checkpoint_dir = "translation/experiment/exp1/"
+    checkpoint_dir = "translation/Grocery_Health/"
     user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num)
-    z_A = np.load(os.path.join(checkpoint_dir, "A.npz"))
-    z_B = np.load(os.path.join(checkpoint_dir, "B.npz"))
-
+    z = np.load(os.path.join(checkpoint_dir, "text.npz"))
+    z_A = z[:health_num]
+    z_B = z[health_num:]
     assert len(user_A) == len(user_B)
     perm = np.random.permutation(len(user_A))
     train_size = 6000
