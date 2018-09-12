@@ -161,10 +161,10 @@ class Translation:
 
 
 def create_dataset(num_A, num_B):
-    dense_A = read_data("data/Health_Clothing/Health_user_product.txt")
+    dense_A = read_data("data/Grocery_Health/Health_user_product.txt")
     user_A = one_hot_vector(dense_A, num_A)
 
-    dense_B = read_data("data/Health_Clothing/Clothing_user_product.txt")
+    dense_B = read_data("data/Grocery_Health/Grocery_user_product.txt")
     user_B = one_hot_vector(dense_B, num_B)
 
     return user_A, user_B, dense_A, dense_B
