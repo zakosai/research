@@ -30,9 +30,9 @@ def load_cvae_data(data_dir):
   # data["content"] = variables['X']
   variables = load_npz(os.path.join(data_dir, "mult_nor.npz"))
   data["content"] = variables.toarray()
-  data["train_users"] = load_rating(os.path.join(data_dir,"cf-train-%s-users.dat"%args.type))
-  data["train_items"] = load_rating(os.path.join(data_dir,"cf-train-%s-items.dat"%args.type))
-  data["test_users"] = load_rating(os.path.join(data_dir,"cf-test-%s-users.dat"%args.type))
+  data["train_users"] = load_rating(os.path.join(data_dir,"cf-train-%sp-users.dat"%args.type))
+  data["train_items"] = load_rating(os.path.join(data_dir,"cf-train-%sp-items.dat"%args.type))
+  data["test_users"] = load_rating(os.path.join(data_dir,"cf-test-%sp-users.dat"%args.type))
 
   return data
 
@@ -65,6 +65,6 @@ model = cf_vae_extend(num_users=5584, num_items=13790, num_factors=num_factors, 
 
 
 model.load_model(extend_file)
-model.predict_test(data['test_users'][6000:])
+model.predict_test(data['test_users'][6000:])d
 
 
