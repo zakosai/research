@@ -527,5 +527,31 @@ class cf_vae_extend:
                 file.write("m = %d, recall = %f"%(m, recall_avg))
             return recall_avg
 
+    def predict_test(self, test_users):
+        recall_health = []
+        recall_clothing = []
+        for i, list_product in enumerate(test_users):
+            if list_product[0] < 16069:
+                real = [j >=16069 for j in list_product]
+                pred = self.pred(i+6000, "clothing")
+                top_M = np.argsort(-pred)[:10]
+                hits = set(top_M) & set(real)
+                recall = float(len(hits))/float(len(real))
+                recall_clothing.append(recall)
+            else:
+                real = [j < 16069 for j in list_product]
+                pred = self.pred(i + 6000, "health")
+                top_M = np.argsort(-pred)[:10]
+                hits = set(top_M) & set(real)
+                recall = float(len(hits)) / float(len(real))
+                recall_health.append(recall)
+        print("average recall health: %f, average recall clothing %f"%(np.mean(recall_health), np.mean(recall_clothing)))
+
     def predict_all(self):
         return np.dot(self.U[:6000], (self.V.T))
+
+    def pred(self, u_id, p_type):
+        if p_type == "health":
+            return np.dot(self.U[u_id], self.V[:16069].T)
+        else:
+            return np.dot(self.U[u_id], self.V[16069:].T)
