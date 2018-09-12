@@ -531,11 +531,10 @@ class cf_vae_extend:
         recall_health = []
         recall_clothing = []
         for i, list_product in enumerate(test_users):
-            if list_product[0] >= 16069:
+            if list_product[0] < 16069:
                 real = [j for j in list_product if j >= 16069]
                 pred = self.pred(i+6000, "clothing")
                 top_M = np.argsort(-pred)[:10]
-                print(top_M, real)
                 hits = set(top_M) & set(real)
                 recall = float(len(hits))/float(len(real))
                 recall_clothing.append(recall)
