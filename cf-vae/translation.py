@@ -35,7 +35,7 @@ class Translation:
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
-        if scope == "A":
+        if "A" in scope:
             x_ = tf.multiply(tf.expand_dims(self.z_A, 0), tf.expand_dims(x_, 2))
         else:
             x_ = tf.multiply(tf.expand_dims(self.z_B, 0), tf.expand_dims(x_, 2))
