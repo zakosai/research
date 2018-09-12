@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow.contrib.layers import fully_connected, flatten
 from tensorflow import sigmoid
 import tensorflow.keras.backend as K
+from tensorflow.contrib.framework import argsort
 import numpy as np
 import os
 
@@ -35,10 +36,13 @@ class Translation:
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
+        ids = argsort(x_, 1)[::-1][:, :200]
         if "A" in scope:
-            x_ = tf.multiply(tf.expand_dims(self.z_A, 0), tf.expand_dims(x_, 2))
+            #x_ = tf.multiply(tf.expand_dims(self.z_A, 0), tf.expand_dims(x_, 2))
+            x_ = tf.nn.embedding_lookup(self.z_A, ids)
         else:
-            x_ = tf.multiply(tf.expand_dims(self.z_B, 0), tf.expand_dims(x_, 2))
+            #x_ = tf.multiply(tf.expand_dims(self.z_B, 0), tf.expand_dims(x_, 2))
+            x_ = tf.nn.embedding_lookup(self.z_B, ids)
         x_ = flatten(x_)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
@@ -218,7 +222,7 @@ def calc_rmse(pred, test):
 
 def main():
     iter = 100
-    batch_size= 10
+    batch_size= 500
     clothing_num = 8364
     health_num = 15084
     encoding_dim_A = encoding_dim_B = [1000, 500]
