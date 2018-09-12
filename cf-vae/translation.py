@@ -44,6 +44,7 @@ class Translation:
             #x_ = tf.multiply(tf.expand_dims(self.z_B, 0), tf.expand_dims(x_, 2))
             x_ = tf.nn.embedding_lookup(self.z_B, ids)
         x_ = flatten(x_)
+        x_ = tf.reshape(x_, (-1, 10000))
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i)
