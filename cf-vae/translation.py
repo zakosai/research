@@ -207,7 +207,7 @@ def one_hot_vector2(A, num_product):
     return one_hot
 
 def calc_recall(pred, test):
-    pred_ab = np.argsort(pred)[:, -10:][::-1]
+    pred_ab = np.argsort(pred)[::-1][:, 10:]
     recall = []
     for i in range(len(pred_ab)):
         hits = set(test[i]) & set(pred_ab[i])
@@ -222,7 +222,7 @@ def calc_rmse(pred, test):
     return np.sqrt(np.mean((test-pred)**2))
 
 def main():
-    iter = 500
+    iter = 1000
     batch_size= 500
     clothing_num = 8364
     health_num = 15084
