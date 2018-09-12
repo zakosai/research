@@ -535,6 +535,7 @@ class cf_vae_extend:
                 real = [j >=16069 for j in list_product]
                 pred = self.pred(i+6000, "clothing")
                 top_M = np.argsort(-pred)[:10]
+                print(top_M)
                 hits = set(top_M) & set(real)
                 recall = float(len(hits))/float(len(real))
                 recall_clothing.append(recall)
