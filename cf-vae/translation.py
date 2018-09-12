@@ -220,7 +220,7 @@ def main():
     iter = 100
     batch_size= 500
     clothing_num = 8364
-    health_num = 15083
+    health_num = 15084
     encoding_dim_A = encoding_dim_B = [1000, 500]
     share_dim = [100]
     decoding_dim_A = [500, 1000, health_num]
