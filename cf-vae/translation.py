@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.contrib.layers import fully_connected
+from tensorflow.contrib.layers import fully_connected, flatten
 from tensorflow import sigmoid
 import tensorflow.keras.backend as K
 import numpy as np
@@ -8,7 +8,8 @@ import os
 
 class Translation:
     def __init__(self, batch_size, dim_A, dim_B, encode_dim_A, decode_dim_A, encode_dim_B, decode_dim_B, adv_dim_A,
-                 adv_dim_B, z_dim, share_dim, eps=1e-10, lambda_0=10, lambda_1=0.1, lambda_2=100, lambda_3=0.1,
+                 adv_dim_B, z_dim, share_dim, z_A, z_B, eps=1e-10, lambda_0=10, lambda_1=0.1, lambda_2=100,
+                 lambda_3=0.1,
                  lambda_4=100, learning_rate=1e-4):
         self.batch_size = batch_size
         self.dim_A = dim_A
@@ -29,9 +30,16 @@ class Translation:
         self.lambda_4 = lambda_4
         self.learning_rate = learning_rate
         self.active_function = tf.nn.sigmoid
+        self.z_A = z_A
+        self.z_B = z_B
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
+        if scope == "A":
+            x_ = tf.multiply(tf.expand_dims(self.z_A, 0), tf.expand_dims(x_, 2))
+        else:
+            x_ = tf.multiply(tf.expand_dims(self.z_B, 0), tf.expand_dims(x_, 2))
+        x_ = flatten(x_)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i)
@@ -153,11 +161,11 @@ class Translation:
 
 
 def create_dataset(num_A, num_B):
-    dense_A = read_data2("data/Health_Clothing/Health_review_info.txt")
-    user_A = one_hot_vector2(dense_A, num_A)
+    dense_A = read_data("data/Health_Clothing/Health_user_product.txt")
+    user_A = one_hot_vector(dense_A, num_A)
 
-    dense_B = read_data2("data/Health_Clothing/Clothing_review_info.txt")
-    user_B = one_hot_vector2(dense_B, num_B)
+    dense_B = read_data("data/Health_Clothing/Clothing_user_product.txt")
+    user_B = one_hot_vector(dense_B, num_B)
 
     return user_A, user_B, dense_A, dense_B
 
@@ -221,6 +229,8 @@ def main():
     adv_dim_A = adv_dim_B = [200, 100, 1]
     checkpoint_dir = "translation/experiment/exp1/"
     user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num)
+    z_A = np.load(os.path.join(checkpoint_dir, "A.npz"))
+    z_B = np.load(os.path.join(checkpoint_dir, "B.npz"))
 
     assert len(user_A) == len(user_B)
     perm = np.random.permutation(len(user_A))
@@ -238,7 +248,7 @@ def main():
     user_B_test = user_B[train_size+200:]
 
     model = Translation(batch_size, health_num, clothing_num, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, z_A, z_B)
     model.build_model()
 
     sess = tf.Session()
@@ -270,18 +280,18 @@ def main():
             loss_val_a, loss_val_b, y_ab = sess.run([model.loss_val_a, model.loss_val_b, model.y_AB],
                                               feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
 
-            # recall = calc_recall(y_ab, dense_B_val)
-            # print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall))
-            # if recall > max_recall:
-            #     max_recall = recall
-            #     saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
-            pred = np.array(y_ab).flatten()
-            test = np.array(user_B_val).flatten()
-            rmse = calc_rmse(pred, test)
-            print("Loss val a: %f, Loss val b: %f, rmse %f" % (loss_val_a, loss_val_b, rmse))
-            if rmse < max_recall:
-                max_recall = rmse
+            recall = calc_recall(y_ab, dense_B_val)
+            print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall))
+            if recall > max_recall:
+                max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
+            # pred = np.array(y_ab).flatten()
+            # test = np.array(user_B_val).flatten()
+            # rmse = calc_rmse(pred, test)
+            # print("Loss val a: %f, Loss val b: %f, rmse %f" % (loss_val_a, loss_val_b, rmse))
+            # if rmse < max_recall:
+            #     max_recall = rmse
+            #     saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
 
     print(max_recall)
 
@@ -289,25 +299,24 @@ def main():
                             feed_dict={model.x_A: user_A_test[200:],model.x_B: user_B_test[200:]})
     print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
 
-    # dense_A_test = dense_A[(train_size+200):]
-    # dense_B_test = dense_B[(train_size+200):]
-    #
-    #
-    # print("recall B: %f"%(calc_recall(y_ab, dense_B_test)))
-    # print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
+    dense_A_test = dense_A[(train_size+200):]
+    dense_B_test = dense_B[(train_size+200):]
 
-    pred_a = np.array(y_ba).flatten()
-    test_a = np.array(user_A_test).flatten()
-    print("rmse A %f"%calc_rmse(pred_a, test_a))
 
-    pred_a = np.array(y_ab).flatten()
-    test_a = np.array(user_B_test).flatten()
-    print("rmse B %f" % calc_rmse(pred_a, test_a))
+    print("recall B: %f"%(calc_recall(y_ab, dense_B_test)))
+    print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
+
+    # pred_a = np.array(y_ba).flatten()
+    # test_a = np.array(user_A_test).flatten()
+    # print("rmse A %f"%calc_rmse(pred_a, test_a))
+    #
+    # pred_a = np.array(y_ab).flatten()
+    # test_a = np.array(user_B_test).flatten()
+    # print("rmse B %f" % calc_rmse(pred_a, test_a))
 
 
 if __name__ == '__main__':
     main()
-
 
 
 
