@@ -533,14 +533,14 @@ class cf_vae_extend:
         for i, list_product in enumerate(test_users):
             if list_product[0] < thred:
                 real = [j for j in list_product if j >= thred]
-                pred = self.pred(i+6000, "grocery")
+                pred = self.pred(i+6000, "grocery", thred)
                 top_M = np.argsort(-pred)[:10]
                 hits = set(top_M) & set(real)
                 recall = float(len(hits))/float(len(real))
                 recall_clothing.append(recall)
             else:
                 real = [j for j in list_product if j < thred]
-                pred = self.pred(i + 6000, "health")
+                pred = self.pred(i + 6000, "health", thred)
                 top_M = np.argsort(-pred)[:10]
                 hits = set(top_M) & set(real)
                 recall = float(len(hits)) / float(len(real))
@@ -551,8 +551,8 @@ class cf_vae_extend:
     def predict_all(self):
         return np.dot(self.U[:6000], (self.V.T))
 
-    def pred(self, u_id, p_type):
+    def pred(self, u_id, p_type, thred):
         if p_type == "health":
-            return np.dot(self.U[u_id], self.V[:16069].T)
+            return np.dot(self.U[u_id], self.V[:thred].T)
         else:
-            return np.dot(self.U[u_id], self.V[16069:].T)
+            return np.dot(self.U[u_id], self.V[thred:].T)
