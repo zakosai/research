@@ -542,6 +542,7 @@ class cf_vae_extend:
                 real = [j for j in list_product if j < thred]
                 pred = self.pred(i + 6000, "health")
                 top_M = np.argsort(-pred)[:10]
+                print(real, top_M)
                 hits = set(top_M) & set(real)
                 recall = float(len(hits)) / float(len(real))
                 recall_health.append(recall)
