@@ -46,20 +46,21 @@ class Translation:
         #     x_ = tf.nn.embedding_lookup(self.z_B, ids)
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
-
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                if self.train:
-                    x_ = tf.nn.dropout(x_, 0.7)
+
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False, train=True):
         x_ = x
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                if self.train:
-                    x_ = tf.nn.dropout(x_, 0.7)
+
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i)
         return x_
 
@@ -67,9 +68,10 @@ class Translation:
         x_ = x
 
         with tf.variable_scope(scope, reuse=reuse):
+            if self.train:
+                x_ = tf.nn.dropout(x_, 0.7)
             for i in range(len(adv_dim)):
-                if self.train:
-                    x_ = tf.nn.dropout(x_, 0.7)
+
                 x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
         return x_
 
