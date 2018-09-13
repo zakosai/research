@@ -224,7 +224,7 @@ def calc_rmse(pred, test):
     return np.sqrt(np.mean((test-pred)**2))
 
 def main():
-    iter = 1000
+    iter = 100
     batch_size= 500
     clothing_num = 8364
     health_num = 15084
