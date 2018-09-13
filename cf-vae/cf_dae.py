@@ -532,9 +532,8 @@ class cf_vae_extend:
         recall_clothing = []
         for i, list_product in enumerate(test_users):
             if list_product[0] < thred:
-                print(list_product[0], thred)
                 real = [j for j in list_product if j >= thred]
-                pred = self.pred(i+6000, "clothing")
+                pred = self.pred(i+6000, "grocery")
                 top_M = np.argsort(-pred)[:10]
                 hits = set(top_M) & set(real)
                 recall = float(len(hits))/float(len(real))
@@ -546,6 +545,7 @@ class cf_vae_extend:
                 hits = set(top_M) & set(real)
                 recall = float(len(hits)) / float(len(real))
                 recall_health.append(recall)
+        print(len(recall_clothing), len(recall_health))
         print("average recall health: %f, average recall clothing %f"%(np.mean(recall_health), np.mean(recall_clothing)))
 
     def predict_all(self):
