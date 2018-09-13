@@ -33,6 +33,7 @@ class Translation:
         self.active_function = tf.nn.sigmoid
         self.z_A = z_A
         self.z_B = z_B
+        self.train = True
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
@@ -48,24 +49,27 @@ class Translation:
 
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = tf.nn.dropout(x_, 0.7)
+                if self.train:
+                    x_ = tf.nn.dropout(x_, 0.7)
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i)
         return x_
 
-    def dec(self, x, scope, decode_dim, reuse=False):
+    def dec(self, x, scope, decode_dim, reuse=False, train=True):
         x_ = x
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                x_ = tf.nn.dropout(x_, 0.7)
+                if self.train:
+                    x_ = tf.nn.dropout(x_, 0.7)
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i)
         return x_
 
-    def adversal(self, x, scope, adv_dim, reuse=False):
+    def adversal(self, x, scope, adv_dim, reuse=False, train=True):
         x_ = x
 
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(adv_dim)):
-                x_ = tf.nn.dropout(x_, 0.7)
+                if self.train:
+                    x_ = tf.nn.dropout(x_, 0.7)
                 x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
         return x_
 
@@ -289,9 +293,10 @@ def main():
 
         # Validation Process
         if i%10 == 0:
+            model.train = False
             loss_val_a, loss_val_b, y_ab = sess.run([model.loss_val_a, model.loss_val_b, model.y_AB],
                                               feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
-
+            model.train = True
             recall = calc_recall(y_ab, dense_B_val)
             print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall))
             if recall > max_recall:
@@ -306,10 +311,11 @@ def main():
             #     saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
 
     print(max_recall)
-
+    model.train = False
     loss_test_a, loss_test_b, y_ab, y_ba = sess.run([model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
                             feed_dict={model.x_A: user_A_test[200:],model.x_B: user_B_test[200:]})
     print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
+    model.train = True
 
     dense_A_test = dense_A[(train_size+200):]
     dense_B_test = dense_B[(train_size+200):]
