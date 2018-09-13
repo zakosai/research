@@ -10,7 +10,7 @@ import scipy
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 
-parser.add_argument('--ckpt_folder',  type=str, default='pre_model/exp1/',
+parser.add_argument('--thred',  type=int, default=15084,
                    help='where model is stored')
 parser.add_argument('--data_dir',  type=str, default='data/amazon',
                    help='where model is stored')
@@ -20,7 +20,7 @@ parser.add_argument('--type',  type=str, default=15,
                    help='where model is stored')
 
 args = parser.parse_args()
-ckpt = args.ckpt_folder
+thred = args.thred
 data_dir = args.data_dir
 extend_file =args.mat_file
 
@@ -65,6 +65,6 @@ model = cf_vae_extend(num_users=6556, num_items=34295, num_factors=num_factors, 
 
 
 model.load_model(extend_file)
-model.predict_test(data['test_users'][6000:])
+model.predict_test(data['test_users'][6000:], thred)
 
 
