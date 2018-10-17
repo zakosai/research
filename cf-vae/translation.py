@@ -72,7 +72,6 @@ class Translation:
                 x_ = tf.nn.dropout(x_, 0.5)
             for i in range(len(adv_dim)):
                 x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
-                x_ = batch_norm(x_)
         return x_
 
     def share_layer(self, x, scope, dim, reuse=False):
@@ -80,6 +79,7 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i)
+                x_ = batch_norm(x_)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
