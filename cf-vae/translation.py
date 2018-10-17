@@ -292,8 +292,8 @@ def main():
             _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
             _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
 
-        print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss gan %f, loss cc %f"%(loss_gen, loss_dis,
-                                                                                loss_vae, loss_gan, loss_cc))
+        # print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss gan %f, loss cc %f"%(loss_gen, loss_dis,
+        #                                                                         loss_vae, loss_gan, loss_cc))
 
         # Validation Process
         if i%10 == 0:
