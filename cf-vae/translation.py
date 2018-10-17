@@ -306,6 +306,18 @@ def main():
             if recall > max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
+                model.train = False
+                loss_test_a, loss_test_b, y_ab, y_ba = sess.run(
+                    [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
+                    feed_dict={model.x_A: user_A_test[200:], model.x_B: user_B_test[200:]})
+                print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
+
+                dense_A_test = dense_A[(train_size + 200):]
+                dense_B_test = dense_B[(train_size + 200):]
+
+                print("recall B: %f" % (calc_recall(y_ab, dense_B_test)))
+                print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
+                model.train = True
             # pred = np.array(y_ab).flatten()
             # test = np.array(user_B_val).flatten()
             # rmse = calc_rmse(pred, test)
@@ -315,18 +327,18 @@ def main():
             #     saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
 
     print(max_recall)
-    model.train = False
-    loss_test_a, loss_test_b, y_ab, y_ba = sess.run([model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
-                            feed_dict={model.x_A: user_A_test[200:],model.x_B: user_B_test[200:]})
-    print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
-    model.train = True
-
-    dense_A_test = dense_A[(train_size+200):]
-    dense_B_test = dense_B[(train_size+200):]
-
-
-    print("recall B: %f"%(calc_recall(y_ab, dense_B_test)))
-    print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
+    # model.train = False
+    # loss_test_a, loss_test_b, y_ab, y_ba = sess.run([model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
+    #                         feed_dict={model.x_A: user_A_test[200:],model.x_B: user_B_test[200:]})
+    # print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
+    # model.train = True
+    #
+    # dense_A_test = dense_A[(train_size+200):]
+    # dense_B_test = dense_B[(train_size+200):]
+    #
+    #
+    # print("recall B: %f"%(calc_recall(y_ab, dense_B_test)))
+    # print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
 
     # pred_a = np.array(y_ba).flatten()
     # test_a = np.array(user_A_test).flatten()
