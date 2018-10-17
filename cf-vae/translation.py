@@ -61,7 +61,6 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i)
-                x_ = batch_norm(x_)
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
@@ -79,7 +78,6 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i)
-                x_ = batch_norm(x_)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
