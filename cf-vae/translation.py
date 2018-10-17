@@ -54,7 +54,7 @@ class Translation:
                 x_ = batch_norm(x_)
         return x_
 
-    def dec(self, x, scope, decode_dim, reuse=False, train=True):
+    def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
         if self.train:
             x_ = tf.nn.dropout(x_, 0.5)
@@ -64,7 +64,7 @@ class Translation:
                 x_ = batch_norm(x_)
         return x_
 
-    def adversal(self, x, scope, adv_dim, reuse=False, train=True):
+    def adversal(self, x, scope, adv_dim, reuse=False):
         x_ = x
 
         with tf.variable_scope(scope, reuse=reuse):
