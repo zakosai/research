@@ -47,7 +47,7 @@ class Translation:
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.3)
+            x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i)
@@ -57,7 +57,7 @@ class Translation:
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.3)
+            x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i)
@@ -65,10 +65,9 @@ class Translation:
 
     def adversal(self, x, scope, adv_dim, reuse=False):
         x_ = x
-
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
-            if self.train:
-                x_ = tf.nn.dropout(x_, 0.3)
             for i in range(len(adv_dim)):
                 x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
         return x_
@@ -76,7 +75,7 @@ class Translation:
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.3)
+            x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i)
