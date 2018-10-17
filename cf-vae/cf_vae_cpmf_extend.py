@@ -634,5 +634,36 @@ class cf_vae_extend:
         discounts = np.log2(np.arange(len(y_true)) + 2)
         return np.sum(gain / discounts)
 
+    # def predict_all(self):
+    #     return np.dot(self.U, (self.V.T))
+
+    def predict_test(self, test_users, thred):
+        recall_health = []
+        recall_clothing = []
+        for i, list_product in enumerate(test_users):
+            if list_product[0] < thred:
+                real = [j for j in list_product if j >= thred]
+                pred = self.pred(i+6200, "grocery", thred)
+                top_M = np.argsort(-pred)[:10]
+                top_M += thred
+                hits = set(top_M) & set(real)
+                recall = float(len(hits))/float(len(real))
+                recall_clothing.append(recall)
+            else:
+                real = [j for j in list_product if j < thred]
+                pred = self.pred(i + 6200, "health", thred)
+                top_M = np.argsort(-pred)[:10]
+                hits = set(top_M) & set(real)
+                recall = float(len(hits)) / float(len(real))
+                recall_health.append(recall)
+        print(len(recall_clothing), len(recall_health))
+        print("average recall health: %f, average recall grocery %f"%(np.mean(recall_health), np.mean(recall_clothing)))
+
     def predict_all(self):
-        return np.dot(self.U, (self.V.T))
+        return np.dot(self.U[6200:], (self.V.T))
+
+    def pred(self, u_id, p_type, thred):
+        if p_type == "health":
+            return np.dot(self.U[u_id], self.V[:thred].T)
+        else:
+            return np.dot(self.U[u_id], self.V[thred:].T)

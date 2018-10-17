@@ -1,14 +1,13 @@
+__author__ = 'linh'
 import numpy as np
 import tensorflow as tf
 import scipy.io
 import matplotlib.pyplot as plt
 from cf_vae_cpmf_extend import cf_vae_extend, params
 from scipy.sparse import load_npz
-import argparse
+import  argparse
 import os
 import csv
-
-
 np.random.seed(0)
 tf.set_random_seed(0)
 
@@ -55,27 +54,27 @@ def load_cvae_data(data_dir):
   data["train_users"] = load_rating(data_dir + "cf-train-%sp-users.dat"%args.data_type)
   data["train_items"] = load_rating(data_dir + "cf-train-%sp-items.dat"%args.data_type)
   data["test_users"] = load_rating(data_dir + "cf-test-%sp-users.dat"%args.data_type)
-  data["test_items"] = load_rating(data_dir + "cf-test-%sp-items.dat"%args.data_type)
 
   return data
+
 
 def load_rating(path):
   arr = []
   for line in open(path):
     a = line.strip().split()
-    if a[0]==0:
+    if a == []:
       l = []
     else:
-      l = [int(x) for x in a[1:]]
+      l = [int(x) for x in a]
     arr.append(l)
   return arr
 
 
 
 params = params()
-params.lambda_u = 1
+params.lambda_u = 10
 params.lambda_v = 1
-params.lambda_r = 1
+params.lambda_r = 0.1
 params.C_a = 1
 params.C_b = 0.01
 params.max_iter_m = 1
@@ -100,6 +99,8 @@ tf.set_random_seed(0)
 num_factors = zdim
 best_recall = 0
 best_hyper = []
+
+
 if gs == 1:
     i = 0
     recalls = []
@@ -111,33 +112,36 @@ if gs == 1:
                 params.lambda_r = r
                 if i > -1:
                     model = cf_vae_extend(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,
-                                          input_dim=8000, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200,400,8000],
-                                          encoding_dims_str=[200], decoding_dims_str=[200, 4526], loss_type='cross_entropy',
-                                          model = model_type, ckpt_folder=ckpt, initial=initial)
+                                          input_dim=8000, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200, 400,8000],
+                                          decoding_dims_str=[200, 4526], loss_type='cross_entropy',
+                                          model = model_type, ckpt_folder=ckpt)
                     model.fit(data["train_users"], data["train_items"], data["content"], params, data["test_users"])
-                    model.save_model(os.path.join(ckpt,"cf_vae_%d_%d.mat"%(model_type, i)))
+                    model.save_model(os.path.join(ckpt,"cf_dae_%d_%d.mat"%(model_type, i)))
                     # model.load_model("cf_vae.mat")
-                    f = open(os.path.join(ckpt, "result_cvae_%d.txt"%model_type), 'a')
-                    f.write("%d-----------%f----------%f----------%f\n"%(i, u,v,r))
+                    f = open(os.path.join(ckpt, "result_cdae_%d.txt"%model_type), 'a')
+                    f.write("%d-----------%f----------%f----------%f\n"%(i,u,v,r))
                     pred_all = model.predict_all()
                     recall = model.predict_val(pred_all, data["train_users"], data["test_users"], f)
                     f.write("\n")
                     f.close()
                     if recall > best_recall:
                         best_recall = recall
-                        best_hyper = [u, v, r]
+                        best_hyper = [u,v, r]
+
                     print(u, v, r)
                 i += 1
+
     f = open(os.path.join(ckpt, "result_sum.txt"), "a")
-    f.write("Best recall CVAE: %f at (%f, %f, %f)\n"%(best_recall, best_hyper[0], best_hyper[1], best_hyper[2]))
+    f.write("Best recall CDAE: %f at (%f, %f, %f)\n" % (best_recall, best_hyper[0], best_hyper[1], best_hyper[2]))
     f.close()
 else:
     model = cf_vae_extend(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,
-                          input_dim=8000, encoding_dims=[200, 100], z_dim = zdim, decoding_dims=[100, 200, 8000],
-                          encoding_dims_str=[500, 200], decoding_dims_str=[200, 500, 4526], loss_type='cross_entropy',
-                          model = model_type, ckpt_folder=ckpt, initial=initial)
+                          input_dim=8000, encoding_dims=[200], z_dim = zdim, decoding_dims=[200, 8000],
+                            decoding_dims_str=[200, 500, 4526], loss_type='cross_entropy',
+                          model = model_type, ckpt_folder=ckpt)
     model.fit(data["train_users"], data["train_items"], data["content"],params, data["test_users"])
-    model.save_model(os.path.join(ckpt,"cf_vae_%d.mat"%(model_type)))
-    # model.load_model("cf_vae.mat")
+    model.save_model(os.path.join(ckpt,"cf_dae_%d.mat"%(model_type)))
+    #model.load_model(os.path.join(ckpt, "cf_dae_0.mat"))
     pred = model.predict_all()
     model.predict_val(pred, data["train_users"], data["test_users"])
+
