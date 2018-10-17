@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.contrib.layers import fully_connected, flatten
+from tensorflow.contrib.layers import fully_connected, flatten, batch_norm
 from tensorflow import sigmoid
 import tensorflow.keras.backend as K
 from tensorflow.contrib.framework import argsort
@@ -30,7 +30,7 @@ class Translation:
         self.lambda_3 = lambda_3
         self.lambda_4 = lambda_4
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.relu
+        self.active_function = tf.nn.sigmoid
         self.z_A = z_A
         self.z_B = z_B
         self.train = True
@@ -50,8 +50,8 @@ class Translation:
             x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i)
+                x_ = batch_norm(x_)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False, train=True):
@@ -60,8 +60,8 @@ class Translation:
             x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i)
+                x_ = batch_norm(x_)
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False, train=True):
@@ -71,7 +71,6 @@ class Translation:
             if self.train:
                 x_ = tf.nn.dropout(x_, 0.5)
             for i in range(len(adv_dim)):
-
                 x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
         return x_
 
@@ -233,7 +232,7 @@ def calc_rmse(pred, test):
     return np.sqrt(np.mean((test-pred)**2))
 
 def main():
-    iter = 500
+    iter = 100
     batch_size= 500
     clothing_num = 8364
     health_num = 15084
