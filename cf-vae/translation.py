@@ -170,9 +170,11 @@ class Translation:
 
         self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B
         self.loss_dis = loss_GAN_A + loss_GAN_B
+        self.loss_rec = self.loss_val_a + self.loss_val_b
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
+        self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
 
 
 def create_dataset(num_A, num_B):
@@ -288,6 +290,7 @@ def main():
             _, loss_gen, loss_vae, loss_gan, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
                                                      model.loss_GAN, model.loss_CC], feed_dict=feed)
             _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
+            _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
 
         print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss gan %f, loss cc %f"%(loss_gen, loss_dis,
                                                                                 loss_vae, loss_gan, loss_cc))
