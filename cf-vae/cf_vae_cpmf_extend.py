@@ -35,8 +35,9 @@ class params:
         self.weight_decay = 2e-4
 
 class cf_vae_extend:
-    def __init__(self, num_users, num_items, num_factors, params, input_dim, encoding_dims, z_dim, decoding_dims, encoding_dims_str,
-                 decoding_dims_str, loss_type="cross_entropy", useTranse = False, eps = 1e-10, model=0, ckpt_folder='pre_model', initial=True, model_mat=None):
+    def __init__(self, num_users, num_items, num_factors, params, input_dim, encoding_dims, z_dim, decoding_dims,
+                 encoding_dims_str=None, decoding_dims_str=None, loss_type="cross_entropy", useTranse = False,
+                 eps=1e-10, model=0, ckpt_folder='pre_model', initial=True, model_mat=None):
         self.num_users = num_users
         self.num_items = num_items
         self.num_factors = num_factors
