@@ -72,6 +72,7 @@ class Translation:
                 x_ = tf.nn.dropout(x_, 0.5)
             for i in range(len(adv_dim)):
                 x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
+                x_ = batch_norm(x_)
         return x_
 
     def share_layer(self, x, scope, dim, reuse=False):
@@ -91,13 +92,13 @@ class Translation:
 
     def encode(self, x, scope, dim, reuse_enc, reuse_share, reuse_z=False):
         h = self.enc(x, "encode_%s"%scope, dim, reuse_enc)
-        h = self.share_layer(h, "encode", self.share_dim, reuse_share)
+        # h = self.share_layer(h, "encode", self.share_dim, reuse_share)
         z, z_mu, z_sigma = self.gen_z(h, "VAE_%s"%scope, reuse=reuse_z)
         return z, z_mu, z_sigma
 
     def decode(self, x, scope, dim, reuse_dec, reuse_share):
-        y = self.share_layer(x, "decode", self.share_dim, reuse_share)
-        y = self.dec(y, "decode_%s"%scope, dim, reuse_dec)
+        # y = self.share_layer(x, "decode", self.share_dim, reuse_share)
+        y = self.dec(x, "decode_%s"%scope, dim, reuse_dec)
         return y
 
     def loss_kl(self, mu, sigma):
@@ -238,10 +239,10 @@ def main():
     batch_size= 500
     clothing_num = 8364
     health_num = 15084
-    encoding_dim_A = encoding_dim_B = [1000, 500]
+    encoding_dim_A = encoding_dim_B = [1000, 500, 100]
     share_dim = [100]
-    decoding_dim_A = [500, 1000, health_num]
-    decoding_dim_B = [500, 1000, clothing_num]
+    decoding_dim_A = [100, 500, 1000, health_num]
+    decoding_dim_B = [100, 500, 1000, clothing_num]
     z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
     checkpoint_dir = "translation/Grocery_Health/"
