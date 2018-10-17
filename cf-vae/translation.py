@@ -75,6 +75,8 @@ class Translation:
 
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i)
@@ -238,7 +240,7 @@ def main():
     clothing_num = 8364
     health_num = 15084
     encoding_dim_A = encoding_dim_B = [1000, 500]
-    share_dim = [200, 100]
+    share_dim = [100]
     decoding_dim_A = [500, 1000, health_num]
     decoding_dim_B = [500, 1000, clothing_num]
     z_dim = 50
