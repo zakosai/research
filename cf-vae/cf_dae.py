@@ -535,6 +535,7 @@ class cf_vae_extend:
                 real = [j for j in list_product if j >= thred]
                 pred = self.pred(i+6200, "grocery", thred)
                 top_M = np.argsort(-pred)[:10]
+                top_M += thred
                 hits = set(top_M) & set(real)
                 recall = float(len(hits))/float(len(real))
                 recall_clothing.append(recall)
@@ -546,7 +547,7 @@ class cf_vae_extend:
                 recall = float(len(hits)) / float(len(real))
                 recall_health.append(recall)
         print(len(recall_clothing), len(recall_health))
-        print("average recall health: %f, average recall clothing %f"%(np.mean(recall_health), np.mean(recall_clothing)))
+        print("average recall health: %f, average recall grocery %f"%(np.mean(recall_health), np.mean(recall_clothing)))
 
     def predict_all(self):
         return np.dot(self.U[6200:], (self.V.T))
