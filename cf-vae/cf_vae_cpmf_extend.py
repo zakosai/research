@@ -554,7 +554,7 @@ class cf_vae_extend:
     def predict_val(self, pred_all, train_users, test_users, file=None):
         train_size = int(len(self.U) * 0.7)
         val_size = int(len(self.U) * 0.05)
-        user_all = test_users[train_size:val_size]
+        user_all = test_users[train_size:train_size+val_size]
         ground_tr_num = [len(user) for user in user_all]
 
         pred_all = list(pred_all)
@@ -641,7 +641,7 @@ class cf_vae_extend:
     def predict_all(self):
         train_size = int(len(self.U) * 0.7)
         val_size = int(len(self.U) * 0.05)
-        return np.dot(self.U[train_size:val_size], (self.V.T))
+        return np.dot(self.U[train_size:train_size+val_size], (self.V.T))
 
     def pred(self, u_id, p_type, thred):
         if p_type == "health":

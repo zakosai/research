@@ -490,7 +490,9 @@ class cf_vae_extend:
         return recall_avgs
 
     def predict_val(self, pred_all, train_users, test_users, file=None):
-        user_all = test_users[:6000]
+        train_size = int(len(self.U) * 0.7)
+        val_size = int(len(self.U) * 0.05)
+        user_all = test_users[train_size:train_size+val_size]
         ground_tr_num = [len(user) for user in user_all]
 
 
@@ -551,7 +553,9 @@ class cf_vae_extend:
         print("average recall health: %f, average recall grocery %f"%(np.mean(recall_health), np.mean(recall_clothing)))
 
     def predict_all(self):
-        return np.dot(self.U[6200:], (self.V.T))
+        train_size = int(len(self.U)*0.7)
+        val_size = int(len(self.U)*0.05)
+        return np.dot(self.U[train_size:train_size+val_size], (self.V.T))
 
     def pred(self, u_id, p_type, thred):
         if p_type == "health":
