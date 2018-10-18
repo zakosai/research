@@ -235,7 +235,7 @@ def calc_rmse(pred, test):
     return np.sqrt(np.mean((test-pred)**2))
 
 def main():
-    iter = 100
+    iter = 500
     batch_size= 500
     clothing_num = 18226
     health_num = 16079
@@ -270,7 +270,7 @@ def main():
     user_B_test = user_B[train_size+val_size:]
 
     model = Translation(batch_size, health_num, clothing_num, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, lambda_0=1, learning_rate=1e-5)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, lambda_0=1)
     model.build_model()
 
     sess = tf.Session()
