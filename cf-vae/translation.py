@@ -270,7 +270,7 @@ def main():
     user_B_test = user_B[train_size+val_size:]
 
     model = Translation(batch_size, health_num, clothing_num, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, lambda_0=1, learning_rate=1e-5)
     model.build_model()
 
     sess = tf.Session()
@@ -295,8 +295,8 @@ def main():
             _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
             _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
 
-        print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss gan %f, loss cc %f"%(loss_gen, loss_dis,
-                                                                                loss_vae, loss_gan, loss_cc))
+        # print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss gan %f, loss cc %f"%(loss_gen, loss_dis,
+        #                                                                         loss_vae, loss_gan, loss_cc))
 
         # Validation Process
         if i%10 == 0:
