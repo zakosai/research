@@ -1,74 +1,15 @@
-#folders='Health Toy TV CD Tool Beauty Kitchen Office Grocery Baby Clothing Kindle Phone Video Pet Music Instrument
-#Automotive Garden Electronics Books'
-folders='CD Tool Beauty Kitchen Office Grocery Baby Clothing Kindle Phone Video Pet Music Instrument
-Automotive Garden Electronics Books'
-rate='1 8'
-zdim=50
+python train_vae.py --ckpt_folder=translation/Health_Clothing/ --data_dir=data/Health_Clothing/ --zdim=100 \
+--data_type=70 --type=text
+python train_cvae_extend.py --model=0 --ckpt_folder=translation/Health_Clothing/ --data_dir=data/Health_Clothing/ \
+--iter=50 --data_type=70 --user_no=6557 --item_no=34305 --gridsearch=1 --zdim=100
 
-for f in $folders
-do
-    for r in $rate
-    do
+python train_cvae_extend.py --model=0 --ckpt_folder=translation/Grocery_Health/ --data_dir=data/Grocery_Health/ \
+--iter=50 --data_type=70 --user_no=6848 --item_no=23448 --gridsearch=1 --zdim=100
 
-        #dim="$(sed -n '3p' data2/$f/info.txt)"
-        user_no="$(sed -n '1p' data2/$f/info.txt)"
-        item_no="$(sed -n '2p' data2/$f/info.txt)"
-        ckpt=$f/sum_${r}_${zdim}
-        mkdir -p $ckpt
-        python wae.py --ckpt_folder=$ckpt --data_dir=data2/$f/ --zdim=$zdim --data_type=$r --type=text
-        python train_cf_wae.py --model=0 --ckpt_folder=$ckpt --data_dir=data2/$f/ --iter=50 --data_type=$r \
-        --user_no=$user_no --item_no=$item_no --gridsearch=1 --zdim=$zdim
-        python train_vae.py --ckpt_folder=$ckpt --data_dir=data2/$f/ --zdim=$zdim --data_type=$r --type=text
-        python train_cvae_extend.py --model=0 --ckpt_folder=$ckpt --data_dir=data2/$f/ --iter=50 --data_type=$r \
-        --user_no=$user_no --item_no=$item_no --gridsearch=1 --zdim=$zdim
-        python train_dae.py --ckpt_folder=$ckpt --data_dir=data2/$f/ --zdim=$zdim --data_type=$r --type=text
-        python train_cf_dae.py --model=0 --ckpt_folder=$ckpt --data_dir=data2/$f/ --iter=50 --data_type=$r \
-        --user_no=$user_no --item_no=$item_no --gridsearch=1 --zdim=$zdim
+python train_vae.py --ckpt_folder=translation/Video_TV/ --data_dir=data/Video_TV/ --zdim=100 \
+--data_type=70 --type=text
+python train_cvae_extend.py --model=0 --ckpt_folder=translation/Video_TV/ --data_dir=data/Video_TV/ \
+--iter=50 --data_type=70 --user_no=5459 --item_no=38650 --gridsearch=1 --zdim=100
 
-        #python train_dae.py --ckpt_folder=$f/$r --data_dir=data2/$f/ --zdim=50 --data_type=$r --user_dim=$dim --type=user
-        #python train_cdae_user.py --model=0 --ckpt_folder=$f/$r --data_dir=data2/$f/ --iter=50 --zdim=50 --gridsearch=1 --data_type=$r --user_dim=$dim --user_no=$user_no --item_no=$item_no
-
-
-
-    done
-
-
-done
-
-#dim='20 100 150'
-#for d in $dim
-#do
-#    #python train_vae.py --ckpt_folder=Tool/1_$d --data_dir=data2/Tool/ --zdim=$d --data_type=1 --user_dim=830 --type=text
-#    #python train_vae.py --ckpt_folder=Tool/1_$d --data_dir=data2/Tool/ --zdim=$d --data_type=1 --user_dim=830 --type=user
-#    python train_cvae_user.py --model=0 --ckpt_folder=Tool/1_$d --data_dir=data2/Tool/ --iter=50 --data_type=1 --user_no=2118 --item_no=7780 --gridsearch=1 --zdim=$d --user_dim=830
-#
-#
-#done
-#
-#folder='Tool Outdoor sport'
-#rate='1 8'
-#for fo in $folder
-#do
-#    for r in $rate
-#    do
-#        python train_pmf.py --ckpt_folder=$fo/$r/ --data_dir=data2/$fo/ --data_type=$r
-#    done
-#
-#done
-#f=Tool
-#r=1
-#dim=830
-#user_no=2118
-#item_no=7780
-#
-#
-#        python train_vae.py --ckpt_folder=$f/0_layer --data_dir=data2/$f/ --zdim=50 --data_type=$r --user_dim=$dim --type=text
-#        python train_vae.py --ckpt_folder=$f/0_layer --data_dir=data2/$f/ --zdim=50 --data_type=$r --user_dim=$dim --type=user
-#
-#
-#        #python train_vae.py --ckpt_folder=$f/$r2 --data_dir=data2/$f/ --zdim=50 --data_type=$r --user_dim=$dim
-#
-#        #python train_cf_dae.py --model=0 --ckpt_folder=$f/0_layer --data_dir=data2/$f/ --iter=50 --data_type=$r --user_no=$user_no --item_no=$item_no --zdim=50
-#        #python train_cvae_user.py --model=0 --ckpt_folder=$f/0_layer --data_dir=data2/$f/ --iter=50 --zdim=50 --data_type=$r --user_dim=$dim --user_no=$user_no --item_no=$item_no
-#        python train_cvae_extend.py --model=0 --ckpt_folder=$f/0_layer --data_dir=data2/$f/ --iter=50 --zdim=50 --data_type=$r --user_no=$user_no --item_no=$item_no
-
+python train_cf_dae.py --model=0 --ckpt_folder=translation/Video_TV/ --data_dir=data/Video_TV/ \
+--iter=50 --data_type=70 --user_no=5459 --item_no=38650 --gridsearch=1 --zdim=100
