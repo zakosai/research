@@ -65,6 +65,7 @@ model = cf_vae_extend(num_users=6556, num_items=34295, num_factors=num_factors, 
 
 
 model.load_model(extend_file)
-model.predict_test(data['test_users'][6200:], thred)
+train_size = int(len(data["test_users"])*0.75)
+model.predict_test(data['test_users'][train_size:], thred)
 
 
