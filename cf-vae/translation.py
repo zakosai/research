@@ -179,10 +179,10 @@ class Translation:
 
 
 def create_dataset(num_A, num_B):
-    dense_A = read_data("data/Grocery_Health/Health_user_product.txt")
+    dense_A = read_data("data/Health_Clothing/Health_user_product.txt")
     user_A = one_hot_vector(dense_A, num_A)
 
-    dense_B = read_data("data/Grocery_Health/Grocery_user_product.txt")
+    dense_B = read_data("data/Health_Clothing/Clothing_user_product.txt")
     user_B = one_hot_vector(dense_B, num_B)
 
     return user_A, user_B, dense_A, dense_B
@@ -237,15 +237,15 @@ def calc_rmse(pred, test):
 def main():
     iter = 500
     batch_size= 500
-    clothing_num = 8364
-    health_num = 15084
+    clothing_num = 18226
+    health_num = 16079
     encoding_dim_A = encoding_dim_B = [1000, 500]
     share_dim = [100]
     decoding_dim_A = [500, 1000, health_num]
     decoding_dim_B = [500, 1000, clothing_num]
     z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
-    checkpoint_dir = "translation/Grocery_Health/"
+    checkpoint_dir = "translation/Health_Clothing/"
     user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num)
     z = np.load(os.path.join(checkpoint_dir, "text.npz"))
     z = z['arr_0']
