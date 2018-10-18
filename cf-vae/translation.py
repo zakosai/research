@@ -9,7 +9,7 @@ import os
 
 class Translation:
     def __init__(self, batch_size, dim_A, dim_B, encode_dim_A, decode_dim_A, encode_dim_B, decode_dim_B, adv_dim_A,
-                 adv_dim_B, z_dim, share_dim, z_A, z_B, eps=1e-10, lambda_0=10, lambda_1=0.1, lambda_2=100,
+                 adv_dim_B, z_dim, share_dim, z_A=None, z_B=None, eps=1e-10, lambda_0=10, lambda_1=0.1, lambda_2=100,
                  lambda_3=0.1,
                  lambda_4=100, learning_rate=1e-4):
         self.batch_size = batch_size
@@ -31,8 +31,8 @@ class Translation:
         self.lambda_4 = lambda_4
         self.learning_rate = learning_rate
         self.active_function = tf.nn.sigmoid
-        self.z_A = z_A
-        self.z_B = z_B
+        # self.z_A = z_A
+        # self.z_B = z_B
         self.train = True
 
     def enc(self, x, scope, encode_dim, reuse=False):
@@ -247,11 +247,11 @@ def main():
     adv_dim_A = adv_dim_B = [200, 100, 1]
     checkpoint_dir = "translation/Health_Clothing/"
     user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num)
-    z = np.load(os.path.join(checkpoint_dir, "text.npz"))
-    z = z['arr_0']
-    print(z.shape)
-    z_A = z[:health_num]
-    z_B = z[health_num:]
+    # z = np.load(os.path.join(checkpoint_dir, "text.npz"))
+    # z = z['arr_0']
+    # print(z.shape)
+    # z_A = z[:health_num]
+    # z_B = z[health_num:]
     assert len(user_A) == len(user_B)
     perm = np.random.permutation(len(user_A))
     total_data = len(user_A)
@@ -270,7 +270,7 @@ def main():
     user_B_test = user_B[train_size+val_size:]
 
     model = Translation(batch_size, health_num, clothing_num, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, z_A, z_B)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim)
     model.build_model()
 
     sess = tf.Session()
