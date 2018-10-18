@@ -254,7 +254,9 @@ def main():
     z_B = z[health_num:]
     assert len(user_A) == len(user_B)
     perm = np.random.permutation(len(user_A))
-    train_size = 6000
+    total_data = len(user_A)
+    train_size = int(total_data * 0.7)
+    val_size = int(total_data * 0.05)
 
     # user_A = user_A[perm]
     # user_B = user_B[perm]
@@ -262,10 +264,10 @@ def main():
     user_A_train = user_A[:train_size]
     user_B_train = user_B[:train_size]
 
-    user_A_val = user_A[train_size:train_size+200]
-    user_B_val = user_B[train_size:train_size+200]
-    user_A_test = user_A[train_size+200:]
-    user_B_test = user_B[train_size+200:]
+    user_A_val = user_A[train_size:train_size+val_size]
+    user_B_val = user_B[train_size:train_size+val_size]
+    user_A_test = user_A[train_size+val_size:]
+    user_B_test = user_B[train_size+val_size:]
 
     model = Translation(batch_size, health_num, clothing_num, encoding_dim_A, decoding_dim_A, encoding_dim_B,
                         decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, z_A, z_B)
@@ -275,7 +277,7 @@ def main():
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(max_to_keep=20)
     max_recall = 0
-    dense_B_val = dense_B[train_size:train_size+200]
+    dense_B_val = dense_B[train_size:train_size+val_size]
 
     for i in range(iter):
         shuffle_idx = np.random.permutation(train_size)
@@ -310,11 +312,11 @@ def main():
                 model.train = False
                 loss_test_a, loss_test_b, y_ab, y_ba = sess.run(
                     [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
-                    feed_dict={model.x_A: user_A_test[200:], model.x_B: user_B_test[200:]})
+                    feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
                 print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
 
-                dense_A_test = dense_A[(train_size + 200):]
-                dense_B_test = dense_B[(train_size + 200):]
+                dense_A_test = dense_A[(train_size + val_size):]
+                dense_B_test = dense_B[(train_size + val_size):]
 
                 print("recall B: %f" % (calc_recall(y_ab, dense_B_test)))
                 print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
