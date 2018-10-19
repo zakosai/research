@@ -175,7 +175,7 @@ class Translation:
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
-        self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate*0.1).minimize(self.loss_rec)
+        self.train_op_rec = tf.train.AdamOptimizer(1e-5).minimize(self.loss_rec)
 
 
 def create_dataset(num_A, num_B):
@@ -270,7 +270,7 @@ def main():
     user_B_test = user_B[train_size+val_size:]
 
     model = Translation(batch_size, health_num, clothing_num, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, lambda_0=10)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, lambda_0=0.01)
     model.build_model()
 
     sess = tf.Session()
