@@ -239,12 +239,12 @@ def main():
     batch_size= 500
     clothing_num = 18226
     health_num = 16079
-    encoding_dim_A = [500, 100]
-    encoding_dim_B = [500, 100]
-    share_dim = [50]
-    decoding_dim_A = [100, 500, health_num]
-    decoding_dim_B = [100, 500, clothing_num]
-    z_dim = 20
+    encoding_dim_A = [500, 200]
+    encoding_dim_B = [500, 200]
+    share_dim = [100]
+    decoding_dim_A = [200, 500, health_num]
+    decoding_dim_B = [200, 500, clothing_num]
+    z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
     checkpoint_dir = "translation/Health_Clothing/"
     user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num)
@@ -271,7 +271,7 @@ def main():
     user_B_test = user_B[train_size+val_size:]
 
     model = Translation(batch_size, health_num, clothing_num, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, lambda_0=0.01, learning_rate=1e-5)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, lambda_0=1, learning_rate=1e-5)
     model.build_model()
 
     sess = tf.Session()
