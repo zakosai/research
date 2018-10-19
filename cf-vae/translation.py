@@ -76,7 +76,7 @@ class Translation:
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.3)
+            x_ = tf.nn.dropout(x_, 0.1)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i)
@@ -323,9 +323,9 @@ def main():
                 print("recall B: %f" % (calc_recall(y_ab, dense_B_test)))
                 print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
                 model.train = True
-        if i%100 == 0:
-            model.learning_rate /= 2
-            print("decrease lr to %f"%model.learning_rate)
+        # if i%100 == 0:
+        #     model.learning_rate /= 2
+        #     print("decrease lr to %f"%model.learning_rate)
 
             # pred = np.array(y_ab).flatten()
             # test = np.array(user_B_val).flatten()
