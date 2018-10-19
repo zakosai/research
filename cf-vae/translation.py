@@ -175,7 +175,7 @@ class Translation:
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
-        self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate*0.1).minimize(self.loss_rec)
+        self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
 
 
 def create_dataset(num_A, num_B):
