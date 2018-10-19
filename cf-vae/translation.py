@@ -239,12 +239,12 @@ def main():
     batch_size= 500
     clothing_num = 18226
     health_num = 16079
-    encoding_dim_A = [500, 250]
-    encoding_dim_B = [500, 250]
+    encoding_dim_A = [1000, 500]
+    encoding_dim_B = [1000, 500]
     share_dim = [100]
-    decoding_dim_A = [250, 500, health_num]
-    decoding_dim_B = [250, 500, clothing_num]
-    z_dim = 50
+    decoding_dim_A = [500, 1000, health_num]
+    decoding_dim_B = [500, 1000, clothing_num]
+    z_dim = 100
     adv_dim_A = adv_dim_B = [200, 100, 1]
     checkpoint_dir = "translation/Health_Clothing/"
     user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num)
@@ -323,7 +323,7 @@ def main():
                 print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
                 model.train = True
         if i%100 == 0:
-            model.learning_rate /= 10
+            model.learning_rate /= 2
             print("decrease lr to %f"%model.learning_rate)
 
             # pred = np.array(y_ab).flatten()
