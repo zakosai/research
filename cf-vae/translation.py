@@ -210,7 +210,8 @@ def one_hot_vector(A, num_product):
 
     for i, row in enumerate(A):
         for j in row:
-            one_hot_A[i,j] = 1
+            if j!= num_product:
+                one_hot_A[i,j] = 1
     return one_hot_A
 
 def one_hot_vector2(A, num_product):
