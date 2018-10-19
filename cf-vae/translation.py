@@ -57,7 +57,7 @@ class Translation:
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.1)
+            x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i)
@@ -305,13 +305,12 @@ def main():
             model.train = False
             loss_val_a, loss_val_b, y_ab = sess.run([model.loss_val_a, model.loss_val_b, model.y_AB],
                                               feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
-            model.train = True
+
             recall = calc_recall(y_ab, dense_B_val)
             print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall))
             if recall > max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
-                # model.train = False
                 loss_test_a, loss_test_b, y_ab, y_ba = sess.run(
                     [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
                     feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
@@ -322,7 +321,7 @@ def main():
 
                 print("recall B: %f" % (calc_recall(y_ab, dense_B_test)))
                 print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
-                model.train = True
+            model.train = True
         # if i%100 == 0:
         #     model.learning_rate /= 2
         #     print("decrease lr to %f"%model.learning_rate)
