@@ -322,8 +322,8 @@ def main():
                 print("recall B: %f" % (calc_recall(y_ab, dense_B_test)))
                 print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
                 model.train = True
-        if i%50 == 0:
-            model.learning_rate /= 2
+        if i%100 == 0:
+            model.learning_rate /= 10
 
             # pred = np.array(y_ab).flatten()
             # test = np.array(user_B_val).flatten()
