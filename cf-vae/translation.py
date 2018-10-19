@@ -76,7 +76,7 @@ class Translation:
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.1)
+            x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i)
@@ -311,7 +311,7 @@ def main():
             if recall > max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
-                model.train = False
+                # model.train = False
                 loss_test_a, loss_test_b, y_ab, y_ba = sess.run(
                     [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
                     feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
