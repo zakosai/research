@@ -270,7 +270,7 @@ def main():
     user_B_test = user_B[train_size+val_size:]
 
     model = Translation(batch_size, health_num, clothing_num, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, lambda_0=1)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, lambda_0=0.1)
     model.build_model()
 
     sess = tf.Session()
