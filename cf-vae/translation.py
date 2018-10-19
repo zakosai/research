@@ -76,7 +76,7 @@ class Translation:
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.3)
+            x_ = tf.nn.dropout(x_, 0.1)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i)
