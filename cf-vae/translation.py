@@ -239,11 +239,11 @@ def main():
     batch_size= 500
     clothing_num = 18226
     health_num = 16079
-    encoding_dim_A = [1000, 500, 200]
-    encoding_dim_B = [1000, 500, 200]
+    encoding_dim_A = [500, 250]
+    encoding_dim_B = [500, 250]
     share_dim = [100]
-    decoding_dim_A = [200, 500, 1000, health_num]
-    decoding_dim_B = [200, 500, 1000, clothing_num]
+    decoding_dim_A = [250, 500, health_num]
+    decoding_dim_B = [250, 500, clothing_num]
     z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
     checkpoint_dir = "translation/Health_Clothing/"
