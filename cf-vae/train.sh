@@ -1,6 +1,10 @@
-#python train_vae.py --ckpt_folder=translation/Health_Clothing/ --data_dir=data/Health_Clothing/ --zdim=100 \
-#--data_type=70 --type=text
+python train_vae.py --ckpt_folder=translation/Health_Clothing/ --data_dir=data/Health_Clothing/ --zdim=100 \
+--data_type=70 --type=text
 python train_cvae_extend.py --model=0 --ckpt_folder=translation/Health_Clothing/ --data_dir=data/Health_Clothing/ \
+--iter=50 --data_type=70 --user_no=6557 --item_no=34305 --gridsearch=1 --zdim=100
+python train_dae.py --ckpt_folder=translation/Health_Clothing/ --data_dir=data/Health_Clothing/ --zdim=100 \
+--data_type=70 --type=text
+python train_cf_dae.py --model=0 --ckpt_folder=translation/Health_Clothing/ --data_dir=data/Health_Clothing/ \
 --iter=50 --data_type=70 --user_no=6557 --item_no=34305 --gridsearch=1 --zdim=100
 
 #python train_cvae_extend.py --model=0 --ckpt_folder=translation/Grocery_Health/ --data_dir=data/Grocery_Health/ \
