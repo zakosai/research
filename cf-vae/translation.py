@@ -244,7 +244,7 @@ def main():
     share_dim = [100]
     decoding_dim_A = [500, 1000, health_num]
     decoding_dim_B = [500, 1000, clothing_num]
-    z_dim = 100
+    z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
     checkpoint_dir = "translation/Health_Clothing/"
     user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num)
