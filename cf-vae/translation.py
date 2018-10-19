@@ -237,8 +237,8 @@ def calc_rmse(pred, test):
 def main():
     iter = 500
     batch_size= 500
-    clothing_num = 10072
-    health_num = 28578
+    health_num = 10072
+    clothing_num = 28578
     encoding_dim_A = [1000, 500]
     encoding_dim_B = [1000, 500]
     share_dim = [100]
