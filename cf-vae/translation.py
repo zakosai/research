@@ -47,11 +47,11 @@ class Translation:
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.3)
+            x_ = tf.nn.dropout(x_, 0.2)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i)
-                x_ = batch_norm(x_, decay=0.995)
+                x_ = batch_norm(x_, decay=0.999)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
@@ -171,7 +171,7 @@ class Translation:
 
         self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B
         self.loss_dis = loss_GAN_A + loss_GAN_B
-        self.loss_rec = 100*self.loss_val_a + 10*self.loss_val_b
+        self.loss_rec = 10*self.loss_val_a + 10*self.loss_val_b
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
@@ -297,6 +297,7 @@ def main():
     saver = tf.train.Saver(max_to_keep=20)
     max_recall = 0
     dense_A_val = dense_A[train_size:train_size+val_size]
+    dense_B_val = dense_B[train_size:train_size+val_size]
 
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(train_size)
@@ -320,10 +321,10 @@ def main():
         # Validation Process
         if i%10 == 0:
             model.train = False
-            loss_val_a, loss_val_b, y_ba = sess.run([model.loss_val_a, model.loss_val_b, model.y_BA],
+            loss_val_a, loss_val_b, y_ba, y_ab = sess.run([model.loss_val_a, model.loss_val_b, model.y_BA, model.y_AB],
                                               feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
 
-            recall = calc_recall(y_ba, dense_A_val)
+            recall = calc_recall(y_ba, dense_A_val) + calc_recall(y_ab, dense_B_val)
             print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall))
             if recall > max_recall:
                 max_recall = recall
