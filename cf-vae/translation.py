@@ -296,7 +296,7 @@ def main():
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(max_to_keep=20)
     max_recall = 0
-    dense_B_val = dense_B[train_size:train_size+val_size]
+    dense_A_val = dense_A[train_size:train_size+val_size]
 
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(train_size)
@@ -320,10 +320,10 @@ def main():
         # Validation Process
         if i%10 == 0:
             model.train = False
-            loss_val_a, loss_val_b, y_ab = sess.run([model.loss_val_a, model.loss_val_b, model.y_AB],
+            loss_val_a, loss_val_b, y_ba = sess.run([model.loss_val_a, model.loss_val_b, model.y_BA],
                                               feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
 
-            recall = calc_recall(y_ab, dense_B_val)
+            recall = calc_recall(y_ba, dense_A_val)
             print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall))
             if recall > max_recall:
                 max_recall = recall
