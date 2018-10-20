@@ -110,7 +110,7 @@ if gs == 1:
             params.lambda_v = v
             for r in [0.1, 1, 10]:
                 params.lambda_r = r
-                if i > 6:
+                if i > -1:
                     model = cf_vae_extend(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,
                                           input_dim=8000, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200, 400,8000],
                                           decoding_dims_str=[200, 4526], loss_type='cross_entropy',
