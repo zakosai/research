@@ -47,7 +47,7 @@ class Translation:
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.5)
+            x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i)
@@ -57,7 +57,7 @@ class Translation:
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.5)
+            x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i)
@@ -68,7 +68,7 @@ class Translation:
 
         with tf.variable_scope(scope, reuse=reuse):
             if self.train:
-                x_ = tf.nn.dropout(x_, 0.5)
+                x_ = tf.nn.dropout(x_, 0.3)
             for i in range(len(adv_dim)):
                 x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
         return x_
@@ -76,7 +76,7 @@ class Translation:
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.5)
+            x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i)
@@ -249,6 +249,10 @@ def main():
     adv_dim_A = adv_dim_B = [200, 100, 1]
     checkpoint_dir = "translation/Health_Clothing/"
     user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num)
+    test_A = list(open("data/Health_Clothing/test_A.txt").readline())
+    test_A = [t.strip() for t in test_A]
+    test_B = list(open("data/Health_Clothing/test_B.txt").readline())
+    test_B = [t.strip() for t in test_B]
     # z = np.load(os.path.join(checkpoint_dir, "text.npz"))
     # z = z['arr_0']
     # print(z.shape)
@@ -268,8 +272,15 @@ def main():
 
     user_A_val = user_A[train_size:train_size+val_size]
     user_B_val = user_B[train_size:train_size+val_size]
-    user_A_test = user_A[train_size+val_size:]
-    user_B_test = user_B[train_size+val_size:]
+    # user_A_test = user_A[train_size+val_size:]
+    # user_B_test = user_B[train_size+val_size:]
+    user_A_test = np.array(user_A)[test_A]
+    user_B_test = np.array(user_B)[test_B]
+    
+    # dense_A_test = dense_A[(train_size + val_size):]
+    # dense_B_test = dense_B[(train_size + val_size):]
+    dense_A_test = np.array(dense_A)[test_A]
+    dense_B_test = np.array(dense_B)[test_B]
 
     model = Translation(batch_size, health_num, clothing_num, encoding_dim_A, decoding_dim_A, encoding_dim_B,
                         decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim)
@@ -315,9 +326,6 @@ def main():
                     [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
                     feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
                 print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
-
-                dense_A_test = dense_A[(train_size + val_size):]
-                dense_B_test = dense_B[(train_size + val_size):]
 
                 print("recall B: %f" % (calc_recall(y_ab, dense_B_test)))
                 print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
