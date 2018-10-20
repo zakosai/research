@@ -47,7 +47,7 @@ class Translation:
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.2)
+            x_ = tf.nn.dropout(x_, 0.1)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i)
@@ -71,6 +71,7 @@ class Translation:
                 x_ = tf.nn.dropout(x_, 0.2)
             for i in range(len(adv_dim)):
                 x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
+                x_ = batch_norm(x_)
         return x_
 
     def share_layer(self, x, scope, dim, reuse=False):
