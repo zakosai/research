@@ -242,10 +242,10 @@ def main():
     clothing_num = 28578
     encoding_dim_A = [1000, 500]
     encoding_dim_B = [1000, 500]
-    share_dim = [100]
+    share_dim = [200]
     decoding_dim_A = [500, 1000, health_num]
     decoding_dim_B = [500, 1000, clothing_num]
-    z_dim = 50
+    z_dim = 100
     adv_dim_A = adv_dim_B = [200, 100, 1]
     checkpoint_dir = "translation/Video_TV/"
     user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num)
