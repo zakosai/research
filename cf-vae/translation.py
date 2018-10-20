@@ -249,12 +249,12 @@ def main():
     adv_dim_A = adv_dim_B = [200, 100, 1]
     checkpoint_dir = "translation/Health_Clothing/"
     user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num)
-    test_A = list(open("data/Health_Clothing/test_A.txt").readline())
+    test_A = list(open("data/Health_Clothing/test_A.txt").readlines())
     test_A = [t.strip() for t in test_A]
     if test_A[-1] == '':
         test_A = test_A[:-1]
     test_A = [int(t) for t in test_A]
-    test_B = list(open("data/Health_Clothing/test_B.txt").readline())
+    test_B = list(open("data/Health_Clothing/test_B.txt").readlines())
     test_B = [t.strip() for t in test_B]
     if test_B[-1] == '':
         test_B = test_B[:-1]
