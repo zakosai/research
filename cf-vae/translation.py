@@ -251,8 +251,10 @@ def main():
     user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num)
     test_A = list(open("data/Health_Clothing/test_A.txt").readline())
     test_A = [t.strip() for t in test_A]
+    test_A = [int(t) for t in test_A]
     test_B = list(open("data/Health_Clothing/test_B.txt").readline())
     test_B = [t.strip() for t in test_B]
+    test_B = [int(t) for t in test_B]
     # z = np.load(os.path.join(checkpoint_dir, "text.npz"))
     # z = z['arr_0']
     # print(z.shape)
@@ -276,7 +278,7 @@ def main():
     # user_B_test = user_B[train_size+val_size:]
     user_A_test = np.array(user_A)[test_A]
     user_B_test = np.array(user_B)[test_B]
-    
+
     # dense_A_test = dense_A[(train_size + val_size):]
     # dense_B_test = dense_B[(train_size + val_size):]
     dense_A_test = np.array(dense_A)[test_A]
