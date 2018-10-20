@@ -285,6 +285,8 @@ def main():
     # dense_B_test = dense_B[(train_size + val_size):]
     dense_A_test = np.array(dense_A)[test_A]
     dense_B_test = np.array(dense_B)[test_B]
+    test_A = [t - train_size - val_size for t in test_A]
+    test_B = [t - train_size - val_size for t in test_B]
 
     model = Translation(batch_size, health_num, clothing_num, encoding_dim_A, decoding_dim_A, encoding_dim_B,
                         decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim)
@@ -330,8 +332,7 @@ def main():
                     [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
                     feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
                 print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
-                test_A = [t-train_size-val_size for t in test_A]
-                test_B = [t-train_size-val_size for t in test_B]
+
                 y_ab = y_ab[test_B]
                 y_ba = y_ba[test_A]
 
