@@ -171,7 +171,7 @@ class Translation:
 
         self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B
         self.loss_dis = loss_GAN_A + loss_GAN_B
-        self.loss_rec = self.loss_val_a + self.loss_val_b
+        self.loss_rec = 10*self.loss_val_a + 100*self.loss_val_b
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
