@@ -51,7 +51,7 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i)
-                x_ = batch_norm(x_)
+                x_ = batch_norm(x_, decay=0.995)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
@@ -71,7 +71,6 @@ class Translation:
                 x_ = tf.nn.dropout(x_, 0.2)
             for i in range(len(adv_dim)):
                 x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
-                x_ = batch_norm(x_)
         return x_
 
     def share_layer(self, x, scope, dim, reuse=False):
@@ -331,7 +330,7 @@ def main():
                 saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
                 loss_test_a, loss_test_b, y_ab, y_ba = sess.run(
                     [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
-                    feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
+                 feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
                 print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
 
                 # y_ab = y_ab[test_B]
