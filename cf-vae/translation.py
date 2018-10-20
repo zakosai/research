@@ -47,7 +47,7 @@ class Translation:
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.1)
+            x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i)
@@ -179,10 +179,10 @@ class Translation:
 
 
 def create_dataset(num_A, num_B):
-    dense_A = read_data("data/Video_TV/Video_user_product.txt")
+    dense_A = read_data("data/Health_Clothing/Health_user_product.txt")
     user_A = one_hot_vector(dense_A, num_A)
 
-    dense_B = read_data("data/Video_TV/TV_user_product.txt")
+    dense_B = read_data("data/Health_Clothing/Clothing_user_product.txt")
     user_B = one_hot_vector(dense_B, num_B)
 
     return user_A, user_B, dense_A, dense_B
@@ -238,8 +238,8 @@ def calc_rmse(pred, test):
 def main():
     iter = 500
     batch_size= 500
-    health_num = 10072
-    clothing_num = 28578
+    health_num = 16070
+    clothing_num = 18226
     encoding_dim_A = [1000, 500]
     encoding_dim_B = [1000, 500]
     share_dim = [100]
@@ -247,7 +247,7 @@ def main():
     decoding_dim_B = [500, 1000, clothing_num]
     z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
-    checkpoint_dir = "translation/Video_TV/"
+    checkpoint_dir = "translation/Health_Clothing/"
     user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num)
     # z = np.load(os.path.join(checkpoint_dir, "text.npz"))
     # z = z['arr_0']
