@@ -280,8 +280,8 @@ def main():
     user_B_val = user_B[train_size:train_size+val_size]
     # user_A_test = user_A[train_size+val_size:]
     # user_B_test = user_B[train_size+val_size:]
-    user_A_test = np.array(user_A)[test_A]
-    user_B_test = np.array(user_B)[test_B]
+    user_A_test = np.array(user_A)[test_B]
+    user_B_test = np.array(user_B)[test_A]
 
     # dense_A_test = dense_A[(train_size + val_size):]
     # dense_B_test = dense_B[(train_size + val_size):]
