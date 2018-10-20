@@ -278,10 +278,8 @@ def main():
 
     user_A_val = user_A[train_size:train_size+val_size]
     user_B_val = user_B[train_size:train_size+val_size]
-    # user_A_test = user_A[train_size+val_size:]
-    # user_B_test = user_B[train_size+val_size:]
-    user_A_test = np.array(user_A)[test_B]
-    user_B_test = np.array(user_B)[test_A]
+    user_A_test = user_A[train_size+val_size:]
+    user_B_test = user_B[train_size+val_size:]
 
     # dense_A_test = dense_A[(train_size + val_size):]
     # dense_B_test = dense_B[(train_size + val_size):]
@@ -332,6 +330,8 @@ def main():
                     [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
                     feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
                 print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
+                y_ab = y_ab[test_B]
+                y_ba = y_ba[test_A]
 
                 print("recall B: %f" % (calc_recall(y_ab, dense_B_test)))
                 print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
