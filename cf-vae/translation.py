@@ -171,7 +171,7 @@ class Translation:
 
         self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B
         self.loss_dis = loss_GAN_A + loss_GAN_B
-        self.loss_rec = 10*self.loss_val_a + 10*self.loss_val_b
+        self.loss_rec = 100*self.loss_val_a + 100*self.loss_val_b
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
@@ -340,9 +340,9 @@ def main():
                 print("recall B: %f" % (calc_recall(y_ab, dense_B_test)))
                 print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
             model.train = True
-        # if i%100 == 0:
-        #     model.learning_rate /= 2
-        #     print("decrease lr to %f"%model.learning_rate)
+        if i%100 == 0:
+            model.learning_rate /= 2
+            print("decrease lr to %f"%model.learning_rate)
 
             # pred = np.array(y_ab).flatten()
             # test = np.array(user_B_val).flatten()
