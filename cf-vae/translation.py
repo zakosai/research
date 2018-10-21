@@ -51,7 +51,7 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i)
-                x_ = batch_norm(x_, decay=0.99)
+                x_ = batch_norm(x_, decay=0.9)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
@@ -113,7 +113,7 @@ class Translation:
             x)))
         loss_fake = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_fake, labels=tf.zeros_like(
             x_fake)))
-        return loss_real + loss_fake*0.5
+        return loss_real + loss_fake
     def loss_generator(self, x):
         loss_real = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x, labels=tf.ones_like(
             x)))
