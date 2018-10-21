@@ -165,8 +165,6 @@ class Translation:
                     + self.lambda_4 * self.loss_reconstruct(x_A, y_ABA)
         loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_B, z_sigma_B) + self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB)\
                     + self.loss_reconstruct(x_B, y_BAB)
-        # loss_CC_A = self.lambda_4 * self.loss_reconstruct(x_A, y_ABA)
-        # loss_CC_B = self.lambda_4 * self.loss_reconstruct(x_B, y_BAB)
 
         self.loss_CC = loss_CC_A + loss_CC_B
 
@@ -175,22 +173,20 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + 100*self.loss_generator(y_ABA) + \
-                        100*self.loss_generator(y_BAB)
+        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B
         self.loss_dis = loss_d_A + loss_d_B
-        self.loss_rec = 100*self.loss_val_a + 10*self.loss_val_b
+        self.loss_rec = 100*self.loss_val_a + 100*self.loss_val_b
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
-        self.train_op_dis_A = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_d_A)
-        self.train_op_dis_B = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_d_B)
+        self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
         self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
 
 
 def create_dataset(num_A, num_B):
-    dense_A = read_data("data/Video_TV/Video_user_product.txt")
+    dense_A = read_data("data/Health_Beauty/Health_user_product.txt")
     user_A = one_hot_vector(dense_A, num_A)
 
-    dense_B = read_data("data/Video_TV/TV_user_product.txt")
+    dense_B = read_data("data/Health_Beauty/Beauty_user_product.txt")
     user_B = one_hot_vector(dense_B, num_B)
 
     return user_A, user_B, dense_A, dense_B
@@ -246,8 +242,8 @@ def calc_rmse(pred, test):
 def main():
     iter = 500
     batch_size= 500
-    health_num = 10072
-    clothing_num = 28578
+    health_num = 15313
+    clothing_num = 10935
     encoding_dim_A = [1000, 500]
     encoding_dim_B = [1000, 500]
     share_dim = [200]
@@ -255,7 +251,7 @@ def main():
     decoding_dim_B = [500, 1000, clothing_num]
     z_dim = 100
     adv_dim_A = adv_dim_B = [200, 100, 1]
-    checkpoint_dir = "translation/Video_TV/"
+    checkpoint_dir = "translation/Health_Beauty/"
     user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num)
     # test_A = list(open("data/Health_Clothing/test_A.txt").readlines())
     # test_A = [t.strip() for t in test_A]
@@ -318,10 +314,9 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
-                                                     model.loss_CC], feed_dict=feed)
-            loss_dis = sess.run([model.train_op_dis_A], feed_dict=feed)
-            loss_dis = sess.run([model.train_op_dis_B], feed_dict=feed)
+            _, loss_gen, loss_vae, loss_gan, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
+                                                     model.loss_GAN, model.loss_CC], feed_dict=feed)
+            _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
             _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
 
         # print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss gan %f, loss cc %f"%(loss_gen, loss_dis,
