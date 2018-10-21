@@ -108,12 +108,16 @@ class Translation:
         # return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
         return tf.reduce_mean(tf.abs(x - x_recon))
 
-    def loss_GAN(self, x, x_fake):
+    def loss_discriminator(self, x, x_fake):
         loss_real = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x, labels=tf.ones_like(
             x)))
         loss_fake = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_fake, labels=tf.zeros_like(
             x_fake)))
-        return loss_real + loss_fake
+        return loss_real + loss_fake*0.5
+    def loss_generator(self, x):
+        loss_real = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x, labels=tf.ones_like(
+            x)))
+        return loss_real
 
     def build_model(self):
         self.x_A = tf.placeholder(tf.float32, [None, self.dim_A], name='input_A')
@@ -152,15 +156,17 @@ class Translation:
         self.loss_VAE = loss_VAE_A + loss_VAE_B
 
         # Loss GAN
-        loss_GAN_A = self.lambda_0 * self.loss_GAN(adv_AA, adv_BA)
-        loss_GAN_B = self.lambda_0 * self.loss_GAN(adv_BB, adv_AB)
-        self.loss_GAN = loss_GAN_A + loss_GAN_B
+        loss_d_A = self.lambda_0 * self.loss_discriminator(adv_AA, adv_BA)
+        loss_d_B = self.lambda_0 * self.loss_discriminator(adv_BB, adv_AB)
+        self.loss_d= loss_d_A + loss_d_B
 
         # Loss cycle - consistency (CC)
-        loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA)\
-                    + self.lambda_4 * self.loss_reconstruct(x_A, y_ABA)
-        loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_B, z_sigma_B) + self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB)\
-                    + self.loss_reconstruct(x_B, y_BAB)
+        # loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA)\
+        #             + self.lambda_4 * self.loss_reconstruct(x_A, y_ABA)
+        # loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_B, z_sigma_B) + self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB)\
+        #             + self.loss_reconstruct(x_B, y_BAB)
+        loss_CC_A = self.lambda_4*self.loss_reconstruct(x_A, y_ABA)
+        loss_CC_B = self.lambda_4 * self.loss_reconstruct(x_B, y_BAB)
 
         self.loss_CC = loss_CC_A + loss_CC_B
 
@@ -169,12 +175,14 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B
-        self.loss_dis = loss_GAN_A + loss_GAN_B
+        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + self.loss_generator(y_ABA) + \
+                        self.loss_generator(y_BAB)
+        self.loss_dis = loss_d_A + loss_d_B
         self.loss_rec = 100*self.loss_val_a + 100*self.loss_val_b
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
-        self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
+        self.train_op_dis_A = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_d_A)
+        self.train_op_dis_B = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_d_B)
         self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
 
 
