@@ -175,10 +175,10 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + self.loss_generator(y_ABA) + \
-                        self.loss_generator(y_BAB)
+        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + 100*self.loss_generator(y_ABA) + \
+                        100*self.loss_generator(y_BAB)
         self.loss_dis = loss_d_A + loss_d_B
-        self.loss_rec = 100*self.loss_val_a + 100*self.loss_val_b
+        self.loss_rec = 100*self.loss_val_a + 10*self.loss_val_b
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         self.train_op_dis_A = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_d_A)
