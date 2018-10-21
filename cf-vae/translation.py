@@ -51,7 +51,7 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i)
-                x_ = batch_norm(x_, decay=0.9)
+                x_ = batch_norm(x_, decay=0.99)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
@@ -175,7 +175,7 @@ class Translation:
 
         self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B
         self.loss_dis = loss_d_A + loss_d_B
-        self.loss_rec = 10*self.loss_val_a + 100*self.loss_val_b
+        self.loss_rec = 10*self.loss_val_a + 50*self.loss_val_b
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
