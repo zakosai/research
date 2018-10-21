@@ -318,9 +318,10 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            _, loss_gen, loss_vae, loss_gan, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
-                                                     model.loss_GAN, model.loss_CC], feed_dict=feed)
-            _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
+            _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
+                                                     model.loss_CC], feed_dict=feed)
+            _, loss_dis = sess.run([model.train_op_dis_A], feed_dict=feed)
+            _, loss_dis = sess.run([model.train_op_dis_B], feed_dict=feed)
             _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
 
         # print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss gan %f, loss cc %f"%(loss_gen, loss_dis,
