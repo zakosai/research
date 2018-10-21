@@ -181,8 +181,8 @@ class Translation:
         self.loss_rec = 100*self.loss_val_a + 100*self.loss_val_b
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
-        self.train_op_dis_A = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_d_A)
-        self.train_op_dis_B = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_d_B)
+        self.train_op_dis_A = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_d_A)
+        self.train_op_dis_B = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_d_B)
         self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
 
 
