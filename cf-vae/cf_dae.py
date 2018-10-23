@@ -547,7 +547,7 @@ class cf_vae_extend:
                 pred = self.pred(i + train_val_size, "health", thred)
                 top_M = np.argsort(-pred)[:100]
                 hits = set(top_M) & set(real)
-                recall = float(len(hits)) / float(len(real))
+                recall = float(len(hits)) / min(float(len(real)),100)
                 recall_health.append(recall)
         print(len(recall_clothing), len(recall_health))
         print("average recall health: %f, average recall grocery %f"%(np.mean(recall_health), np.mean(recall_clothing)))

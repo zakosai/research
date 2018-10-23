@@ -229,7 +229,7 @@ def calc_recall(pred, test):
     recall = []
     for i in range(len(pred_ab)):
         hits = set(test[i]) & set(pred_ab[i])
-        recall_val = float(len(hits)) / len(test[i])
+        recall_val = float(len(hits)) / min(len(test[i]), 100)
         recall.append(recall_val)
     return np.mean(np.array(recall))
 
