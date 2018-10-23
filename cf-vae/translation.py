@@ -232,8 +232,7 @@ def calc_recall(pred, test):
     recall = []
     for i in range(len(pred)):
         p = pred[i]
-        p = np.argsort(p)[::-1]
-        p = p[:10]
+        p = np.argsort(-p)[:10]
         hits = set(test[i]) & set(p)
         recall_val = float(len(hits)) / min(len(test[i]), 10)
         recall.append(recall_val)
