@@ -182,17 +182,17 @@ class Translation:
         self.loss_rec = self.loss_val_a + self.loss_val_b
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
-        adv_varlist = [var for var in tf.all_variables() if 'adv' in var.name]
-        print(adv_varlist)
-        self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis, var_list=adv_varlist)
+        # adv_varlist = [var for var in tf.all_variables() if 'adv' in var.name]
+        # print(adv_varlist)
+        self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
         # self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
 
 
-def create_dataset(num_A, num_B):
-    dense_A = read_data("data/Grocery_Health/Health_user_product.txt")
+def create_dataset(num_A, num_B, A="Health", B="Clothing"):
+    dense_A = read_data("data/%s_%s/%s_user_product.txt"%(A,B,A))
     user_A = one_hot_vector(dense_A, num_A)
 
-    dense_B = read_data("data/Grocery_Health/Grocery_user_product.txt")
+    dense_B = read_data("data/%s_%s/%s_user_product.txt"%(A, B, B))
     user_B = one_hot_vector(dense_B, num_B)
 
     return user_A, user_B, dense_A, dense_B
@@ -248,8 +248,10 @@ def calc_rmse(pred, test):
 def main():
     iter = 3000
     batch_size= 500
-    health_num = 15084
-    clothing_num = 8365
+    A = "Health"
+    B = "Clothing"
+    health_num = 16070
+    clothing_num = 18226
     encoding_dim_A = [1000, 500]
     encoding_dim_B = [1000, 500]
     share_dim = [100]
@@ -257,8 +259,8 @@ def main():
     decoding_dim_B = [500,1000, clothing_num]
     z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
-    checkpoint_dir = "translation/Grocery_Health/"
-    user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num)
+    checkpoint_dir = "translation/%s_%s/"%(A,B)
+    user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num, A, B)
     # test_A = list(open("data/Health_Clothing/test_A.txt").readlines())
     # test_A = [t.strip() for t in test_A]
     # if test_A[-1] == '':
