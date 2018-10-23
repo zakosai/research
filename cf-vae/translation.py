@@ -47,17 +47,17 @@ class Translation:
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.2)
+            x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i)
-                x_ = batch_norm(x_, decay=0.99)
+                x_ = batch_norm(x_, decay=0.999)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.2)
+            x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i)
@@ -68,7 +68,7 @@ class Translation:
 
         with tf.variable_scope(scope, reuse=reuse):
             if self.train:
-                x_ = tf.nn.dropout(x_, 0.2)
+                x_ = tf.nn.dropout(x_, 0.3)
             for i in range(len(adv_dim)):
                 x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
         return x_
@@ -76,7 +76,7 @@ class Translation:
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.2)
+            x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i)
@@ -93,7 +93,7 @@ class Translation:
     def encode(self, x, scope, dim, reuse_enc, reuse_share, reuse_z=False):
         h = self.enc(x, "encode_%s"%scope, dim, reuse_enc)
         h = self.share_layer(h, "encode", self.share_dim, reuse_share)
-        z, z_mu, z_sigma = self.gen_z(h, "VAE_%s"%scope, reuse=reuse_z)
+        z, z_mu, z_sigma = self.gen_z(h, "VAE", reuse=reuse_z)
         return z, z_mu, z_sigma
 
     def decode(self, x, scope, dim, reuse_dec, reuse_share):
@@ -131,7 +131,7 @@ class Translation:
         y_AA = self.decode(z_A, "A", self.decode_dim_A, False, False)
 
         # VAE for domain B
-        z_B, z_mu_B, z_sigma_B = self.encode(x_B, "B", self.encode_dim_B, False, True)
+        z_B, z_mu_B, z_sigma_B = self.encode(x_B, "B", self.encode_dim_B, False, True, True)
         y_BB = self.decode(z_B, "B", self.decode_dim_B, False, True)
 
         # Adversal
