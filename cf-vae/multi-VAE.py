@@ -236,7 +236,7 @@ def main():
                                               feed_dict={model.x:user_val_A})
             loss_val_b, y_a = sess.run([model.loss, model.x_recon],
                                        feed_dict={model.x: user_val_B})
-            print(len(y_a), len(y_b))
+            print(len(y_a[0]), len(y_b[0]))
             recall = calc_recall(y_b[health_num:], dense_B_val) + calc_recall(y_a[:health_num], dense_A_val)
             print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall))
             if recall > max_recall:
