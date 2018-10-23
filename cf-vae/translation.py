@@ -84,8 +84,8 @@ class Translation:
 
     def gen_z(self, h, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
-            z_mu = fully_connected(h, self.z_dim, self.active_function, scope="z_mu")
-            z_sigma = fully_connected(h, self.z_dim, self.active_function, scope="z_sigma")
+            z_mu = fully_connected(h, self.z_dim, scope="z_mu")
+            z_sigma = fully_connected(h, self.z_dim, scope="z_sigma")
             e = tf.random_normal(tf.shape(z_mu))
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
         return z, z_mu, z_sigma
