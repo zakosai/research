@@ -51,8 +51,7 @@ class Translation:
             x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
-                                     weights_regularizer=self.regularizer)
+                x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i)
                 x_ = batch_norm(x_, decay=0.995)
         return x_
 
@@ -62,9 +61,7 @@ class Translation:
             x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
-                                     weights_regularizer=self.regularizer)
-                x_ = batch_norm(x_, decay=0.995)
+                x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i)
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
@@ -252,9 +249,9 @@ def main():
     iter = 3000
     batch_size= 500
     A = "Health"
-    B = "Clothing"
-    health_num = 16070
-    clothing_num = 18226
+    B = "Grocery"
+    health_num = 15084
+    clothing_num = 8364
     encoding_dim_A = [1000, 500]
     encoding_dim_B = [1000, 500]
     share_dim = [100]
