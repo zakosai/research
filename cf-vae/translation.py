@@ -56,8 +56,8 @@ class Translation:
 
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.3)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i)
@@ -75,8 +75,8 @@ class Translation:
 
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.3)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i)
@@ -131,7 +131,7 @@ class Translation:
         y_AA = self.decode(z_A, "A", self.decode_dim_A, False, False)
 
         # VAE for domain B
-        z_B, z_mu_B, z_sigma_B = self.encode(x_B, "B", self.encode_dim_B, False, True)
+        z_B, z_mu_B, z_sigma_B = self.encode(x_B, "B", self.encode_dim_B, False, True, True)
         y_BB = self.decode(z_B, "B", self.decode_dim_B, False, True)
 
         # Adversal
