@@ -51,7 +51,8 @@ class Translation:
         #     x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i)
+                x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
+                                     weights_regularizer=self.regularizer)
                 # x_ = batch_norm(x_, decay=0.995)
         return x_
 
@@ -61,7 +62,8 @@ class Translation:
         #     x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i)
+                x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
+                                     weights_regularizer=self.regularizer)
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
@@ -175,14 +177,14 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B
+        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + tf.losses.get_regularization_loss()
         self.loss_dis = loss_d_A + loss_d_B
         self.loss_rec = self.loss_val_a + self.loss_val_b
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
-        # adv_varlist = [var for var in tf.all_variables() if 'adv' in var.name]
+        adv_varlist = [var for var in tf.all_variables() if 'adv' in var.name]
         # print(adv_varlist)
-        self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
+        self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis, var_list=adv_varlist)
         # self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
 
 
