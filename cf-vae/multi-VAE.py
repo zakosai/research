@@ -236,12 +236,12 @@ def main():
                                               feed_dict={model.x:user_val_A})
             loss_val_b, y_a = sess.run([model.loss, model.x_recon],
                                        feed_dict={model.x: user_val_B})
-
+            print(len(y_a), len(y_b))
             recall = calc_recall(y_b[health_num:], dense_B_val) + calc_recall(y_a[:health_num], dense_A_val)
             print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall))
             if recall > max_recall:
                 max_recall = recall
-            saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
+            saver.save(sess, os.path.join(checkpoint_dir, 'multi-VAE-model'), i)
             loss_test_a, y_b= sess.run([model.loss, model.x_recon], feed_dict={model.x: user_test_A})
             loss_test_b, y_a = sess.run([model.loss, model.x_recon], feed_dict={model.x: user_test_B})
             print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
