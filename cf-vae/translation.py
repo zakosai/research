@@ -47,7 +47,7 @@ class Translation:
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.1)
+            x_ = tf.nn.dropout(x_, 0.2)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i)
@@ -175,7 +175,7 @@ class Translation:
 
         self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B
         self.loss_dis = loss_d_A + loss_d_B
-        self.loss_rec = 10*self.loss_val_a + 50*self.loss_val_b
+        self.loss_rec = 100*self.loss_val_a + 10*self.loss_val_b
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
@@ -229,7 +229,7 @@ def calc_recall(pred, test):
     recall = []
     for i in range(len(pred_ab)):
         hits = set(test[i]) & set(pred_ab[i])
-        recall_val = float(len(hits)) / min(len(test[i]), 10)
+        recall_val = float(len(hits)) / len(test[i])
         recall.append(recall_val)
     return np.mean(np.array(recall))
 
