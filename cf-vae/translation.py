@@ -175,7 +175,7 @@ class Translation:
 
         self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B
         self.loss_dis = loss_d_A + loss_d_B
-        self.loss_rec = self.loss_val_a + self.loss_val_b
+        self.loss_rec = 100*self.loss_val_a + self.loss_val_b
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
@@ -225,7 +225,7 @@ def one_hot_vector2(A, num_product):
     return one_hot
 
 def calc_recall(pred, test):
-    pred_ab = np.argsort(pred)[::-1][:, :10]
+    pred_ab = np.argsort(pred)[::-1][:, :100]
     recall = []
     for i in range(len(pred_ab)):
         hits = set(test[i]) & set(pred_ab[i])
