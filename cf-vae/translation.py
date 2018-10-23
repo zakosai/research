@@ -177,9 +177,9 @@ class Translation:
         self.loss_dis = loss_d_A + loss_d_B
         self.loss_rec = 100*self.loss_val_a + 10*self.loss_val_b
 
-        self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
-        self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
-        self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
+        self.train_op_gen = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.loss_gen)
+        self.train_op_dis = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.loss_dis)
+        self.train_op_rec = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.loss_rec)
 
 
 def create_dataset(num_A, num_B):
