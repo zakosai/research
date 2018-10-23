@@ -105,8 +105,8 @@ class Translation:
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
     def loss_reconstruct(self, x, x_recon):
-        # return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
-        return tf.reduce_mean(tf.abs(x - x_recon))
+        return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
+        # return tf.reduce_mean(tf.abs(x - x_recon))
 
     def loss_discriminator(self, x, x_fake):
         loss_real = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x, labels=tf.ones_like(
@@ -225,11 +225,11 @@ def one_hot_vector2(A, num_product):
     return one_hot
 
 def calc_recall(pred, test):
-    pred_ab = np.argsort(pred)[::-1][:, :100]
+    pred_ab = np.argsort(pred)[::-1][:, :10]
     recall = []
     for i in range(len(pred_ab)):
         hits = set(test[i]) & set(pred_ab[i])
-        recall_val = float(len(hits)) / min(len(test[i]), 100)
+        recall_val = float(len(hits)) / min(len(test[i]), 10)
         recall.append(recall_val)
     return np.mean(np.array(recall))
 
