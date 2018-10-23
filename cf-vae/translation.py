@@ -232,10 +232,12 @@ def one_hot_vector2(A, num_product):
     return one_hot
 
 def calc_recall(pred, test):
-    pred_ab = np.argsort(pred)[::-1][:, :10]
     recall = []
-    for i in range(len(pred_ab)):
-        hits = set(test[i]) & set(pred_ab[i])
+    for i in range(len(pred)):
+        p = pred[i]
+        p = np.argsort(p)[::-1]
+        p = p[:10]
+        hits = set(test[i]) & set(p)
         recall_val = float(len(hits)) / min(len(test[i]), 10)
         recall.append(recall_val)
     return np.mean(np.array(recall))
