@@ -93,7 +93,7 @@ class Translation:
     def encode(self, x, scope, dim, reuse_enc, reuse_share, reuse_z=False):
         h = self.enc(x, "encode_%s"%scope, dim, reuse_enc)
         h = self.share_layer(h, "encode", self.share_dim, reuse_share)
-        z, z_mu, z_sigma = self.gen_z(h, "VAE", reuse=reuse_z)
+        z, z_mu, z_sigma = self.gen_z(h, "VAE_%s"%scope, reuse=reuse_z)
         return z, z_mu, z_sigma
 
     def decode(self, x, scope, dim, reuse_dec, reuse_share):
@@ -113,7 +113,7 @@ class Translation:
             x)))
         loss_fake = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_fake, labels=tf.zeros_like(
             x_fake)))
-        return loss_real + loss_fake
+        return loss_real + loss_fake*0.5
     def loss_generator(self, x):
         loss_real = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x, labels=tf.ones_like(
             x)))
@@ -131,7 +131,7 @@ class Translation:
         y_AA = self.decode(z_A, "A", self.decode_dim_A, False, False)
 
         # VAE for domain B
-        z_B, z_mu_B, z_sigma_B = self.encode(x_B, "B", self.encode_dim_B, False, True, True)
+        z_B, z_mu_B, z_sigma_B = self.encode(x_B, "B", self.encode_dim_B, False, True)
         y_BB = self.decode(z_B, "B", self.decode_dim_B, False, True)
 
         # Adversal
@@ -175,7 +175,7 @@ class Translation:
 
         self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B
         self.loss_dis = loss_d_A + loss_d_B
-        self.loss_rec = 100*self.loss_val_a + self.loss_val_b
+        self.loss_rec = self.loss_val_a + self.loss_val_b
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
