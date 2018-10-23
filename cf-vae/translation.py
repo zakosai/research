@@ -332,17 +332,17 @@ def main():
             print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall))
             if recall > max_recall:
                 max_recall = recall
-                saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
-                loss_test_a, loss_test_b, y_ab, y_ba = sess.run(
-                    [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
-                 feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
-                print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
+            saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
+            loss_test_a, loss_test_b, y_ab, y_ba = sess.run(
+                [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
+             feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
+            print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
 
-                # y_ab = y_ab[test_B]
-                # y_ba = y_ba[test_A]
+            # y_ab = y_ab[test_B]
+            # y_ba = y_ba[test_A]
 
-                print("recall B: %f" % (calc_recall(y_ab, dense_B_test)))
-                print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
+            print("recall B: %f" % (calc_recall(y_ab, dense_B_test)))
+            print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
             model.train = True
         if i%100 == 0:
             model.learning_rate /= 2
