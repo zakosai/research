@@ -46,7 +46,6 @@ class Translation:
         #     x_ = tf.nn.embedding_lookup(self.z_B, ids)
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
-        x_ = tf.nn.l2_normalize(x_)
         if self.train:
             x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
@@ -180,7 +179,7 @@ class Translation:
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
-        self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
+        # self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
 
 
 def create_dataset(num_A, num_B):
@@ -318,7 +317,7 @@ def main():
             _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
                                                 model.loss_CC], feed_dict=feed)
             _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
-            _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
+            # _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
 
         # print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss gan %f, loss cc %f"%(loss_gen, loss_dis,
         #                                                                         loss_vae, loss_gan, loss_cc))
