@@ -248,10 +248,10 @@ def calc_rmse(pred, test):
 def main():
     iter = 3000
     batch_size= 500
-    A = "Health"
-    B = "Clothing"
-    health_num = 16070
-    clothing_num = 18226
+    A = "Video"
+    B = "TV"
+    health_num = 10072
+    clothing_num = 28578
     encoding_dim_A = [1000, 500]
     encoding_dim_B = [1000, 500]
     share_dim = [100]
