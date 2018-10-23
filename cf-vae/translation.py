@@ -30,7 +30,7 @@ class Translation:
         self.lambda_3 = lambda_3
         self.lambda_4 = lambda_4
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.tanh
+        self.active_function = tf.nn.sigmoid
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
@@ -46,6 +46,7 @@ class Translation:
         #     x_ = tf.nn.embedding_lookup(self.z_B, ids)
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
+        x_ = tf.nn.l2_normalize(x_)
         if self.train:
             x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
