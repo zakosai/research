@@ -50,10 +50,10 @@ class Translation:
         # x_ = tf.nn.l2_normalize(x)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
-                                     weights_initializer=tf.random_normal_initializer(0, 1),
+                x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                # x_ = tf.nn.leaky_relu(x_)
+                x_ = tf.nn.leaky_relu(x_)
+                # x_ = batch_norm(x_, decay=0.995)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
@@ -62,10 +62,8 @@ class Translation:
         #     x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
-                                     weights_initializer=tf.random_normal_initializer(0, 1),
+                x_ = fully_connected(x_, decode_dim[i], tf.nn.sigmoid, scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
-            x_ = tf.nn.sigmoid(x_)
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
@@ -75,8 +73,7 @@ class Translation:
             # if self.train:
             #     x_ = tf.nn.dropout(x_, 0.3)
             for i in range(len(adv_dim)):
-                x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i,
-                                     weights_initializer= tf.random_normal_initializer(0, 1), )
+                x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
         return x_
 
     def share_layer(self, x, scope, dim, reuse=False):
@@ -92,9 +89,8 @@ class Translation:
 
     def gen_z(self, h, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
-            z_mu = fully_connected(h, self.z_dim, scope="z_mu", weights_initializer= tf.random_normal_initializer(0, 1))
-            z_sigma = fully_connected(h, self.z_dim,  scope="z_sigma", weights_initializer=
-            tf.random_normal_initializer(0, 1))
+            z_mu = fully_connected(h, self.z_dim, self.active_function, scope="z_mu")
+            z_sigma = fully_connected(h, self.z_dim, self.active_function, scope="z_sigma")
             e = tf.random_normal(tf.shape(z_mu))
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
         return z, z_mu, z_sigma
@@ -186,8 +182,7 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + tf.losses.get_regularization_loss() + \
-                        self.loss_generator(y_AA) + self.loss_generator(y_BB)
+        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + tf.losses.get_regularization_loss() 
         self.loss_dis = loss_d_A + loss_d_B
         self.loss_rec =  self.loss_val_a + self.loss_val_b
 
