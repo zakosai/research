@@ -168,9 +168,9 @@ class Translation:
 
         # Loss cycle - consistency (CC)
         loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA)\
-                    + self.lambda_4 * self.loss_reconstruct(x_A, y_BA)
+                    + self.lambda_4 * self.loss_reconstruct(x_A, y_ABA)
         loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_B, z_sigma_B) + self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB)\
-                    + self.lambda_4 * self.loss_reconstruct(x_B, y_AB)
+                    + self.lambda_4 * self.loss_reconstruct(x_B, y_BAB)
 
         self.loss_CC = loss_CC_A + loss_CC_B
 
@@ -253,9 +253,9 @@ def main():
     iter = 3000
     batch_size= 500
     A = "Health"
-    B = "Clothing"
-    health_num = 16070
-    clothing_num = 18226
+    B = "Grocery"
+    health_num = 15084
+    clothing_num = 8364
     encoding_dim_A = [1000, 500]
     encoding_dim_B = [1000, 500]
     share_dim = [100]
