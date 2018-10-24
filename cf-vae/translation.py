@@ -83,7 +83,6 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], scope="share_%d"%i,
-                                     weights_initializer= tf.random_normal_initializer(0, 1),
                                      weights_regularizer=self.regularizer)
         return x_
 
@@ -182,7 +181,7 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + tf.losses.get_regularization_loss() 
+        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + tf.losses.get_regularization_loss()
         self.loss_dis = loss_d_A + loss_d_B
         self.loss_rec =  self.loss_val_a + self.loss_val_b
 
