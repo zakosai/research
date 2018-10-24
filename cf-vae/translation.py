@@ -183,7 +183,7 @@ class Translation:
         self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + tf.losses.get_regularization_loss() + \
                         self.loss_generator(y_AA) + self.loss_generator(y_BB)
         self.loss_dis = loss_d_A + loss_d_B
-        self.loss_rec = 100 * self.loss_val_a + 100*self.loss_val_b
+        self.loss_rec =  self.loss_val_a + self.loss_val_b
 
         # self.train_op_VAE = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_VAE)
 
