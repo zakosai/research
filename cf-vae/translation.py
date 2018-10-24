@@ -50,8 +50,8 @@ class Translation:
         # x_ = tf.nn.l2_normalize(x)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
-                                     weights_initializer=tf.random_normal_initializer(0, 0.02),
+                x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
+                                     weights_initializer=tf.random_normal_initializer(0, 1),
                                      weights_regularizer=self.regularizer)
                 # x_ = tf.nn.leaky_relu(x_)
         return x_
@@ -62,8 +62,8 @@ class Translation:
         #     x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                x_ = fully_connected(x_, decode_dim[i],scope="dec_%d" % i,
-                                     weights_initializer=tf.random_normal_initializer(0, 0.02),
+                x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
+                                     weights_initializer=tf.random_normal_initializer(0, 1),
                                      weights_regularizer=self.regularizer)
             x_ = tf.nn.sigmoid(x_)
         return x_
@@ -76,7 +76,7 @@ class Translation:
             #     x_ = tf.nn.dropout(x_, 0.3)
             for i in range(len(adv_dim)):
                 x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i,
-                                     weights_initializer= tf.random_normal_initializer(0, 0.02), )
+                                     weights_initializer= tf.random_normal_initializer(0, 1), )
         return x_
 
     def share_layer(self, x, scope, dim, reuse=False):
@@ -86,14 +86,15 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], scope="share_%d"%i,
-                                     weights_initializer= tf.random_normal_initializer(0, 0.02),
+                                     weights_initializer= tf.random_normal_initializer(0, 1),
                                      weights_regularizer=self.regularizer)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
-            z_mu = fully_connected(h, self.z_dim, scope="z_mu", weights_initializer= tf.random_normal_initializer(0, 0.02))
-            z_sigma = fully_connected(h, self.z_dim,  scope="z_sigma", weights_initializer= tf.random_normal_initializer(0, 0.02))
+            z_mu = fully_connected(h, self.z_dim, scope="z_mu", weights_initializer= tf.random_normal_initializer(0, 1))
+            z_sigma = fully_connected(h, self.z_dim,  scope="z_sigma", weights_initializer=
+            tf.random_normal_initializer(0, 1))
             e = tf.random_normal(tf.shape(z_mu))
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
         return z, z_mu, z_sigma
@@ -264,12 +265,12 @@ def main():
     B = "Grocery"
     health_num = 15084
     clothing_num = 8364
-    encoding_dim_A = [500]
-    encoding_dim_B = [500]
-    share_dim = [200]
-    decoding_dim_A = [500, health_num]
-    decoding_dim_B = [500, clothing_num]
-    z_dim = 100
+    encoding_dim_A = [1000, 500]
+    encoding_dim_B = [1000, 500]
+    share_dim = [100]
+    decoding_dim_A = [500, 1000, health_num]
+    decoding_dim_B = [500, 1000, clothing_num]
+    z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
     checkpoint_dir = "translation/%s_%s/"%(A,B)
     user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num, A, B)
