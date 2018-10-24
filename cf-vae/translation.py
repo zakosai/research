@@ -9,8 +9,8 @@ import os
 
 class Translation:
     def __init__(self, batch_size, dim_A, dim_B, encode_dim_A, decode_dim_A, encode_dim_B, decode_dim_B, adv_dim_A,
-                 adv_dim_B, z_dim, share_dim, z_A=None, z_B=None, eps=1e-10, lambda_0=10, lambda_1=0.01, lambda_2=100,
-                 lambda_3=0.01,
+                 adv_dim_B, z_dim, share_dim, z_A=None, z_B=None, eps=1e-10, lambda_0=10, lambda_1=0.1, lambda_2=100,
+                 lambda_3=0.1,
                  lambda_4=100, learning_rate=1e-4):
         self.batch_size = batch_size
         self.dim_A = dim_A
@@ -51,6 +51,7 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
+                                     weights_initializer=tf.random_normal_initializer(0, 0.02),
                                      weights_regularizer=self.regularizer)
                 # x_ = tf.nn.leaky_relu(x_)
         return x_
@@ -62,6 +63,7 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i],scope="dec_%d" % i,
+                                     weights_initializer=tf.random_normal_initializer(0, 0.02),
                                      weights_regularizer=self.regularizer)
             x_ = tf.nn.sigmoid(x_)
         return x_
@@ -72,9 +74,9 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             # if self.train:
             #     x_ = tf.nn.dropout(x_, 0.3)
-            for i in range(len(adv_dim)-1):
-                x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
-            x_ = fully_connected(x_, 1, scope="adv_last")
+            for i in range(len(adv_dim)):
+                x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i,
+                                     weights_initializer= tf.random_normal_initializer(0, 0.02), )
         return x_
 
     def share_layer(self, x, scope, dim, reuse=False):
@@ -84,13 +86,14 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], scope="share_%d"%i,
+                                     weights_initializer= tf.random_normal_initializer(0, 0.02),
                                      weights_regularizer=self.regularizer)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
-            z_mu = fully_connected(h, self.z_dim, scope="z_mu")
-            z_sigma = fully_connected(h, self.z_dim,  scope="z_sigma")
+            z_mu = fully_connected(h, self.z_dim, scope="z_mu", weights_initializer= tf.random_normal_initializer(0, 0.02))
+            z_sigma = fully_connected(h, self.z_dim,  scope="z_sigma", weights_initializer= tf.random_normal_initializer(0, 0.02))
             e = tf.random_normal(tf.shape(z_mu))
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
         return z, z_mu, z_sigma
