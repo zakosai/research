@@ -255,11 +255,11 @@ def main():
     B = "Clothing"
     health_num = 16070
     clothing_num = 18226
-    encoding_dim_A = [1000]
-    encoding_dim_B = [1000]
-    share_dim = [500, 100]
-    decoding_dim_A = [1000, health_num]
-    decoding_dim_B = [1000, clothing_num]
+    encoding_dim_A = [1000, 500]
+    encoding_dim_B = [1000, 500]
+    share_dim = [200, 100]
+    decoding_dim_A = [500, 1000, health_num]
+    decoding_dim_B = [500, 1000, clothing_num]
     z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
     checkpoint_dir = "translation/%s_%s/"%(A,B)
