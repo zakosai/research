@@ -53,7 +53,7 @@ class Translation:
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
                 x_ = tf.nn.leaky_relu(x_)
-                # x_ = batch_norm(x_, decay=0.995)
+                x_ = batch_norm(x_, decay=0.995)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
