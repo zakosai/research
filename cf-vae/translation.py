@@ -112,6 +112,9 @@ class Translation:
         # return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
         return tf.reduce_mean(tf.abs(x - x_recon))
 
+    def loss_recsys(self, pred, label):
+        return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=pred, labels=label))
+
     def loss_discriminator(self, x, x_fake):
         loss_real = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x, labels=tf.ones_like(
             x)))
@@ -172,8 +175,8 @@ class Translation:
 
         self.loss_CC = loss_CC_A + loss_CC_B
 
-        self.loss_val_a = self.loss_reconstruct(x_A, y_BA)
-        self.loss_val_b = self.loss_reconstruct(x_B, y_AB)
+        self.loss_val_a = self.loss_recsys(x_A, y_BA)
+        self.loss_val_b = self.loss_recsys(x_B, y_AB)
         self.y_BA = y_BA
         self.y_AB = y_AB
 
@@ -189,7 +192,7 @@ class Translation:
         print(adv_varlist)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_dis,
                                                                                          var_list=adv_varlist)
-        # self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
+        self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
 
 
 def create_dataset(num_A, num_B, A="Health", B="Clothing"):
@@ -331,7 +334,7 @@ def main():
                                                 model.loss_CC], feed_dict=feed)
             _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
             # _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
-            # _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
+            _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
 
         # print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss gan %f, loss cc %f"%(loss_gen, loss_dis,
         #                                                                         loss_vae, loss_gan, loss_cc))
