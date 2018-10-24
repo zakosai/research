@@ -325,8 +325,9 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            if i < 10:
+            if i < 30:
                 _, loss_vae = sess.run([model.train_op_VAE, model.loss_VAE], feed_dict=feed)
+                loss_gen = loss_dis = loss_cc = 0
             else:
                 _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
                                                     model.loss_CC], feed_dict=feed)
@@ -364,9 +365,9 @@ def main():
                 print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
 
             model.train = True
-        if i%100 == 0:
-            model.learning_rate /= 2
-            print("decrease lr to %f"%model.learning_rate)
+        # if i%100 == 0:
+        #     model.learning_rate /= 2
+        #     print("decrease lr to %f"%model.learning_rate)
 
             # pred = np.array(y_ab).flatten()
             # test = np.array(user_B_val).flatten()
