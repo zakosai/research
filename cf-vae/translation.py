@@ -106,7 +106,7 @@ class Translation:
         return y
 
     def loss_kl(self, mu, sigma):
-        return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
+        return tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
     def loss_reconstruct(self, x, x_recon):
         # return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
@@ -183,7 +183,7 @@ class Translation:
         self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + tf.losses.get_regularization_loss() + \
                         self.loss_generator(y_AA) + self.loss_generator(y_BB)
         self.loss_dis = loss_d_A + loss_d_B
-        self.loss_rec = self.loss_val_a + self.loss_val_b
+        self.loss_rec = 100 * self.loss_val_a + 100*self.loss_val_b
 
         # self.train_op_VAE = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_VAE)
 
@@ -308,7 +308,7 @@ def main():
     # test_B = [t - train_size - val_size for t in test_B]
 
     model = Translation(batch_size, health_num, clothing_num, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=2e-4)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=e-4)
     model.build_model()
 
     sess = tf.Session()
