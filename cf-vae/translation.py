@@ -53,7 +53,7 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
-                                     weights_initializer=tf.initializers.random_uniform(), weights_regularizer=self.regularizer)
+                                     weights_initializer=tf.initializers.random_normal(), weights_regularizer=self.regularizer)
                 # x_ = batch_norm(x_, decay=0.995)
         return x_
 
@@ -64,7 +64,7 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
-                                weights_initializer=tf.initializers.random_uniform(),
+                                weights_initializer=tf.initializers.random_normal(),
                                      weights_regularizer=self.regularizer)
         return x_
 
@@ -85,13 +85,13 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i,
-                                     weights_initializer=tf.initializers.random_uniform(),weights_regularizer=self.regularizer)
+                                     weights_initializer=tf.initializers.random_normal(),weights_regularizer=self.regularizer)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
-            z_mu = fully_connected(h, self.z_dim, scope="z_mu", weights_initializer=tf.initializers.random_uniform())
-            z_sigma = fully_connected(h, self.z_dim, scope="z_sigma", weights_initializer=tf.initializers.random_uniform())
+            z_mu = fully_connected(h, self.z_dim, scope="z_mu", weights_initializer=tf.initializers.random_normal())
+            z_sigma = fully_connected(h, self.z_dim, scope="z_sigma", weights_initializer=tf.initializers.random_normal())
             e = tf.random_normal(tf.shape(z_mu))
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
         return z, z_mu, z_sigma
