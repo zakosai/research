@@ -182,6 +182,8 @@ class Translation:
         self.loss_dis = loss_d_A + loss_d_B
         self.loss_rec = self.loss_val_a + self.loss_val_b
 
+        self.train_op_VAE = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_VAE)
+
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         adv_varlist = [var for var in tf.all_variables() if 'adv' in var.name]
         # print(adv_varlist)
@@ -253,11 +255,11 @@ def main():
     B = "Clothing"
     health_num = 16070
     clothing_num = 18226
-    encoding_dim_A = [1000, 500, 200]
-    encoding_dim_B = [1000, 500, 200]
+    encoding_dim_A = [1000, 500]
+    encoding_dim_B = [1000, 500]
     share_dim = [100]
-    decoding_dim_A = [200, 500, 1000, health_num]
-    decoding_dim_B = [200, 500, 1000, clothing_num]
+    decoding_dim_A = [500, 1000, health_num]
+    decoding_dim_B = [500, 1000, clothing_num]
     z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
     checkpoint_dir = "translation/%s_%s/"%(A,B)
@@ -323,9 +325,12 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
-                                                model.loss_CC], feed_dict=feed)
-            _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
+            if i < 11:
+                _, loss_vae = sess.run([model.train_op_VAE, model.loss_VAE], feed_dict=feed)
+            else:
+                _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
+                                                    model.loss_CC], feed_dict=feed)
+                _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
             # _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
 
         # print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss gan %f, loss cc %f"%(loss_gen, loss_dis,
