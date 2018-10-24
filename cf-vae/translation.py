@@ -52,7 +52,7 @@ class Translation:
         #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
+                x_ = fully_connected(x_, encode_dim[i], tf.nn.relu, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
                 # x_ = batch_norm(x_, decay=0.995)
         return x_
@@ -186,7 +186,7 @@ class Translation:
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         adv_varlist = [var for var in tf.all_variables() if 'adv' in var.name]
-        # print(adv_varlist)
+        print(adv_varlist)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis, var_list=adv_varlist)
         # self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
 
@@ -257,7 +257,7 @@ def main():
     clothing_num = 18226
     encoding_dim_A = [1000, 500]
     encoding_dim_B = [1000, 500]
-    share_dim = [200, 100]
+    share_dim = [100]
     decoding_dim_A = [500, 1000, health_num]
     decoding_dim_B = [500, 1000, clothing_num]
     z_dim = 50
@@ -329,7 +329,7 @@ def main():
             _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
                                                 model.loss_CC], feed_dict=feed)
             _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
-            _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
+            # _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
             # _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
 
         # print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss gan %f, loss cc %f"%(loss_gen, loss_dis,
