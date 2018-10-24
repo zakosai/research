@@ -257,7 +257,7 @@ def main():
     clothing_num = 18226
     encoding_dim_A = [1000, 500]
     encoding_dim_B = [1000, 500]
-    share_dim = [100]
+    share_dim = [200, 100]
     decoding_dim_A = [500, 1000, health_num]
     decoding_dim_B = [500, 1000, clothing_num]
     z_dim = 50
@@ -325,13 +325,10 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            if i < 100:
-                _, loss_vae = sess.run([model.train_op_VAE, model.loss_VAE], feed_dict=feed)
-                loss_gen = loss_dis = loss_cc = 0
-            else:
-                _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
-                                                    model.loss_CC], feed_dict=feed)
-                _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
+
+            _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
+                                                model.loss_CC], feed_dict=feed)
+            _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
             # _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
 
         # print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss gan %f, loss cc %f"%(loss_gen, loss_dis,
