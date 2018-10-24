@@ -62,10 +62,9 @@ class Translation:
         # if self.train:
         #     x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
-            for i in range(len(decode_dim)-1):
-                x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
+            for i in range(len(decode_dim)):
+                x_ = fully_connected(x_, decode_dim[i], tf.nn.relu, scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
-            x_ = fully_connected(x_, decode_dim[-1], tf.nn.sigmoid, scope="dec_last", weights_regularizer=self.regularizer)
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
@@ -305,7 +304,7 @@ def main():
     # test_B = [t - train_size - val_size for t in test_B]
 
     model = Translation(batch_size, health_num, clothing_num, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=0.01)
     model.build_model()
 
     sess = tf.Session()
