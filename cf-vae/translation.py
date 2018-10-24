@@ -89,8 +89,8 @@ class Translation:
 
     def gen_z(self, h, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
-            z_mu = fully_connected(h, self.z_dim, self.active_function, scope="z_mu")
-            z_sigma = fully_connected(h, self.z_dim, self.active_function, scope="z_sigma")
+            z_mu = fully_connected(h, self.z_dim,  scope="z_mu")
+            z_sigma = fully_connected(h, self.z_dim, scope="z_sigma")
             e = tf.random_normal(tf.shape(z_mu))
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
         return z, z_mu, z_sigma
@@ -182,7 +182,8 @@ class Translation:
         self.loss_dis = loss_d_A + loss_d_B
         self.loss_rec = self.loss_val_a + self.loss_val_b
 
-        self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
+        gen_varlist = [var for var in tf.all_variables() if 'adv' not in var.name]
+        self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen, var_list=gen_varlist)
         adv_varlist = [var for var in tf.all_variables() if 'adv' in var.name]
         # print(adv_varlist)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis, var_list=adv_varlist)
