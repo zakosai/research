@@ -192,7 +192,7 @@ class Translation:
         print(adv_varlist)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_dis,
                                                                                          var_list=adv_varlist)
-        self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
+        # self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
 
 
 def create_dataset(num_A, num_B, A="Health", B="Clothing"):
@@ -259,11 +259,11 @@ def main():
     B = "Grocery"
     health_num = 15084
     clothing_num = 8364
-    encoding_dim_A = [1000]
-    encoding_dim_B = [1000]
+    encoding_dim_A = [500]
+    encoding_dim_B = [500]
     share_dim = [100]
-    decoding_dim_A = [1000, health_num]
-    decoding_dim_B = [1000, clothing_num]
+    decoding_dim_A = [500, health_num]
+    decoding_dim_B = [500, clothing_num]
     z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
     checkpoint_dir = "translation/%s_%s/"%(A,B)
@@ -334,7 +334,7 @@ def main():
                                                 model.loss_CC], feed_dict=feed)
             _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
             # _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
-            _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
+            # _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
 
         # print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss gan %f, loss cc %f"%(loss_gen, loss_dis,
         #                                                                         loss_vae, loss_gan, loss_cc))
