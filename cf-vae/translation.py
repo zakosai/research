@@ -34,7 +34,7 @@ class Translation:
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
-        self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.3)
+        self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
@@ -48,8 +48,8 @@ class Translation:
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
         # x_ = tf.nn.l2_normalize(x)
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.5)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
@@ -337,11 +337,13 @@ def main():
             print("Loss last batch: loss gen %f, loss dis %f, loss vae %f,loss cc %f" % (
             loss_gen, loss_dis, loss_vae, loss_cc))
             #                                                                         loss_vae, loss_gan, loss_cc))
-            loss_val_a, loss_val_b, y_ba, y_ab = sess.run([model.loss_val_a, model.loss_val_b, model.y_BA, model.y_AB],
+            loss_gen, loss_val_a, loss_val_b, y_ba, y_ab = sess.run([model.loss_gen, model.loss_val_a,
+                                                                     model.loss_val_b, model.y_BA, model.y_AB],
                                               feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
 
             recall = calc_recall(y_ba, dense_A_val) + calc_recall(y_ab, dense_B_val)
-            print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall))
+            print("Loss gen: %f, Loss val a: %f, Loss val b: %f, recall %f" % (loss_gen, loss_val_a, loss_val_b,
+                                                                               recall))
             if recall > max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
