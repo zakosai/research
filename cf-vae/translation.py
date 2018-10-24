@@ -118,7 +118,7 @@ class Translation:
             x)))
         loss_fake = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_fake, labels=tf.zeros_like(
             x_fake)))
-        return loss_real + loss_fake*0.5
+        return loss_real + loss_fake
     def loss_generator(self, x):
         loss_real = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x, labels=tf.ones_like(
             x)))
@@ -167,9 +167,9 @@ class Translation:
 
         # Loss cycle - consistency (CC)
         loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA)\
-                    + self.lambda_4 * self.loss_reconstruct(x_A, y_ABA)
+                    + self.lambda_4 * self.loss_reconstruct(x_A, y_BA)
         loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_B, z_sigma_B) + self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB)\
-                    + self.lambda_4 * self.loss_reconstruct(x_B, y_BAB)
+                    + self.lambda_4 * self.loss_reconstruct(x_B, y_AB)
 
         self.loss_CC = loss_CC_A + loss_CC_B
 
@@ -257,7 +257,7 @@ def main():
     clothing_num = 18226
     encoding_dim_A = [1000, 500]
     encoding_dim_B = [1000, 500]
-    share_dim = [200, 100]
+    share_dim = [100]
     decoding_dim_A = [500, 1000, health_num]
     decoding_dim_B = [500, 1000, clothing_num]
     z_dim = 50
