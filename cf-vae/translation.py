@@ -47,7 +47,7 @@ class Translation:
         #     x_ = tf.nn.embedding_lookup(self.z_B, ids)
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
-        x_ = tf.nn.l2_normalize(x)
+        # x_ = tf.nn.l2_normalize(x)
         # if self.train:
         #     x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
@@ -255,10 +255,10 @@ def main():
     clothing_num = 28578
     encoding_dim_A = [1000, 500]
     encoding_dim_B = [1500, 500]
-    share_dim = [200]
+    share_dim = [100]
     decoding_dim_A = [500, 1000, health_num]
     decoding_dim_B = [500, 1500, clothing_num]
-    z_dim = 100
+    z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
     checkpoint_dir = "translation/%s_%s/"%(A,B)
     user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num, A, B)
