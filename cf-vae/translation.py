@@ -48,8 +48,8 @@ class Translation:
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
         # x_ = tf.nn.l2_normalize(x)
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.8)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
@@ -188,7 +188,7 @@ class Translation:
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_gen)
         adv_varlist = [var for var in tf.all_variables() if 'adv' in var.name]
         print(adv_varlist)
-        self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_dis,
+        self.train_op_dis_A = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_dis,
                                                                                          var_list=adv_varlist)
         # self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
 
@@ -306,7 +306,7 @@ def main():
     # test_B = [t - train_size - val_size for t in test_B]
 
     model = Translation(batch_size, health_num, clothing_num, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=2e-4)
     model.build_model()
 
     sess = tf.Session()
