@@ -52,8 +52,9 @@ class Translation:
         #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
+                x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
+                x_ = tf.nn.leaky_relu(x_)
                 # x_ = batch_norm(x_, decay=0.995)
         return x_
 
@@ -83,7 +84,7 @@ class Translation:
         #     x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
-                x_ = fully_connected(x_, dim[i], self.active_function , scope="share_%d"%i,
+                x_ = fully_connected(x_, dim[i], scope="share_%d"%i,
                                      weights_regularizer=self.regularizer)
         return x_
 
