@@ -249,10 +249,10 @@ def calc_rmse(pred, test):
 def main():
     iter = 3000
     batch_size= 500
-    A = "Video"
-    B = "TV"
-    health_num = 10072
-    clothing_num = 28578
+    A = "Health"
+    B = "Clothing"
+    health_num = 16070
+    clothing_num = 18226
     encoding_dim_A = [1000, 500]
     encoding_dim_B = [1500, 500]
     share_dim = [100]
@@ -302,7 +302,7 @@ def main():
     # test_B = [t - train_size - val_size for t in test_B]
 
     model = Translation(batch_size, health_num, clothing_num, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, lambda_0=1, lambda_1=1, lambda_3=1)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim)
     model.build_model()
 
     sess = tf.Session()
