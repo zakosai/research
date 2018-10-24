@@ -325,7 +325,7 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            if i < 11:
+            if i < 10:
                 _, loss_vae = sess.run([model.train_op_VAE, model.loss_VAE], feed_dict=feed)
             else:
                 _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
