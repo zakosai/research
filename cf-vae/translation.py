@@ -34,7 +34,7 @@ class Translation:
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
-        self.regularizer = tf.contrib.layers.l1_regularizer(scale=0.1)
+        self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
@@ -48,8 +48,8 @@ class Translation:
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
         # x_ = tf.nn.l2_normalize(x)
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
