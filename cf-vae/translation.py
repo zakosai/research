@@ -262,7 +262,7 @@ def main():
     decoding_dim_A = [500, 1000, health_num]
     decoding_dim_B = [500, 1000, clothing_num]
     z_dim = 50
-    adv_dim_A = adv_dim_B = [200, 100, 1]
+    adv_dim_A = adv_dim_B = [1000, 500, 100, 1]
     checkpoint_dir = "translation/%s_%s/"%(A,B)
     user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num, A, B)
     # test_A = list(open("data/Health_Clothing/test_A.txt").readlines())
