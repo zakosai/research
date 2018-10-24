@@ -48,8 +48,8 @@ class Translation:
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
         # x_ = tf.nn.l2_normalize(x)
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
@@ -325,7 +325,7 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            if i < 30:
+            if i < 100:
                 _, loss_vae = sess.run([model.train_op_VAE, model.loss_VAE], feed_dict=feed)
                 loss_gen = loss_dis = loss_cc = 0
             else:
