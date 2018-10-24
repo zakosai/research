@@ -47,8 +47,9 @@ class Translation:
         #     x_ = tf.nn.embedding_lookup(self.z_B, ids)
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.5)
+        x_ = tf.nn.l2_normalize(x)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
