@@ -302,7 +302,7 @@ def main():
     # test_B = [t - train_size - val_size for t in test_B]
 
     model = Translation(batch_size, health_num, clothing_num, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=0.01)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=0.1)
     model.build_model()
 
     sess = tf.Session()
@@ -352,7 +352,7 @@ def main():
 
                 print("recall B: %f" % (calc_recall(y_ab, dense_B_test)))
                 print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
-                model.learning_rate /= 2
+
             model.train = True
         if i%100 == 0:
             model.learning_rate /= 2
