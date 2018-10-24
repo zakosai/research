@@ -182,10 +182,10 @@ class Translation:
         self.loss_dis = loss_d_A + loss_d_B
         self.loss_rec = self.loss_val_a + self.loss_val_b
 
-        self.train_op_gen = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.loss_gen)
+        self.train_op_gen = tf.train.RMSPropOptimizer(self.learning_rate).minimize(self.loss_gen)
         adv_varlist = [var for var in tf.all_variables() if 'adv' in var.name]
         # print(adv_varlist)
-        self.train_op_dis = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.loss_dis, var_list=adv_varlist)
+        self.train_op_dis = tf.train.RMSPropOptimizer(self.learning_rate).minimize(self.loss_dis, var_list=adv_varlist)
         # self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
 
 
