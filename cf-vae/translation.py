@@ -30,7 +30,7 @@ class Translation:
         self.lambda_3 = lambda_3
         self.lambda_4 = lambda_4
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.sigmoid
+        self.active_function = tf.nn.relu
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
@@ -52,7 +52,7 @@ class Translation:
         #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = fully_connected(x_, encode_dim[i], tf.nn.relu, scope="enc_%d"%i,
+                x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
                 # x_ = batch_norm(x_, decay=0.995)
         return x_
@@ -62,9 +62,10 @@ class Translation:
         # if self.train:
         #     x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
-            for i in range(len(decode_dim)):
+            for i in range(len(decode_dim)-1):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
+            x_ = fully_connected(x_, decode_dim[-1], tf.nn.sigmoid, scope="dec_last", weights_regularizer=self.regularizer)
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
@@ -74,7 +75,7 @@ class Translation:
             # if self.train:
             #     x_ = tf.nn.dropout(x_, 0.3)
             for i in range(len(adv_dim)):
-                x_ = fully_connected(x_, adv_dim[i], tf.nn.relu, scope="adv_%d" % i)
+                x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
         return x_
 
     def share_layer(self, x, scope, dim, reuse=False):
@@ -83,7 +84,7 @@ class Translation:
         #     x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
-                x_ = fully_connected(x_, dim[i], tf.nn.relu , scope="share_%d"%i,
+                x_ = fully_connected(x_, dim[i], self.active_function , scope="share_%d"%i,
                                      weights_regularizer=self.regularizer)
         return x_
 
