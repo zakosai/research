@@ -182,12 +182,11 @@ class Translation:
         self.loss_dis = loss_d_A + loss_d_B
         self.loss_rec = self.loss_val_a + self.loss_val_b
 
-        gen_varlist = [var for var in tf.all_variables() if 'adv' not in var.name]
-        self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen, var_list=gen_varlist)
+        self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         adv_varlist = [var for var in tf.all_variables() if 'adv' in var.name]
         # print(adv_varlist)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis, var_list=adv_varlist)
-        # self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
+        self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
 
 
 def create_dataset(num_A, num_B, A="Health", B="Clothing"):
@@ -327,7 +326,7 @@ def main():
             _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
                                                 model.loss_CC], feed_dict=feed)
             _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
-            # _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
+            _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
 
         # print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss gan %f, loss cc %f"%(loss_gen, loss_dis,
         #                                                                         loss_vae, loss_gan, loss_cc))
