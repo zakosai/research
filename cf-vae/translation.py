@@ -89,8 +89,8 @@ class Translation:
         return z, z_mu, z_sigma
 
     def encode(self, x, scope, dim, reuse_enc, reuse_share, reuse_z=False):
-        # h = self.enc(x, "encode_%s"%scope, dim, reuse_enc)
-        h = self.share_layer(h, "encode", self.share_dim, reuse_share)
+        h = self.enc(x, "encode_%s"%scope, dim, reuse_enc)
+        # h = self.share_layer(h, "encode", self.share_dim, reuse_share)
         z, z_mu, z_sigma = self.gen_z(h, "encode", reuse=reuse_z)
         return z, z_mu, z_sigma
 
