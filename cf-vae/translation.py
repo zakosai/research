@@ -338,7 +338,7 @@ def main():
                                                 model.loss_CC], feed_dict=feed)
             _, loss_dis, adv_AA, adv_AB = sess.run([model.train_op_dis, model.loss_dis, model.adv_AA, model.adv_AB],
                                         feed_dict=feed)
-            print(adv_AA, adv_AB)
+            # print(adv_AA, adv_AB)
             # _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
             # _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
 
