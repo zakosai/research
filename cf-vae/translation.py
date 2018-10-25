@@ -356,7 +356,7 @@ def main():
                                         feed_dict=feed)
             # print(adv_AA, adv_AB)
             # _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
-            _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
+            # _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
 
         # print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss rec %f, loss cc %f"%(loss_gen, loss_dis,
         #                                                                         loss_vae, loss_rec, loss_cc))
