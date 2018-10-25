@@ -5,6 +5,7 @@ import tensorflow.keras.backend as K
 from tensorflow.contrib.framework import argsort
 import numpy as np
 import os
+import argparse
 
 
 class Translation:
@@ -70,8 +71,13 @@ class Translation:
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
     def loss_reconstruct(self, x, x_recon):
-        # return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
-        return tf.reduce_mean(tf.abs(x - x_recon))
+        log_softmax_var = tf.nn.log_softmax(x_recon)
+
+        neg_ll = -tf.reduce_mean(tf.reduce_sum(
+            log_softmax_var * x,
+            axis=-1))
+        # return tf.reduce_mean(tf.abs(x - x_recon))
+        return neg_ll
 
     def build_model(self):
         self.x = tf.placeholder(tf.float32, [None, self.dim], name='input')
@@ -89,14 +95,24 @@ class Translation:
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
 
-def create_dataset(num_A, num_B):
-    dense_A = read_data("data/Grocery_Health/Health_user_product.txt")
+def create_dataset(A="Health", B="Clothing"):
+    dense_A = read_data("data/%s_%s/%s_user_product.txt"%(A,B,A))
+    num_A = 0
+    for i in dense_A:
+        if num_A < max(i):
+            num_A = max(i)
+    num_A += 1
     user_A = one_hot_vector(dense_A, num_A)
 
-    dense_B = read_data("data/Grocery_Health/Grocery_user_product.txt")
+    dense_B = read_data("data/%s_%s/%s_user_product.txt"%(A, B, B))
+    num_B = 0
+    for i in dense_B:
+        if num_B < max(i):
+            num_B = max(i)
+    num_B += 1
     user_B = one_hot_vector(dense_B, num_B)
 
-    return user_A, user_B, dense_A, dense_B
+    return user_A, user_B, dense_A, dense_B, num_A, num_B
 
 def read_data(filename):
     f = list(open(filename).readlines())
@@ -132,12 +148,10 @@ def one_hot_vector2(A, num_product):
     return one_hot
 
 def calc_recall(pred, test):
+    pred_ab = np.argsort(pred)[::-1][:, :10]
     recall = []
-    for i in range(len(pred)):
-        p = pred[i]
-        p = np.argsort(p)[::-1]
-        p = p[:10]
-        hits = set(test[i]) & set(p)
+    for i in range(len(pred_ab)):
+        hits = set(test[i]) & set(pred_ab[i])
         recall_val = float(len(hits)) / min(len(test[i]), 10)
         recall.append(recall_val)
     return np.mean(np.array(recall))
@@ -151,28 +165,16 @@ def calc_rmse(pred, test):
 def main():
     iter = 3000
     batch_size= 500
-    health_num = 15084
-    clothing_num = 8365
-    encoding_dim = [1000, 500, 100]
-    decoding_dim = [100, 500,1000, health_num + clothing_num]
+    args = parser.parse_args()
+    A = args.A
+    B = args.B
+    checkpoint_dir = "translation/%s_%s/"%(A, B)
+    user_A, user_B, dense_A, dense_B, num_A, num_B = create_dataset(A, B)
+    encoding_dim = [600, 200]
+    decoding_dim = [200, 600, num_A +num_B]
     z_dim = 50
-    checkpoint_dir = "translation/Grocery_Health/"
-    user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num)
-    # test_A = list(open("data/Health_Clothing/test_A.txt").readlines())
-    # test_A = [t.strip() for t in test_A]
-    # if test_A[-1] == '':
-    #     test_A = test_A[:-1]
-    # test_A = [int(t) for t in test_A]
-    # test_B = list(open("data/Health_Clothing/test_B.txt").readlines())
-    # test_B = [t.strip() for t in test_B]
-    # if test_B[-1] == '':
-    #     test_B = test_B[:-1]
-    # test_B = [int(t) for t in test_B]
-    # z = np.load(os.path.join(checkpoint_dir, "text.npz"))
-    # z = z['arr_0']
-    # print(z.shape)
-    # z_A = z[:health_num]
-    # z_B = z[health_num:]
+
+
     perm = np.random.permutation(len(user_A))
     total_data = len(user_A)
     train_size = int(total_data * 0.7)
@@ -206,7 +208,7 @@ def main():
     # test_A = [t - train_size - val_size for t in test_A]
     # test_B = [t - train_size - val_size for t in test_B]
 
-    model = Translation(batch_size, health_num + clothing_num, encoding_dim, decoding_dim, z_dim)
+    model = Translation(batch_size, num_A + num_B, encoding_dim, decoding_dim, z_dim)
     model.build_model()
 
     sess = tf.Session()
@@ -239,7 +241,7 @@ def main():
             loss_val_b, y_a = sess.run([model.loss, model.x_recon],
                                        feed_dict={model.x: user_val_B})
             print(len(y_a[0]), len(y_b[0]))
-            recall = calc_recall(y_b[:, health_num:], dense_B_val) + calc_recall(y_a[:, :health_num], dense_A_val)
+            recall = calc_recall(y_b[:, num_A:], dense_B_val) + calc_recall(y_a[:, :num_A], dense_A_val)
             print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall))
             if recall > max_recall:
                 max_recall = recall
@@ -251,23 +253,21 @@ def main():
             # y_ab = y_ab[test_B]
             # y_ba = y_ba[test_A]
 
-            print("recall B: %f" % (calc_recall(y_b[:, health_num:], dense_B_test)))
-            print("recall A: %f" % (calc_recall(y_a[:, health_num], dense_A_test)))
+            print("recall B: %f" % (calc_recall(y_b[:, num_A:], dense_B_test)))
+            print("recall A: %f" % (calc_recall(y_a[:, num_A], dense_A_test)))
             model.train = True
         if i%100 == 0:
             model.learning_rate /= 2
             print("decrease lr to %f"%model.learning_rate)
 
-            # pred = np.array(y_ab).flatten()
-            # test = np.array(user_B_val).flatten()
-            # rmse = calc_rmse(pred, test)
-            # print("Loss val a: %f, Loss val b: %f, rmse %f" % (loss_val_a, loss_val_b, rmse))
-            # if rmse < max_recall:
-            #     max_recall = rmse
-            #     saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
 
     print(max_recall)
 
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('--A',  type=str, default="Health",
+                   help='domain A')
+parser.add_argument('--B',  type=str, default='Grocery',
+                   help='domain B')
 
 
 if __name__ == '__main__':
