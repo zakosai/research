@@ -50,11 +50,13 @@ class Translation:
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
         x_ = tf.nn.l2_normalize(x_, 1)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
-                                     weights_regularizer=self.regularizer, biases_regularizer=self.regularizer)
-                x_ = tf.nn.tanh(x_)
+                                     weights_regularizer=self.regularizer)
+                x_ = tf.nn.sigmoid(x_)
                 # x_ = batch_norm(x_, decay=0.995)
         return x_
 
@@ -64,7 +66,7 @@ class Translation:
         #     x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                x_ = fully_connected(x_, decode_dim[i], tf.nn.tanh, scope="dec_%d" % i,
+                x_ = fully_connected(x_, decode_dim[i], tf.nn.sigmoid, scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
         return x_
 
