@@ -95,9 +95,9 @@ class Translation:
         return z, z_mu, z_sigma
 
     def decode(self, x, scope, dim, reuse_dec, reuse_share):
-        # y = self.share_layer(x, "decode", self.share_dim[::-1], reuse_share)
-        y = self.dec(y, "decode_%s"%scope, dim, reuse_dec)
-        return y
+        # x = self.share_layer(x, "decode", self.share_dim[::-1], reuse_share)
+        x = self.dec(x, "decode_%s"%scope, dim, reuse_dec)
+        return x
 
     def loss_kl(self, mu, sigma):
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
