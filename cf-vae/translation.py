@@ -73,8 +73,8 @@ class Translation:
             # if self.train:
             #     x_ = tf.nn.dropout(x_, 0.3)
             for i in range(len(adv_dim)-1):
-                x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i, weights_initializer=tf.random_normal_initializer(0, 0.02))
-            x_ = fully_connected(x_, adv_dim[-1], scope="adv_last", weights_initializer=tf.random_normal_initializer(0, 0.02))
+                x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
+            x_ = fully_connected(x_, adv_dim[-1], scope="adv_last")
         return x_
 
     def share_layer(self, x, scope, dim, reuse=False):
@@ -194,7 +194,7 @@ class Translation:
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_gen)
         adv_varlist = [var for var in tf.all_variables() if 'adv' in var.name]
         print(adv_varlist)
-        self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_dis,
+        self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate*1e-2, beta1=0.5).minimize(self.loss_dis,
                                                                                          var_list=adv_varlist)
         # self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
 
