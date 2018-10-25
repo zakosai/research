@@ -55,7 +55,7 @@ class Translation:
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
                                      weights_initializer=tf.contrib.layers.xavier_initializer(seed=98765),
                                      weights_regularizer=self.regularizer)
-                x_ = tf.nn.sigmoid(x_)
+                x_ = tf.nn.tanh(x_)
                 # x_ = batch_norm(x_, decay=0.995)
         return x_
 
@@ -91,6 +91,7 @@ class Translation:
                 x_ = fully_connected(x_, dim[i], scope="share_%d"%i,
                                      weights_initializer=tf.contrib.layers.xavier_initializer(seed=98765),
                                      weights_regularizer=self.regularizer)
+                x_ = tf.nn.tanh(x_)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
