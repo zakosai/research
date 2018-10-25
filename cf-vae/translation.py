@@ -167,6 +167,8 @@ class Translation:
         loss_d_A = self.lambda_0 * self.loss_discriminator(adv_AA, adv_BA)
         loss_d_B = self.lambda_0 * self.loss_discriminator(adv_BB, adv_AB)
         self.loss_d= loss_d_A + loss_d_B
+        self.adv_AA = adv_AA
+        self.adv_AB = adv_AB
 
         # Loss cycle - consistency (CC)
         loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA)\
@@ -333,7 +335,9 @@ def main():
 
             _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
                                                 model.loss_CC], feed_dict=feed)
-            _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
+            _, loss_dis, adv_AA, adv_AB = sess.run([model.train_op_dis, model.loss_dis, model.adv_AA, model.adv_AB],
+                                        feed_dict=feed)
+            print(adv_AA, adv_AB)
             # _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
             # _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
 
