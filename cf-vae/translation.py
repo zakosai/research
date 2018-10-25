@@ -65,7 +65,7 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], tf.nn.tanh, scope="dec_%d" % i,
-                                     weights_regularizer=self.regularizer, biases_regularizer=self.regularizer)
+                                     weights_regularizer=self.regularizer)
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
@@ -85,14 +85,14 @@ class Translation:
         #     x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
-                x_ = fully_connected(x_, dim[i], scope="share_%d"%i, activation_fn=tf.nn.tanh,
-                                     weights_regularizer=self.regularizer, biases_regularizer=self.regularizer)
+                x_ = fully_connected(x_, dim[i], scope="share_%d"%i,
+                                     weights_regularizer=self.regularizer)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
-            z_mu = fully_connected(h, self.z_dim, self.active_function, scope="z_mu", weights_regularizer=self.regularizer)
-            z_sigma = fully_connected(h, self.z_dim, self.active_function, scope="z_sigma")
+            z_mu = fully_connected(h, self.z_dim,  scope="z_mu")
+            z_sigma = fully_connected(h, self.z_dim,  scope="z_sigma")
             e = tf.random_normal(tf.shape(z_mu))
             if self.train:
                 z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
@@ -349,8 +349,8 @@ def main():
             # _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
             _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
 
-        print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss rec %f, loss cc %f"%(loss_gen, loss_dis,
-                                                                                loss_vae, loss_rec, loss_cc))
+        # print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss rec %f, loss cc %f"%(loss_gen, loss_dis,
+        #                                                                         loss_vae, loss_rec, loss_cc))
 
         # Validation Process
         if i%10 == 0:
