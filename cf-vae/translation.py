@@ -185,7 +185,8 @@ class Translation:
         self.y_AB = y_AB
 
         self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + 0.1*tf.losses.get_regularization_loss() + \
-                        10 *self.loss_val_a + 10*self.loss_val_b + self.loss_generator(y_AB) + self.loss_generator(y_BA)
+                        10 *self.loss_val_a + 10*self.loss_val_b + 10*self.loss_generator(y_AB) + \
+                        10*self.loss_generator(y_BA)
         self.loss_dis = loss_d_A + loss_d_B
         self.loss_rec =  self.loss_val_a + self.loss_val_b
 
