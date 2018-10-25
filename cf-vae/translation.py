@@ -68,7 +68,7 @@ class Translation:
                 x_ = fully_connected(x_, decode_dim[i], tf.nn.tanh, scope="dec_%d" % i,
                                      weights_initializer=tf.contrib.layers.xavier_initializer(seed=98765),
                                      weights_regularizer=self.regularizer)
-            x_ = fully_connected(x_, scope="dec_last", weights_regularizer=self.regularizer)
+            x_ = fully_connected(x_, decode_dim[-1], scope="dec_last", weights_regularizer=self.regularizer)
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
