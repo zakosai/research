@@ -31,7 +31,7 @@ class Translation:
         self.lambda_3 = lambda_3
         self.lambda_4 = lambda_4
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.sigmoid
+        self.active_function = tf.nn.tanh
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
@@ -71,8 +71,8 @@ class Translation:
         x_ = x
 
         with tf.variable_scope(scope, reuse=reuse):
-            # if self.train:
-            #     x_ = tf.nn.dropout(x_, 0.3)
+            if self.train:
+                x_ = tf.nn.dropout(x_, 0.3)
             for i in range(len(adv_dim)-1):
                 x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
             x_ = fully_connected(x_, adv_dim[-1], scope="adv_last")
@@ -80,8 +80,8 @@ class Translation:
 
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.3)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i,
@@ -111,12 +111,19 @@ class Translation:
         return y
 
     def loss_kl(self, mu, sigma):
-        return tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
+        return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
     def loss_reconstruct(self, x, x_recon):
         # return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
         return tf.reduce_mean(tf.abs(x - x_recon))
         # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_recon, labels=x))
+
+        log_softmax_var = tf.nn.log_softmax(x_recon)
+
+        neg_ll = -tf.reduce_mean(tf.reduce_sum(
+            log_softmax_var * x,
+            axis=-1))
+        return neg_ll
 
 
     def loss_recsys(self, pred, label):
@@ -327,7 +334,8 @@ def main():
     # test_B = [t - train_size - val_size for t in test_B]
 
     model = Translation(batch_size, num_A, num_B, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, lambda_1=1, lambda_2=1, lambda_3=1,
+                        lambda_4=1)
     model.build_model()
 
     sess = tf.Session()
