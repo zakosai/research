@@ -73,8 +73,8 @@ class Translation:
             # if self.train:
             #     x_ = tf.nn.dropout(x_, 0.3)
             for i in range(len(adv_dim)-1):
-                x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
-            x_ = fully_connected(x_, adv_dim[-1], scope="adv_last")
+                x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i, weights_initializer=tf.random_normal_initializer(0, 0.02))
+            x_ = fully_connected(x_, adv_dim[-1], scope="adv_last", weights_initializer=tf.random_normal_initializer(0, 0.02))
         return x_
 
     def share_layer(self, x, scope, dim, reuse=False):
@@ -269,7 +269,7 @@ def main():
     decoding_dim_A = [500, 1000, health_num]
     decoding_dim_B = [500, 1000, clothing_num]
     z_dim = 50
-    adv_dim_A = adv_dim_B = [200, 100, 1]
+    adv_dim_A = adv_dim_B = [100, 1]
     checkpoint_dir = "translation/%s_%s/"%(A,B)
     user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num, A, B)
     # test_A = list(open("data/Health_Clothing/test_A.txt").readlines())
