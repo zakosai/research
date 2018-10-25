@@ -123,9 +123,9 @@ class Translation:
         return tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
     def loss_reconstruct(self, x, x_recon):
-        # return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
+        return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
         # return tf.reduce_mean(tf.abs(x - x_recon))
-        return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_recon, labels=x))
+        # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_recon, labels=x))
 
 
     def loss_recsys(self, pred, label):
@@ -328,7 +328,7 @@ def main():
     # test_B = [t - train_size - val_size for t in test_B]
 
     model = Translation(batch_size, health_num, clothing_num, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, lambda_2=10, lambda_4=100, lambda_1=1,
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, lambda_2=1, lambda_4=1, lambda_1=1,
                         lambda_3=1)
     model.build_model()
 
