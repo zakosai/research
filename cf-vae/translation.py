@@ -173,7 +173,7 @@ class Translation:
         self.adv_AB = adv_BA
 
         # Loss cycle - consistency (CC)
-        loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA) 
+        loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA)
         loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB)
 
         self.loss_CC = loss_CC_A + loss_CC_B
@@ -183,7 +183,8 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + tf.losses.get_regularization_loss()
+        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + tf.losses.get_regularization_loss() + \
+                        self.loss_generator(y_AB) + self.loss_generator(y_BA)
 
         self.loss_dis = loss_d_A + loss_d_B
 
