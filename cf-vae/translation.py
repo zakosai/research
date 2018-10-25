@@ -52,10 +52,9 @@ class Translation:
 
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
+                x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
                                      weights_initializer=tf.contrib.layers.xavier_initializer(seed=98765),
                                      weights_regularizer=self.regularizer)
-                x_ = tf.nn.tanh(x_)
                 # x_ = batch_norm(x_, decay=0.995)
         return x_
 
@@ -65,7 +64,7 @@ class Translation:
         #     x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)-1):
-                x_ = fully_connected(x_, decode_dim[i], tf.nn.tanh, scope="dec_%d" % i,
+                x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
                                      weights_initializer=tf.contrib.layers.xavier_initializer(seed=98765),
                                      weights_regularizer=self.regularizer)
             x_ = fully_connected(x_, decode_dim[-1], scope="dec_last", weights_regularizer=self.regularizer)
@@ -88,10 +87,9 @@ class Translation:
         #     x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
-                x_ = fully_connected(x_, dim[i], scope="share_%d"%i,
+                x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i,
                                      weights_initializer=tf.contrib.layers.xavier_initializer(seed=98765),
                                      weights_regularizer=self.regularizer)
-                x_ = tf.nn.tanh(x_)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
@@ -121,10 +119,9 @@ class Translation:
 
     def loss_reconstruct(self, x, x_recon):
         # return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
-        # return tf.reduce_mean(tf.abs(x - x_recon))
+        return -tf.reduce_mean(tf.abs(x - x_recon))
         # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_recon, labels=x))
-        x = tf.nn.log_softmax(x)
-        return -tf.reduce_mean(tf.reduce_sum(x * x_recon, axis=1))
+
 
     def loss_recsys(self, pred, label):
         return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=pred, labels=label))
