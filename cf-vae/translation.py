@@ -31,7 +31,7 @@ class Translation:
         self.lambda_3 = lambda_3
         self.lambda_4 = lambda_4
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.tanh
+        self.active_function = tf.nn.sigmoid
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
@@ -90,12 +90,12 @@ class Translation:
 
     def encode(self, x, scope, dim, reuse_enc, reuse_share, reuse_z=False):
         h = self.enc(x, "encode_%s"%scope, dim, reuse_enc)
-        # h = self.share_layer(h, "encode", self.share_dim, reuse_share)
+        h = self.share_layer(h, "encode", self.share_dim, reuse_share)
         z, z_mu, z_sigma = self.gen_z(h, "encode", reuse=reuse_z)
         return z, z_mu, z_sigma
 
     def decode(self, x, scope, dim, reuse_dec, reuse_share):
-        # x = self.share_layer(x, "decode", self.share_dim[::-1], reuse_share)
+        x = self.share_layer(x, "decode", self.share_dim[::-1], reuse_share)
         x = self.dec(x, "decode_%s"%scope, dim, reuse_dec)
         return x
 
@@ -104,15 +104,15 @@ class Translation:
 
     def loss_reconstruct(self, x, x_recon):
         # return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
-        # return tf.reduce_mean(tf.abs(x - x_recon))
+        return tf.reduce_mean(tf.abs(x - x_recon))
         # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_recon, labels=x))
 
-        log_softmax_var = tf.nn.log_softmax(x_recon)
-
-        neg_ll = -tf.reduce_mean(tf.reduce_sum(
-            log_softmax_var * x,
-            axis=-1))
-        return neg_ll
+        # log_softmax_var = tf.nn.log_softmax(x_recon)
+        #
+        # neg_ll = -tf.reduce_mean(tf.reduce_sum(
+        #     log_softmax_var * x,
+        #     axis=-1))
+        # return neg_ll
 
 
     def loss_recsys(self, pred, label):
@@ -185,7 +185,7 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen = loss_VAE_A + loss_VAE_B +tf.losses.get_regularization_loss()
+        self.loss_gen = loss_VAE_A + loss_VAE_B + tf.losses.get_regularization_loss()
 
         self.loss_dis = loss_d_A + loss_d_B
 
