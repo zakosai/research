@@ -325,7 +325,7 @@ def main():
     # test_A = [t - train_size - val_size for t in test_A]
     # test_B = [t - train_size - val_size for t in test_B]
 
-    model = Translation(batch_size, health_num, clothing_num, encoding_dim_A, decoding_dim_A, encoding_dim_B,
+    model = Translation(batch_size, num_A, num_B, encoding_dim_A, decoding_dim_A, encoding_dim_B,
                         decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim)
     model.build_model()
 
