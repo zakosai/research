@@ -48,18 +48,19 @@ class Translation:
         #     x_ = tf.nn.embedding_lookup(self.z_B, ids)
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
-
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                # x_ = batch_norm(x_, decay=0.995)
+                x_ = batch_norm(x_, decay=0.995)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.3)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
@@ -279,11 +280,11 @@ def main():
     B = args.B
     checkpoint_dir = "translation/%s_%s/"%(A,B)
     user_A, user_B, dense_A, dense_B, num_A, num_B = create_dataset(A, B)
-    encoding_dim_A = [1000, 500]
-    encoding_dim_B = [1000, 500]
-    share_dim = [100]
-    decoding_dim_A = [500, 1000, num_A]
-    decoding_dim_B = [500, 1000, num_B]
+    encoding_dim_A = [600]
+    encoding_dim_B = [600]
+    share_dim = [200]
+    decoding_dim_A = [600, num_A]
+    decoding_dim_B = [600, num_B]
     z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
     # test_A = list(open("data/Health_Clothing/test_A.txt").readlines())
