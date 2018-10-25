@@ -64,10 +64,11 @@ class Translation:
         # if self.train:
         #     x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
-            for i in range(len(decode_dim)):
-                x_ = fully_connected(x_, decode_dim[i], tf.nn.sigmoid, scope="dec_%d" % i,
+            for i in range(len(decode_dim)-1):
+                x_ = fully_connected(x_, decode_dim[i], tf.nn.tanh, scope="dec_%d" % i,
                                      weights_initializer=tf.contrib.layers.xavier_initializer(seed=98765),
                                      weights_regularizer=self.regularizer)
+            x_ = fully_connected(x_, scope="dec_last", weights_regularizer=self.regularizer)
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
@@ -119,8 +120,10 @@ class Translation:
 
     def loss_reconstruct(self, x, x_recon):
         # return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
-        return tf.reduce_mean(tf.abs(x - x_recon))
+        # return tf.reduce_mean(tf.abs(x - x_recon))
         # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_recon, labels=x))
+        x = tf.nn.log_softmax(x)
+        return -tf.reduce_mean(tf.reduce_sum(x * x_recon, axis=1))
 
     def loss_recsys(self, pred, label):
         return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=pred, labels=label))
