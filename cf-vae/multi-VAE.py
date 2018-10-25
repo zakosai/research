@@ -200,7 +200,7 @@ def main():
 
     user_train = np.concatenate((user_A_train, user_B_train), axis=1)
     user_val_A = np.concatenate((user_A_val, np.zeros(shape=user_B_val.shape)), axis=1)
-    print(user_A_val.shape)
+    print(user_val_A.shape)
     user_val_B = np.concatenate((np.zeros(shape=user_A_val.shape), user_B_val), axis=1)
     user_test_A = np.concatenate((user_A_test, np.zeros(shape=user_B_test.shape)), axis=1)
     user_test_B = np.concatenate((np.zeros(shape=user_A_test.shape), user_B_test), axis=1)
@@ -257,7 +257,7 @@ def main():
             # y_ba = y_ba[test_A]
 
             print("recall B: %f" % (calc_recall(y_b[:, num_A:], dense_B_test)))
-            print("recall A: %f" % (calc_recall(y_a[:, num_A], dense_A_test)))
+            print("recall A: %f" % (calc_recall(y_a[:, :num_A], dense_A_test)))
             model.train = True
         if i%100 == 0:
             model.learning_rate /= 2
