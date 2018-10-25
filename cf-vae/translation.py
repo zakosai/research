@@ -5,8 +5,7 @@ import tensorflow.keras.backend as K
 from tensorflow.contrib.framework import argsort
 import numpy as np
 import os
-import bottleneck as bn
-
+import argparse
 
 
 class Translation:
@@ -32,7 +31,7 @@ class Translation:
         self.lambda_3 = lambda_3
         self.lambda_4 = lambda_4
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.relu
+        self.active_function = tf.nn.sigmoid
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
@@ -53,7 +52,6 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
-                                     weights_initializer=tf.contrib.layers.xavier_initializer(seed=98765),
                                      weights_regularizer=self.regularizer)
                 # x_ = batch_norm(x_, decay=0.995)
         return x_
@@ -63,15 +61,8 @@ class Translation:
         # if self.train:
         #     x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
-            for i in range(len(decode_dim)-1):
+            for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
-                                     weights_initializer=tf.contrib.layers.xavier_initializer(seed=98765),
-                                     weights_regularizer=self.regularizer)
-            if self.train:
-                x_ = fully_connected(x_, decode_dim[-1], tf.nn.sigmoid, scope="dec_last", \
-                                                                            weights_regularizer=self.regularizer)
-            else:
-                x_ = fully_connected(x_, decode_dim[-1], scope="dec_last", \
                                      weights_regularizer=self.regularizer)
         return x_
 
@@ -93,7 +84,6 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i,
-                                     weights_initializer=tf.contrib.layers.xavier_initializer(seed=98765),
                                      weights_regularizer=self.regularizer)
         return x_
 
@@ -193,8 +183,8 @@ class Translation:
 
         self.loss_CC = loss_CC_A + loss_CC_B
 
-        self.loss_val_a = self.loss_recsys(x_A, y_BA)
-        self.loss_val_b = self.loss_recsys(x_B, y_AB)
+        self.loss_val_a = self.loss_reconstruct(x_A, y_BA)
+        self.loss_val_b = self.loss_reconstruct(x_B, y_AB)
         self.y_BA = y_BA
         self.y_AB = y_AB
 
@@ -214,14 +204,24 @@ class Translation:
         # self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_rec, var_list=gen_var)
 
 
-def create_dataset(num_A, num_B, A="Health", B="Clothing"):
+def create_dataset(A="Health", B="Clothing"):
     dense_A = read_data("data/%s_%s/%s_user_product.txt"%(A,B,A))
+    num_A = 0
+    for i in dense_A:
+        if num_A < max(i):
+            num_A = max(i)
+    num_A += 1
     user_A = one_hot_vector(dense_A, num_A)
 
     dense_B = read_data("data/%s_%s/%s_user_product.txt"%(A, B, B))
+    num_B = 0
+    for i in dense_B:
+        if num_B < max(i):
+            num_B = max(i)
+    num_B += 1
     user_B = one_hot_vector(dense_B, num_B)
 
-    return user_A, user_B, dense_A, dense_B
+    return user_A, user_B, dense_A, dense_B, num_A, num_B
 
 def read_data(filename):
     f = list(open(filename).readlines())
@@ -274,19 +274,18 @@ def calc_rmse(pred, test):
 def main():
     iter = 3000
     batch_size= 500
-    A = "Health"
-    B = "Grocery"
-    health_num = 15084
-    clothing_num = 8364
+    args = parser.parse_args()
+    A = args.A
+    B = args.B
+    checkpoint_dir = "translation/%s_%s/"%(A,B)
+    user_A, user_B, dense_A, dense_B, num_A, num_B = create_dataset(A, B)
     encoding_dim_A = [1000, 500]
     encoding_dim_B = [1000, 500]
     share_dim = [100]
-    decoding_dim_A = [500, 1000, health_num]
-    decoding_dim_B = [500, 1000, clothing_num]
+    decoding_dim_A = [500, 1000, num_A]
+    decoding_dim_B = [500, 1000, num_B]
     z_dim = 100
     adv_dim_A = adv_dim_B = [100, 1]
-    checkpoint_dir = "translation/%s_%s/"%(A,B)
-    user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num, A, B)
     # test_A = list(open("data/Health_Clothing/test_A.txt").readlines())
     # test_A = [t.strip() for t in test_A]
     # if test_A[-1] == '':
@@ -423,6 +422,11 @@ def main():
     # test_a = np.array(user_B_test).flatten()
     # print("rmse B %f" % calc_rmse(pred_a, test_a))
 
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('--A',  type=str, default="Health",
+                   help='domain A')
+parser.add_argument('--B',  type=str, default='Grocery',
+                   help='domain B')
 
 if __name__ == '__main__':
     main()
