@@ -39,15 +39,7 @@ class Translation:
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
-        # ids = argsort(x_, 1)[::-1][:, :200]
-        # if "A" in scope:
-        #     #x_ = tf.multiply(tf.expand_dims(self.z_A, 0), tf.expand_dims(x_, 2))
-        #     x_ = tf.nn.embedding_lookup(self.z_A, ids)
-        # else:
-        #     #x_ = tf.multiply(tf.expand_dims(self.z_B, 0), tf.expand_dims(x_, 2))
-        #     x_ = tf.nn.embedding_lookup(self.z_B, ids)
-        # x_ = flatten(x_)
-        # x_ = tf.reshape(x_, (-1, 10000))
+
         if self.train:
             x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
@@ -98,12 +90,12 @@ class Translation:
 
     def encode(self, x, scope, dim, reuse_enc, reuse_share, reuse_z=False):
         h = self.enc(x, "encode_%s"%scope, dim, reuse_enc)
-        h = self.share_layer(h, "encode", self.share_dim, reuse_share)
+        # h = self.share_layer(h, "encode", self.share_dim, reuse_share)
         z, z_mu, z_sigma = self.gen_z(h, "encode", reuse=reuse_z)
         return z, z_mu, z_sigma
 
     def decode(self, x, scope, dim, reuse_dec, reuse_share):
-        y = self.share_layer(x, "decode", self.share_dim[::-1], reuse_share)
+        # y = self.share_layer(x, "decode", self.share_dim[::-1], reuse_share)
         y = self.dec(y, "decode_%s"%scope, dim, reuse_dec)
         return y
 
@@ -193,7 +185,7 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + tf.losses.get_regularization_loss()
+        self.loss_gen = loss_VAE_A + loss_VAE_B + tf.losses.get_regularization_loss()
 
         self.loss_dis = loss_d_A + loss_d_B
 
@@ -280,11 +272,11 @@ def main():
     B = args.B
     checkpoint_dir = "translation/%s_%s/"%(A,B)
     user_A, user_B, dense_A, dense_B, num_A, num_B = create_dataset(A, B)
-    encoding_dim_A = [600]
-    encoding_dim_B = [600]
+    encoding_dim_A = [600, 200]
+    encoding_dim_B = [600, 200]
     share_dim = [200]
-    decoding_dim_A = [600, num_A]
-    decoding_dim_B = [600, num_B]
+    decoding_dim_A = [200, 600, num_A]
+    decoding_dim_B = [200, 600, num_B]
     z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
     # test_A = list(open("data/Health_Clothing/test_A.txt").readlines())
