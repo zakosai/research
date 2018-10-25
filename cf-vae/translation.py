@@ -168,8 +168,8 @@ class Translation:
         loss_d_A = self.lambda_0 * self.loss_discriminator(adv_AA, adv_BA)
         loss_d_B = self.lambda_0 * self.loss_discriminator(adv_BB, adv_AB)
         self.loss_d= loss_d_A + loss_d_B
-        self.adv_AA = y_AA
-        self.adv_AB = y_BA
+        self.adv_AA = adv_AA
+        self.adv_AB = adv_BA
 
         # Loss cycle - consistency (CC)
         loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA)\
