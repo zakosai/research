@@ -72,8 +72,9 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             # if self.train:
             #     x_ = tf.nn.dropout(x_, 0.3)
-            for i in range(len(adv_dim)):
+            for i in range(len(adv_dim)-1):
                 x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
+            x_ = fully_connected(x_, adv_dim[-1], scope="adv_last")
         return x_
 
     def share_layer(self, x, scope, dim, reuse=False):
