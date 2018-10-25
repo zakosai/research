@@ -98,7 +98,7 @@ class Translation:
     def encode(self, x, scope, dim, reuse_enc, reuse_share, reuse_z=False):
         h = self.enc(x, "encode_%s"%scope, dim, reuse_enc)
         h = self.share_layer(h, "encode", self.share_dim, reuse_share)
-        z, z_mu, z_sigma = self.gen_z(h, "VAE", reuse=reuse_z)
+        z, z_mu, z_sigma = self.gen_z(h, "encode", reuse=reuse_z)
         return z, z_mu, z_sigma
 
     def decode(self, x, scope, dim, reuse_dec, reuse_share):
@@ -192,12 +192,13 @@ class Translation:
 
         # self.train_op_VAE = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_VAE)
 
-        self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_gen)
+        gen_var = [var for var in tf.all_variables() if 'enc' in var.name or 'dec' in var.name]
+        self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_gen, var_list=gen_var)
         adv_varlist = [var for var in tf.all_variables() if 'adv' in var.name]
         print(adv_varlist)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_dis,
                                                                                          var_list=adv_varlist)
-        self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_rec)
+        self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_rec, var_list=gen_var)
 
 
 def create_dataset(num_A, num_B, A="Health", B="Clothing"):
