@@ -145,11 +145,11 @@ class Translation:
 
         # Adversal
         y_BA = self.decode(z_B, "A", self.decode_dim_A, True, True)
-        adv_AA = self.adversal(y_AA, "adv_A", self.adv_dim_A)
+        adv_AA = self.adversal(x_A, "adv_A", self.adv_dim_A)
         adv_BA = self.adversal(y_BA, "adv_A", self.adv_dim_A, reuse=True)
 
         y_AB = self.decode(z_A, "B", self.decode_dim_B, True, True)
-        adv_BB = self.adversal(y_BB, "adv_B", self.adv_dim_B)
+        adv_BB = self.adversal(x_B, "adv_B", self.adv_dim_B)
         adv_AB = self.adversal(y_AB, "adv_B", self.adv_dim_B, reuse=True)
 
         # Cycle - Consistency
