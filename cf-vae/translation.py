@@ -49,9 +49,7 @@ class Translation:
         #     x_ = tf.nn.embedding_lookup(self.z_B, ids)
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
-        x_ = tf.nn.l2_normalize(x_, 1)
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
@@ -383,9 +381,9 @@ def main():
 
 
             model.train = True
-        # if i%100 == 0:
-        #     model.learning_rate /= 2
-        #     print("decrease lr to %f"%model.learning_rate)
+        if i%50 == 0:
+            model.learning_rate /= 10
+            print("decrease lr to %f"%model.learning_rate)
 
             # pred = np.array(y_ab).flatten()
             # test = np.array(user_B_val).flatten()
