@@ -85,7 +85,7 @@ class Translation:
         #     x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
-                x_ = fully_connected(x_, dim[i], scope="share_%d"%i,
+                x_ = fully_connected(x_, dim[i], scope="share_%d"%i, activation_fn=tf.nn.tanh,
                                      weights_regularizer=self.regularizer, biases_regularizer=self.regularizer)
         return x_
 
