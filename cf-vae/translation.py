@@ -197,7 +197,7 @@ class Translation:
         print(adv_varlist)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_dis,
                                                                                          var_list=adv_varlist)
-        self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
+        self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_rec)
 
 
 def create_dataset(num_A, num_B, A="Health", B="Clothing"):
