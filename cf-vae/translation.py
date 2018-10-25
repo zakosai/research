@@ -198,9 +198,8 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + tf.losses.get_regularization_loss() + \
-                        10*self.loss_generator(y_AB) + \
-                        10*self.loss_generator(y_BA)
+        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + tf.losses.get_regularization_loss()
+
         self.loss_dis = loss_d_A + loss_d_B
         self.loss_rec = 10 * self.loss_val_a + 10*self.loss_val_b
 
@@ -212,7 +211,7 @@ class Translation:
         print(adv_varlist)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_dis,
                                                                                          var_list=adv_varlist)
-        self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_rec, var_list=gen_var)
+        # self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_rec, var_list=gen_var)
 
 
 def create_dataset(num_A, num_B, A="Health", B="Clothing"):
