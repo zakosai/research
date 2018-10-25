@@ -47,12 +47,12 @@ class Translation:
         #     x_ = tf.nn.embedding_lookup(self.z_B, ids)
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
-        # x_ = tf.nn.l2_normalize(x)
+        x_ = tf.nn.l2_normalize(x_, 1)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer, biases_regularizer=self.regularizer)
-                x_ = tf.nn.leaky_relu(x_)
+                x_ = tf.nn.tanh(x_)
                 # x_ = batch_norm(x_, decay=0.995)
         return x_
 
@@ -92,7 +92,10 @@ class Translation:
             z_mu = fully_connected(h, self.z_dim, self.active_function, scope="z_mu", weights_regularizer=self.regularizer)
             z_sigma = fully_connected(h, self.z_dim, self.active_function, scope="z_sigma")
             e = tf.random_normal(tf.shape(z_mu))
-            z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
+            if self.train:
+                z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
+            else:
+                z = z_mu
         return z, z_mu, z_sigma
 
     def encode(self, x, scope, dim, reuse_enc, reuse_share, reuse_z=False):
