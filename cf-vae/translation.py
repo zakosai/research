@@ -64,7 +64,7 @@ class Translation:
         #     x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                x_ = fully_connected(x_, decode_dim[i], tf.nn.sigmoid, scope="dec_%d" % i,
+                x_ = fully_connected(x_, decode_dim[i], tf.nn.tanh, scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer, biases_regularizer=self.regularizer)
         return x_
 
@@ -257,20 +257,6 @@ def calc_recall(pred, test):
         recall.append(recall_val)
     return np.mean(np.array(recall))
 
-def Recall_at_k_batch(X_pred, heldout_batch, k=100):
-    batch_users = X_pred.shape[0]
-
-    idx = bn.argpartition(-X_pred, k, axis=1)
-    X_pred_binary = np.zeros_like(X_pred, dtype=bool)
-    X_pred_binary[np.arange(batch_users)[:, np.newaxis], idx[:, :k]] = True
-
-    X_true_binary = heldout_batch
-    tmp = (np.logical_and(X_true_binary, X_pred_binary).sum(axis=1)).astype(
-        np.float32)
-    recall = tmp / np.minimum(k, X_true_binary.sum(axis=1))
-    recall = np.mean(recall)
-    return recall
-
 def calc_rmse(pred, test):
     idx = np.where(test != 0)
     pred = pred[idx]
@@ -390,10 +376,9 @@ def main():
                 # y_ab = y_ab[test_B]
                 # y_ba = y_ba[test_A]
 
-                # print("recall B: %f" % (calc_recall(y_ab, dense_B_test)))
-                # print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
-                print("recall B: %f" % (Recall_at_k_batch(y_ab, user_B_test)))
-                print("recall A: %f" % (Recall_at_k_batch(y_ba, user_A_test)))
+                print("recall B: %f" % (calc_recall(y_ab, dense_B_test)))
+                print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
+
 
             model.train = True
         # if i%100 == 0:
