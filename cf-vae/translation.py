@@ -94,10 +94,10 @@ class Translation:
             z_mu = fully_connected(h, self.z_dim,  scope="z_mu")
             z_sigma = fully_connected(h, self.z_dim,  scope="z_sigma")
             e = tf.random_normal(tf.shape(z_mu))
-            if self.train:
-                z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
-            else:
-                z = z_mu
+            # if self.train:
+            #     z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
+            # else:
+            z = z_mu
         return z, z_mu, z_sigma
 
     def encode(self, x, scope, dim, reuse_enc, reuse_share, reuse_z=False):
@@ -189,9 +189,14 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + 0.1*tf.losses.get_regularization_loss() + \
-                        10*self.loss_generator(y_AB) + \
-                        10*self.loss_generator(y_BA)
+        # self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + 0.1*tf.losses.get_regularization_loss() + \
+        #                 10*self.loss_generator(y_AB) + \
+        #                 10*self.loss_generator(y_BA)
+        self.loss_gen = self.lambda_2 * self.loss_reconstruct(x_A, y_AA) +\
+                        self.lambda_2 * self.loss_reconstruct(x_B,y_BB) + \
+                        self.lambda_4 * self.loss_reconstruct(x_A, y_ABA) + \
+                        self.lambda_4 * self.loss_reconstruct(x_B, y_BAB) + 0.1 * tf.losses.get_regularization_loss()
+
         self.loss_dis = loss_d_A + loss_d_B
         self.loss_rec = 10 * self.loss_val_a + 10*self.loss_val_b
 
