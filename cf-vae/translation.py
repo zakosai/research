@@ -284,8 +284,8 @@ def main():
     share_dim = [100]
     decoding_dim_A = [500, 1000, num_A]
     decoding_dim_B = [500, 1000, num_B]
-    z_dim = 100
-    adv_dim_A = adv_dim_B = [100, 1]
+    z_dim = 50
+    adv_dim_A = adv_dim_B = [200, 100, 1]
     # test_A = list(open("data/Health_Clothing/test_A.txt").readlines())
     # test_A = [t.strip() for t in test_A]
     # if test_A[-1] == '':
@@ -388,9 +388,9 @@ def main():
 
 
             model.train = True
-        if i%50 == 0:
-            model.learning_rate /= 10
-            print("decrease lr to %f"%model.learning_rate)
+        # if i%50 == 0:
+        #     model.learning_rate /= 10
+        #     print("decrease lr to %f"%model.learning_rate)
 
             # pred = np.array(y_ab).flatten()
             # test = np.array(user_B_val).flatten()
