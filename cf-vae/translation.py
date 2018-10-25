@@ -97,7 +97,7 @@ class Translation:
             z_sigma = fully_connected(h, self.z_dim,  scope="z_sigma")
             e = tf.random_normal(tf.shape(z_mu))
             if self.train:
-                z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
+                z = z_mu + tf.maximum(tf.exp(0.5*z_sigma), self.eps) * e
             else:
                 z = z_mu
         return z, z_mu, z_sigma
