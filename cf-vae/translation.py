@@ -334,8 +334,7 @@ def main():
     # test_B = [t - train_size - val_size for t in test_B]
 
     model = Translation(batch_size, num_A, num_B, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, lambda_1=1, lambda_2=1, lambda_3=1,
-                        lambda_4=1)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim)
     model.build_model()
 
     sess = tf.Session()
