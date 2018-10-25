@@ -185,19 +185,19 @@ class Translation:
         self.y_AB = y_AB
 
         self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + 0.1*tf.losses.get_regularization_loss() + \
-                        10 *self.loss_val_a + 10*self.loss_val_b + 10*self.loss_generator(y_AB) + \
+                        10*self.loss_generator(y_AB) + \
                         10*self.loss_generator(y_BA)
         self.loss_dis = loss_d_A + loss_d_B
-        self.loss_rec =  self.loss_val_a + self.loss_val_b
+        self.loss_rec = 10 * self.loss_val_a + 10*self.loss_val_b
 
         # self.train_op_VAE = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_VAE)
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_gen)
         adv_varlist = [var for var in tf.all_variables() if 'adv' in var.name]
         print(adv_varlist)
-        self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate*0.1, beta1=0.5).minimize(self.loss_dis,
+        self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_dis,
                                                                                          var_list=adv_varlist)
-        # self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
+        self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_rec)
 
 
 def create_dataset(num_A, num_B, A="Health", B="Clothing"):
@@ -341,10 +341,10 @@ def main():
                                         feed_dict=feed)
             # print(adv_AA, adv_AB)
             # _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
-            # _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
+            _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
 
-        # print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss gan %f, loss cc %f"%(loss_gen, loss_dis,
-        #                                                                         loss_vae, loss_gan, loss_cc))
+        print("Loss last batch: loss gen %f, loss dis %f, loss vae %f, loss rec %f, loss cc %f"%(loss_gen, loss_dis,
+                                                                                loss_vae, loss_rec, loss_cc))
 
         # Validation Process
         if i%10 == 0:
