@@ -97,7 +97,7 @@ class Translation:
             z_sigma = fully_connected(h, self.z_dim,  scope="z_sigma")
             e = tf.random_normal(tf.shape(z_mu))
             if self.train:
-                z = z_mu + tf.maximum(tf.exp(0.5*z_sigma), self.eps) * e
+                z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
             else:
                 z = z_mu
         return z, z_mu, z_sigma
@@ -277,7 +277,7 @@ def main():
     share_dim = [100]
     decoding_dim_A = [500, 1000, health_num]
     decoding_dim_B = [500, 1000, clothing_num]
-    z_dim = 50
+    z_dim = 100
     adv_dim_A = adv_dim_B = [100, 1]
     checkpoint_dir = "translation/%s_%s/"%(A,B)
     user_A, user_B, dense_A, dense_B = create_dataset(health_num, clothing_num, A, B)
