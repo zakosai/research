@@ -29,25 +29,29 @@ class Translation:
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
+        self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
+
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
 
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.3)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i)
-                # x_ = batch_norm(x_, decay=0.995)
+                x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
+                                     weights_regularizer=self.regularizer)
+                x_ = batch_norm(x_, decay=0.995)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.3)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i)
+                x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
+                                     weights_regularizer=self.regularizer)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
@@ -90,7 +94,9 @@ class Translation:
         self.x_recon = x_recon
 
         # Loss VAE
-        self.loss = self.lambda_1 * self.loss_kl(z_mu, z_sigma) + self.lambda_2 * self.loss_reconstruct(x, x_recon)
+        self.loss = self.lambda_1 * self.loss_kl(z_mu, z_sigma) + self.lambda_2 * self.loss_reconstruct(x,
+                                                                                                        x_recon) + \
+                    tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
@@ -149,7 +155,6 @@ def one_hot_vector2(A, num_product):
 
 def calc_recall(pred, test):
     pred_ab = np.argsort(pred)[:, ::-1][:, :100]
-    len(pred_ab[0])
     recall = []
     for i in range(len(pred_ab)):
         hits = set(test[i]) & set(pred_ab[i])

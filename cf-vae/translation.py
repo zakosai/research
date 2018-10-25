@@ -90,13 +90,10 @@ class Translation:
 
     def gen_z(self, h, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
-            z_mu = fully_connected(h, self.z_dim,  scope="z_mu")
-            z_sigma = fully_connected(h, self.z_dim,  scope="z_sigma")
+            z_mu = fully_connected(h, self.z_dim, self.active_function, scope="z_mu")
+            z_sigma = fully_connected(h, self.z_dim,  self.active_function, scope="z_sigma")
             e = tf.random_normal(tf.shape(z_mu))
-            if self.train:
-                z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
-            else:
-                z = z_mu
+            z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
         return z, z_mu, z_sigma
 
     def encode(self, x, scope, dim, reuse_enc, reuse_share, reuse_z=False):
@@ -199,17 +196,13 @@ class Translation:
         self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + tf.losses.get_regularization_loss()
 
         self.loss_dis = loss_d_A + loss_d_B
-        self.loss_rec = 10 * self.loss_val_a + 10*self.loss_val_b
 
-        # self.train_op_VAE = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_VAE)
 
-        gen_var = [var for var in tf.all_variables() if 'enc' in var.name or 'dec' in var.name]
-        self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_gen, var_list=gen_var)
+        self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         adv_varlist = [var for var in tf.all_variables() if 'adv' in var.name]
         print(adv_varlist)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_dis,
                                                                                          var_list=adv_varlist)
-        # self.train_op_rec = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_rec, var_list=gen_var)
 
 
 def create_dataset(A="Health", B="Clothing"):
