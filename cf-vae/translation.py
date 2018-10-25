@@ -5,6 +5,8 @@ import tensorflow.keras.backend as K
 from tensorflow.contrib.framework import argsort
 import numpy as np
 import os
+import bottleneck as bn
+
 
 
 class Translation:
@@ -255,6 +257,19 @@ def calc_recall(pred, test):
         recall.append(recall_val)
     return np.mean(np.array(recall))
 
+def Recall_at_k_batch(X_pred, heldout_batch, k=100):
+    batch_users = X_pred.shape[0]
+
+    idx = bn.argpartition(-X_pred, k, axis=1)
+    X_pred_binary = np.zeros_like(X_pred, dtype=bool)
+    X_pred_binary[np.arange(batch_users)[:, np.newaxis], idx[:, :k]] = True
+
+    X_true_binary = (heldout_batch > 0).toarray()
+    tmp = (np.logical_and(X_true_binary, X_pred_binary).sum(axis=1)).astype(
+        np.float32)
+    recall = tmp / np.minimum(k, X_true_binary.sum(axis=1))
+    return recall
+
 def calc_rmse(pred, test):
     idx = np.where(test != 0)
     pred = pred[idx]
@@ -374,8 +389,10 @@ def main():
                 # y_ab = y_ab[test_B]
                 # y_ba = y_ba[test_A]
 
-                print("recall B: %f" % (calc_recall(y_ab, dense_B_test)))
-                print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
+                # print("recall B: %f" % (calc_recall(y_ab, dense_B_test)))
+                # print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
+                print("recall B: %f" % (Recall_at_k_batch(y_ab, user_B_test)))
+                print("recall A: %f" % (Recall_at_k_batch(y_ba, user_A_test)))
 
             model.train = True
         # if i%100 == 0:
