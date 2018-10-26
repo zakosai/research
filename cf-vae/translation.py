@@ -10,9 +10,9 @@ import argparse
 
 class Translation:
     def __init__(self, batch_size, dim_A, dim_B, encode_dim_A, decode_dim_A, encode_dim_B, decode_dim_B, adv_dim_A,
-                 adv_dim_B, z_dim, share_dim, z_A=None, z_B=None, eps=1e-10, lambda_0=10, lambda_1=0.1, lambda_2=100,
+                 adv_dim_B, z_dim, share_dim, z_A=None, z_B=None, eps=1e-10, lambda_0=10, lambda_1=0.1, lambda_2=1000,
                  lambda_3=0.1,
-                 lambda_4=100, learning_rate=1e-4):
+                 lambda_4=1000, learning_rate=1e-4):
         self.batch_size = batch_size
         self.dim_A = dim_A
         self.dim_B = dim_B
@@ -183,15 +183,14 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen_A = loss_VAE_A  + loss_CC_A  + 0.1 * tf.losses.get_regularization_loss()
-        self.loss_gen_B = loss_VAE_B + loss_CC_B + 0.1*tf.losses.get_regularization_loss()
+        self.loss_gen_A = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + 0.1 * tf.losses.get_regularization_loss()
+
 
 
         self.loss_dis = loss_d_A + loss_d_B
 
 
-        self.train_op_gen_A = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen_A)
-        self.train_op_gen_B = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen_B)
+        self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         adv_var_A = [var for var in tf.all_variables() if 'adv_A' in var.name]
         adv_var_B = [var for var in tf.all_variables() if 'adv_B' in var.name]
         self.train_op_dis_A = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_d_A,
@@ -344,11 +343,8 @@ def main():
                     model.x_B: x_B}
 
 
-            _, loss_gen_A, loss_vae, loss_cc = sess.run([model.train_op_gen_A, model.loss_gen_A, model.loss_VAE,
+            _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
                                                 model.loss_CC], feed_dict=feed)
-
-            _, loss_gen_B, loss_vae, loss_cc = sess.run([model.train_op_gen_B, model.loss_gen_B, model.loss_VAE,
-                                                       model.loss_CC], feed_dict=feed)
             sess.run([model.train_op_dis_A],feed_dict=feed)
             sess.run([model.train_op_dis_B], feed_dict=feed)
             loss_dis = 0
@@ -363,9 +359,9 @@ def main():
         if i%10 == 0:
             model.train = False
             print("Loss last batch: loss gen %f, loss dis %f, loss vae %f,loss cc %f" % (
-            loss_gen_B, loss_dis, loss_vae, loss_cc))
+            loss_gen, loss_dis, loss_vae, loss_cc))
             #                                                                         loss_vae, loss_gan, loss_cc))
-            loss_gen, loss_val_a, loss_val_b, y_ba, y_ab = sess.run([model.loss_gen_A, model.loss_val_a,
+            loss_gen, loss_val_a, loss_val_b, y_ba, y_ab = sess.run([model.loss_gen, model.loss_val_a,
                                                                      model.loss_val_b, model.y_BA, model.y_AB],
                                               feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
 
