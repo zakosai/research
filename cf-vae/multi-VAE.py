@@ -251,7 +251,7 @@ def main():
                                        feed_dict={model.x: user_val_B})
             print(len(y_a[0]), len(y_b[0]))
             recall = calc_recall(y_b[:, num_A:], dense_B_val) + calc_recall(y_a[:, :num_A], dense_A_val)
-            print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall))
+            print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall, args.k))
             if recall > max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'multi-VAE-model'), i)
@@ -261,8 +261,8 @@ def main():
 
                 # y_ab = y_ab[test_B]
                 # y_ba = y_ba[test_A]
-                print("recall A: %f" % (calc_recall(y_a[:, :num_A], dense_A_test)))
-                print("recall B: %f" % (calc_recall(y_b[:, num_A:], dense_B_test)))
+                print("recall A: %f" % (calc_recall(y_a[:, :num_A], dense_A_test, args.k)))
+                print("recall B: %f" % (calc_recall(y_b[:, num_A:], dense_B_test, args.k)))
             model.train = True
         if i%100 == 0:
             model.learning_rate /= 2

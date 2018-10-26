@@ -83,7 +83,8 @@ class Translation:
     def gen_z(self, h, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
             z_mu = fully_connected(h, self.z_dim, self.active_function, scope="z_mu", weights_regularizer=self.regularizer)
-            z_sigma = fully_connected(h, self.z_dim,  self.active_function, scope="z_sigma", weights_regularizer=self.regularizer)
+            z_sigma = fully_connected(h, self.z_dim,  self.active_function, scope="z_sigma",
+                                      weights_regularizer=self.regularizery)
             e = tf.random_normal(tf.shape(z_mu))
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
         return z, z_mu, z_sigma
@@ -180,22 +181,22 @@ class Translation:
 
         self.loss_CC = loss_CC_A + loss_CC_B
 
-        self.loss_val_a = self.loss_reconstruct(x_A, y_BA)
-        self.loss_val_b = self.loss_reconstruct(x_B, y_AB)
+        self.loss_val_a = self.lambda_4 * self.loss_reconstruct(x_A, y_BA)
+        self.loss_val_b = self.lambda_4 * self.loss_reconstruct(x_B, y_AB)
         self.y_BA = y_BA
         self.y_AB = y_AB
 
         self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + tf.losses.get_regularization_loss() + \
-                        10*self.loss_generator(y_AB) + 10*self.loss_generator(y_BA) + 10*self.loss_generator(y_ABA) + \
-                        10*self.loss_generator(y_BAB)
+                        self.loss_generator(y_AB) + self.loss_generator(y_BA) + self.loss_generator(y_ABA) + \
+                        self.loss_generator(y_BAB) + self.loss_val_a + self.loss_val_b
 
         self.loss_dis = loss_d_A + loss_d_B
 
 
-        self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
+        self.train_op_gen = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.loss_gen)
         adv_varlist = [var for var in tf.all_variables() if 'adv' in var.name]
         print(adv_varlist)
-        self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.loss_dis,
+        self.train_op_dis = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.loss_dis,
                                                                                          var_list=adv_varlist)
 
 
@@ -274,11 +275,11 @@ def main():
     B = args.B
     checkpoint_dir = "translation/%s_%s/"%(A,B)
     user_A, user_B, dense_A, dense_B, num_A, num_B = create_dataset(A, B)
-    encoding_dim_A = [600]
-    encoding_dim_B = [600]
-    share_dim = [200]
-    decoding_dim_A = [600, num_A]
-    decoding_dim_B = [600, num_B]
+    encoding_dim_A = [1000, 500]
+    encoding_dim_B = [1000, 500]
+    share_dim = [100]
+    decoding_dim_A = [500, 1000, num_A]
+    decoding_dim_B = [500, 1000, num_B]
     z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
     # test_A = list(open("data/Health_Clothing/test_A.txt").readlines())
@@ -321,7 +322,7 @@ def main():
     # test_B = [t - train_size - val_size for t in test_B]
 
     model = Translation(batch_size, num_A, num_B, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-2)
     model.build_model()
 
     sess = tf.Session()
