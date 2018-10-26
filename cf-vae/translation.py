@@ -173,8 +173,9 @@ class Translation:
         self.adv_AB = adv_BA
 
         # Loss cycle - consistency (CC)
-        loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA)
-        loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB)
+        loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA) + \
+                    self.lambda_4 * self.loss_reconstruct(y_AB,y_ABA)
+        loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB) + self.lambda_4 * self.loss_reconstruct(y_BA,y_BAB)
 
         self.loss_CC = loss_CC_A + loss_CC_B
 
@@ -375,9 +376,9 @@ def main():
 
                 # y_ab = y_ab[test_B]
                 # y_ba = y_ba[test_A]
-
-                print("recall B: %f" % (calc_recall(y_ab, dense_B_test)))
                 print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
+                print("recall B: %f" % (calc_recall(y_ab, dense_B_test)))
+
 
 
             model.train = True
