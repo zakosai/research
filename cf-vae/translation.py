@@ -54,10 +54,9 @@ class Translation:
         if self.train:
             x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
-            for i in range(len(decode_dim)-1):
+            for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
-            x_ = fully_connected(x_, decode_dim[-1], scope="dec_last", weights_regularizer=self.regularizer)
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
@@ -105,8 +104,8 @@ class Translation:
 
     def loss_reconstruct(self, x, x_recon):
         # return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
-        return tf.reduce_mean(tf.abs(x - x_recon))
-        # return tf.reduce_mean(tf.reduce_sum((x-x_recon)**2, axis=1))
+        # return tf.reduce_mean(tf.abs(x - x_recon))
+        return tf.reduce_mean(tf.reduce_sum((x-x_recon)**2, axis=1))
         # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_recon, labels=x))
 
         # log_softmax_var = tf.nn.log_softmax(x_recon)
