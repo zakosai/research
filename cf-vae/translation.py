@@ -344,10 +344,10 @@ def main():
                     model.x_B: x_B}
 
 
-            _, loss_gen_A, loss_vae, loss_cc = sess.run([model.train_op_gen_A, model.loss_gen, model.loss_VAE,
+            _, loss_gen_A, loss_vae, loss_cc = sess.run([model.train_op_gen_A, model.loss_gen_A, model.loss_VAE,
                                                 model.loss_CC], feed_dict=feed)
 
-            _, loss_gen_B, loss_vae, loss_cc = sess.run([model.train_op_gen_B, model.loss_gen, model.loss_VAE,
+            _, loss_gen_B, loss_vae, loss_cc = sess.run([model.train_op_gen_B, model.loss_gen_B, model.loss_VAE,
                                                        model.loss_CC], feed_dict=feed)
             sess.run([model.train_op_dis_A],feed_dict=feed)
             sess.run([model.train_op_dis_B], feed_dict=feed)
