@@ -250,8 +250,8 @@ def main():
             loss_val_b, y_a = sess.run([model.loss, model.x_recon],
                                        feed_dict={model.x: user_val_B})
             print(len(y_a[0]), len(y_b[0]))
-            recall = calc_recall(y_b[:, num_A:], dense_B_val) + calc_recall(y_a[:, :num_A], dense_A_val)
-            print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall, args.k))
+            recall = calc_recall(y_b[:, num_A:], dense_B_val, args.k) + calc_recall(y_a[:, :num_A], dense_A_val, args.k)
+            print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall))
             if recall > max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'multi-VAE-model'), i)
