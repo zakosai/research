@@ -137,31 +137,31 @@ class Translation:
 
         # VAE for domain A
         z_A, z_mu_A, z_sigma_A = self.encode(x_A, "A", self.encode_dim_A, False, False)
-        y_AA = self.decode(z_mu_A, "A", self.decode_dim_A, False, False)
+        y_AA = self.decode(z_A, "A", self.decode_dim_A, False, False)
 
         # VAE for domain B
         z_B, z_mu_B, z_sigma_B = self.encode(x_B, "B", self.encode_dim_B, False, True, True)
-        y_BB = self.decode(z_mu_B, "B", self.decode_dim_B, False, True)
+        y_BB = self.decode(z_B, "B", self.decode_dim_B, False, True)
 
         # Adversal
-        y_BA = self.decode(z_mu_B, "A", self.decode_dim_A, True, True)
+        y_BA = self.decode(z_B, "A", self.decode_dim_A, True, True)
         adv_AA = self.adversal(x_A, "adv_A", self.adv_dim_A)
         adv_BA = self.adversal(y_BA, "adv_A", self.adv_dim_A, reuse=True)
 
-        y_AB = self.decode(z_mu_A, "B", self.decode_dim_B, True, True)
+        y_AB = self.decode(z_A, "B", self.decode_dim_B, True, True)
         adv_BB = self.adversal(x_B, "adv_B", self.adv_dim_B)
         adv_AB = self.adversal(y_AB, "adv_B", self.adv_dim_B, reuse=True)
 
         # Cycle - Consistency
         z_ABA, z_mu_ABA, z_sigma_ABA = self.encode(y_AB, "B", self.encode_dim_B, True, True, True)
-        y_ABA = self.decode(z_mu_ABA, "A", self.decode_dim_A, True, True)
+        y_ABA = self.decode(z_ABA, "A", self.decode_dim_A, True, True)
         z_BAB, z_mu_BAB, z_sigma_BAB = self.encode(y_BA, "A", self.encode_dim_A, True, True, True)
-        y_BAB = self.decode(z_mu_BAB, "B", self.decode_dim_B, True, True)
+        y_BAB = self.decode(z_BAB, "B", self.decode_dim_B, True, True)
 
 
         # Loss VAE
-        loss_VAE_A = self.lambda_2 * self.loss_reconstruct(x_A, y_AA)
-        loss_VAE_B = self.lambda_2 * self.loss_reconstruct(x_B, y_BB)
+        loss_VAE_A = self.lambda_1 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_2 * self.loss_reconstruct(x_A, y_AA)
+        loss_VAE_B = self.lambda_1 * self.loss_kl(z_mu_B, z_sigma_B) + self.lambda_2 * self.loss_reconstruct(x_B, y_BB)
         self.loss_VAE = loss_VAE_A + loss_VAE_B
 
         # Loss GAN
@@ -172,8 +172,9 @@ class Translation:
         self.adv_AB = adv_BA
 
         # Loss cycle - consistency (CC)
-        loss_CC_A = self.lambda_4 * self.loss_reconstruct(x_A,y_ABA)
-        loss_CC_B = self.lambda_4 * self.loss_reconstruct(x_B,y_BAB)
+        loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA) + \
+                    self.lambda_4 * self.loss_reconstruct(x_A,y_ABA)
+        loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB) + self.lambda_4 * self.loss_reconstruct(x_B,y_BAB)
 
         self.loss_CC = loss_CC_A + loss_CC_B
 
@@ -318,7 +319,7 @@ def main():
     # test_B = [t - train_size - val_size for t in test_B]
 
     model = Translation(batch_size, num_A, num_B, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-2)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-3)
     model.build_model()
 
     sess = tf.Session()
