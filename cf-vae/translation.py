@@ -31,7 +31,7 @@ class Translation:
         self.lambda_3 = lambda_3
         self.lambda_4 = lambda_4
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.sigmoid
+        self.active_function = tf.nn.tanh
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
@@ -54,9 +54,10 @@ class Translation:
         if self.train:
             x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
-            for i in range(len(decode_dim)):
+            for i in range(len(decode_dim)-1):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
+            x_ = fully_connected(x_, decode_dim[-1], scope="dec_last", weights_regularizer=self.regularizer)
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
@@ -104,15 +105,15 @@ class Translation:
 
     def loss_reconstruct(self, x, x_recon):
         # return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
-        return tf.reduce_mean(tf.abs(x - x_recon))
+        # return tf.reduce_mean(tf.abs(x - x_recon))
         # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_recon, labels=x))
 
-        # log_softmax_var = tf.nn.log_softmax(x_recon)
-        #
-        # neg_ll = -tf.reduce_mean(tf.reduce_sum(
-        #     log_softmax_var * x,
-        #     axis=-1))
-        # return neg_ll
+        log_softmax_var = tf.nn.log_softmax(x_recon)
+
+        neg_ll = -tf.reduce_mean(tf.reduce_sum(
+            log_softmax_var * x,
+            axis=-1))
+        return neg_ll
 
 
     def loss_recsys(self, pred, label):
