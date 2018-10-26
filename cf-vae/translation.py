@@ -252,8 +252,8 @@ def one_hot_vector2(A, num_product):
         one_hot[i[0], i[1]] = i[2]
     return one_hot
 
-def calc_recall(pred, test):
-    pred_ab = np.argsort(pred)[:,::-1][:, :100]
+def calc_recall(pred, test, k=100):
+    pred_ab = np.argsort(pred)[:,::-1][:, :k]
     recall = []
     for i in range(len(pred_ab)):
         hits = set(test[i]) & set(pred_ab[i])
