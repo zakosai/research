@@ -121,15 +121,12 @@ class Translation:
         return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(label, pred), axis=1))
 
     def loss_discriminator(self, x, x_fake):
-        loss_real = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x, labels=tf.ones_like(
-            x)))
-        loss_fake = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_fake, labels=tf.zeros_like(
-            x_fake)))
-        return loss_real + loss_fake
+        loss_real = tf.reduce_mean(tf.squared_difference(x, 1))
+        loss_fake = tf.reduce_mean(tf.squared_difference(x_fake, 0))
+        return (loss_real + loss_fake) *0.5
     def loss_generator(self, x):
-        loss_real = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x, labels=tf.ones_like(
-            x)))
-        return loss_real
+        return tf.reduce_mean(tf.squared_difference(x, 1))
+
 
     def build_model(self):
         self.x_A = tf.placeholder(tf.float32, [None, self.dim_A], name='input_A')
@@ -163,8 +160,8 @@ class Translation:
 
 
         # Loss VAE
-        loss_VAE_A = self.lambda_1 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_2 * self.loss_reconstruct(x_A, y_AA)
-        loss_VAE_B = self.lambda_1 * self.loss_kl(z_mu_B, z_sigma_B) + self.lambda_2 * self.loss_reconstruct(x_B, y_BB)
+        loss_VAE_A = self.lambda_2 * self.loss_reconstruct(x_A, y_AA)
+        loss_VAE_B = self.lambda_2 * self.loss_reconstruct(x_B, y_BB)
         self.loss_VAE = loss_VAE_A + loss_VAE_B
 
         # Loss GAN
@@ -175,9 +172,8 @@ class Translation:
         self.adv_AB = adv_BA
 
         # Loss cycle - consistency (CC)
-        loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA) + \
-                    self.lambda_4 * self.loss_reconstruct(x_A,y_ABA)
-        loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB) + self.lambda_4 * self.loss_reconstruct(x_B,y_BAB)
+        loss_CC_A = self.lambda_4 * self.loss_reconstruct(x_A,y_ABA)
+        loss_CC_B = self.lambda_4 * self.loss_reconstruct(x_B,y_BAB)
 
         self.loss_CC = loss_CC_A + loss_CC_B
 
