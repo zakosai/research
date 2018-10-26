@@ -183,7 +183,7 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen_A = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + 0.1 * tf.losses.get_regularization_loss()
+        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + 0.1 * tf.losses.get_regularization_loss()
 
 
 
