@@ -190,10 +190,10 @@ class Translation:
         self.loss_dis = loss_d_A + loss_d_B
 
 
-        self.train_op_gen = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.loss_gen)
+        self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         adv_varlist = [var for var in tf.all_variables() if 'adv' in var.name]
         print(adv_varlist)
-        self.train_op_dis = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.loss_dis,
+        self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis,
                                                                                          var_list=adv_varlist)
 
 
@@ -319,7 +319,7 @@ def main():
     # test_B = [t - train_size - val_size for t in test_B]
 
     model = Translation(batch_size, num_A, num_B, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-1)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-3)
     model.build_model()
 
     sess = tf.Session()
