@@ -320,7 +320,7 @@ def main():
     # test_B = [t - train_size - val_size for t in test_B]
 
     model = Translation(batch_size, num_A, num_B, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-3)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-4)
     model.build_model()
 
     sess = tf.Session()
@@ -383,9 +383,9 @@ def main():
 
 
             model.train = True
-        # if i%50 == 0:
-        #     model.learning_rate /= 10
-        #     print("decrease lr to %f"%model.learning_rate)
+        if i%50 == 0:
+            model.learning_rate /= 10
+            print("decrease lr to %f"%model.learning_rate)
 
             # pred = np.array(y_ab).flatten()
             # test = np.array(user_B_val).flatten()
