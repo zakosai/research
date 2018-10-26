@@ -41,7 +41,7 @@ class Translation:
         x_ = x
 
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.3)
+            x_ = tf.nn.dropout(x_, 0.2)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
@@ -183,18 +183,19 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + tf.losses.get_regularization_loss() + \
-                        self.loss_generator(y_AB) + self.loss_generator(y_BA) + self.loss_generator(y_ABA) + \
-                        self.loss_generator(y_BAB) + self.loss_val_a + self.loss_val_b
+        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + 0.1 * tf.losses.get_regularization_loss()
+
 
         self.loss_dis = loss_d_A + loss_d_B
 
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
-        adv_varlist = [var for var in tf.all_variables() if 'adv' in var.name]
-        print(adv_varlist)
-        self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis,
-                                                                                         var_list=adv_varlist)
+        adv_var_A = [var for var in tf.all_variables() if 'adv_A' in var.name]
+        adv_var_B = [var for var in tf.all_variables() if 'adv_B' in var.name]
+        self.train_op_dis_A = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_d_A,
+                                                                                         var_list=adv_var_A)
+        self.train_op_dis_B = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_d_B,
+                                                                                  var_list=adv_var_B)
 
 
 def create_dataset(A="Health", B="Clothing"):
@@ -343,8 +344,9 @@ def main():
 
             _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
                                                 model.loss_CC], feed_dict=feed)
-            _, loss_dis, adv_AA, adv_AB = sess.run([model.train_op_dis, model.loss_dis, model.adv_AA, model.adv_AB],
-                                        feed_dict=feed)
+            sess.run([model.train_op_dis_A],feed_dict=feed)
+            sess.run([model.train_op_dis_B], feed_dict=feed)
+            loss_dis = 0
             # print(adv_AA, adv_AB)
             # _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
             # _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
