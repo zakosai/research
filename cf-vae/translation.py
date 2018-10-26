@@ -106,14 +106,15 @@ class Translation:
     def loss_reconstruct(self, x, x_recon):
         # return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
         # return tf.reduce_mean(tf.abs(x - x_recon))
+        return tf.reduce_mean(tf.reduce_sum((x-x_recon)**2, axis=1))
         # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_recon, labels=x))
 
-        log_softmax_var = tf.nn.log_softmax(x_recon)
-
-        neg_ll = -tf.reduce_mean(tf.reduce_sum(
-            log_softmax_var * x,
-            axis=-1))
-        return neg_ll
+        # log_softmax_var = tf.nn.log_softmax(x_recon)
+        #
+        # neg_ll = -tf.reduce_mean(tf.reduce_sum(
+        #     log_softmax_var * x,
+        #     axis=-1))
+        # return neg_ll
 
 
     def loss_recsys(self, pred, label):
@@ -175,8 +176,8 @@ class Translation:
 
         # Loss cycle - consistency (CC)
         loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA) + \
-                    self.lambda_4 * self.loss_reconstruct(y_AB,y_ABA)
-        loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB) + self.lambda_4 * self.loss_reconstruct(y_BA,y_BAB)
+                    self.lambda_4 * self.loss_reconstruct(x_A,y_ABA)
+        loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB) + self.lambda_4 * self.loss_reconstruct(x_B,y_BAB)
 
         self.loss_CC = loss_CC_A + loss_CC_B
 
