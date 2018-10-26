@@ -108,7 +108,7 @@ class Translation:
         # return tf.reduce_mean(tf.abs(x - x_recon))
         # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_recon, labels=x))
 
-        # log_softmax_var = tf.nn.log_softmax(x_recon)
+        log_softmax_var = tf.nn.log_softmax(x_recon)
 
         neg_ll = -tf.reduce_mean(tf.reduce_sum(
             x_recon * x,
