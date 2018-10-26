@@ -364,7 +364,7 @@ def main():
                                                                      model.loss_val_b, model.y_BA, model.y_AB],
                                               feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
 
-            recall = calc_recall(y_ba, dense_A_val) + calc_recall(y_ab, dense_B_val)
+            recall = calc_recall(y_ba, dense_A_val, args.k) + calc_recall(y_ab, dense_B_val, args.k)
             print("Loss gen: %f, Loss val a: %f, Loss val b: %f, recall %f" % (loss_gen, loss_val_a, loss_val_b,
                                                                                recall))
             if recall > max_recall:
@@ -377,8 +377,8 @@ def main():
 
                 # y_ab = y_ab[test_B]
                 # y_ba = y_ba[test_A]
-                print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
-                print("recall B: %f" % (calc_recall(y_ab, dense_B_test)))
+                print("recall A: %f" % (calc_recall(y_ba, dense_A_test, args.k)))
+                print("recall B: %f" % (calc_recall(y_ab, dense_B_test, args.k)))
 
 
 
@@ -422,7 +422,8 @@ parser.add_argument('--A',  type=str, default="Health",
                    help='domain A')
 parser.add_argument('--B',  type=str, default='Grocery',
                    help='domain B')
-
+parser.add_argument('--k',  type=int, default=100,
+                   help='top-K')
 if __name__ == '__main__':
     main()
 

@@ -153,8 +153,8 @@ def one_hot_vector2(A, num_product):
         one_hot[i[0], i[1]] = i[2]
     return one_hot
 
-def calc_recall(pred, test):
-    pred_ab = np.argsort(pred)[:, ::-1][:, :100]
+def calc_recall(pred, test, k):
+    pred_ab = np.argsort(pred)[:, ::-1][:, :k]
     recall = []
     for i in range(len(pred_ab)):
         hits = set(test[i]) & set(pred_ab[i])
@@ -254,15 +254,15 @@ def main():
             print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall))
             if recall > max_recall:
                 max_recall = recall
-            saver.save(sess, os.path.join(checkpoint_dir, 'multi-VAE-model'), i)
-            loss_test_a, y_b= sess.run([model.loss, model.x_recon], feed_dict={model.x: user_test_A})
-            loss_test_b, y_a = sess.run([model.loss, model.x_recon], feed_dict={model.x: user_test_B})
-            print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
+                saver.save(sess, os.path.join(checkpoint_dir, 'multi-VAE-model'), i)
+                loss_test_a, y_b= sess.run([model.loss, model.x_recon], feed_dict={model.x: user_test_A})
+                loss_test_b, y_a = sess.run([model.loss, model.x_recon], feed_dict={model.x: user_test_B})
+                print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
 
-            # y_ab = y_ab[test_B]
-            # y_ba = y_ba[test_A]
-            print("recall A: %f" % (calc_recall(y_a[:, :num_A], dense_A_test)))
-            print("recall B: %f" % (calc_recall(y_b[:, num_A:], dense_B_test)))
+                # y_ab = y_ab[test_B]
+                # y_ba = y_ba[test_A]
+                print("recall A: %f" % (calc_recall(y_a[:, :num_A], dense_A_test)))
+                print("recall B: %f" % (calc_recall(y_b[:, num_A:], dense_B_test)))
             model.train = True
         if i%100 == 0:
             model.learning_rate /= 2
@@ -276,6 +276,7 @@ parser.add_argument('--A',  type=str, default="Health",
                    help='domain A')
 parser.add_argument('--B',  type=str, default='Grocery',
                    help='domain B')
+parser.add_argument('--k', type=int, default=100, help='top-K')
 
 
 if __name__ == '__main__':

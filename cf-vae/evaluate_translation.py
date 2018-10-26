@@ -18,6 +18,8 @@ parser.add_argument('--mat_file',  type=str, default='cf_vae_1.mat',
                    help='where model is stored')
 parser.add_argument('--type',  type=str, default=15,
                    help='where model is stored')
+parser.add_argument('--k',  type=int, default=100,
+                   help='top-K')
 
 args = parser.parse_args()
 thred = args.thred
@@ -66,6 +68,6 @@ model = cf_vae_extend(num_users=6556, num_items=34295, num_factors=num_factors, 
 
 model.load_model(extend_file)
 train_size = int(len(data["test_users"])*0.75)
-model.predict_test(data['test_users'][train_size:], thred)
+model.predict_test(data['test_users'][train_size:], thred, args.k)
 
 
