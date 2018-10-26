@@ -192,9 +192,9 @@ class Translation:
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         adv_var_A = [var for var in tf.all_variables() if 'adv_A' in var.name]
         adv_var_B = [var for var in tf.all_variables() if 'adv_B' in var.name]
-        self.train_op_dis_A = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_d_A,
+        self.train_op_dis_A = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_d_A,
                                                                                          var_list=adv_var_A)
-        self.train_op_dis_B = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_d_B,
+        self.train_op_dis_B = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_d_B,
                                                                                   var_list=adv_var_B)
 
 
