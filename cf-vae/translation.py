@@ -137,26 +137,26 @@ class Translation:
 
         # VAE for domain A
         z_A, z_mu_A, z_sigma_A = self.encode(x_A, "A", self.encode_dim_A, False, False)
-        y_AA = self.decode(z_A, "A", self.decode_dim_A, False, False)
+        y_AA = self.decode(z_mu_A, "A", self.decode_dim_A, False, False)
 
         # VAE for domain B
         z_B, z_mu_B, z_sigma_B = self.encode(x_B, "B", self.encode_dim_B, False, True, True)
-        y_BB = self.decode(z_B, "B", self.decode_dim_B, False, True)
+        y_BB = self.decode(z_mu_B, "B", self.decode_dim_B, False, True)
 
         # Adversal
-        y_BA = self.decode(z_B, "A", self.decode_dim_A, True, True)
+        y_BA = self.decode(z_mu_B, "A", self.decode_dim_A, True, True)
         adv_AA = self.adversal(x_A, "adv_A", self.adv_dim_A)
         adv_BA = self.adversal(y_BA, "adv_A", self.adv_dim_A, reuse=True)
 
-        y_AB = self.decode(z_A, "B", self.decode_dim_B, True, True)
+        y_AB = self.decode(z_mu_A, "B", self.decode_dim_B, True, True)
         adv_BB = self.adversal(x_B, "adv_B", self.adv_dim_B)
         adv_AB = self.adversal(y_AB, "adv_B", self.adv_dim_B, reuse=True)
 
         # Cycle - Consistency
         z_ABA, z_mu_ABA, z_sigma_ABA = self.encode(y_AB, "B", self.encode_dim_B, True, True, True)
-        y_ABA = self.decode(z_ABA, "A", self.decode_dim_A, True, True)
+        y_ABA = self.decode(z_mu_ABA, "A", self.decode_dim_A, True, True)
         z_BAB, z_mu_BAB, z_sigma_BAB = self.encode(y_BA, "A", self.encode_dim_A, True, True, True)
-        y_BAB = self.decode(z_BAB, "B", self.decode_dim_B, True, True)
+        y_BAB = self.decode(z_mu_BAB, "B", self.decode_dim_B, True, True)
 
 
         # Loss VAE
