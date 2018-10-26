@@ -105,8 +105,8 @@ class Translation:
 
     def loss_reconstruct(self, x, x_recon):
         # return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
-        # return tf.reduce_mean(tf.abs(x - x_recon))
-        return tf.reduce_mean(tf.reduce_sum((x-x_recon)**2, axis=1))
+        return tf.reduce_mean(tf.abs(x - x_recon))
+        # return tf.reduce_mean(tf.reduce_sum((x-x_recon)**2, axis=1))
         # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_recon, labels=x))
 
         # log_softmax_var = tf.nn.log_softmax(x_recon)
