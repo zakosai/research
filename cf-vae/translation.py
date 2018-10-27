@@ -182,8 +182,7 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + 0.1 * tf.losses.get_regularization_loss() +\
-                        self.loss_generator(y_BA) + self.loss_generator(y_AB)
+        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + 0.1 * tf.losses.get_regularization_loss()
 
 
         self.loss_dis = loss_d_A + loss_d_B
@@ -278,7 +277,7 @@ def main():
     share_dim = [50]
     decoding_dim_A = [100, num_A]
     decoding_dim_B = [100, num_B]
-    z_dim = 10
+    z_dim = 20
     adv_dim_A = adv_dim_B = [200, 100, 1]
     # test_A = list(open("data/Health_Clothing/test_A.txt").readlines())
     # test_A = [t.strip() for t in test_A]
@@ -320,7 +319,7 @@ def main():
     # test_B = [t - train_size - val_size for t in test_B]
 
     model = Translation(batch_size, num_A, num_B, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-4, lambda_2=1,
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-3, lambda_2=1,
                         lambda_4=1)
     model.build_model()
 
