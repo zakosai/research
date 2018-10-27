@@ -274,12 +274,12 @@ def main():
     B = args.B
     checkpoint_dir = "translation/%s_%s/"%(A,B)
     user_A, user_B, dense_A, dense_B, num_A, num_B = create_dataset(A, B)
-    encoding_dim_A = [1000, 500]
-    encoding_dim_B = [1000, 500]
-    share_dim = [200]
-    decoding_dim_A = [500, 1000, num_A]
-    decoding_dim_B = [500, 1000, num_B]
-    z_dim = 100
+    encoding_dim_A = [100]
+    encoding_dim_B = [100]
+    share_dim = [50]
+    decoding_dim_A = [100, num_A]
+    decoding_dim_B = [100, num_B]
+    z_dim = 10
     adv_dim_A = adv_dim_B = [200, 100, 1]
     # test_A = list(open("data/Health_Clothing/test_A.txt").readlines())
     # test_A = [t.strip() for t in test_A]
