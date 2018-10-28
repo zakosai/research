@@ -148,7 +148,7 @@ class Translation:
         y_AA = self.decode(z_A, "A", self.decode_dim_A, False, False)
 
         # VAE for domain B
-        z_B, z_mu_B, z_sigma_B = self.encode(x_B, "B", self.encode_dim_B, False, True, True)
+        z_B, z_mu_B, z_sigma_B = self.encode(x_B, "B", self.encode_dim_B, False, True)
         y_BB = self.decode(z_B, "B", self.decode_dim_B, False, True)
 
         # Adversal
