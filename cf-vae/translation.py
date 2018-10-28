@@ -55,7 +55,7 @@ class Translation:
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                x_ = maxout(x_, encode_dim[i])
+                # x_ = maxout(x_, encode_dim[i])
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
