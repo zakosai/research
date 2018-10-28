@@ -59,7 +59,7 @@ class Translation:
                 print(x_.shape)
         return x_
 
-    def maxout(inputs, num_units, axis=None):
+    def maxout(self, inputs, num_units, axis=None):
         shape = inputs.get_shape().as_list()
         if axis is None:
             # Assume that channel is the last dimension
