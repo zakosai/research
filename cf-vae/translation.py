@@ -384,19 +384,19 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            if i <20:
-                _, loss_vae = sess.run([model.train_op_VAE_A, model.loss_VAE], feed_dict=feed)
-                loss_gen = loss_dis = loss_cc = 0
-            elif i>=20 and i < 40:
-                _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
-                loss_gen = loss_dis = loss_cc = 0
-            else:
-                model.freeze = False
-                _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
-                                                    model.loss_CC], feed_dict=feed)
-                sess.run([model.train_op_dis_A],feed_dict=feed)
-                sess.run([model.train_op_dis_B], feed_dict=feed)
-                loss_dis = 0
+            # if i <20:
+            #     _, loss_vae = sess.run([model.train_op_VAE_A, model.loss_VAE], feed_dict=feed)
+            #     loss_gen = loss_dis = loss_cc = 0
+            # elif i>=20 and i < 40:
+            #     _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
+            #     loss_gen = loss_dis = loss_cc = 0
+            # else:
+            #     model.freeze = False
+            _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
+                                                model.loss_CC], feed_dict=feed)
+            sess.run([model.train_op_dis_A],feed_dict=feed)
+            sess.run([model.train_op_dis_B], feed_dict=feed)
+            loss_dis = 0
             # print(adv_AA, adv_AB)
             # _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
             # _, loss_rec = sess.run([model.train_op_rec, model.loss_rec], feed_dict=feed)
