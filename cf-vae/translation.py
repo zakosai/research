@@ -220,7 +220,8 @@ class Translation:
         self.loss_dis = loss_d_A + loss_d_B
 
 
-        self.train_op_VAE = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_VAE)
+        self.train_op_VAE_A = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_VAE_A)
+        self.train_op_VAE_B = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_VAE_B)
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         adv_var_A = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_A")
         adv_var_B = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_B")
@@ -374,8 +375,11 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            if i <50:
-                _, loss_vae = sess.run([model.train_op_VAE, model.loss_VAE], feed_dict=feed)
+            if i <20:
+                _, loss_vae = sess.run([model.train_op_VAE_A, model.loss_VAE], feed_dict=feed)
+                loss_gen = loss_dis = loss_cc = 0
+            elif i>=20 and i < 40:
+                _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
                 loss_gen = loss_dis = loss_cc = 0
             else:
                 model.freeze = False
