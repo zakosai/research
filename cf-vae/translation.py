@@ -185,14 +185,14 @@ class Translation:
         adv_AB = self.adversal(y_AB, "adv_B", self.adv_dim_B, reuse=True)
 
         # Cycle - Consistency
-        # z_ABA, z_mu_ABA, z_sigma_ABA = self.encode(y_AB, "B", self.encode_dim_B, True, True, True)
-        # y_ABA = self.decode(z_ABA, "A", self.decode_dim_A, True, True)
-        # z_BAB, z_mu_BAB, z_sigma_BAB = self.encode(y_BA, "A", self.encode_dim_A, True, True, True)
-        # y_BAB = self.decode(z_BAB, "B", self.decode_dim_B, True, True)
-        z_AAB, z_mu_AAB, z_sigma_AAB = self.encode(y_AA, "A", self.encode_dim_A, True, True, True)
-        y_AAB = self.decode(z_AAB, "B", self.decode_dim_B, True, True)
-        z_BBA, z_mu_BBA, z_sigma_BBA = self.encode(y_BB, "B", self.encode_dim_B, True, True, True)
-        y_BBA = self.decode(z_BBA, "A", self.decode_dim_A, True, True)
+        z_ABA, z_mu_ABA, z_sigma_ABA = self.encode(y_AB, "B", self.encode_dim_B, True, True, True)
+        y_ABA = self.decode(z_ABA, "A", self.decode_dim_A, True, True)
+        z_BAB, z_mu_BAB, z_sigma_BAB = self.encode(y_BA, "A", self.encode_dim_A, True, True, True)
+        y_BAB = self.decode(z_BAB, "B", self.decode_dim_B, True, True)
+        # z_AAB, z_mu_AAB, z_sigma_AAB = self.encode(y_AA, "A", self.encode_dim_A, True, True, True)
+        # y_AAB = self.decode(z_AAB, "B", self.decode_dim_B, True, True)
+        # z_BBA, z_mu_BBA, z_sigma_BBA = self.encode(y_BB, "B", self.encode_dim_B, True, True, True)
+        # y_BBA = self.decode(z_BBA, "A", self.decode_dim_A, True, True)
 
 
         # Loss VAE
@@ -208,13 +208,13 @@ class Translation:
         self.adv_AB = adv_BA
 
         # Loss cycle - consistency (CC)
-        # loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA) + \
-        #             self.lambda_4 * self.loss_reconstruct(x_A,y_ABA)
-        # loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB) + self.lambda_4 * self.loss_reconstruct(x_B,y_BAB)
-        loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_AAB, z_sigma_AAB) + \
-                    self.lambda_4 * self.loss_reconstruct(x_B, y_AAB)
-        loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_BBA, z_sigma_BBA) + self.lambda_4 * self.loss_reconstruct(x_A,
-                                                                                                                y_BBA)
+        loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA) + \
+                    self.lambda_4 * self.loss_reconstruct(x_A,y_ABA)
+        loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB) + self.lambda_4 * self.loss_reconstruct(x_B,y_BAB)
+        # loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_AAB, z_sigma_AAB) + \
+        #             self.lambda_4 * self.loss_reconstruct(x_B, y_AAB)
+        # loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_BBA, z_sigma_BBA) + self.lambda_4 * self.loss_reconstruct(x_A,
+        #                                                                                                         y_BBA)
 
         self.loss_CC = loss_CC_A + loss_CC_B
 
@@ -223,7 +223,7 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B +\
+        self.loss_gen = loss_VAE_A + loss_VAE_B + loss_CC_A + loss_CC_B + 0.1 * tf.losses.get_regularization_loss() +\
                         self.loss_generator(y_AA) + self.loss_generator(y_BB)
 
 
