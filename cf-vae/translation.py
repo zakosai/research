@@ -49,13 +49,13 @@ class Translation:
         # x_ = flatten(x_)
         # x_ = tf.reshape(x_, (-1, 10000))
 
-        # if self.train:
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
                 x_ = maxout(x_, encode_dim[i])
-                x_ = tf.nn.dropout(x_, 0.1)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
