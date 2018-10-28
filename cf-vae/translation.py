@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.contrib.layers import fully_connected, flatten, batch_norm
+from tensorflow.contrib.layers import fully_connected, flatten, batch_norm, maxout
 from tensorflow import sigmoid
 import tensorflow.keras.backend as K
 from tensorflow.contrib.framework import argsort
@@ -31,7 +31,7 @@ class Translation:
         self.lambda_3 = lambda_3
         self.lambda_4 = lambda_4
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.sigmoid
+        self.active_function = None
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
@@ -54,25 +54,27 @@ class Translation:
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
+                x_ = maxout(x_, encode_dim[i])
                 x_ = tf.nn.dropout(x_, 0.1)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
-        # if self.train:
-        x_ = tf.nn.dropout(x_, 0.3)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
+                x_ = maxout(x_, decode_dim[i])
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
         x_ = x
 
         with tf.variable_scope(scope, reuse=reuse):
-            # if self.train:
-            x_ = tf.nn.dropout(x_, 0.3)
+            if self.train:
+                x_ = tf.nn.dropout(x_, 0.3)
             for i in range(len(adv_dim)-1):
                 x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
             x_ = fully_connected(x_, adv_dim[-1], scope="adv_last")
@@ -80,12 +82,13 @@ class Translation:
 
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
-        # if self.train:
-        x_ = tf.nn.dropout(x_, 0.3)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i,
                                      weights_regularizer=self.regularizer)
+                x_ = maxout(x_, dim[i])
         return x_
 
     def gen_z(self, h, scope, reuse=False):
@@ -283,7 +286,7 @@ def main():
     user_A, user_B, dense_A, dense_B, num_A, num_B = create_dataset(A, B)
     encoding_dim_A = [200]
     encoding_dim_B = [200]
-    share_dim = []
+    share_dim = [100]
     decoding_dim_A = [200, num_A]
     decoding_dim_B = [200, num_B]
     z_dim = 50
