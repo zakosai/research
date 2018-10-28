@@ -113,16 +113,16 @@ class Translation:
 
     def loss_reconstruct(self, x, x_recon):
         # return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
-        # return tf.reduce_mean(tf.abs(x - x_recon))
+        return tf.reduce_mean(tf.abs(x - x_recon))
         # return tf.reduce_mean(tf.reduce_sum((x-x_recon)**2, axis=1))
         # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_recon, labels=x))
 
-        log_softmax_var = tf.nn.log_softmax(x_recon)
-
-        neg_ll = -tf.reduce_mean(tf.reduce_sum(
-            log_softmax_var * x,
-            axis=-1))
-        return neg_ll
+        # log_softmax_var = tf.nn.log_softmax(x_recon)
+        #
+        # neg_ll = -tf.reduce_mean(tf.reduce_sum(
+        #     log_softmax_var * x,
+        #     axis=-1))
+        # return neg_ll
 
 
     def loss_recsys(self, pred, label):
@@ -328,8 +328,7 @@ def main():
     # test_B = [t - train_size - val_size for t in test_B]
 
     model = Translation(batch_size, num_A, num_B, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-3, lambda_1=1,
-                        lambda_4=1)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-3)
     model.build_model()
 
     sess = tf.Session()
