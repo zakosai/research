@@ -113,16 +113,16 @@ class Translation:
 
     def loss_reconstruct(self, x, x_recon):
         # return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
-        return tf.reduce_mean(tf.abs(x - x_recon))
+        # return tf.reduce_mean(tf.abs(x - x_recon))
         # return tf.reduce_mean(tf.reduce_sum((x-x_recon)**2, axis=1))
         # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_recon, labels=x))
 
-        # log_softmax_var = tf.nn.log_softmax(x_recon)
-        #
-        # neg_ll = -tf.reduce_mean(tf.reduce_sum(
-        #     log_softmax_var * x,
-        #     axis=-1))
-        # return neg_ll
+        log_softmax_var = tf.nn.log_softmax(x_recon)
+
+        neg_ll = -tf.reduce_mean(tf.reduce_sum(
+            log_softmax_var * x,
+            axis=-1))
+        return neg_ll
 
 
     def loss_recsys(self, pred, label):
@@ -281,12 +281,12 @@ def main():
     B = args.B
     checkpoint_dir = "translation/%s_%s/"%(A,B)
     user_A, user_B, dense_A, dense_B, num_A, num_B = create_dataset(A, B)
-    encoding_dim_A = [100]
-    encoding_dim_B = [100]
-    share_dim = []
-    decoding_dim_A = [100, num_A]
-    decoding_dim_B = [100, num_B]
-    z_dim = 10
+    encoding_dim_A = [200]
+    encoding_dim_B = [200]
+    share_dim = [100]
+    decoding_dim_A = [200, num_A]
+    decoding_dim_B = [200, num_B]
+    z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
     # test_A = list(open("data/Health_Clothing/test_A.txt").readlines())
     # test_A = [t.strip() for t in test_A]
