@@ -31,7 +31,7 @@ class Translation:
         self.lambda_3 = lambda_3
         self.lambda_4 = lambda_4
         self.learning_rate = learning_rate
-        self.active_function = None
+        self.active_function = tf.nn.tanh
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
@@ -55,8 +55,8 @@ class Translation:
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                y = maxout(x_, encode_dim[i])
-                x_ = tf.reshape(y, x_.shape)
+                # y = maxout(x_, encode_dim[i])
+                # x_ = tf.reshape(y, x_.shape)
 
                 print(x_.shape)
         return x_
@@ -83,8 +83,8 @@ class Translation:
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
-                y = maxout(x_, decode_dim[i])
-                x_ = tf.reshape(y, x_.shape)
+                # y = maxout(x_, decode_dim[i])
+                # x_ = tf.reshape(y, x_.shape)
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
@@ -106,8 +106,8 @@ class Translation:
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i,
                                      weights_regularizer=self.regularizer)
-                y = maxout(x_, dim[i])
-                x_ = tf.reshape(y, x_.shape)
+                # y = maxout(x_, dim[i])
+                # x_ = tf.reshape(y, x_.shape)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
