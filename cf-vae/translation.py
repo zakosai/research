@@ -39,6 +39,15 @@ class Translation:
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
+        # ids = argsort(x_, 1)[::-1][:, :200]
+        # if "A" in scope:
+        #     #x_ = tf.multiply(tf.expand_dims(self.z_A, 0), tf.expand_dims(x_, 2))
+        #     x_ = tf.nn.embedding_lookup(self.z_A, ids)
+        # else:
+        #     #x_ = tf.multiply(tf.expand_dims(self.z_B, 0), tf.expand_dims(x_, 2))
+        #     x_ = tf.nn.embedding_lookup(self.z_B, ids)
+        # x_ = flatten(x_)
+        # x_ = tf.reshape(x_, (-1, 10000))
 
         if self.train:
             x_ = tf.nn.dropout(x_, 0.5)
@@ -277,7 +286,7 @@ def main():
     share_dim = [50]
     decoding_dim_A = [100, num_A]
     decoding_dim_B = [100, num_B]
-    z_dim = 20
+    z_dim = 10
     adv_dim_A = adv_dim_B = [200, 100, 1]
     # test_A = list(open("data/Health_Clothing/test_A.txt").readlines())
     # test_A = [t.strip() for t in test_A]
