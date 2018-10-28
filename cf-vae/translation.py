@@ -83,7 +83,7 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
-                                     weights_regularizer=self.regularizer)
+                                     weights_regularizer=self.regularizer, trainable=self.freeze)
                 # y = maxout(x_, decode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
         return x_
