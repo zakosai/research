@@ -55,7 +55,9 @@ class Translation:
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                x_ = self.maxout(x_, encode_dim[i])
+                y = maxout(x_, encode_dim[i])
+                x_ = tf.reshape(y, x_.shape)
+
                 print(x_.shape)
         return x_
 
@@ -81,7 +83,8 @@ class Translation:
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
-                x_ = self.maxout(x_, decode_dim[i])
+                y = maxout(x_, decode_dim[i])
+                x_ = tf.reshape(y, x_.shape)
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
@@ -103,7 +106,8 @@ class Translation:
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i,
                                      weights_regularizer=self.regularizer)
-                x_ = self.maxout(x_, dim[i])
+                y = maxout(x_, dim[i])
+                x_ = tf.reshape(y, x_.shape)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
@@ -216,8 +220,8 @@ class Translation:
 
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
-        adv_var_A = [var for var in tf.all_variables() if 'adv_A' in var.name]
-        adv_var_B = [var for var in tf.all_variables() if 'adv_B' in var.name]
+        adv_var_A = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_A")
+        adv_var_B = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_B")
         self.train_op_dis_A = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_d_A,
                                                                                          var_list=adv_var_A)
         self.train_op_dis_B = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_d_B,
