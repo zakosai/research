@@ -55,9 +55,23 @@ class Translation:
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                x_ = maxout(x_, encode_dim[i])
+                x_ = self.maxout(x_, encode_dim[i])
                 print(x_.shape)
         return x_
+
+    def maxout(inputs, num_units, axis=None):
+        shape = inputs.get_shape().as_list()
+        if axis is None:
+            # Assume that channel is the last dimension
+            axis = -1
+        num_channels = shape[axis]
+        if num_channels % num_units:
+            raise ValueError('number of features({}) is not a multiple of num_units({})'
+                             .format(num_channels, num_units))
+        shape[axis] = -1
+        shape += [num_channels // num_units]
+        outputs = tf.reduce_max(tf.reshape(inputs, shape), -1, keep_dims=False)
+        return outputs
 
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
@@ -67,7 +81,7 @@ class Translation:
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
-                x_ = maxout(x_, decode_dim[i])
+                x_ = self.maxout(x_, decode_dim[i])
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
@@ -89,7 +103,7 @@ class Translation:
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i,
                                      weights_regularizer=self.regularizer)
-                x_ = maxout(x_, dim[i])
+                x_ = self.maxout(x_, dim[i])
         return x_
 
     def gen_z(self, h, scope, reuse=False):
