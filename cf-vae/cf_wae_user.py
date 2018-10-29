@@ -118,6 +118,7 @@ class cf_vae_extend:
                     y = fully_connected(y, self.decoding_dims[i], tf.nn.sigmoid, scope="dec_layer"+"%s" %i,
                                         weights_regularizer=self.regularizer)
                 x_recons = y
+                self.wae_lambda = 0.5
                 if self.loss_type == 'gan':
                     loss_gan_x, penalty_x = self.gan_penalty(z_fake, z)
 
@@ -149,7 +150,7 @@ class cf_vae_extend:
                                       weights_regularizer=self.regularizer)
             x_u_recons = y_u
 
-            self.wae_lambda = 0.5
+
             if self.loss_type == 'gan':
                 loss_gan_u, penalty_u = self.gan_penalty(z_u_fake, z_u)
                 self.loss_gan = loss_gan_x + loss_gan_u
