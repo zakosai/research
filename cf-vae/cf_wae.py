@@ -105,7 +105,7 @@ class cf_vae_extend:
 
             # z_fake, _, _ = encode(y_true, reuse=True)
 
-            self.wae_lambda = 0.5
+            self.wae_lambda = 0.1
             if self.loss_type == 'gan':
                 self.loss_gan, self.penalty = self.gan_penalty(z_fake, z_mu)
             elif self.loss_type =='mmd':
@@ -124,7 +124,7 @@ class cf_vae_extend:
                 loss=self.loss_gan[0], var_list=z_adv_vars)
 
         ae_opt = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss=self.wae_objective,
-                                   var_list=encoder_vars + decoder_vars)
+                                   var_list=encoder_vars + decoder_vars + z_adv_vars)
 
 
         self.sess = tf.Session()
