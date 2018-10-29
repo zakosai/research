@@ -227,7 +227,7 @@ class cf_vae_extend:
             x_u_batch = u_data[idu]
             u_batch = self.U[idu]
             sample_noise = self.sample_pz('normal')
-            sample_noise_u = self.sample_pz('norml')
+            sample_noise_u = self.sample_pz('normal')
             if self.model != 0:
                 img_batch = im_data[idx]
                 str_batch = str_data[idx]
