@@ -153,7 +153,7 @@ class cf_vae_extend:
 
         elif self.loss_type == 'mmd':
             self.penalty = self.mmd_penalty(z_fake, z)
-        self.loss_reconstruct = self.reconstruction_loss(self.x_, y) + self.reconstruction_loss(self.x_u_ + y_u)
+        self.loss_reconstruct = self.reconstruction_loss(self.x_, y) + self.reconstruction_loss(self.x_u_, y_u)
         loss_x = 1.0 * self.params.lambda_v / self.params.lambda_r * tf.reduce_mean(tf.reduce_sum(tf.square(self.v_ -
                                                                                                           z), 1))
         loss_u = self.params.lambda_u / self.params.lambda_r + tf.reduce_mean(tf.reduce_sum(tf.square(self.u_ - z_u),
@@ -172,9 +172,9 @@ class cf_vae_extend:
 
         ae_opt = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss=self.wae_objective)
 
-        with tf.variable_scope("loss"):
-            train_op_u = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss_e_step_u)
-            train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss_e_step)
+        # with tf.variable_scope("loss"):
+        #     train_op_u = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss_e_step_u)
+        #     train_op = tf.train.AdamOptimizer(self.params.learning_rate).minimize(self.loss_e_step)
 
 
         self.sess = tf.Session()
@@ -248,7 +248,7 @@ class cf_vae_extend:
             #     _, _,l, lu = self.sess.run((train_op, train_op_u, self.loss_e_step, self.loss_e_step_u),
             #                          feed_dict={self.x_:x_batch, self.v_:v_batch,
             #                                     self.x_u_: x_u_batch, self.u_:u_batch})
-           
+
         # for i in range(self.params.num_iter):
         #     idx = np.random.choice(self.num_users, self.params.batch_size, replace=False)
         #     x_u_batch = u_data[idx]
