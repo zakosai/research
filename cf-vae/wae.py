@@ -103,6 +103,8 @@ class vanilla_vae:
             z_adv_opt = tf.train.AdamOptimizer(self.learning_rate).minimize(
                 loss=self.loss_gan[0], var_list=z_adv_vars)
 
+        print(z_adv_vars)
+
         ae_opt = tf.train.AdamOptimizer(self.learning_rate).minimize(loss=self.wae_objective,
                                    var_list=encoder_vars + decoder_vars)
 
