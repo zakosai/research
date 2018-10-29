@@ -101,18 +101,19 @@ class cf_vae_extend:
 
             # generative process
             z, z_mu, z_log_sigma_sq = encode(x)
-            y_true = self.decode(z)
+            y_true = self.decode(z_mu)
             self.reconstructed = y_true
 
             # z_fake, _, _ = encode(y_true, reuse=True)
 
             self.wae_lambda = 0.1
             if self.loss_type == 'gan':
-                self.loss_gan, self.penalty = self.gan_penalty(z_fake, z)
+                self.loss_gan, self.penalty = self.gan_penalty(z_fake, z_mu)
             elif self.loss_type =='mmd':
                 self.penalty = self.mmd_penalty(z_fake, z)
             self.loss_reconstruct = self.reconstruction_loss(self.x_, y_true)
-            loss = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean(tf.reduce_sum(tf.square(self.v_ - z),1))
+            loss = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean(tf.reduce_sum(tf.square(self.v_ -
+                                                                                                          z_mu),1))
             self.wae_objective = self.loss_reconstruct + \
                                  self.wae_lambda * self.penalty + loss
 
