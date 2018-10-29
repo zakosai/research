@@ -110,10 +110,10 @@ class cf_vae_extend:
                                                          weights_regularizer=self.regularizer)
                         e = tf.random_normal(tf.shape(z_mu))
                         z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
-                    return z
+                    return z, z_mu
 
                 # generative process
-                z = encode(x)
+                z, z_mu = encode(x)
                 x_recons = self.decode(z, self.decoding_dims)
                 self.wae_lambda = 0.5
                 if self.loss_type == 'gan':
@@ -139,9 +139,9 @@ class cf_vae_extend:
                                                      weights_regularizer=self.regularizer)
                     e = tf.random_normal(tf.shape(z_mu))
                     z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
-                return z
+                return z, z_mu
 
-            z_u = encode(x_u)
+            z_u, z_u_mu = encode(x_u)
             x_u_recons = self.decode(z_u, decoding_dims)
 
 
@@ -227,7 +227,7 @@ class cf_vae_extend:
             x_u_batch = u_data[idu]
             u_batch = self.U[idu]
             sample_noise = self.sample_pz('normal')
-            sample_noise_u = self.sample_pz('normla')
+            sample_noise_u = self.sample_pz('norml')
             if self.model != 0:
                 img_batch = im_data[idx]
                 str_batch = str_data[idx]
