@@ -101,13 +101,13 @@ class cf_vae_extend:
                     with tf.variable_scope("encode", reuse=reuse):
                         for i in range(depth_inf):
                             x = fully_connected(x, self.encoding_dims[i], tf.nn.sigmoid, scope="enc_layer" + "%s" % i,
-                                                weights_regularizer=self.regularize)
+                                                weights_regularizer=self.regularizer)
 
                         h_encode = x
                         z_mu = fully_connected(h_encode, self.z_dim, scope="mu_layer",
-                                               weights_regularizer=self.regularize)
+                                               weights_regularizer=self.regularizer)
                         z_log_sigma_sq = fully_connected(h_encode, self.z_dim, scope="sigma_layer",
-                                                         weights_regularizer=self.regularize)
+                                                         weights_regularizer=self.regularizer)
                         e = tf.random_normal(tf.shape(z_mu))
                         z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
                     return z
@@ -131,12 +131,12 @@ class cf_vae_extend:
                 with tf.variable_scope("encode", reuse=reuse):
                     for i in range(depth_inf):
                         x = fully_connected(x, self.encoding_dims[i], tf.nn.sigmoid, scope="enc_layer" + "%s" % i,
-                                            weights_regularizer=self.regularize)
+                                            weights_regularizer=self.regularizer)
 
                     h_encode = x
-                    z_mu = fully_connected(h_encode, self.z_dim, scope="mu_layer", weights_regularizer=self.regularize)
+                    z_mu = fully_connected(h_encode, self.z_dim, scope="mu_layer", weights_regularizer=self.regularizer)
                     z_log_sigma_sq = fully_connected(h_encode, self.z_dim, scope="sigma_layer",
-                                                     weights_regularizer=self.regularize)
+                                                     weights_regularizer=self.regularizer)
                     e = tf.random_normal(tf.shape(z_mu))
                     z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
                 return z
