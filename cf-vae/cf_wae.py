@@ -94,8 +94,8 @@ class cf_vae_extend:
             def encode(x, reuse=False):
                 with tf.variable_scope("encode", reuse=reuse):
                     for i in range(depth_inf):
-                        x = fully_connected(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i,
-                                            activation=tf.nn.sigmoid, weights_regularizer=self.regularizer)
+                        x = fully_connected(x, self.encoding_dims[i], tf.nn.sigmoid, scope="enc_layer"+"%s" %i,
+                                             weights_regularizer=self.regularizer)
 
                     h_encode = x
                     z_mu = fully_connected(h_encode, self.z_dim, scope="mu_layer", weights_regularizer=self.regularizer)
@@ -278,7 +278,7 @@ class cf_vae_extend:
             depth_gen = len(self.decoding_dims)
             y = z
             for i in range(depth_gen):
-                y = fully_connected(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.sigmoid,
+                y = fully_connected(y, self.decoding_dims[i], tf.nn.sigmoid, scope="dec_layer" + "%s" % i,
                                     weights_regularizer=self.regularizer)
         return y
 

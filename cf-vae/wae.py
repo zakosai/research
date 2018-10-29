@@ -71,8 +71,8 @@ class vanilla_vae:
             def encode(x, reuse=False):
                 with tf.variable_scope("encode", reuse=reuse):
                     for i in range(depth_inf):
-                        x = fully_connected(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i,
-                                            activation=tf.nn.sigmoid, weights_regularizer=self.regularize)
+                        x = fully_connected(x, self.encoding_dims[i], tf.nn.sigmoid, scope="enc_layer"+"%s" %i,
+                                            weights_regularizer=self.regularize)
 
                     h_encode = x
                     z_mu = fully_connected(h_encode, self.z_dim, scope="mu_layer", weights_regularizer=self.regularize)
@@ -98,7 +98,7 @@ class vanilla_vae:
             # self.loss_reconstruct = 0.2*tf.reduce_mean(tf.nn.l2_loss(x_- self.reconstructed))
             self.loss_reconstruct = self.reconstruction_loss(x_, y_true)
             self.wae_objective = self.loss_reconstruct + \
-                                 self.wae_lambda * self.penalty
+                                 self.wae_lambda * self.penalty + 0.1*tf.losses.get_regularization_loss()
 
         encoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=scope+'/encode')
         decoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=scope+'/decode')
@@ -147,7 +147,7 @@ class vanilla_vae:
             depth_gen = len(self.decoding_dims)
             y = z
             for i in range(depth_gen):
-                y = fully_connected(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.sigmoid,
+                y = fully_connected(y, self.decoding_dims[i], tf.nn.sigmoid, scope="dec_layer" + "%s" % i,
                                     weights_regularizer=self.regularize)
         return y
 
