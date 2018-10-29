@@ -52,7 +52,7 @@ class cf_vae_extend:
         self.decoding_dims = decoding_dims
         self.encoding_dims_str = encoding_dims_str
         self.decoding_dims_str = decoding_dims_str
-        self.loss_type = loss_type
+        self.loss_type = 'gan'
         self.useTranse = useTranse
         self.eps = eps
         self.initial = initial
@@ -69,6 +69,7 @@ class cf_vae_extend:
         print(self.params.EM_iter)
         if self.initial == False:
             self.load_model(model_mat)
+
 
         self.regularize = l2_regularizer(scale=0.1)
 
