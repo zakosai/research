@@ -455,67 +455,6 @@ class cf_vae_extend:
 
         return likelihood
 
-    def sample_pz(self, distr):
-        noise = None
-        if distr == 'uniform':
-            noise = np.random.uniform(
-                -1, 1, [self.params.batch_size, self.z_dim]).astype(np.float32)
-        elif distr in ('normal', 'sphere'):
-            mean = np.zeros(self.z_dim)
-            cov = np.identity(self.z_dim)
-            noise = np.random.multivariate_normal(
-                mean, cov, self.params.batch_size).astype(np.float32)
-            if distr == 'sphere':
-                noise = noise / np.sqrt(
-                    np.sum(noise * noise, axis=1))[:, np.newaxis]
-        return 0.5 * noise
-
-    def gan_penalty(self, sample_qz, sample_pz):
-        # Pz = Qz test based on GAN in the Z space
-        logits_Pz = self.z_adversary(sample_pz)
-        logits_Qz = self.z_adversary(sample_qz, reuse=True)
-        loss_Pz = tf.reduce_mean(
-            tf.nn.sigmoid_cross_entropy_with_logits(
-                logits=logits_Pz, labels=tf.ones_like(logits_Pz)))
-        loss_Qz = tf.reduce_mean(
-            tf.nn.sigmoid_cross_entropy_with_logits(
-                logits=logits_Qz, labels=tf.zeros_like(logits_Qz)))
-        loss_Qz_trick = tf.reduce_mean(
-            tf.nn.sigmoid_cross_entropy_with_logits(
-                logits=logits_Qz, labels=tf.ones_like(logits_Qz)))
-        loss_adversary = self.wae_lambda * (loss_Pz + loss_Qz)
-        # Non-saturating loss trick
-        loss_match = loss_Qz_trick
-        return (loss_adversary, logits_Pz, logits_Qz), loss_match
-
-    def z_adversary(self, inputs, reuse=False):
-        num_units = 100
-        num_layers = 1
-        nowozin_trick = 0
-        # No convolutions as GAN happens in the latent space
-        with tf.variable_scope('z_adversary', reuse=reuse):
-            hi = inputs
-            for i in xrange(num_layers):
-                hi = dense(hi, num_units, scope='hi_%d' % i)
-                hi = tf.nn.sigmoid(hi)
-            hi = dense(hi, 1, scope='hfinal_lin')
-            # if nowozin_trick:
-            #     # We are doing GAN between our model Qz and the true Pz.
-            #     # Imagine we know analytical form of the true Pz.
-            #     # The optimal discriminator for D_JS(Pz, Qz) is given by:
-            #     # Dopt(x) = log dPz(x) - log dQz(x)
-            #     # And we know exactly dPz(x). So add log dPz(x) explicitly
-            #     # to the discriminator and let it learn only the remaining
-            #     # dQz(x) term. This appeared in the AVB paper.
-            #     assert opts['pz'] == 'normal', \
-            #         'The GAN Pz trick is currently available only for Gaussian Pz'
-            #     sigma2_p = float(opts['pz_scale']) ** 2
-            #     normsq = tf.reduce_sum(tf.square(inputs), 1)
-            #     hi = hi - normsq / 2. / sigma2_p \
-            #          - 0.5 * tf.log(2. * np.pi) \
-            #          - 0.5 * opts['zdim'] * np.log(sigma2_p)
-        return hi
-
 
     def get_exp_hidden(self, x_data, im_data, str_data, u_data):
         if self.model != 6:
