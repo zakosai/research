@@ -118,6 +118,8 @@ class cf_vae_extend:
                     y = fully_connected(y, self.decoding_dims[i], tf.nn.sigmoid, scope="dec_layer"+"%s" %i,
                                         weights_regularizer=self.regularizer)
                 x_recons = y
+                if self.loss_type == 'gan':
+                    loss_gan_x, penalty_x = self.gan_penalty(z_fake, z)
 
 
         with tf.variable_scope("user"):
@@ -147,15 +149,15 @@ class cf_vae_extend:
                                       weights_regularizer=self.regularizer)
             x_u_recons = y_u
 
-        self.wae_lambda = 0.5
-        if self.loss_type == 'gan':
-            loss_gan_x, penalty_x = self.gan_penalty(z_fake, z)
-            loss_gan_u, penalty_u = self.gan_penalty(z_u_fake, z_u)
-            self.loss_gan = loss_gan_x + loss_gan_u
-            self.penalty = penalty_x + penalty_u
+            self.wae_lambda = 0.5
+            if self.loss_type == 'gan':
+                loss_gan_u, penalty_u = self.gan_penalty(z_u_fake, z_u)
+                self.loss_gan = loss_gan_x + loss_gan_u
+                self.penalty = penalty_x + penalty_u
 
-        elif self.loss_type == 'mmd':
-            self.penalty = self.mmd_penalty(z_fake, z)
+            elif self.loss_type == 'mmd':
+                self.penalty = self.mmd_penalty(z_fake, z)
+
         self.loss_reconstruct = self.reconstruction_loss(self.x_, y) + self.reconstruction_loss(self.x_u_, y_u)
         loss_x = 1.0 * self.params.lambda_v / self.params.lambda_r * tf.reduce_mean(tf.reduce_sum(tf.square(self.v_ -
                                                                                                           z), 1))
@@ -169,9 +171,10 @@ class cf_vae_extend:
         # decoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/decode')
         # ae_vars = encoder_vars + decoder_vars
         if self.loss_type == 'gan':
-            z_adv_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/z_adversary')
+            z_adv_vars_text = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/z_adversary')
+            z_adv_vars_user = tf.get_collection(tf.GraphKeys.TABLE_INITIALIZERS, scope='user/z_adversary')
             z_adv_opt = tf.train.AdamOptimizer(self.params.learning_rate).minimize(
-                loss=self.loss_gan[0], var_list=z_adv_vars)
+                loss=self.loss_gan[0], var_list=z_adv_vars_text + z_adv_vars_user)
 
         ae_opt = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss=self.wae_objective)
 
