@@ -123,16 +123,15 @@ class cf_vae_extend:
             self.wae_objective = self.loss_reconstruct + \
                                  self.wae_lambda * self.penalty + loss + 0.1 + tf.losses.get_regularization_loss()
 
-        encoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/encode')
-        decoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/decode')
-        ae_vars = encoder_vars + decoder_vars
+        # encoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/encode')
+        # decoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/decode')
+        # ae_vars = encoder_vars + decoder_vars
         if self.loss_type == 'gan':
             z_adv_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/z_adversary')
             z_adv_opt = tf.train.AdamOptimizer(self.params.learning_rate).minimize(
                 loss=self.loss_gan[0], var_list=z_adv_vars)
 
-        ae_opt = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss=self.wae_objective,
-                                   var_list=encoder_vars + decoder_vars + z_adv_vars)
+        ae_opt = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss=self.wae_objective)
 
 
         self.sess = tf.Session()
