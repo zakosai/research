@@ -1,54 +1,28 @@
-mkdir translation/Drama_Comedy
-python train_vae.py --ckpt_folder=translation/Drama_Comedy/ --data_dir=data/Drama_Comedy/ --zdim=50 \
---data_type=70 --type=text
-python train_cvae_extend.py --model=0 --ckpt_folder=translation/Drama_Comedy/ --data_dir=data/Drama_Comedy/ \
---iter=50 --data_type=70 --user_no=6023 --item_no=2577 --gridsearch=1 --zdim=50
-python train_dae.py --ckpt_folder=translation/Drama_Comedy/ --data_dir=data/Drama_Comedy/ --zdim=50 \
---data_type=70 --type=text
-python train_cf_dae.py --model=0 --ckpt_folder=translation/Drama_Comedy/ --data_dir=data/Drama_Comedy/ \
---iter=50 --data_type=70 --user_no=6023 --item_no=2577 --gridsearch=1 --zdim=50
+dir=("Tool" "Outdoor" "Health" "Kitchen")
+rate="1 8"
+u_no=("2118" "4062" "5584" "7981")
+i_no=("7780" "11560" "13790" "19184")
+u_dim=("83" "994" "786" "896")
+mkdir wae
 
-mkdir translation/Romance_Thriller
+for i in `seq 0 3`;
+do
+    mkdir wae/${dir[$i]}
+    for r in $rate;
+    do
+        mkdir wae/${dir[$i]}/$r
+        ckpt=wae/${dir[$i]}/$r
+        python wae.py --ckpt_folder=$ckpt --data_dir=data2/${dir[$i]}/ --zdim=50 \
+        --data_type=$r --type=text
+        python train_cf_wae.py --model=0 --ckpt_folder=$ckpt --data_dir=data2/${dir[$i]}/ \
+        --iter=50 --data_type=$r --user_no=${u_no[$i]} --item_no=${i_no[$i]} --gridsearch=1 --zdim=50
+        python wae.py --ckpt_folder=$ckpt --data_dir=data2/${dir[$i]}/ --zdim=50 \
+        --data_type=$r --type=user
+        python train_cwae_user.py --model=0 --ckpt_folder=$ckpt --data_dir=data2/${dir[$i]}/ \
+        --iter=50 --data_type=$r --user_no=${u_no[$i]} --item_no=${i_no[$i]} --gridsearch=1 --zdim=50 \
+        --user_dim=${u_dim[$i]}
+    done
+done
 
-python train_vae.py --ckpt_folder=translation/Romance_Thriller/ --data_dir=data/Romance_Thriller/ --zdim=50 \
---data_type=70 --type=text
-python train_cvae_extend.py --model=0 --ckpt_folder=translation/Romance_Thriller/ --data_dir=data/Romance_Thriller/ \
---iter=50 --data_type=70 --user_no=5875 --item_no=930 --gridsearch=1 --zdim=50
-python train_dae.py --ckpt_folder=translation/Romance_Thriller/ --data_dir=data/Romance_Thriller/ --zdim=50 \
---data_type=70 --type=text
-python train_cf_dae.py --model=0 --ckpt_folder=translation/Romance_Thriller/ --data_dir=data/Romance_Thriller/ \
---iter=50 --data_type=70 --user_no=5875 --item_no=930 --gridsearch=1 --zdim=50
 
 
-#mkdir translation2/Health_Grocery
-#
-#python train_vae.py --ckpt_folder=translation2/Health_Grocery/ --data_dir=data/Health_Grocery/ --zdim=50 \
-#--data_type=70 --type=text
-#python train_cvae_extend.py --model=0 --ckpt_folder=translation2/Health_Grocery/ --data_dir=data/Health_Grocery/ \
-#--iter=50 --data_type=70 --user_no=6848 --item_no=23448 --gridsearch=1 --zdim=50
-#python train_dae.py --ckpt_folder=translation2/Health_Grocery/ --data_dir=data/Health_Grocery/ --zdim=50 \
-#--data_type=70 --type=text
-#python train_cf_dae.py --model=0 --ckpt_folder=translation2/Health_Grocery/ --data_dir=data/Health_Grocery/ \
-#--iter=50 --data_type=70 --user_no=6848 --item_no=23448 --gridsearch=1 --zdim=50
-
-mkdir translation2/Health_Beauty
-
-python train_vae.py --ckpt_folder=translation2/Health_Beauty/ --data_dir=data/Health_Beauty/ --zdim=50 \
---data_type=70 --type=text
-python train_cvae_extend.py --model=0 --ckpt_folder=translation2/Health_Beauty/ --data_dir=data/Health_Beauty/ \
---iter=50 --data_type=70 --user_no=7026 --item_no=26248 --gridsearch=1 --zdim=50
-python train_dae.py --ckpt_folder=translation2/Health_Beauty/ --data_dir=data/Health_Beauty/ --zdim=50 \
---data_type=70 --type=text
-python train_cf_dae.py --model=0 --ckpt_folder=translation2/Health_Beauty/ --data_dir=data/Health_Beauty/ \
---iter=50 --data_type=70 --user_no=7026 --item_no=26248 --gridsearch=1 --zdim=50
-
-#python train_cvae_extend.py --model=0 --ckpt_folder=translation/Grocery_Health/ --data_dir=data/Grocery_Health/ \
-#--iter=50 --data_type=70 --user_no=6848 --item_no=23448 --gridsearch=1 --zdim=100
-#
-#python train_vae.py --ckpt_folder=translation/Video_TV/ --data_dir=data/Video_TV/ --zdim=100 \
-#--data_type=70 --type=text
-#python train_cvae_extend.py --model=0 --ckpt_folder=translation/Video_TV/ --data_dir=data/Video_TV/ \
-#--iter=50 --data_type=70 --user_no=5459 --item_no=38650 --gridsearch=1 --zdim=100
-#
-#python train_cf_dae.py --model=0 --ckpt_folder=translation/Video_TV/ --data_dir=data/Video_TV/ \
-#--iter=50 --data_type=70 --user_no=5459 --item_no=38650 --gridsearch=1 --zdim=100
