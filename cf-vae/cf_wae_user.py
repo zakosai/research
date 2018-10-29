@@ -112,7 +112,7 @@ class cf_vae_extend:
 
                 # generative process
 
-                x_recons = self.decode(z)
+                x_recons = self.decode(z, self.decoding_dims)
                 self.wae_lambda = 0.5
                 if self.loss_type == 'gan':
                     loss_gan_x, penalty_x = self.gan_penalty(z_fake, z)
@@ -139,7 +139,7 @@ class cf_vae_extend:
             z_u = z_u_mu + tf.sqrt(tf.maximum(tf.exp(z_u_log_sigma_sq), self.eps)) * e_u
             # generative process
 
-            x_u_recons = self.decode(z_u)
+            x_u_recons = self.decode(z_u, decoding_dims)
 
 
             if self.loss_type == 'gan':
@@ -277,12 +277,12 @@ class cf_vae_extend:
                     np.sum(noise * noise, axis=1))[:, np.newaxis]
         return 0.5*noise
 
-    def decode(self, z, reuse=False):
+    def decode(self, z, dim, reuse=False):
         with tf.variable_scope("decode", reuse=reuse):
-            depth_gen = len(self.decoding_dims)
+            depth_gen = len(dim)
             y = z
             for i in range(depth_gen):
-                y = fully_connected(y, self.decoding_dims[i], tf.nn.sigmoid, scope="dec_layer" + "%s" % i,
+                y = fully_connected(y, dim[i], tf.nn.sigmoid, scope="dec_layer" + "%s" % i,
                                     weights_regularizer=self.regularizer)
         return y
 
