@@ -57,7 +57,7 @@ class vanilla_vae:
 
         self.g = tf.Graph()
         # inference process
-        z_fake = placeholder((None, self.z_dim))
+        # z_fake = placeholder((None, self.z_dim))
         ########TEXT###################
         with tf.variable_scope(scope):
             x_ = placeholder((None, self.input_dim))
@@ -66,22 +66,24 @@ class vanilla_vae:
 
             # noisy_level = 1
             # x = x + noisy_level*tf.random_normal(tf.shape(x))
-            with tf.variable_scope("encode"):
-                for i in range(depth_inf):
-                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+            def encode(x, reuse=False):
+                with tf.variable_scope("encode", reuse=reuse):
+                    for i in range(depth_inf):
+                        x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
-                h_encode = x
-                z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
-                z_log_sigma_sq = dense(h_encode, self.z_dim, scope = "sigma_layer")
-                e = tf.random_normal(tf.shape(z_mu))
-                z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
+                    h_encode = x
+                    z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
+                    z_log_sigma_sq = dense(h_encode, self.z_dim, scope = "sigma_layer")
+                    e = tf.random_normal(tf.shape(z_mu))
+                    z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
+                return z
 
             # generative process
-            print(z[0])
+            z = encode(x)
             y_true = self.decode(z)
             self.reconstructed = y_true
 
-            y_fake = self.decode(z_fake, reuse=True)
+            z_fake = encode(y_true, reuse=True)
 
             self.wae_lambda = 0.5
             if self.loss_type == 'gan':

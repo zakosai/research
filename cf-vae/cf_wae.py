@@ -77,7 +77,7 @@ class cf_vae_extend:
         tf.reset_default_graph()
         self.x_ = placeholder((None, self.input_dim))  # we need these global nodes
         self.v_ = placeholder((None, self.num_factors))
-        z_fake = placeholder((None, self.z_dim))
+        # z_fake = placeholder((None, self.z_dim))
 
         # inference process
         with tf.variable_scope("text"):
@@ -86,26 +86,28 @@ class cf_vae_extend:
 
             # noisy_level = 1
             # x = x + noisy_level*tf.random_normal(tf.shape(x))
+            def encode(x, reuse=False):
+                with tf.variable_scope("encode", reuse=reuse):
+                    for i in range(depth_inf):
+                        x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
-            with tf.variable_scope("encode"):
-                for i in range(depth_inf):
-                    x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
-
-                h_encode = x
-                z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
-                z_log_sigma_sq = dense(h_encode, self.z_dim, scope = "sigma_layer")
-                e = tf.random_normal(tf.shape(z_mu))
-                z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
+                    h_encode = x
+                    z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
+                    z_log_sigma_sq = dense(h_encode, self.z_dim, scope = "sigma_layer")
+                    e = tf.random_normal(tf.shape(z_mu))
+                    z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
+                return z, z_mu, z_log_sigma_sq
 
             # generative process
+            z, z_mu, z_log_sigma_sq = encode(x)
             y_true = self.decode(z)
             self.reconstructed = y_true
 
-            y_fake = self.decode(z_fake, reuse=True)
+            z_fake, _, _ = encode(y_true, reuse=True)
 
             self.wae_lambda = 0.5
             if self.loss_type == 'gan':
-                self.loss_gan, self.penalty = self.gan_penalty(z_fake, z)
+                self.loss_gan, self.penalty = self.gan_penalty(z_fake, z_mu)
             elif self.loss_type =='mmd':
                 self.penalty = self.mmd_penalty(z_fake, z)
             self.loss_reconstruct = 0.2*tf.reduce_mean(tf.nn.l2_loss(self.x_- self.reconstructed))
@@ -122,7 +124,7 @@ class cf_vae_extend:
                 loss=self.loss_gan[0], var_list=z_adv_vars)
 
         ae_opt = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss=self.wae_objective,
-                                   var_list=encoder_vars + decoder_vars)
+                                   var_list=encoder_vars + decoder_vars + z_adv_vars)
 
 
         self.sess = tf.Session()
