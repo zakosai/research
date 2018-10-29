@@ -156,7 +156,7 @@ class cf_vae_extend:
         self.loss_reconstruct = self.reconstruction_loss(self.x_, x_recons) + self.reconstruction_loss(self.x_u_, x_u_recons)
         loss_x = 1.0 * self.params.lambda_v / self.params.lambda_r * tf.reduce_mean(tf.reduce_sum(tf.square(self.v_ -
                                                                                                           z), 1))
-        loss_u = self.params.lambda_u / self.params.lambda_r + tf.reduce_mean(tf.reduce_sum(tf.square(self.u_ - z_u),
+        loss_u = self.params.lambda_u / self.params.lambda_r * tf.reduce_mean(tf.reduce_sum(tf.square(self.u_ - z_u),
                                                                                             1))
         loss = loss_x + loss_u
         self.wae_objective = self.loss_reconstruct + \
