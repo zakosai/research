@@ -225,18 +225,30 @@ class cf_vae_extend:
             idu = np.random.choice(self.num_users, self.params.batch_size, replace=False)
             x_u_batch = u_data[idu]
             u_batch = self.U[idu]
+            sample_noise = self.sample_pz('normal')
+            sample_noise_u = self.sample_pz('normla')
             if self.model != 0:
                 img_batch = im_data[idx]
                 str_batch = str_data[idx]
-                _, lu = self.sess.run((train_op_u, self.loss_e_step_u),
-                                     feed_dict={self.x_:x_batch, self.v_:v_batch, self.x_s_:str_batch, self.x_im_:img_batch,
-                                                self.x_u_: x_u_batch, self.u_:u_batch})
-            else:
-                _, _,l, lu = self.sess.run((train_op, train_op_u, self.loss_e_step, self.loss_e_step_u),
-                                     feed_dict={self.x_:x_batch, self.v_:v_batch,
-                                                self.x_u_: x_u_batch, self.u_:u_batch})
+            _, l, lv = self.sess.run((ae_opt, self.wae_objective, loss),
+                                     feed_dict={self.x_: x_batch, self.v_: v_batch, z_fake: sample_noise,
+                                                self.x_u_:u_data, self.u_:u_batch, z_u_fake:sample_noise_u})
+
+            if self.loss_type == 'gan':
+                _, lg = self.sess.run((z_adv_opt, self.loss_gan[0]),
+                                      feed_dict={self.x_: x_batch, self.v_: v_batch, z_fake: sample_noise,
+                                                 self.x_u_: u_data, self.u_: u_batch, z_u_fake: sample_noise_u})
+
             if i % 50 == 0:
-               print("epoches: %d\t loss u: %f\t time: %d s"%(i,lu, time.time()-start))
+                print("epoches: %d\t loss: %f\t loss v:%f\t time: %d s" % (i, l, lv, time.time() - start))
+            #     _, lu = self.sess.run((train_op_u, self.loss_e_step_u),
+            #                          feed_dict={self.x_:x_batch, self.v_:v_batch, self.x_s_:str_batch, self.x_im_:img_batch,
+            #                                     self.x_u_: x_u_batch, self.u_:u_batch, })
+            # else:
+            #     _, _,l, lu = self.sess.run((train_op, train_op_u, self.loss_e_step, self.loss_e_step_u),
+            #                          feed_dict={self.x_:x_batch, self.v_:v_batch,
+            #                                     self.x_u_: x_u_batch, self.u_:u_batch})
+           
         # for i in range(self.params.num_iter):
         #     idx = np.random.choice(self.num_users, self.params.batch_size, replace=False)
         #     x_u_batch = u_data[idx]
