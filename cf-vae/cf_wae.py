@@ -90,7 +90,7 @@ class cf_vae_extend:
             def encode(x, reuse=False):
                 with tf.variable_scope("encode", reuse=reuse):
                     for i in range(depth_inf):
-                        x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.tanh)
+                        x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
                     h_encode = x
                     z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
@@ -101,19 +101,19 @@ class cf_vae_extend:
 
             # generative process
             z, z_mu, z_log_sigma_sq = encode(x)
-            y_true = self.decode(z_mu)
+            y_true = self.decode(z)
             self.reconstructed = y_true
 
             # z_fake, _, _ = encode(y_true, reuse=True)
 
             self.wae_lambda = 0.1
             if self.loss_type == 'gan':
-                self.loss_gan, self.penalty = self.gan_penalty(z_fake, z_mu)
+                self.loss_gan, self.penalty = self.gan_penalty(z_fake, z)
             elif self.loss_type =='mmd':
                 self.penalty = self.mmd_penalty(z_fake, z)
             self.loss_reconstruct = self.reconstruction_loss(self.x_, y_true)
             loss = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean(tf.reduce_sum(tf.square(self.v_ -
-                                                                                                          z_mu),1))
+                                                                                                          z),1))
             self.wae_objective = self.loss_reconstruct + \
                                  self.wae_lambda * self.penalty + loss
 
@@ -272,7 +272,7 @@ class cf_vae_extend:
             depth_gen = len(self.decoding_dims)
             y = z
             for i in range(depth_gen):
-                y = dense(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.tanh)
+                y = dense(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.sigmoid)
         return y
 
     def reconstruction_loss(self, real, reconstr):
