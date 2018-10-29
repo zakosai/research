@@ -130,7 +130,7 @@ class cf_vae_extend:
             def encode(x, reuse=False):
                 with tf.variable_scope("encode", reuse=reuse):
                     for i in range(depth_inf):
-                        x = fully_connected(x, self.encoding_dims[i], tf.nn.sigmoid, scope="enc_layer" + "%s" % i,
+                        x = fully_connected(x, encoding_dims[i], tf.nn.sigmoid, scope="enc_layer" + "%s" % i,
                                             weights_regularizer=self.regularizer)
 
                     h_encode = x
