@@ -64,20 +64,20 @@ model = cf_vae_extend(num_users=5584, num_items=13790, num_factors=num_factors, 
     loss_type='cross_entropy', encoding_dims_str=[200,100])
 
 
-d = os.path.join(ckpt, "vae.mat")
-print(d)
-model.load_model(os.path.join(ckpt, "vae.mat"))
+# d = os.path.join(ckpt, "vae.mat")
+# print(d)
+model.load_model(os.path.join(ckpt, extend_file))
 pred = model.predict_all()
 model.predict_val(pred, data['train_users'], data['test_users'])
 
-model.load_model(os.path.join(ckpt, "vae_user.mat"))
-pred = model.predict_all()
-model.predict_val(pred, data['train_users'], data['test_users'])
-
-model.load_model(os.path.join(ckpt, "dae.mat"))
-# model.load_model("cf_vae.mat")
-pred = model.predict_all()
-model.predict_val(pred, data['train_users'], data['test_users'])
+# model.load_model(os.path.join(ckpt, "vae_user.mat"))
+# pred = model.predict_all()
+# model.predict_val(pred, data['train_users'], data['test_users'])
+#
+# model.load_model(os.path.join(ckpt, "dae.mat"))
+# # model.load_model("cf_vae.mat")
+# pred = model.predict_all()
+# model.predict_val(pred, data['train_users'], data['test_users'])
 #
 # plt.figure()
 # plt.ylabel("Recall@M")

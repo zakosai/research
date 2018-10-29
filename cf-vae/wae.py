@@ -69,7 +69,7 @@ class vanilla_vae:
             def encode(x, reuse=False):
                 with tf.variable_scope("encode", reuse=reuse):
                     for i in range(depth_inf):
-                        x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                        x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.tanh)
 
                     h_encode = x
                     z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
@@ -91,7 +91,8 @@ class vanilla_vae:
 
             elif self.loss_type == 'mmd':
                 self.penalty = self.mmd_penalty(z_fake, z)
-            self.loss_reconstruct = 0.2*tf.reduce_mean(tf.nn.l2_loss(x_- self.reconstructed))
+            # self.loss_reconstruct = 0.2*tf.reduce_mean(tf.nn.l2_loss(x_- self.reconstructed))
+            self.loss_reconstruct = self.reconstruction_loss(x_, y_true)
             self.wae_objective = self.loss_reconstruct + \
                                  self.wae_lambda * self.penalty
 
@@ -142,13 +143,20 @@ class vanilla_vae:
             depth_gen = len(self.decoding_dims)
             y = z
             for i in range(depth_gen):
-                y = dense(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.sigmoid)
+                y = dense(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.tanh)
         return y
 
     def reconstruction_loss(self, real, reconstr):
-        loss = tf.reduce_sum(tf.square(real - reconstr), axis=[1, 2, 3])
-        loss = 0.2 * tf.reduce_mean(tf.sqrt(1e-08 + loss))
-        return loss
+        # loss = tf.reduce_sum(tf.square(real - reconstr), axis=[1, 2, 3])
+        # loss = 0.2 * tf.reduce_mean(tf.sqrt(1e-08 + loss))
+        # return loss
+        log_softmax_var = tf.nn.log_softmax(reconstr)
+
+        neg_ll = -tf.reduce_mean(tf.reduce_sum(
+            log_softmax_var * real,
+            axis=-1))
+        # return tf.reduce_mean(tf.abs(x - x_recon))
+        return neg_ll
 
     def gan_penalty(self, sample_qz, sample_pz):
         # Pz = Qz test based on GAN in the Z space
@@ -177,7 +185,7 @@ class vanilla_vae:
             hi = inputs
             for i in xrange(num_layers):
                 hi = dense(hi, num_units, scope='hi_%d'%i)
-                hi = tf.nn.sigmoid(hi)
+                hi = tf.nn.tanh(hi)
             hi = dense(hi, 1, scope='hfinal_lin')
             if nowozin_trick:
                 # We are doing GAN between our model Qz and the true Pz.

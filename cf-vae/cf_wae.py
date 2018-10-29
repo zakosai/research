@@ -89,7 +89,7 @@ class cf_vae_extend:
             def encode(x, reuse=False):
                 with tf.variable_scope("encode", reuse=reuse):
                     for i in range(depth_inf):
-                        x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                        x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.tanh)
 
                     h_encode = x
                     z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
@@ -110,7 +110,7 @@ class cf_vae_extend:
                 self.loss_gan, self.penalty = self.gan_penalty(z_fake, z_mu)
             elif self.loss_type =='mmd':
                 self.penalty = self.mmd_penalty(z_fake, z)
-            self.loss_reconstruct = 0.2*tf.reduce_mean(tf.nn.l2_loss(self.x_- self.reconstructed))
+            self.loss_reconstruct = self.reconstruction_loss(self.x_, y_true)
             loss = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean(tf.reduce_sum(tf.square(self.v_ - z),1))
             self.wae_objective = self.loss_reconstruct + \
                                  self.wae_lambda * self.penalty + loss
@@ -270,20 +270,20 @@ class cf_vae_extend:
             depth_gen = len(self.decoding_dims)
             y = z
             for i in range(depth_gen):
-                y = dense(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.sigmoid)
+                y = dense(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.tanh)
         return y
 
     def reconstruction_loss(self, real, reconstr):
-        loss = tf.reduce_sum(tf.square(real - reconstr), axis=[1, 2, 3])
-        loss = 0.2 * tf.reduce_mean(tf.sqrt(1e-08 + loss))
-        return loss
-        # log_softmax_var = tf.nn.log_softmax(reconstr)
-        #
-        # neg_ll = -tf.reduce_mean(tf.reduce_sum(
-        #     log_softmax_var * real,
-        #     axis=-1))
-        # # return tf.reduce_mean(tf.abs(x - x_recon))
-        # return neg_ll
+        # loss = tf.reduce_sum(tf.square(real - reconstr), axis=[1, 2, 3])
+        # loss = 0.2 * tf.reduce_mean(tf.sqrt(1e-08 + loss))
+        # return loss
+        log_softmax_var = tf.nn.log_softmax(reconstr)
+
+        neg_ll = -tf.reduce_mean(tf.reduce_sum(
+            log_softmax_var * real,
+            axis=-1))
+        # return tf.reduce_mean(tf.abs(x - x_recon))
+        return neg_ll
 
     def gan_penalty(self, sample_qz, sample_pz):
         # Pz = Qz test based on GAN in the Z space
