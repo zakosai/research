@@ -75,7 +75,7 @@ def load_rating(path):
 params = params()
 params.lambda_u = 10
 params.lambda_v = 1
-params.lambda_r = 0.1
+params.lambda_r = 10
 params.C_a = 1
 params.C_b = 0.01
 params.max_iter_m = 1
@@ -142,4 +142,5 @@ else:
     model.save_model(os.path.join(ckpt,"cf_wae_%d.mat"%(model_type)))
     # model.load_model("cf_vae.mat")
     pred = model.predict_all()
+
     model.predict_val(pred, data["train_users"], data["test_users"])
