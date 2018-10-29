@@ -100,9 +100,9 @@ class vanilla_vae:
             self.wae_objective = self.loss_reconstruct + \
                                  self.wae_lambda * self.penalty + 0.1*tf.losses.get_regularization_loss()
 
-        encoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=scope+'/encode')
-        decoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=scope+'/decode')
-        ae_vars = encoder_vars + decoder_vars
+        # encoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=scope+'/encode')
+        # decoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=scope+'/decode')
+        # ae_vars = encoder_vars + decoder_vars
         if self.loss_type == "gan":
             z_adv_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=scope + '/z_adversary')
             z_adv_opt = tf.train.AdamOptimizer(self.learning_rate).minimize(
@@ -110,8 +110,7 @@ class vanilla_vae:
 
         print(z_adv_vars)
 
-        ae_opt = tf.train.AdamOptimizer(self.learning_rate).minimize(loss=self.wae_objective,
-                                   var_list=encoder_vars + decoder_vars + z_adv_vars)
+        ae_opt = tf.train.AdamOptimizer(self.learning_rate).minimize(loss=self.wae_objective)
 
 
         sess = tf.Session()
@@ -337,7 +336,8 @@ if __name__ == '__main__':
 
     # model = vanilla_vae(input_dim=args.user_dim, encoding_dims=[100], z_dim=zdim, decoding_dims=[100, args.user_dim], loss='cross_entropy', ckpt_folder=ckpt)
     if args.type == "text":
-        model = vanilla_vae(input_dim=8000, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200, 400,8000], loss='cross_entropy', ckpt_folder=ckpt)
+        model = vanilla_vae(input_dim=8000, encoding_dims=[200], z_dim=zdim, decoding_dims=[200, 8000],
+                            loss='cross_entropy', ckpt_folder=ckpt)
     # As there will be an additional layer from 100 to 50 in the encoder. in decoder, we also take this layer
                         # lr=0.01, batch_size=128, print_step=50)
         print('fitting data starts...')
