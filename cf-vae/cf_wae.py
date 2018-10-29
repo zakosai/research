@@ -86,6 +86,7 @@ class cf_vae_extend:
 
             # noisy_level = 1
             # x = x + noisy_level*tf.random_normal(tf.shape(x))
+            x = tf.nn.dropout(x, 0.5)
             def encode(x, reuse=False):
                 with tf.variable_scope("encode", reuse=reuse):
                     for i in range(depth_inf):
@@ -107,7 +108,7 @@ class cf_vae_extend:
 
             self.wae_lambda = 0.1
             if self.loss_type == 'gan':
-                self.loss_gan, self.penalty = self.gan_penalty(z_fake, z_mu)
+                self.loss_gan, self.penalty = self.gan_penalty(z_fake, z)
             elif self.loss_type =='mmd':
                 self.penalty = self.mmd_penalty(z_fake, z)
             self.loss_reconstruct = self.reconstruction_loss(self.x_, y_true)
