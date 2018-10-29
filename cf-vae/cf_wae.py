@@ -106,7 +106,7 @@ class cf_vae_extend:
 
             # z_fake, _, _ = encode(y_true, reuse=True)
 
-            self.wae_lambda = 0.1
+            self.wae_lambda = 0.5
             if self.loss_type == 'gan':
                 self.loss_gan, self.penalty = self.gan_penalty(z_fake, z)
             elif self.loss_type =='mmd':
