@@ -103,7 +103,7 @@ class cf_vae_extend:
             y_true = self.decode(z)
             self.reconstructed = y_true
 
-            z_fake, _, _ = encode(y_true, reuse=True)
+            # z_fake, _, _ = encode(y_true, reuse=True)
 
             self.wae_lambda = 0.5
             if self.loss_type == 'gan':

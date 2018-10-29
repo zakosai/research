@@ -57,7 +57,7 @@ class vanilla_vae:
 
         self.g = tf.Graph()
         # inference process
-        # z_fake = placeholder((None, self.z_dim))
+        z_fake = placeholder((None, self.z_dim))
         ########TEXT###################
         with tf.variable_scope(scope):
             x_ = placeholder((None, self.input_dim))
@@ -83,7 +83,7 @@ class vanilla_vae:
             y_true = self.decode(z)
             self.reconstructed = y_true
 
-            z_fake = encode(y_true, reuse=True)
+            # z_fake = encode(y_true, reuse=True)
 
             self.wae_lambda = 0.5
             if self.loss_type == 'gan':
@@ -336,7 +336,7 @@ if __name__ == '__main__':
     # As there will be an additional layer from 100 to 50 in the encoder. in decoder, we also take this layer
                         # lr=0.01, batch_size=128, print_step=50)
         print('fitting data starts...')
-        model.fit(train_X, epochs=1000,learning_rate=0.001, batch_size=500, print_size=50, train=True, scope="text")
+        model.fit(train_X, epochs=5000,learning_rate=0.001, batch_size=500, print_size=50, train=True, scope="text")
 
     else:
         model = vanilla_vae(input_dim=args.user_dim, encoding_dims=[200], z_dim=zdim, decoding_dims=[200,args.user_dim], loss='cross_entropy', ckpt_folder=ckpt)
