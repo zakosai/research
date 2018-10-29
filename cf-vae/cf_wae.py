@@ -77,7 +77,7 @@ class cf_vae_extend:
         tf.reset_default_graph()
         self.x_ = placeholder((None, self.input_dim))  # we need these global nodes
         self.v_ = placeholder((None, self.num_factors))
-        # z_fake = placeholder((None, self.z_dim))
+        z_fake = placeholder((None, self.z_dim))
 
         # inference process
         with tf.variable_scope("text"):
@@ -124,7 +124,7 @@ class cf_vae_extend:
                 loss=self.loss_gan[0], var_list=z_adv_vars)
 
         ae_opt = tf.train.AdamOptimizer(self.params.learning_rate).minimize(loss=self.wae_objective,
-                                   var_list=encoder_vars + decoder_vars + z_adv_vars)
+                                   var_list=encoder_vars + decoder_vars)
 
 
         self.sess = tf.Session()
@@ -277,6 +277,13 @@ class cf_vae_extend:
         loss = tf.reduce_sum(tf.square(real - reconstr), axis=[1, 2, 3])
         loss = 0.2 * tf.reduce_mean(tf.sqrt(1e-08 + loss))
         return loss
+        # log_softmax_var = tf.nn.log_softmax(reconstr)
+        #
+        # neg_ll = -tf.reduce_mean(tf.reduce_sum(
+        #     log_softmax_var * real,
+        #     axis=-1))
+        # # return tf.reduce_mean(tf.abs(x - x_recon))
+        # return neg_ll
 
     def gan_penalty(self, sample_qz, sample_pz):
         # Pz = Qz test based on GAN in the Z space
