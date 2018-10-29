@@ -71,7 +71,7 @@ class cf_vae_extend:
             self.load_model(model_mat)
 
 
-        self.regularize = l2_regularizer(scale=0.1)
+        self.regularizer = l2_regularizer(scale=0.1)
 
 
     # def e_step(self, x_data, reuse = None):
@@ -99,13 +99,14 @@ class cf_vae_extend:
                 # x = multiply([x, attention], name='attention_mul')
                 for i in range(depth_inf):
                     x = fully_connected(x, self.encoding_dims[i], tf.nn.sigmoid, scope="enc_layer"+"%s" %i,
-                                        weights_regularizer=self.regularize)
+                                        weights_regularizer=self.regularizer)
 
                 h_encode = x
                 print(x.shape)
-                z_mu = slim.fully_connected(h_encode, self.z_dim, scope="mu_layer", weights_regularizer=self.regularize)
+                z_mu = slim.fully_connected(h_encode, self.z_dim, scope="mu_layer",
+                                            weights_regularizer=self.regularizer)
                 z_log_sigma_sq = slim.fully_connected(h_encode, self.z_dim, scope="sigma_layer",
-                                                      weights_regularizer=self.regularize)
+                                                      weights_regularizer=self.regularizer)
                 e = tf.random_normal(tf.shape(z_mu))
                 z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
 
@@ -115,7 +116,7 @@ class cf_vae_extend:
                 y = z
                 for i in range(depth_gen):
                     y = fully_connected(y, self.decoding_dims[i], tf.nn.sigmoid, scope="dec_layer"+"%s" %i,
-                                        weights_regularizer=self.regularize)
+                                        weights_regularizer=self.regularizer)
                 x_recons = y
 
 
@@ -130,11 +131,12 @@ class cf_vae_extend:
             # x_u = multiply([x_u, attention],name='attention_mul')
             for i in range(depth_inf):
                 x_u = fully_connected(x_u, encoding_dims[i], tf.nn.sigmoid, scope="enc_layer"+"%s" %i,
-                                      weights_regularizer=self.regularize)
+                                      weights_regularizer=self.regularizer)
 
             h_u_encode = x_u
-            z_u_mu = fully_connected(h_u_encode, self.z_dim, scope="mu_layer", weights_regularizer=self.regularize)
-            z_u_log_sigma_sq = fully_connected(h_u_encode, self.z_dim, scope="sigma_layer", weights_regularizer=self.regularize)
+            z_u_mu = fully_connected(h_u_encode, self.z_dim, scope="mu_layer", weights_regularizer=self.regularizer)
+            z_u_log_sigma_sq = fully_connected(h_u_encode, self.z_dim, scope="sigma_layer",
+                                               weights_regularizer=self.regularizer)
             e_u = tf.random_normal(tf.shape(z_u_mu))
             z_u = z_u_mu + tf.sqrt(tf.maximum(tf.exp(z_u_log_sigma_sq), self.eps)) * e_u
             # generative process
@@ -142,7 +144,7 @@ class cf_vae_extend:
             y_u = z_u
             for i in range(depth_gen):
                 y_u = fully_connected(y_u, decoding_dims[i], tf.nn.sigmoid, scope="dec_layer"+"%s" %i,
-                                      weights_regularizer=self.regularize)
+                                      weights_regularizer=self.regularizer)
             x_u_recons = y_u
 
         self.wae_lambda = 0.5
