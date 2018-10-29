@@ -187,10 +187,10 @@ class cf_vae_extend:
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
         # LOAD TEXT#
-        ckpt = os.path.join(self.ckpt_model, "cvae_%d.ckpt"%self.model)
+        ckpt = os.path.join(self.ckpt_model, "cwae_user_%d.ckpt"%self.model)
         if self.initial:
             if self.model != 6:
-                ckpt_file = os.path.join(self.ckpt_model, "vae_text.ckpt")
+                ckpt_file = os.path.join(self.ckpt_model, "wae_text.ckpt")
                 text_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="text")
                 text_saver = tf.train.Saver(var_list=text_varlist)
                 # if init == True:
@@ -210,7 +210,7 @@ class cf_vae_extend:
                 structure_saver = tf.train.Saver(var_list=structure_varlist)
                 structure_saver.restore(self.sess, ckpt_file)
 
-            ckpt_file = os.path.join(self.ckpt_model, "vae_user.ckpt")
+            ckpt_file = os.path.join(self.ckpt_model, "wae_user.ckpt")
             user_varlist = tf.get_collection(tf.GraphKeys.VARIABLES, scope="user")
             user_saver = tf.train.Saver(var_list=user_varlist)
             # if init == True:
