@@ -6,6 +6,7 @@ import numpy as np
 import time
 from scipy.sparse import load_npz
 import argparse
+from tensorflow.contrib.layers import fully_connected, flatten, batch_norm, maxout, l2_regularizer
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 
@@ -43,6 +44,7 @@ class vanilla_vae:
         self.weights = []    # better in np form. first run, then append in
         self.bias = []
         self.ckpt = ckpt_folder
+        self.regularize = l2_regularizer(scale=0.1)
 
 
 
@@ -69,11 +71,13 @@ class vanilla_vae:
             def encode(x, reuse=False):
                 with tf.variable_scope("encode", reuse=reuse):
                     for i in range(depth_inf):
-                        x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.tanh)
+                        x = fully_connected(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i,
+                                            activation=tf.nn.sigmoid, weights_regularizer=self.regularize)
 
                     h_encode = x
-                    z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
-                    z_log_sigma_sq = dense(h_encode, self.z_dim, scope = "sigma_layer")
+                    z_mu = fully_connected(h_encode, self.z_dim, scope="mu_layer", weights_regularizer=self.regularize)
+                    z_log_sigma_sq = fully_connected(h_encode, self.z_dim, scope = "sigma_layer",
+                                                     weights_regularizer=self.regularize)
                     e = tf.random_normal(tf.shape(z_mu))
                     z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
                 return z
@@ -143,7 +147,8 @@ class vanilla_vae:
             depth_gen = len(self.decoding_dims)
             y = z
             for i in range(depth_gen):
-                y = dense(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.tanh)
+                y = fully_connected(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.sigmoid,
+                                    weights_regularizer=self.regularize)
         return y
 
     def reconstruction_loss(self, real, reconstr):
@@ -184,8 +189,8 @@ class vanilla_vae:
         with tf.variable_scope('z_adversary', reuse=reuse):
             hi = inputs
             for i in xrange(num_layers):
-                hi = dense(hi, num_units, scope='hi_%d'%i)
-                hi = tf.nn.tanh(hi)
+                hi = fully_connected(hi, num_units, scope='hi_%d'%i, weights_regularizer=self.regularize)
+                hi = tf.nn.sigmoid(hi)
             hi = dense(hi, 1, scope='hfinal_lin')
             if nowozin_trick:
                 # We are doing GAN between our model Qz and the true Pz.
