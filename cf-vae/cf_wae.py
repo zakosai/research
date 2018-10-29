@@ -7,6 +7,8 @@ from keras.backend import binary_crossentropy
 from keras.layers import Input, Dense, Lambda, Flatten, Reshape
 from keras import metrics
 from keras import backend as K
+from tensorflow.contrib.layers import fully_connected, flatten, batch_norm, maxout
+
 import numpy as np
 import time
 from vae import vanilla_vae
@@ -70,6 +72,8 @@ class cf_vae_extend:
         if self.initial == False:
             self.load_model(model_mat)
 
+        self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
+
 
 
     # def e_step(self, x_data, reuse = None):
@@ -90,11 +94,13 @@ class cf_vae_extend:
             def encode(x, reuse=False):
                 with tf.variable_scope("encode", reuse=reuse):
                     for i in range(depth_inf):
-                        x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
+                        x = fully_connected(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i,
+                                            activation=tf.nn.sigmoid, weights_regularizer=self.regularizer)
 
                     h_encode = x
-                    z_mu = dense(h_encode, self.z_dim, scope="mu_layer")
-                    z_log_sigma_sq = dense(h_encode, self.z_dim, scope = "sigma_layer")
+                    z_mu = fully_connected(h_encode, self.z_dim, scope="mu_layer", weights_regularizer=self.regularizer)
+                    z_log_sigma_sq = fully_connected(h_encode, self.z_dim, scope = "sigma_layer",
+                                                     weights_regularizer=self.regularizer)
                     e = tf.random_normal(tf.shape(z_mu))
                     z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
                 return z, z_mu, z_log_sigma_sq
@@ -115,7 +121,7 @@ class cf_vae_extend:
             loss = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean(tf.reduce_sum(tf.square(self.v_ -
                                                                                                           z),1))
             self.wae_objective = self.loss_reconstruct + \
-                                 self.wae_lambda * self.penalty + loss
+                                 self.wae_lambda * self.penalty + loss + 0.1 + tf.losses.get_regularization_loss()
 
         encoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/encode')
         decoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/decode')
@@ -272,7 +278,8 @@ class cf_vae_extend:
             depth_gen = len(self.decoding_dims)
             y = z
             for i in range(depth_gen):
-                y = dense(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.sigmoid)
+                y = fully_connected(y, self.decoding_dims[i], scope="dec_layer" + "%s" % i, activation=tf.nn.sigmoid,
+                                    weights_regularizer=self.regularizer)
         return y
 
     def reconstruction_loss(self, real, reconstr):
@@ -313,7 +320,7 @@ class cf_vae_extend:
         with tf.variable_scope('z_adversary', reuse=reuse):
             hi = inputs
             for i in xrange(num_layers):
-                hi = dense(hi, num_units, scope='hi_%d' % i)
+                hi = fully_connected(hi, num_units, scope='hi_%d' % i, weights_regularizer=self.regularizer)
                 hi = tf.nn.sigmoid(hi)
             hi = dense(hi, 1, scope='hfinal_lin')
             # if nowozin_trick:
