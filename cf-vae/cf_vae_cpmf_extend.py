@@ -497,7 +497,7 @@ class cf_vae_extend:
             self.U = data["U"]
             self.V = data["V"]
             self.exp_z = data["Z"]
-v            print "model loaded"
+            print "model loaded"
         except:
             self.U = data["m_U"]
             self.V = data["m_V"]
