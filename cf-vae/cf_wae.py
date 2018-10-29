@@ -71,6 +71,7 @@ class cf_vae_extend:
             self.load_model(model_mat)
 
 
+
     # def e_step(self, x_data, reuse = None):
     def e_step(self, x_data):
         print "e_step finetuning"
@@ -86,7 +87,6 @@ class cf_vae_extend:
 
             # noisy_level = 1
             # x = x + noisy_level*tf.random_normal(tf.shape(x))
-            x = tf.nn.dropout(x, 0.5)
             def encode(x, reuse=False):
                 with tf.variable_scope("encode", reuse=reuse):
                     for i in range(depth_inf):
