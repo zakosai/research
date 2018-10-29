@@ -111,13 +111,8 @@ class cf_vae_extend:
                 z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_log_sigma_sq), self.eps)) * e
 
                 # generative process
-                print(self.decoding_dims)
-                depth_gen = len(self.decoding_dims)
-                y = z
-                for i in range(depth_gen):
-                    y = fully_connected(y, self.decoding_dims[i], tf.nn.sigmoid, scope="dec_layer"+"%s" %i,
-                                        weights_regularizer=self.regularizer)
-                x_recons = y
+
+                x_recons = self.decode(z)
                 self.wae_lambda = 0.5
                 if self.loss_type == 'gan':
                     loss_gan_x, penalty_x = self.gan_penalty(z_fake, z)
@@ -143,12 +138,8 @@ class cf_vae_extend:
             e_u = tf.random_normal(tf.shape(z_u_mu))
             z_u = z_u_mu + tf.sqrt(tf.maximum(tf.exp(z_u_log_sigma_sq), self.eps)) * e_u
             # generative process
-            depth_gen = len(decoding_dims)
-            y_u = z_u
-            for i in range(depth_gen):
-                y_u = fully_connected(y_u, decoding_dims[i], tf.nn.sigmoid, scope="dec_layer"+"%s" %i,
-                                      weights_regularizer=self.regularizer)
-            x_u_recons = y_u
+
+            x_u_recons = self.decode(z_u)
 
 
             if self.loss_type == 'gan':
@@ -159,7 +150,7 @@ class cf_vae_extend:
             elif self.loss_type == 'mmd':
                 self.penalty = self.mmd_penalty(z_fake, z)
 
-        self.loss_reconstruct = self.reconstruction_loss(self.x_, y) + self.reconstruction_loss(self.x_u_, y_u)
+        self.loss_reconstruct = self.reconstruction_loss(self.x_, x_recons) + self.reconstruction_loss(self.x_u_, x_u_recons)
         loss_x = 1.0 * self.params.lambda_v / self.params.lambda_r * tf.reduce_mean(tf.reduce_sum(tf.square(self.v_ -
                                                                                                           z), 1))
         loss_u = self.params.lambda_u / self.params.lambda_r + tf.reduce_mean(tf.reduce_sum(tf.square(self.u_ - z_u),
