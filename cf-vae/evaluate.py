@@ -3,7 +3,7 @@ __author__ = 'linh'
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.sparse import load_npz
-from cf_vae_cpmf_extend import cf_vae_extend, params
+from cf_wae import cf_vae_extend, params
 import argparse
 import os
 import scipy
