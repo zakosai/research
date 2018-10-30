@@ -579,7 +579,7 @@ class cf_vae_extend:
         recall_avgs = []
         precision_avgs = []
         mapk_avgs = []
-        for m in range(10, 100, 10):
+        for m in range(10, 10, 10):
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
             for i in range(len(user_all)):
@@ -609,6 +609,7 @@ class cf_vae_extend:
             if file != None:
                 file.write("m = %d, recall = %f\t"%(m, recall_avg))
             # precision_avgs.append(precision_avg)
+        return recall_avg
 
 
     def predict_all(self):
