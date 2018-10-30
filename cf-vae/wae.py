@@ -96,9 +96,9 @@ class vanilla_vae:
             elif self.loss_type == 'mmd':
                 self.penalty = self.mmd_penalty(z_fake, z)
             # self.loss_reconstruct = 0.2*tf.reduce_mean(tf.nn.l2_loss(x_- self.reconstructed))
-            self.loss_reconstruct = self.reconstruction_loss(x_, y_true)
-            self.wae_objective = self.loss_reconstruct + \
-                                 self.wae_lambda * self.penalty + 0.1*tf.losses.get_regularization_loss()
+        self.loss_reconstruct = self.reconstruction_loss(x_, y_true)
+        self.wae_objective = self.loss_reconstruct + \
+                             self.wae_lambda * self.penalty + 0.1*tf.losses.get_regularization_loss()
 
         # encoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=scope+'/encode')
         # decoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=scope+'/decode')
@@ -180,12 +180,12 @@ class vanilla_vae:
         loss_match = loss_Qz_trick
         return (loss_adversary, logits_Pz, logits_Qz), loss_match
 
-    def z_adversary(self, inputs, reuse=False):
+    def z_adversary(self, inputs, scope, reuse=False):
         num_units = 100
         num_layers = 1
         nowozin_trick = 0
         # No convolutions as GAN happens in the latent space
-        with tf.variable_scope('z_adversary', reuse=reuse):
+        with tf.variable_scope(scope, reuse=reuse):
             hi = inputs
             for i in xrange(num_layers):
                 hi = fully_connected(hi, num_units, scope='hi_%d'%i, weights_regularizer=self.regularize)
@@ -336,7 +336,7 @@ if __name__ == '__main__':
 
     # model = vanilla_vae(input_dim=args.user_dim, encoding_dims=[100], z_dim=zdim, decoding_dims=[100, args.user_dim], loss='cross_entropy', ckpt_folder=ckpt)
     if args.type == "text":
-        model = vanilla_vae(input_dim=8000, encoding_dims=[200], z_dim=zdim, decoding_dims=[200, 8000],
+        model = vanilla_vae(input_dim=8000, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200, 400, 8000],
                             loss='cross_entropy', ckpt_folder=ckpt)
     # As there will be an additional layer from 100 to 50 in the encoder. in decoder, we also take this layer
                         # lr=0.01, batch_size=128, print_step=50)
@@ -347,4 +347,4 @@ if __name__ == '__main__':
         model = vanilla_vae(input_dim=args.user_dim, encoding_dims=[100], z_dim=zdim, decoding_dims=[100,
                                                                                                    args.user_dim], loss='cross_entropy', ckpt_folder=ckpt)
         print('fitting data starts...')
-        model.fit(train_X, epochs=500,learning_rate=0.001, batch_size=500, print_size=50, train=True, scope="user")
+        model.fit(train_X, epochs=5000,learning_rate=0.001, batch_size=500, print_size=50, train=True, scope="user")
