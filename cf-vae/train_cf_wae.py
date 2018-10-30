@@ -137,7 +137,7 @@ if gs == 1:
     f.close()
 else:
     model = cf_vae_extend(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,
-                          input_dim=8000, encoding_dims=[200], z_dim = zdim, decoding_dims=[200, 8000],
+                          input_dim=8000, encoding_dims=[400, 200], z_dim = zdim, decoding_dims=[200, 400, 8000],
                           encoding_dims_str=[500, 200], decoding_dims_str=[200, 500, 4526], loss_type='cross_entropy',
                           model = model_type, ckpt_folder=ckpt, initial=initial)
     model.fit(data["train_users"], data["train_items"], data["content"],params, data["test_users"])
