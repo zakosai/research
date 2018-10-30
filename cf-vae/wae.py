@@ -180,12 +180,12 @@ class vanilla_vae:
         loss_match = loss_Qz_trick
         return (loss_adversary, logits_Pz, logits_Qz), loss_match
 
-    def z_adversary(self, inputs, scope, reuse=False):
+    def z_adversary(self, inputs, reuse=False):
         num_units = 100
         num_layers = 1
         nowozin_trick = 0
         # No convolutions as GAN happens in the latent space
-        with tf.variable_scope(scope, reuse=reuse):
+        with tf.variable_scope('z_adversary', reuse=reuse):
             hi = inputs
             for i in xrange(num_layers):
                 hi = fully_connected(hi, num_units, scope='hi_%d'%i, weights_regularizer=self.regularize)
