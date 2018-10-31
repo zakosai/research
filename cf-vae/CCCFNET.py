@@ -5,7 +5,10 @@ import argparse
 from scipy.sparse import load_npz
 import os
 class CCCFNET(object):
-    def __init__(self):
+    def __init__(self, user_dim, item_A_dim, item_B_dim):
+        self.user_dim = user_dim
+        self.item_A_dim = item_A_dim
+        self.item_B_dim = item_B_dim
         self.activation = tf.nn.tanh
         self.regular = l2_regularizer(scale=0.1)
         self.layer = [200, 50]
@@ -139,7 +142,7 @@ def main():
 
 
     model = CCCFNET()
-    model.build_model()
+    model.build_model(len(user), num_A, num_B)
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
