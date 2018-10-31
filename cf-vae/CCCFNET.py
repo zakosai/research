@@ -71,17 +71,18 @@ def create_dataset(A="Health", B="Clothing"):
         p_B = dense_B[i]
         if len(p_A) > len(p_B):
             max_len = len(p_A)
-            p_B += p_B
+            while len(p_B) <len(p_A):
+                p_B += p_B
         else:
             max_len = len(p_B)
-            p_A += p_B
+            while len(p_B) <len(p_B):
+                p_A += p_A
 
         u = [i]*max_len
         i_a = np.random.permutation(p_A)
         i_a = i_a[:max_len]
         i_b = np.random.permutation(p_B)
         i_b = i_b[:max_len]
-        print(len(u), len(i_b), len(i_a), max_len)
 
         tr = np.column_stack((u, i_a, i_b))
         if i == 0:
