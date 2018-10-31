@@ -63,7 +63,6 @@ def create_dataset(A="Health", B="Clothing"):
     item_B = user_B.T
     variables = load_npz("data/%s_%s/mult_nor.npz"%(A,B))
     data = variables.toarray()
-    print(item_A.shape, item_B.shape, data.shape, data[:num_A].shape)
     item_A = np.concatenate((item_A, data[:num_A]), axis=-1)
     item_B = np.concatenate((item_B, data[num_A:]), axis=-1)
 
@@ -82,6 +81,7 @@ def create_dataset(A="Health", B="Clothing"):
         i_a = i_a[:max_len]
         i_b = np.random.permutation(p_B)
         i_b = i_b[:max_len]
+        print(u.shape, i_a.shape, i_b.shape)
 
         tr = np.column_stack((u, i_a, i_b))
         if i == 0:
