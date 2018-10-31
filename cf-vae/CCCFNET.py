@@ -187,6 +187,8 @@ def main():
             z_u_B = sess.run([model.z_u], feed_dict={model.user:u_B_val})
             y_ab = np.dot(z_u_A, z_B.T)
             y_ba = np.dot(z_u_B, z_A.T)
+            y_ab.reshape((y_ab.shape[1], y_ab.shape[2]))
+            y_ba.reshape((y_ba.shape[1], y_ba.shape[2]))
             print(y_ab.shape)
             print(y_ba.shape)
 
