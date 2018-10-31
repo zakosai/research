@@ -115,7 +115,7 @@ def calc_recall(pred, test, k=100):
     pred_ab = np.argsort(pred)[:,::-1][:, :k]
     recall = []
     for i in range(len(pred_ab)):
-        t = test[i].tolist()
+        t = test[i]
         p = pred_ab[i].tolist()
         hits = set(t) & set(p)
         recall_val = float(len(hits)) / len(t)
