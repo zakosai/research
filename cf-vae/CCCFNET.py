@@ -179,6 +179,7 @@ def main():
 
             u_A_val = np.concatenate((user[test_position:, :num_A], np.zeros((test_size, num_B))), axis=-1)
             u_B_val = np.concatenate((np.zeros((test_size, num_A)), user[test_position:, num_A:]), axis=-1)
+            print(u_A_val.shape, u_B_val.shape)
 
             z_A, z_B = sess.run([model.z_A, model.z_B], feed_dict={model.item_A:item_A,
                                                                         model.item_B: item_B})
@@ -186,6 +187,8 @@ def main():
             z_u_B = sess.run([model.z_u], feed_dict={model.user:u_B_val})
             y_ab = np.dot(z_u_A, z_B.T)
             y_ba = np.dot(z_u_B, z_A.T)
+            print(y_ab.shape)
+            print(y_ba.shape)
 
             saver.save(sess, os.path.join(checkpoint_dir, 'CCFNET-model'), i)
 
