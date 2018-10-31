@@ -63,7 +63,7 @@ def create_dataset(A="Health", B="Clothing"):
     item_B = user_B.T
     variables = load_npz("data/%s_%s/mult_nor.npz"%(A,B))
     data = variables.toarray()
-    print(item_A.shape, item_B.shape, data.shape)
+    print(item_A.shape, item_B.shape, data.shape, data[:num_A].shape)
     item_A = np.concatenate((item_A, data[:num_A]), axis=-1)
     item_B = np.concatenate((item_B, data[num_A:]), axis=-1)
 
