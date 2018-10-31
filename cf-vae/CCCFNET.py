@@ -141,7 +141,7 @@ def main():
 
 
 
-    model = CCCFNET(num_A+num_B, num_A+8000, num_B+8000)
+    model = CCCFNET(num_A+num_B, len(user)+8000, len(user)+8000)
     model.build_model()
 
     sess = tf.Session()
