@@ -185,10 +185,11 @@ def main():
                                                                         model.item_B: item_B})
             z_u_A = sess.run([model.z_u], feed_dict={model.user:u_A_val})
             z_u_B = sess.run([model.z_u], feed_dict={model.user:u_B_val})
+            print(z_u_A.shape, z_u_B.shape, z_A.shape, z_B.shape)
             y_ab = np.dot(z_u_A, z_B.T)
             y_ba = np.dot(z_u_B, z_A.T)
-            y_ab.reshape((y_ab.shape[1], y_ab.shape[2]))
-            y_ba.reshape((y_ba.shape[1], y_ba.shape[2]))
+            y_ab = y_ab.reshape((y_ab.shape[1], y_ab.shape[2]))
+            y_ba = y_ba.reshape((y_ba.shape[1], y_ba.shape[2]))
             print(y_ab.shape)
             print(y_ba.shape)
 
