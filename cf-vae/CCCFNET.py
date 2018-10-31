@@ -75,7 +75,7 @@ def create_dataset(A="Health", B="Clothing"):
                 p_B += p_B
         else:
             max_len = len(p_B)
-            while len(p_B) <len(p_B):
+            while len(p_A) < len(p_B):
                 p_A += p_A
 
         u = [i]*max_len
