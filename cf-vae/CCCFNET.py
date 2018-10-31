@@ -116,7 +116,7 @@ def calc_recall(pred, test, k=100):
     recall = []
     for i in range(len(pred_ab)):
         t = test[i]
-        p = pred_ab[i].tolist()
+        p = list(pred_ab[i])
         hits = set(t) & set(p)
         recall_val = float(len(hits)) / len(t)
         recall.append(recall_val)
@@ -171,7 +171,7 @@ def main():
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
         print("Loss last batch: loss %f" % (loss))
 
-        if i%10 == 0:
+        if i%2 == 0:
             # model.train = False
             # print("Loss last batch: loss %f" % (loss))
 
