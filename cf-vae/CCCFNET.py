@@ -117,8 +117,7 @@ def calc_recall(pred, test, k=100):
     for i in range(len(pred_ab)):
         t = test[i]
         p = pred_ab[i, :].tolist()
-        print(p)
-        print(len(t), len(p))
+        print(i)
         hits = set(t) & set(p)
         recall_val = float(len(hits)) / len(t)
         recall.append(recall_val)
