@@ -169,10 +169,11 @@ def main():
                     model.rating_B:r_B}
 
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
+        print("Loss last batch: loss %f" % (loss))
 
         if i%10 == 0:
             # model.train = False
-            print("Loss last batch: loss %f" % (loss))
+            # print("Loss last batch: loss %f" % (loss))
 
             u_A_val = np.concatenate((user[test_position:, :num_A], np.zeros((test_size, num_B))), axis=-1)
             u_B_val = np.concatenate((np.zeros((test_size, num_A)), user[test_position:, num_A:]), axis=-1)
