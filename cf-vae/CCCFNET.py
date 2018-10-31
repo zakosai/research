@@ -112,13 +112,13 @@ def read_data(filename):
     return f
 
 def calc_recall(pred, test, k=100):
+    print(pred.shape)
     pred = np.reshape(pred, (pred.shape[1], pred.shape[2]))
     print(pred.shape)
     pred_ab = np.argsort(-pred)[:, :k]
     print(pred_ab.shape)
     recall = []
     for i in range(len(pred_ab)):
-        print(i)
         hits = set(test[i]) & set(pred_ab[i, :])
         recall_val = float(len(hits)) / len(test[i])
         recall.append(recall_val)
