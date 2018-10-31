@@ -35,7 +35,7 @@ class CCCFNET(object):
         predict_B = tf.reduce_sum(tf.multiply(z_u, z_B), axis=-1)
 
         self.loss = 0.5 * tf.reduce_sum((self.rating_A - predict_A)**2) + \
-                    0.5 * tf.reduce_sum((self.rating_B - predict_B)**5) +  \
+                    0.5 * tf.reduce_sum((self.rating_B - predict_B)**2) +  \
                     0.1 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
@@ -115,8 +115,10 @@ def calc_recall(pred, test, k=100):
     pred_ab = np.argsort(pred)[:,::-1][:, :k]
     recall = []
     for i in range(len(pred_ab)):
-        hits = set(test[i]) & set(pred_ab[i])
-        recall_val = float(len(hits)) / len(test[i])
+        t = test[i].tolist()
+        p = pred_ab[i].tolist()
+        hits = set(t) & set(p)
+        recall_val = float(len(hits)) / len(t)
         recall.append(recall_val)
     return np.mean(np.array(recall))
 
