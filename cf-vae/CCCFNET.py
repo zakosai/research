@@ -133,7 +133,6 @@ def main():
     decoding_dim_B = [600, num_B]
     z_dim = 50
     train_size = len(triple)
-    val_position = int(len())
     test_position = int(len(user)*0.75)
     test_size = len(user) - test_position
 
