@@ -81,7 +81,7 @@ def create_dataset(A="Health", B="Clothing"):
         i_a = i_a[:max_len]
         i_b = np.random.permutation(p_B)
         i_b = i_b[:max_len]
-        print(u.shape, i_a.shape, i_b.shape)
+        print(len(u), len(i_b), len(i_a), max_len)
 
         tr = np.column_stack((u, i_a, i_b))
         if i == 0:
