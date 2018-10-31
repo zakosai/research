@@ -112,11 +112,11 @@ def read_data(filename):
     return f
 
 def calc_recall(pred, test, k=100):
-    print(pred.shape)
+    # print(pred.shape)
     # pred = np.reshape(pred, (pred.shape[1], pred.shape[2]))
     # print(pred.shape)
     pred_ab = np.argsort(-pred)[:, :k]
-    print(pred_ab.shape)
+    # print(pred_ab.shape)
     recall = []
     for i in range(len(pred_ab)):
         hits = set(test[i]) & set(pred_ab[i, :])
@@ -190,8 +190,7 @@ def main():
             y_ba = list(np.dot(z_u_B, z_A.T))
             # y_ab = y_ab.reshape((y_ab.shape[1], y_ab.shape[2]))
             # y_ba = y_ba.reshape((y_ba.shape[1], y_ba.shape[2]))
-            print(y_ab.shape)
-            print(y_ba.shape)
+            print(len(y_ab), len(y_ab[0]))
 
             saver.save(sess, os.path.join(checkpoint_dir, 'CCFNET-model'), i)
 
