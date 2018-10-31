@@ -27,7 +27,7 @@ class CCCFNET(object):
         self.rating_A = tf.placeholder(tf.float32, [None], name="rating_A")
         self.rating_B = tf.placeholder(tf.float32, [None], name="rating_B")
 
-        z_u = self.encode(self.u, self.layer, "user")
+        z_u = self.encode(self.user, self.layer, "user")
         z_A = self.encode(self.item_A, self.layer, "item_A")
         z_B = self.encode(self.item_B, self.layer, "item_B")
 
