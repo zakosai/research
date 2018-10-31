@@ -116,7 +116,7 @@ def calc_recall(pred, test, k=100):
     recall = []
     for i in range(len(pred_ab)):
         t = test[i]
-        p = list(pred_ab[i])
+        p = list(pred_ab[i, :])
         hits = set(t) & set(p)
         recall_val = float(len(hits)) / len(t)
         recall.append(recall_val)
@@ -151,7 +151,7 @@ def main():
     saver = tf.train.Saver(max_to_keep=20)
     max_recall = 0
 
-    for i in range(1, iter):
+    for i in range(0, iter):
         shuffle_idx = np.random.permutation(train_size)
         train_cost = 0
         for j in range(int(train_size / batch_size)):
@@ -171,7 +171,7 @@ def main():
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
         print("Loss last batch: loss %f" % (loss))
 
-        if i%2 == 0:
+        if i%10 == 0:
             # model.train = False
             # print("Loss last batch: loss %f" % (loss))
 
