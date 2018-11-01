@@ -54,11 +54,11 @@ class Translation:
         x_ = tf.nn.dropout(x_, 0.2)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
+                x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
                 # y = maxout(x_, encode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
-                x_ = batch_norm(x_)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.2)
 
                 print(x_.shape)
         return x_
@@ -83,10 +83,12 @@ class Translation:
         x_ = tf.nn.dropout(x_, 0.2)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
+                x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
                 # y = maxout(x_, decode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.2)
+
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
@@ -106,10 +108,12 @@ class Translation:
         x_ = tf.nn.dropout(x_, 0.2)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
-                x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i,
+                x_ = fully_connected(x_, dim[i],  scope="share_%d"%i,
                                      weights_regularizer=self.regularizer)
                 # y = maxout(x_, dim[i])
                 # x_ = tf.reshape(y, x_.shape)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.2)
+
         return x_
 
     def gen_z(self, h, scope, reuse=False):
