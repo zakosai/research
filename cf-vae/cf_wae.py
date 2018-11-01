@@ -94,7 +94,7 @@ class cf_vae_extend:
             def encode(x, reuse=False):
                 with tf.variable_scope("encode", reuse=reuse):
                     for i in range(depth_inf):
-                        x = fully_connected(x, self.encoding_dims[i], tf.nn.tanh, scope="enc_layer"+"%s" %i,
+                        x = fully_connected(x, self.encoding_dims[i], tf.nn.relu, scope="enc_layer"+"%s" %i,
                                              weights_regularizer=self.regularizer)
 
                     h_encode = x
@@ -277,7 +277,7 @@ class cf_vae_extend:
             depth_gen = len(self.decoding_dims)
             y = z
             for i in range(depth_gen):
-                y = fully_connected(y, self.decoding_dims[i], tf.nn.tanh, scope="dec_layer" + "%s" % i,
+                y = fully_connected(y, self.decoding_dims[i], tf.nn.relu, scope="dec_layer" + "%s" % i,
                                     weights_regularizer=self.regularizer)
         return y
 
@@ -320,7 +320,7 @@ class cf_vae_extend:
             hi = inputs
             for i in xrange(num_layers):
                 hi = fully_connected(hi, num_units, scope='hi_%d' % i, weights_regularizer=self.regularizer)
-                hi = tf.nn.tanh(hi)
+                hi = tf.nn.relu(hi)
             hi = dense(hi, 1, scope='hfinal_lin')
             # if nowozin_trick:
             #     # We are doing GAN between our model Qz and the true Pz.
