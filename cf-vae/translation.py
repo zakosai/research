@@ -322,11 +322,11 @@ def main():
     B = args.B
     checkpoint_dir = "translation/%s_%s/"%(A,B)
     user_A, user_B, dense_A, dense_B, num_A, num_B = create_dataset(A, B)
-    encoding_dim_A = [600, 200]
-    encoding_dim_B = [600, 200]
-    share_dim = [100]
-    decoding_dim_A = [200,600, num_A]
-    decoding_dim_B = [200,600, num_B]
+    encoding_dim_A = [600]
+    encoding_dim_B = [600]
+    share_dim = [200]
+    decoding_dim_A = [600, num_A]
+    decoding_dim_B = [600, num_B]
     z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
     # test_A = list(open("data/Health_Clothing/test_A.txt").readlines())
