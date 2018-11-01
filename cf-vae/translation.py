@@ -58,6 +58,7 @@ class Translation:
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
                 # y = maxout(x_, encode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
+                x_ = batch_norm(x_)
 
                 print(x_.shape)
         return x_
@@ -92,8 +93,8 @@ class Translation:
         x_ = x
 
         with tf.variable_scope(scope, reuse=reuse):
-            if self.train:
-                x_ = tf.nn.dropout(x_, 0.2)
+            # if self.train:
+            x_ = tf.nn.dropout(x_, 0.2)
             for i in range(len(adv_dim)-1):
                 x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
             x_ = fully_connected(x_, adv_dim[-1], scope="adv_last")
@@ -101,8 +102,8 @@ class Translation:
 
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.2)
+        # if self.train:
+        x_ = tf.nn.dropout(x_, 0.2)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i], self.active_function, scope="share_%d"%i,
