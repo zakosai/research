@@ -196,8 +196,8 @@ class Translation:
 
 
         # Loss VAE
-        loss_VAE_A = self.lambda_1 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_2 * self.loss_reconstruct(x_A, y_AA)
-        loss_VAE_B = self.lambda_1 * self.loss_kl(z_mu_B, z_sigma_B) + self.lambda_2 * self.loss_reconstruct(x_B, y_BB)
+        loss_VAE_A = self.lambda_1 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_2 * self.loss_reconstruct(x_A, y_ABA)
+        loss_VAE_B = self.lambda_1 * self.loss_kl(z_mu_B, z_sigma_B) + self.lambda_2 * self.loss_reconstruct(x_B, y_BAB)
         self.loss_VAE = loss_VAE_A + loss_VAE_B
 
         # Loss GAN
@@ -369,8 +369,8 @@ def main():
     # test_B = [t - train_size - val_size for t in test_B]
 
     model = Translation(batch_size, num_A, num_B, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-4, lambda_2=1,
-                        lambda_4=0.1)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-3, lambda_2=1,
+                        lambda_4=0.01)
     model.build_model()
 
     sess = tf.Session()
