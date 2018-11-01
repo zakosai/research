@@ -239,7 +239,7 @@ class Translation:
         self.loss_dis = loss_d_A + loss_d_B
 
 
-        self.train_op_VAE = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_VAE)
+        self.train_op_VAE_A = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_VAE_A)
         self.train_op_VAE_B = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_VAE_B)
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         # self.train_op_gen_A = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_gen_A)
@@ -397,8 +397,9 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            if i <150:
+            if i <100:
                 _, loss_vae = sess.run([model.train_op_VAE, model.loss_VAE], feed_dict=feed)
+                _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
                 loss_gen = loss_dis = loss_cc = 0
             # elif i>=50 and i < 100:
             #     _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
