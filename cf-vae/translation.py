@@ -10,8 +10,8 @@ import argparse
 
 class Translation:
     def __init__(self, batch_size, dim_A, dim_B, encode_dim_A, decode_dim_A, encode_dim_B, decode_dim_B, adv_dim_A,
-                 adv_dim_B, z_dim, share_dim, z_A=None, z_B=None, eps=1e-10, lambda_0=10, lambda_1=1, lambda_2=100,
-                 lambda_3=1,
+                 adv_dim_B, z_dim, share_dim, z_A=None, z_B=None, eps=1e-10, lambda_0=10, lambda_1=10, lambda_2=100,
+                 lambda_3=10,
                  lambda_4=100, learning_rate=1e-4):
         self.batch_size = batch_size
         self.dim_A = dim_A
@@ -311,7 +311,7 @@ def calc_rmse(pred, test):
     return np.sqrt(np.mean((test-pred)**2))
 
 def main():
-    iter = 3000
+    iter = 400
     batch_size= 500
     args = parser.parse_args()
     A = args.A
