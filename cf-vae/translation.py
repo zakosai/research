@@ -320,7 +320,7 @@ def main():
     user_A, user_B, dense_A, dense_B, num_A, num_B = create_dataset(A, B)
     encoding_dim_A = [200, 100]
     encoding_dim_B = [200, 100]
-    share_dim = []
+    share_dim = [50]
     decoding_dim_A = [100,200, num_A]
     decoding_dim_B = [100,200, num_B]
     z_dim = 50
