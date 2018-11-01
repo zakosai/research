@@ -196,8 +196,12 @@ class Translation:
 
 
         # Loss VAE
-        loss_VAE_A = self.lambda_1 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_2 * self.loss_reconstruct(x_A, y_AA)
-        loss_VAE_B = self.lambda_1 * self.loss_kl(z_mu_B, z_sigma_B) + self.lambda_2 * self.loss_reconstruct(x_B, y_BB)
+        loss_VAE_A = self.lambda_1 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_2 * self.loss_reconstruct(x_A,
+                                                                                                             y_AA) + \
+                     0.1*tf.losses.get_regularization_loss()
+        loss_VAE_B = self.lambda_1 * self.loss_kl(z_mu_B, z_sigma_B) + self.lambda_2 * self.loss_reconstruct(x_B,
+                                                                                                             y_BB) + \
+                     0.1*tf.losses.get_regularization_loss()
         # if not self.freeze:
         #     loss_VAE_A = self.lambda_1 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_2 * self.loss_reconstruct(x_A,
         #                                                                                                          y_BA)
@@ -207,8 +211,8 @@ class Translation:
         self.loss_VAE = loss_VAE_A + loss_VAE_B
 
         # Loss GAN
-        loss_d_A = self.lambda_0 * self.loss_discriminator(adv_AA, adv_BA) + tf.losses.get_regularization_loss()
-        loss_d_B = self.lambda_0 * self.loss_discriminator(adv_BB, adv_AB) + tf.losses.get_regularization_loss()
+        loss_d_A = self.lambda_0 * self.loss_discriminator(adv_AA, adv_BA)
+        loss_d_B = self.lambda_0 * self.loss_discriminator(adv_BB, adv_AB)
         self.loss_d= loss_d_A + loss_d_B
         self.adv_AA = adv_AA
         self.adv_AB = adv_BA
