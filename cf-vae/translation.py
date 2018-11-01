@@ -207,8 +207,8 @@ class Translation:
         self.loss_VAE = loss_VAE_A + loss_VAE_B
 
         # Loss GAN
-        loss_d_A = self.lambda_0 * self.loss_discriminator(adv_AA, adv_BA)
-        loss_d_B = self.lambda_0 * self.loss_discriminator(adv_BB, adv_AB)
+        loss_d_A = self.lambda_0 * self.loss_discriminator(adv_AA, adv_BA) + tf.losses.get_regularization_loss()
+        loss_d_B = self.lambda_0 * self.loss_discriminator(adv_BB, adv_AB) + tf.losses.get_regularization_loss()
         self.loss_d= loss_d_A + loss_d_B
         self.adv_AA = adv_AA
         self.adv_AB = adv_BA
