@@ -402,7 +402,7 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            if i <100:
+            if i <20:
                 _, loss_vae = sess.run([model.train_op_VAE_A, model.loss_VAE], feed_dict=feed)
                 _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
                 loss_gen = loss_dis = loss_cc = 0
