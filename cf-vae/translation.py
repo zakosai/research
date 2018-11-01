@@ -10,8 +10,8 @@ import argparse
 
 class Translation:
     def __init__(self, batch_size, dim_A, dim_B, encode_dim_A, decode_dim_A, encode_dim_B, decode_dim_B, adv_dim_A,
-                 adv_dim_B, z_dim, share_dim, z_A=None, z_B=None, eps=1e-10, lambda_0=10, lambda_1=0.01, lambda_2=100,
-                 lambda_3=0.01,
+                 adv_dim_B, z_dim, share_dim, z_A=None, z_B=None, eps=1e-10, lambda_0=10, lambda_1=1, lambda_2=100,
+                 lambda_3=1,
                  lambda_4=100, learning_rate=1e-4):
         self.batch_size = batch_size
         self.dim_A = dim_A
@@ -31,7 +31,7 @@ class Translation:
         self.lambda_3 = lambda_3
         self.lambda_4 = lambda_4
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.relu
+        self.active_function = tf.nn.tanh
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
@@ -196,8 +196,8 @@ class Translation:
 
 
         # Loss VAE
-        loss_VAE_A = self.lambda_2 * self.loss_reconstruct(x_A, y_AA)
-        loss_VAE_B = self.lambda_2 * self.loss_reconstruct(x_B, y_BB)
+        loss_VAE_A = self.lambda_1 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_2 * self.loss_reconstruct(x_A, y_AA)
+        loss_VAE_B = self.lambda_1 * self.loss_kl(z_mu_B, z_sigma_B) + self.lambda_2 * self.loss_reconstruct(x_B, y_BB)
         self.loss_VAE = loss_VAE_A + loss_VAE_B
 
         # Loss GAN
@@ -208,8 +208,9 @@ class Translation:
         self.adv_AB = adv_BA
 
         # Loss cycle - consistency (CC)
-        loss_CC_A = self.lambda_4 * self.loss_reconstruct(x_A,y_ABA)
-        loss_CC_B = self.lambda_4 * self.loss_reconstruct(x_B,y_BAB)
+        loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA) + \
+                    self.lambda_4 * self.loss_reconstruct(x_A,y_ABA)
+        loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB) + self.lambda_4 * self.loss_reconstruct(x_B,y_BAB)
         # loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_AAB, z_sigma_AAB) + \
         #             self.lambda_4 * self.loss_reconstruct(x_B, y_AAB)
         # loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_BBA, z_sigma_BBA) + self.lambda_4 * self.loss_reconstruct(x_A,
@@ -235,6 +236,7 @@ class Translation:
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         adv_var_A = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_A")
         adv_var_B = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_B")
+        print(adv_var_A, adv_var_B)
         self.train_op_dis_A = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_d_A,
                                                                                          var_list=adv_var_A)
         self.train_op_dis_B = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_d_B,
@@ -395,8 +397,8 @@ def main():
                 model.freeze = False
                 _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
                                                     model.loss_CC], feed_dict=feed)
-                sess.run([model.train_op_dis_A],feed_dict=feed)
-                sess.run([model.train_op_dis_B], feed_dict=feed)
+                # sess.run([model.train_op_dis_A],feed_dict=feed)
+                # sess.run([model.train_op_dis_B], feed_dict=feed)
                 loss_dis = 0
             # print(adv_AA, adv_AB)
             # _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
