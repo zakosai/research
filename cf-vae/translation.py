@@ -80,7 +80,7 @@ class Translation:
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
         # if self.train:
-        x_ = tf.nn.dropout(x_, 0.2)
+        x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
@@ -96,7 +96,7 @@ class Translation:
 
         with tf.variable_scope(scope, reuse=reuse):
             # if self.train:
-            x_ = tf.nn.dropout(x_, 0.2)
+            x_ = tf.nn.dropout(x_, 0.5)
             for i in range(len(adv_dim)-1):
                 x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
             x_ = fully_connected(x_, adv_dim[-1], scope="adv_last")
@@ -105,7 +105,7 @@ class Translation:
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
         # if self.train:
-        x_ = tf.nn.dropout(x_, 0.2)
+        x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i],  scope="share_%d"%i,
@@ -402,12 +402,12 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            if i <50:
+            if i <100:
                 _, loss_vae = sess.run([model.train_op_VAE_A, model.loss_VAE], feed_dict=feed)
-                # _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
-                loss_gen = loss_dis = loss_cc = 0
-            elif i>=50 and i < 100:
                 _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
+                loss_gen = loss_dis = loss_cc = 0
+            # elif i>=50 and i < 100:
+            #     _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
                 loss_gen = loss_dis = loss_cc = 0
             else:
                 model.freeze = False
