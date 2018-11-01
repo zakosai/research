@@ -397,7 +397,7 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            if i <50:
+            if i <150:
                 _, loss_vae = sess.run([model.train_op_VAE, model.loss_VAE], feed_dict=feed)
                 loss_gen = loss_dis = loss_cc = 0
             # elif i>=50 and i < 100:
