@@ -1,4 +1,4 @@
-folders='Health Toy TV CD Tool Beauty Kitchen Office Grocery Baby Clothing Kindle Phone Video Pet Music Instrument
+folders='TV CD Office Grocery Baby Clothing Kindle Phone Video Pet Music Instrument
 Automotive Garden Electronics Books'
 rate="1 8"
 u_no=("5584" "7981")
@@ -7,7 +7,7 @@ u_dim=("786" "896")
 
 for f in $folders;
 do
-    mkdir wae/${dir[$i]}
+    mkdir wae/$f
     user_no="$(sed -n '1p' data2/$f/info.txt)"
     item_no="$(sed -n '2p' data2/$f/info.txt)"
     for r in $rate;
