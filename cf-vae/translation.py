@@ -328,7 +328,7 @@ def main():
     decoding_dim_A = [600, num_A]
     decoding_dim_B = [600, num_B]
     z_dim = 50
-    adv_dim_A = adv_dim_B = [200, 100, 1]
+    adv_dim_A = adv_dim_B = [100, 1]
     # test_A = list(open("data/Health_Clothing/test_A.txt").readlines())
     # test_A = [t.strip() for t in test_A]
     # if test_A[-1] == '':
