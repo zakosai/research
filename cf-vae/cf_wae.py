@@ -121,7 +121,7 @@ class cf_vae_extend:
             loss = 1.0*self.params.lambda_v/self.params.lambda_r * tf.reduce_mean(tf.reduce_sum(tf.square(self.v_ -
                                                                                                           z),1))
             self.wae_objective = self.loss_reconstruct + \
-                                 self.wae_lambda * self.penalty + loss + 0.1 + tf.losses.get_regularization_loss()
+                                 self.wae_lambda * self.penalty + loss + 0.1 * tf.losses.get_regularization_loss()
 
         # encoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/encode')
         # decoder_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='text/decode')
