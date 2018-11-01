@@ -235,7 +235,7 @@ class Translation:
         self.y_AB = y_AB
 
         self.loss_gen =  loss_CC_A + loss_CC_B + 0.1 * tf.losses.get_regularization_loss() +\
-                        self.loss_generator(y_AB) + \
+                        self.loss_generator(y_AB) + self.loss_generator(y_ABA) + self.loss_generator(y_BAB) +\
                         self.loss_generator(y_BA) + self.loss_reconstruct(x_A, y_BA) + self.loss_reconstruct(x_B, y_AB)
         loss_gen_A = loss_VAE_A + loss_CC_A + tf.losses.get_regularization_loss()
         loss_gen_B = loss_VAE_B + loss_CC_B + tf.losses.get_regularization_loss()
@@ -326,7 +326,7 @@ def calc_rmse(pred, test):
     return np.sqrt(np.mean((test-pred)**2))
 
 def main():
-    iter = 400
+    iter = 500
     batch_size= 500
     args = parser.parse_args()
     A = args.A
