@@ -11,7 +11,7 @@ import argparse
 class Translation:
     def __init__(self, batch_size, dim_A, dim_B, encode_dim_A, decode_dim_A, encode_dim_B, decode_dim_B, adv_dim_A,
                  adv_dim_B, z_dim, share_dim, z_A=None, z_B=None, eps=1e-10, lambda_0=10, lambda_1=0.1, lambda_2=1,
-                 lambda_3=0.1,
+                 lambda_3=0.01,
                  lambda_4=1, learning_rate=1e-4):
         self.batch_size = batch_size
         self.dim_A = dim_A
@@ -318,11 +318,11 @@ def main():
     B = args.B
     checkpoint_dir = "translation/%s_%s/"%(A,B)
     user_A, user_B, dense_A, dense_B, num_A, num_B = create_dataset(A, B)
-    encoding_dim_A = [600]
-    encoding_dim_B = [600]
-    share_dim = [200]
-    decoding_dim_A = [600, num_A]
-    decoding_dim_B = [600, num_B]
+    encoding_dim_A = [200, 100]
+    encoding_dim_B = [200, 100]
+    share_dim = []
+    decoding_dim_A = [100,200, num_A]
+    decoding_dim_B = [100,200, num_B]
     z_dim = 50
     adv_dim_A = adv_dim_B = [200, 100, 1]
     # test_A = list(open("data/Health_Clothing/test_A.txt").readlines())
