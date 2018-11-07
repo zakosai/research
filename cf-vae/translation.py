@@ -310,39 +310,42 @@ def one_hot_vector2(A, num_product):
         one_hot[i[0], i[1]] = i[2]
     return one_hot
 
-def calc_recall(pred, test, k=100):
-    pred_ab = np.argsort(pred)[:,::-1][:, :k]
-    recall = []
-    hit = 0
-    ndcg = []
-    for i in range(len(pred_ab)):
-        p = pred_ab[i]
-        hits = set(test[i]) & set(p)
+def calc_recall(pred, test, k=100, type=None):
+    if type:
+        m = [50, 100, 150, 200, 250, 300]
+    else:
+        m=[k]
 
-        #recall
-        recall_val = float(len(hits)) / len(test[i])
-        recall.append(recall_val)
+    for k in m:
+        pred_ab = np.argsort(pred)[:,::-1][:, :k]
+        recall = []
+        ndcg = []
+        for i in range(len(pred_ab)):
+            p = pred_ab[i]
+            hits = set(test[i]) & set(p)
 
-        #hit
-        if hits > 0:
-            hit += 1
+            #recall
+            recall_val = float(len(hits)) / len(test[i])
+            recall.append(recall_val)
 
-        #ncdg
-        score = []
-        for j in range(k):
-            if p[j] in hits:
-                score.append(1)
+            #ncdg
+            score = []
+            for j in range(k):
+                if p[j] in hits:
+                    score.append(1)
+                else:
+                    score.append(0)
+            actual = dcg_score(score, pred[i, p], k)
+            best = dcg_score(score, score, k)
+            if best == 0:
+                ndcg.append(0)
             else:
-                score.append(0)
-        actual = dcg_score(score, pred[i, p], k)
-        best = dcg_score(score, score, k)
-        if best == 0:
-            ndcg.append(0)
-        else:
-            ndcg.append(float(actual) / best)
+                ndcg.append(float(actual) / best)
+
+        print("recall %s: %f, ndcg: %f"%(type, np.mean(np.array(recall), np.mean(ndcg))))
 
 
-    return np.mean(np.array(recall)), float(hit)/len(pred_ab), np.mean(ndcg)
+    return np.mean(np.array(recall))
 
 def dcg_score(y_true, y_score, k=50):
     """Discounted cumulative gain (DCG) at rank K.
@@ -485,9 +488,8 @@ def main():
                                                                      model.loss_val_b, model.y_BA, model.y_AB],
                                               feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
 
-            recall_A, hit, ncdg = calc_recall(y_ba, dense_A_val, args.k)
-            recall_B, hit, ncdg = calc_recall(y_ab, dense_B_val, args.k)
-            recall = recall_A + recall_B
+
+            recall = calc_recall(y_ba, dense_A_val, args.k) + calc_recall(y_ab, dense_B_val, args.k)
             print("Loss gen: %f, Loss val a: %f, Loss val b: %f, recall %f" % (loss_gen, loss_val_a, loss_val_b,
                                                                                recall))
             if recall > max_recall:
@@ -500,10 +502,8 @@ def main():
 
                 # y_ab = y_ab[test_B]
                 # y_ba = y_ba[test_A]
-                print("recall A: %f, hit: %f, ncdg: %f" % (calc_recall(y_ba, dense_A_test, args.k)))
-                print("recall B: %f, hit: %f, ncdg: %f" % (calc_recall(y_ab, dense_B_test, args.k)))
-
-
+                calc_recall(y_ba, dense_A_test, args.k, type="A")
+                calc_recall(y_ab, dense_B_test, args.k, type="B")
 
             model.train = True
         if i%100 == 0:
