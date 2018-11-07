@@ -342,7 +342,7 @@ def calc_recall(pred, test, k=100, type=None):
             else:
                 ndcg.append(float(actual) / best)
 
-        print("k= %d, recall %s: %f, ndcg: %f"%(m, type, np.mean(recall), np.mean(ndcg)))
+        print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
 
 
     return np.mean(np.array(recall))
