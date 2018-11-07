@@ -558,6 +558,7 @@ class cf_vae_extend:
                         score.append(1)
                     else:
                         score.append(0)
+                top_M -= thred
                 actual = self.dcg_score(score, pred[top_M], k)
                 best = self.dcg_score(score, score, k)
                 if best ==0:
@@ -583,6 +584,7 @@ class cf_vae_extend:
                         score.append(1)
                     else:
                         score.append(0)
+                top_M -= thred
                 actual = self.dcg_score(score, pred[top_M], k)
                 best = self.dcg_score(score, score, k)
                 if best == 0:
