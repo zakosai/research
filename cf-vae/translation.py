@@ -310,7 +310,7 @@ def one_hot_vector2(A, num_product):
         one_hot[i[0], i[1]] = i[2]
     return one_hot
 
-def calc_recall(pred, test, m=100, type=None):
+def calc_recall(pred, test, m=[100], type=None):
 
     for k in m:
         pred_ab = np.argsort(pred)[:,::-1][:, :k]
@@ -484,7 +484,7 @@ def main():
                                               feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
 
 
-            recall = calc_recall(y_ba, dense_A_val, args.k) + calc_recall(y_ab, dense_B_val, args.k)
+            recall = calc_recall(y_ba, dense_A_val, [50]) + calc_recall(y_ab, dense_B_val, [50])
             print("Loss gen: %f, Loss val a: %f, Loss val b: %f, recall %f" % (loss_gen, loss_val_a, loss_val_b,
                                                                                recall))
             if recall > max_recall:
