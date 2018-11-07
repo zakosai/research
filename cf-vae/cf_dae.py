@@ -533,6 +533,10 @@ class cf_vae_extend:
         recall_health = []
         recall_clothing = []
         train_val_size = int(len(self.U)*0.75)
+        hit_A = 0
+        hit_B = 0
+        ndcg_A = []
+        ndcg_B = []
         for i, list_product in enumerate(test_users):
             if list_product[0] < thred:
                 real = [j for j in list_product if j >= thred]
@@ -542,6 +546,24 @@ class cf_vae_extend:
                 hits = set(top_M) & set(real)
                 recall = float(len(hits))/float(len(real))
                 recall_clothing.append(recall)
+
+                #hit
+                if hits > 0:
+                    hit_B += 1
+
+                #ncdg
+                score = []
+                for j in range(k):
+                    if top_M[j] in hits:
+                        score.append(1)
+                    else:
+                        score.append(0)
+                actual = self.dcg_score(score, pred[top_M], k)
+                best = self.dcg_score(score, score, k)
+                if best ==0:
+                    ndcg_B.append(0)
+                else:
+                    ndcg_B.append(float(actual)/best)
             else:
                 real = [j for j in list_product if j < thred]
                 pred = self.pred(i + train_val_size, "health", thred)
@@ -549,8 +571,30 @@ class cf_vae_extend:
                 hits = set(top_M) & set(real)
                 recall = float(len(hits)) / float(len(real))
                 recall_health.append(recall)
+
+                # hit
+                if hits > 0:
+                    hit_A += 1
+
+                # ncdg
+                score = []
+                for j in range(k):
+                    if top_M[j] in hits:
+                        score.append(1)
+                    else:
+                        score.append(0)
+                actual = self.dcg_score(score, pred[top_M], k)
+                best = self.dcg_score(score, score, k)
+                if best == 0:
+                    ndcg_A.append(0)
+                else:
+                    ndcg_A.append(float(actual) / best)
         print(len(recall_clothing), len(recall_health))
-        print("average recall health: %f, average recall grocery %f"%(np.mean(recall_health), np.mean(recall_clothing)))
+        print("average recall A: %f, hit %f, ndcg: %f"%(np.mean(recall_health), float(hit_A)/len(recall_health),
+                                                             np.mean(ndcg_A)))
+        print("average recall B: %f, hit %f, ndcg: %f" % (
+        np.mean(recall_clothing), float(hit_B) / len(recall_clothing),
+        np.mean(ndcg_B)))
 
     def predict_all(self):
         train_size = int(len(self.U)*0.7)
@@ -669,29 +713,29 @@ class cf_vae_extend:
     #             file.write("m = %d, recall = %f\t"%(m, recall_avg))
     #         # precision_avgs.append(precision_avg)
     #         return recall_avg
-    # def dcg_score(self, y_true, y_score, k=5):
-    #     """Discounted cumulative gain (DCG) at rank K.
-    #
-    #     Parameters
-    #     ----------
-    #     y_true : array, shape = [n_samples]
-    #         Ground truth (true relevance labels).
-    #     y_score : array, shape = [n_samples, n_classes]
-    #         Predicted scores.
-    #     k : int
-    #         Rank.
-    #
-    #     Returns
-    #     -------
-    #     score : float
-    #     """
-    #     order = np.argsort(y_score)[::-1]
-    #     y_true = np.take(y_true, order[:k])
-    #
-    #     gain = 2 ** y_true - 1
-    #
-    #     discounts = np.log2(np.arange(len(y_true)) + 2)
-    #     return np.sum(gain / discounts)
+    def dcg_score(self, y_true, y_score, k=5):
+        """Discounted cumulative gain (DCG) at rank K.
+
+        Parameters
+        ----------
+        y_true : array, shape = [n_samples]
+            Ground truth (true relevance labels).
+        y_score : array, shape = [n_samples, n_classes]
+            Predicted scores.
+        k : int
+            Rank.
+
+        Returns
+        -------
+        score : float
+        """
+        order = np.argsort(y_score)[::-1]
+        y_true = np.take(y_true, order[:k])
+
+        gain = 2 ** y_true - 1
+
+        discounts = np.log2(np.arange(len(y_true)) + 2)
+        return np.sum(gain / discounts)
     #
     # def predict_all(self):
     #     return np.dot(self.U, (self.V.T))
