@@ -311,7 +311,7 @@ def one_hot_vector2(A, num_product):
     return one_hot
 
 def calc_recall(pred, test, k=100, type=None):
-    if type:
+    if type !=None:
         m = [50, 100, 150, 200, 250, 300]
     else:
         m=[k]
