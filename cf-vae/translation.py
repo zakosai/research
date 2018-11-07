@@ -503,7 +503,7 @@ def main():
 
             model.train = True
         if i%100 == 0:
-            model.learning_rate /= 2
+            model.learning_rate /= 10
             print("decrease lr to %f"%model.learning_rate)
 
             # pred = np.array(y_ab).flatten()
