@@ -1,10 +1,33 @@
-folders='TV CD Office Grocery Baby Clothing Kindle Phone Video Pet Music Instrument
-Automotive Garden Electronics Books'
-rate="1 8"
-u_no=("5584" "7981")
-i_no=("13790" "19184")
-u_dim=("786" "896")
+python CCCFNET.py --A=Health --B=Clothing --k=50 >> translation/Health_Clothing/CCCFNET.txt
+python CCCFNET.py --A=Video --B=TV --k=50 >> translation/Video_TV/CCCFNET.txt
+python CCCFNET.py --A=Drama --B=Comedy --k=50 >> translation/Drama_Comedy/CCCFNET.txt
+python CCCFNET.py --A=Romance --B=Thriller --k=50 >> translation/Romance_Thriller/CCCFNET.txt
 
+python adversarial_personalized_ranking/AMF.py --path=data/Health_Clothing/ --dataset=Health_Clothing \
+--adv_epoch=1000 --epochs=2000 --eps=0.5 --reg_adv=1 --ckpt=1 --verbose=20 >>translation/Health_Clothing/AMF.txt
+
+python adversarial_personalized_ranking/AMF.py --path=data/Video_TV/ --dataset=Video_TV \
+--adv_epoch=1000 --epochs=2000 --eps=0.5 --reg_adv=1 --ckpt=1 --verbose=20 >>translation/Video_TV/AMF.txt
+
+python adversarial_personalized_ranking/AMF.py --path=data/Drama_Comedy/ --dataset=Drama_Comedy \
+--adv_epoch=1000 --epochs=2000 --eps=0.5 --reg_adv=1 --ckpt=1 --verbose=20 >>translation/Drama_Comedy/AMF.txt
+
+python adversarial_personalized_ranking/AMF.py --path=data/Romance_Thriller/ --dataset=Romance_Thriller \
+--adv_epoch=1000 --epochs=2000 --eps=0.5 --reg_adv=1 --ckpt=1 --verbose=20 >>translation/Romance_Thriller/AMF.txt
+
+
+python train_dae.py --ckpt_folder=wae/Baby/8/ --data_dir=data2/Baby/ --zdim=100 \
+--data_type=8 --type=text
+python train_cf_dae.py --model=0 --ckpt_folder=wae/Baby/8/ --data_dir=data2/Baby/ \
+--iter=50 --data_type=8 --user_no=2792 --item_no=4897 --gridsearch=1 --zdim=100
+python wae.py --ckpt_folder=wae/Baby/8/ --data_dir=data2/Baby/ --zdim=100 \
+--data_type=8 --type=text
+python train_cf_wae.py --model=0 --ckpt_folder=wae/Baby/8/ --data_dir=data2/Baby/ \
+--iter=50 --data_type=$r --user_no=2792 --item_no=4897 --gridsearch=1 --zdim=100
+
+
+folders='Clothing Kindle Phone Video Pet Music Instrument Automotive Garden Electronics Books'
+rate="1 8"
 for f in $folders;
 do
     mkdir wae/$f
@@ -18,15 +41,16 @@ do
         --data_type=$r --type=text
         python train_cvae_extend.py --model=0 --ckpt_folder=$ckpt --data_dir=data2/$f/ \
         --iter=50 --data_type=$r --user_no=$user_no --item_no=$item_no --gridsearch=1 --zdim=100
-         python train_dae.py --ckpt_folder=$ckpt --data_dir=data2/$f/ --zdim=100 \
+
+        python train_dae.py --ckpt_folder=$ckpt --data_dir=data2/$f/ --zdim=100 \
         --data_type=$r --type=text
         python train_cf_dae.py --model=0 --ckpt_folder=$ckpt --data_dir=data2/$f/ \
         --iter=50 --data_type=$r --user_no=$user_no --item_no=$item_no --gridsearch=1 --zdim=100
-#        python wae.py --ckpt_folder=$ckpt --data_dir=data2/${dir[$i]}/ --zdim=50 \
-#        --data_type=$r --type=user --user_dim=${u_dim[$i]}
-#        python train_cwae_user.py --model=0 --ckpt_folder=$ckpt --data_dir=data2/${dir[$i]}/ \
-#        --iter=50 --data_type=$r --user_no=${u_no[$i]} --item_no=${i_no[$i]} --gridsearch=1 --zdim=50 \
-#        --user_dim=${u_dim[$i]}
+
+        python wae.py --ckpt_folder=$ckpt --data_dir=data2/$f/ --zdim=100 \
+        --data_type=$r --type=text
+        python train_cf_wae.py --model=0 --ckpt_folder=$ckpt --data_dir=data2/$f/ \
+        --iter=50 --data_type=$r --user_no=$user_no --item_no=$item_no --gridsearch=1 --zdim=100
     done
 done
 
