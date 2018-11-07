@@ -153,15 +153,63 @@ def one_hot_vector2(A, num_product):
         one_hot[i[0], i[1]] = i[2]
     return one_hot
 
-def calc_recall(pred, test, k):
-    pred_ab = np.argsort(pred)[:, ::-1][:, :k]
+def calc_recall(pred, test, k=100):
+    pred_ab = np.argsort(pred)[:,::-1][:, :k]
     recall = []
+    hit = 0
+    ndcg = []
     for i in range(len(pred_ab)):
-        hits = set(test[i]) & set(pred_ab[i])
+        p = pred_ab[i]
+        hits = set(test[i]) & set(p)
+
+        #recall
         recall_val = float(len(hits)) / len(test[i])
         recall.append(recall_val)
-    return np.mean(np.array(recall))
 
+        #hit
+        if hits > 0:
+            hit += 1
+
+        #ncdg
+        score = []
+        for j in range(k):
+            if p[j] in hits:
+                score.append(1)
+            else:
+                score.append(0)
+        actual = dcg_score(score, pred[i, p], k)
+        best = dcg_score(score, score, k)
+        if best == 0:
+            ndcg.append(0)
+        else:
+            ndcg.append(float(actual) / best)
+
+
+    return np.mean(np.array(recall)), float(hit)/len(pred_ab), np.mean(ndcg)
+
+def dcg_score(y_true, y_score, k=50):
+    """Discounted cumulative gain (DCG) at rank K.
+
+    Parameters
+    ----------
+    y_true : array, shape = [n_samples]
+        Ground truth (true relevance labels).
+    y_score : array, shape = [n_samples, n_classes]
+        Predicted scores.
+    k : int
+        Rank.
+
+    Returns
+    -------
+    score : float
+    """
+    order = np.argsort(y_score)[::-1]
+    y_true = np.take(y_true, order[:k])
+
+    gain = 2 ** y_true - 1
+
+    discounts = np.log2(np.arange(len(y_true)) + 2)
+    return np.sum(gain / discounts)
 def calc_rmse(pred, test):
     idx = np.where(test != 0)
     pred = pred[idx]
