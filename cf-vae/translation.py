@@ -485,7 +485,9 @@ def main():
                                                                      model.loss_val_b, model.y_BA, model.y_AB],
                                               feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
 
-            recall, hit, ncdg = calc_recall(y_ba, dense_A_val, args.k) + calc_recall(y_ab, dense_B_val, args.k)
+            recall_A, hit, ncdg = calc_recall(y_ba, dense_A_val, args.k)
+            recall_B, hit, ncdg = calc_recall(y_ab, dense_B_val, args.k)
+            recall = recall_A + recall_B
             print("Loss gen: %f, Loss val a: %f, Loss val b: %f, recall %f" % (loss_gen, loss_val_a, loss_val_b,
                                                                                recall))
             if recall > max_recall:
