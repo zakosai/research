@@ -310,11 +310,7 @@ def one_hot_vector2(A, num_product):
         one_hot[i[0], i[1]] = i[2]
     return one_hot
 
-def calc_recall(pred, test, k=100, type=None):
-    if type !=None:
-        m = [50, 100, 150, 200, 250, 300]
-    else:
-        m=[k]
+def calc_recall(pred, test, m=100, type=None):
 
     for k in m:
         pred_ab = np.argsort(pred)[:,::-1][:, :k]
@@ -385,28 +381,27 @@ def main():
     B = args.B
     checkpoint_dir = "translation/%s_%s/"%(A,B)
     user_A, user_B, dense_A, dense_B, num_A, num_B = create_dataset(A, B)
-    encoding_dim_A = [600]
-    encoding_dim_B = [600]
-    share_dim = [200]
-    decoding_dim_A = [600, num_A]
-    decoding_dim_B = [600, num_B]
     z_dim = 50
     adv_dim_A = adv_dim_B = [100, 1]
-    # test_A = list(open("data/Health_Clothing/test_A.txt").readlines())
-    # test_A = [t.strip() for t in test_A]
-    # if test_A[-1] == '':
-    #     test_A = test_A[:-1]
-    # test_A = [int(t) for t in test_A]
-    # test_B = list(open("data/Health_Clothing/test_B.txt").readlines())
-    # test_B = [t.strip() for t in test_B]
-    # if test_B[-1] == '':
-    #     test_B = test_B[:-1]
-    # test_B = [int(t) for t in test_B]
-    # z = np.load(os.path.join(checkpoint_dir, "text.npz"))
-    # z = z['arr_0']
-    # print(z.shape)
-    # z_A = z[:health_num]
-    # z_B = z[health_num:]
+
+    if A == "Drama" or A == "Romance":
+        k = [10, 20, 30, 40, 50]
+        dim = 200
+        share = 100
+    else:
+        k = [50, 100, 150, 200, 250, 300]
+        dim = 600
+        share = 200
+
+    print(k)
+
+    encoding_dim_A = [dim]
+    encoding_dim_B = [dim]
+    share_dim = [share]
+    decoding_dim_A = [dim, num_A]
+    decoding_dim_B = [dim, num_B]
+
+
     assert len(user_A) == len(user_B)
     perm = np.random.permutation(len(user_A))
     total_data = len(user_A)
@@ -502,8 +497,9 @@ def main():
 
                 # y_ab = y_ab[test_B]
                 # y_ba = y_ba[test_A]
-                calc_recall(y_ba, dense_A_test, args.k, type="A")
-                calc_recall(y_ab, dense_B_test, args.k, type="B")
+
+                calc_recall(y_ba, dense_A_test, k, type="A")
+                calc_recall(y_ab, dense_B_test, k, type="B")
 
             model.train = True
         if i%100 == 0:

@@ -111,12 +111,7 @@ def read_data(filename):
     f = [i[1:] for i in f]
     return f
 
-def calc_recall(pred, test, k=100, type=None):
-    if type !=None:
-        m = [50, 100, 150, 200, 250, 300]
-    else:
-        m=[k]
-
+def calc_recall(pred, test, m=[100], type=None):
     for k in m:
         pred_ab = np.argsort(pred)[:,::-1][:, :k]
         recall = []
@@ -179,13 +174,21 @@ def main():
     args = parser.parse_args()
     A = args.A
     B = args.B
+    if A == "Drama" or A=="Romance":
+        k =[10, 20, 30, 40, 50]
+        dim = 200
+        share = 100
+    else:
+        k = [50, 100, 150, 200, 250, 300]
+        dim = 600
+        share = 200
     checkpoint_dir = "translation/%s_%s/"%(A,B)
     user, dense_A, dense_B, num_A, num_B, triple, item_A, item_B = create_dataset(A, B)
-    encoding_dim_A = [600]
-    encoding_dim_B = [600]
-    share_dim = [200]
-    decoding_dim_A = [600, num_A]
-    decoding_dim_B = [600, num_B]
+    encoding_dim_A = [dim]
+    encoding_dim_B = [dim]
+    share_dim = [share]
+    decoding_dim_A = [dim, num_A]
+    decoding_dim_B = [dim, num_B]
     z_dim = 50
     train_size = len(triple)
     test_position = int(len(user)*0.75)
@@ -242,8 +245,8 @@ def main():
 
             saver.save(sess, os.path.join(checkpoint_dir, 'CCFNET-model'), i)
 
-            calc_recall(y_ba, dense_A[test_position:], args.k, "A")
-            calc_recall(y_ab, dense_B[test_position:], args.k, "B")
+            calc_recall(y_ba, dense_A[test_position:], k, "A")
+            calc_recall(y_ab, dense_B[test_position:], k, "B")
 
 
 
