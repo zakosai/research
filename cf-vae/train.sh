@@ -1,4 +1,3 @@
-stdbuf -oL python CCCFNET.py --A=Health --B=Clothing --k=50 |tee -a translation/Health_Clothing/CCCFNET.txt
 stdbuf -oL python CCCFNET.py --A=Video --B=TV --k=50 |tee -a translation/Video_TV/CCCFNET.txt
 stdbuf -oL python CCCFNET.py --A=Drama --B=Comedy --k=50 |tee -a translation/Drama_Comedy/CCCFNET.txt
 stdbuf -oL python CCCFNET.py --A=Romance --B=Thriller --k=50 |tee -a translation/Romance_Thriller/CCCFNET.txt

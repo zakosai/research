@@ -169,7 +169,7 @@ def dcg_score(y_true, y_score, k=50):
 
 
 def main():
-    iter = 3000
+    iter = 200
     batch_size= 500
     args = parser.parse_args()
     A = args.A
