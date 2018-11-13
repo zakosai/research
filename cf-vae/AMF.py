@@ -606,8 +606,8 @@ if __name__ == '__main__':
     pred = training(MF_BPR, dataset, args, epoch_start=0, epoch_end=0, time_stamp=time_stamp)
     dense_A = read_data("data/Health_Clothing/Health_user_product.txt")
     dense_B = read_data("data/Health_Clothing/Clothing_user_product.txt")
-    dense_A = dense_A[int(dataset.num_users*0.75)]
-    dense_B = dense_B[int(dataset.num_users*0.75)]
+    dense_A = dense_A[int(dataset.num_users*0.75):]
+    dense_B = dense_B[int(dataset.num_users*0.75):]
     num_A = 16069
     num_B = 18226
 
