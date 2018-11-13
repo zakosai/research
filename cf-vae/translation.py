@@ -51,7 +51,7 @@ class Translation:
         # x_ = tf.reshape(x_, (-1, 10000))
 
         # if self.train:
-        # x_ = tf.nn.dropout(x_, 0.7)
+        x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
@@ -388,7 +388,8 @@ def load_rating(path, thred, test_size):
                 print(l)
                 dense_A.append(l)
             else:
-                l = [i-thred for i in l if i >= thred]
+                l = [i for i in l if i >= thred]
+                l = l - thred
                 dense_B.append(l)
         i += 1
     return dense_A, dense_B
