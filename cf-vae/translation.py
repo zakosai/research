@@ -315,7 +315,7 @@ def one_hot_vector2(A, num_product):
 def calc_recall(pred, test, m=[100], type=None):
 
     for k in m:
-        pred_ab = np.argsort(pred)[:,::-1][:, :k]
+        pred_ab = np.argsort(-pred)[:, :k]
         recall = []
         ndcg = []
         for i in range(len(pred_ab)):
