@@ -389,7 +389,7 @@ def load_rating(path, thred, test_size):
                 dense_A.append(l)
             else:
                 l = [i for i in l if i >= thred]
-                l = l - thred
+                l =[i - thred for i in l ]
                 dense_B.append(l)
         i += 1
     return dense_A, dense_B
