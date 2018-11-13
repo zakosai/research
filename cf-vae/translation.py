@@ -217,6 +217,8 @@ class Translation:
         self.loss_d= loss_d_A + loss_d_B
         self.adv_AA = adv_AA
         self.adv_AB = adv_BA
+        self.y_AA = y_AA
+        self.y_BB = y_BB
 
         # Loss cycle - consistency (CC)
         loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA) + \
@@ -300,7 +302,7 @@ def one_hot_vector(A, num_product):
 
     for i, row in enumerate(A):
         for j in row:
-            if j!= num_product:
+            if j< num_product:
                 one_hot_A[i,j] = 1
     return one_hot_A
 
@@ -373,6 +375,23 @@ def calc_rmse(pred, test):
     test = test[idx]
     return np.sqrt(np.mean((test-pred)**2))
 
+def load_rating(path, thred, test_size):
+    dense_A = []
+    dense_B = []
+    i = 0
+    for line in open(path):
+        a = line.strip().split()
+        if i >= test_size:
+            l = [int(x) for x in a]
+            if l[0] < thred:
+                l = [i for i in l if i < thred]
+                dense_A.append(l)
+            else:
+                l = [i-thred for i in l if i >= thred]
+                dense_B.append(l)
+        i += 1
+    return dense_A, dense_B
+
 def main():
     iter = 400
     batch_size= 500
@@ -416,11 +435,16 @@ def main():
 
     user_A_val = user_A[train_size:train_size+val_size]
     user_B_val = user_B[train_size:train_size+val_size]
-    user_A_test = user_A[train_size+val_size:]
-    user_B_test = user_B[train_size+val_size:]
+    # user_A_test = user_A[train_size+val_size:]
+    # user_B_test = user_B[train_size+val_size:]
+    #
+    # dense_A_test = dense_A[(train_size + val_size):]
+    # dense_B_test = dense_B[(train_size + val_size):]
+    dense_A_test, dense_B_test = load_rating("data/%s_%s/cf-test-70p-users.dat"%(A, B), num_A, train_size+val_size)
+    user_A_test, user_B_test = load_rating("data/%s_%s/cf-train-70p-users.dat"%(A, B), num_A, train_size+val_size)
+    user_A_test = one_hot_vector(user_A_test, num_A)
+    user_B_test = one_hot_vector(user_B_test, num_B)
 
-    dense_A_test = dense_A[(train_size + val_size):]
-    dense_B_test = dense_B[(train_size + val_size):]
     # dense_A_test = np.array(dense_A)[test_A]
     # dense_B_test = np.array(dense_B)[test_B]
     # test_A = [t - train_size - val_size for t in test_A]
@@ -491,7 +515,7 @@ def main():
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
                 loss_test_a, loss_test_b, y_ab, y_ba = sess.run(
-                    [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
+                    [model.loss_val_a, model.loss_val_b, model.y_BB, model.y_AA],
                  feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
                 print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
 
