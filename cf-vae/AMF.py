@@ -284,8 +284,8 @@ def training(model, dataset, args, epoch_start, epoch_end, time_stamp):  # saver
         for u in user:
             u_test = np.array([u] * dataset.num_items).reshape((dataset.num_items, 1))
             i_test = np.array(range(dataset.num_items)).reshape((dataset.num_items, 1))
-            feed_dict = {_model.user_input: u_test, _model.item_input_pos: i_test}
-            pred = _sess.run(_model.output, feed_dict)
+            feed_dict = {model.user_input: u_test, model.item_input_pos: i_test}
+            pred = sess.run(model.output, feed_dict)
             predict.append(pred)
         return predict
 
