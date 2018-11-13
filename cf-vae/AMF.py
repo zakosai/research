@@ -245,7 +245,7 @@ def training(model, dataset, args, epoch_start, epoch_end, time_stamp):  # saver
         # initialized the save op
         if args.adver:
             ckpt_save_path = "Pretrain/%s/APR/embed_%d/%s/" % (args.dataset, args.embed_size, time_stamp)
-            ckpt_restore_path = "Pretrain/%s/MF_BPR/embed_%d/%s/" % (args.dataset, args.embed_size, time_stamp)
+            ckpt_restore_path = "Pretrain/%s/APR/embed_%d/%s/" % (args.dataset, args.embed_size, time_stamp)
         else:
             ckpt_save_path = "Pretrain/%s/MF_BPR/embed_%d/%s/" % (args.dataset, args.embed_size, time_stamp)
             ckpt_restore_path = 0 if args.restore is None else "Pretrain/%s/MF_BPR/embed_%d/%s/" % (args.dataset, args.embed_size, args.restore)
@@ -271,53 +271,53 @@ def training(model, dataset, args, epoch_start, epoch_end, time_stamp):  # saver
             print "Initialized from scratch"
 
         # initialize for Evaluate
-        eval_feed_dicts = init_eval_model(model, dataset)
-
-        # sample the data
-        samples = sampling(dataset)
-
-        # initialize the max_ndcg to memorize the best result
-        max_ndcg = 0
-        best_res = {}
-
-        # train by epoch
-        for epoch_count in range(epoch_start, epoch_end+1):
-
-            # initialize for training batches
-            batch_begin = time()
-            batches = shuffle(samples, args.batch_size, dataset, model)
-            batch_time = time() - batch_begin
-
-            # compute the accuracy before training
-            prev_batch = batches[0], batches[1], batches[3]
-            _, prev_acc = training_loss_acc(model, sess, prev_batch, output_adv=0)
-
-            # training the model
-            train_begin = time()
-            train_batches = training_batch(model, sess, batches, args.adver)
-            train_time = time() - train_begin
-
-            if epoch_count % args.verbose == 0:
-                _, ndcg, cur_res = output_evaluate(model, sess, dataset, train_batches, eval_feed_dicts,
-                                                   epoch_count, batch_time, train_time, prev_acc, output_adv=0)
-
-            # print and log the best result
-            if max_ndcg < ndcg:
-                max_ndcg = ndcg
-                best_res['result'] = cur_res
-                best_res['epoch'] = epoch_count
-
-            if model.epochs == epoch_count:
-                print "Epoch %d is the best epoch" % best_res['epoch']
-                for idx, (hr_k, ndcg_k, auc_k) in enumerate(np.swapaxes(best_res['result'], 0, 1)):
-                    res = "K = %d: HR = %.4f, NDCG = %.4f AUC = %.4f" % (idx + 1, hr_k, ndcg_k, auc_k)
-                    print res
-
-            # save the embedding weights
-            if args.ckpt > 0 and epoch_count % args.ckpt == 0:
-                saver_ckpt.save(sess, ckpt_save_path + 'weights', global_step=epoch_count)
-
-        saver_ckpt.save(sess, ckpt_save_path + 'weights', global_step=epoch_count)
+        # eval_feed_dicts = init_eval_model(model, dataset)
+        #
+        # # sample the data
+        # samples = sampling(dataset)
+        #
+        # # initialize the max_ndcg to memorize the best result
+        # max_ndcg = 0
+        # best_res = {}
+        #
+        # # train by epoch
+        # for epoch_count in range(epoch_start, epoch_end+1):
+        #
+        #     # initialize for training batches
+        #     batch_begin = time()
+        #     batches = shuffle(samples, args.batch_size, dataset, model)
+        #     batch_time = time() - batch_begin
+        #
+        #     # compute the accuracy before training
+        #     prev_batch = batches[0], batches[1], batches[3]
+        #     _, prev_acc = training_loss_acc(model, sess, prev_batch, output_adv=0)
+        #
+        #     # training the model
+        #     train_begin = time()
+        #     train_batches = training_batch(model, sess, batches, args.adver)
+        #     train_time = time() - train_begin
+        #
+        #     if epoch_count % args.verbose == 0:
+        #         _, ndcg, cur_res = output_evaluate(model, sess, dataset, train_batches, eval_feed_dicts,
+        #                                            epoch_count, batch_time, train_time, prev_acc, output_adv=0)
+        #
+        #     # print and log the best result
+        #     if max_ndcg < ndcg:
+        #         max_ndcg = ndcg
+        #         best_res['result'] = cur_res
+        #         best_res['epoch'] = epoch_count
+        #
+        #     if model.epochs == epoch_count:
+        #         print "Epoch %d is the best epoch" % best_res['epoch']
+        #         for idx, (hr_k, ndcg_k, auc_k) in enumerate(np.swapaxes(best_res['result'], 0, 1)):
+        #             res = "K = %d: HR = %.4f, NDCG = %.4f AUC = %.4f" % (idx + 1, hr_k, ndcg_k, auc_k)
+        #             print res
+        #
+        #     # save the embedding weights
+        #     if args.ckpt > 0 and epoch_count % args.ckpt == 0:
+        #         saver_ckpt.save(sess, ckpt_save_path + 'weights', global_step=epoch_count)
+        #
+        # saver_ckpt.save(sess, ckpt_save_path + 'weights', global_step=epoch_count)
 
 
 def output_evaluate(model, sess, dataset, train_batches, eval_feed_dicts, epoch_count, batch_time, train_time, prev_acc,
@@ -583,16 +583,15 @@ if __name__ == '__main__':
 
     # start training
     saver_ckpt = tf.train.Saver({'embedding_P': MF_BPR.embedding_P, 'embedding_Q': MF_BPR.embedding_Q})
-    # training(MF_BPR, dataset, args, epoch_start=0, epoch_end=args.adv_epoch-1, time_stamp=time_stamp)
+    args.restore = True
+    training(MF_BPR, dataset, args, epoch_start=0, epoch_end=args.adv_epoch-1, time_stamp=time_stamp)
     sess = tf.Session()
-    ckpt = tf.train.get_checkpoint_state("Pretrain/Health_Clothing/MF_BPR/embed_64/2018_11_08_23_38_44/checkpoint")
     dense_A = read_data("data/Health_Clothing/Health_user_product.txt")
     dense_B = read_data("data/Health_Clothing/Clothing_user_product.txt")
     dense_A = dense_A[int(dataset.num_users*0.75)]
     dense_B = dense_B[int(dataset.num_users*0.75)]
     num_A = 16069
     num_B = 18226
-    saver_ckpt.restore(sess, ckpt.model_checkpoint_path)
 
     pred = []
     for u in range(int(dataset.num_users*0.75), dataset.num_users):
@@ -618,9 +617,7 @@ if __name__ == '__main__':
     print "Initialize AMF"
 
     # start training
-    # training(AMF, dataset, args, epoch_start=args.adv_epoch, epoch_end=args.epochs, time_stamp=time_stamp)
-    ckpt = tf.train.get_checkpoint_state("Pretrain/Health_Clothing/APR/embed_64/2018_11_08_23_38_44/checkpoint")
-    saver_ckpt.restore(sess, ckpt.model_checkpoint_path)
+    training(AMF, dataset, args, epoch_start=args.adv_epoch, epoch_end=args.epochs, time_stamp=time_stamp)
     pred = []
     for u in range(int(dataset.num_users * 0.75), dataset.num_users):
         u_test = [u] * dataset.num_items
