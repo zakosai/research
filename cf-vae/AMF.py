@@ -265,6 +265,7 @@ def training(model, dataset, args, epoch_start, epoch_end, time_stamp):  # saver
             ckpt = tf.train.get_checkpoint_state(os.path.dirname(ckpt_restore_path + 'checkpoint'))
             if ckpt and ckpt.model_checkpoint_path:
                 saver_ckpt.restore(sess, ckpt.model_checkpoint_path)
+                print(ckpt_restore_path)
         # initialize the weights
         else:
             logging.info("Initialized from scratch")
@@ -612,7 +613,7 @@ if __name__ == '__main__':
 
 
     print("finish cal pred")
-    pred = np.array(pred)
+    pred = np.array(pred).reshape((1640,34296))
     print(pred.shape)
     k = [50, 100, 150, 200, 250, 300]
     calc_recall(pred[:, :num_A], dense_A, k, "A")
@@ -629,15 +630,9 @@ if __name__ == '__main__':
     print "Initialize AMF"
 
     # start training
-    training(AMF, dataset, args, epoch_start=1, epoch_end=1, time_stamp=time_stamp)
-    pred = []
-    for u in range(int(dataset.num_users * 0.75), dataset.num_users):
-        u_test = np.array([u] * dataset.num_items).reshape((dataset.num_items, 1))
-        i_test = np.array(range(dataset.num_items)).reshape((dataset.num_items, 1))
-        p = sess.run(AMF.output, feed_dict={AMF.user_input: u_test, AMF.item_input_pos: i_test})
-        p.append(pred)
+    pred = training(AMF, dataset, args, epoch_start=1, epoch_end=1, time_stamp=time_stamp)
     print("finish cal pred")
-    pred = np.array(pred)
+    pred = np.array(pred).reshape((1640, 34296))
     print(pred.shape)
     k = [50, 100, 150, 200, 250, 300]
     calc_recall(pred[:, :num_A], dense_A, k, "A")
