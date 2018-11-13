@@ -279,45 +279,54 @@ def training(model, dataset, args, epoch_start, epoch_end, time_stamp):  # saver
         # initialize the max_ndcg to memorize the best result
         max_ndcg = 0
         best_res = {}
+        user = list(range(int(dataset.num_users*0.75), dataset.num_users))
+        predict = []
+        for u in user:
+            u_test = np.array([u] * dataset.num_items).reshape((dataset.num_items, 1))
+            i_test = np.array(range(dataset.num_items)).reshape((dataset.num_items, 1))
+            feed_dict = {_model.user_input: u_test, _model.item_input_pos: i_test}
+            pred = _sess.run(_model.output, feed_dict)
+            predict.append(pred)
+        return predict
 
         # train by epoch
-        for epoch_count in range(epoch_start, epoch_end+1):
-
-            # initialize for training batches
-            batch_begin = time()
-            batches = shuffle(samples, args.batch_size, dataset, model)
-            batch_time = time() - batch_begin
-
-            # compute the accuracy before training
-            prev_batch = batches[0], batches[1], batches[3]
-            _, prev_acc = training_loss_acc(model, sess, prev_batch, output_adv=0)
-
-            # training the model
-            train_begin = time()
-            train_batches = training_batch(model, sess, batches, args.adver)
-            train_time = time() - train_begin
-
-            if epoch_count % args.verbose == 0:
-                _, ndcg, cur_res = output_evaluate(model, sess, dataset, train_batches, eval_feed_dicts,
-                                                   epoch_count, batch_time, train_time, prev_acc, output_adv=0)
-
-            # print and log the best result
-            if max_ndcg < ndcg:
-                max_ndcg = ndcg
-                best_res['result'] = cur_res
-                best_res['epoch'] = epoch_count
-
-            if model.epochs == epoch_count:
-                print "Epoch %d is the best epoch" % best_res['epoch']
-                for idx, (hr_k, ndcg_k, auc_k) in enumerate(np.swapaxes(best_res['result'], 0, 1)):
-                    res = "K = %d: HR = %.4f, NDCG = %.4f AUC = %.4f" % (idx + 1, hr_k, ndcg_k, auc_k)
-                    print res
-
-            # save the embedding weights
-            if args.ckpt > 0 and epoch_count % args.ckpt == 0:
-                saver_ckpt.save(sess, ckpt_save_path + 'weights', global_step=epoch_count)
-
-        saver_ckpt.save(sess, ckpt_save_path + 'weights', global_step=epoch_count)
+        # for epoch_count in range(epoch_start, epoch_end+1):
+        #
+        #     # initialize for training batches
+        #     batch_begin = time()
+        #     batches = shuffle(samples, args.batch_size, dataset, model)
+        #     batch_time = time() - batch_begin
+        #
+        #     # compute the accuracy before training
+        #     prev_batch = batches[0], batches[1], batches[3]
+        #     _, prev_acc = training_loss_acc(model, sess, prev_batch, output_adv=0)
+        #
+        #     # training the model
+        #     train_begin = time()
+        #     train_batches = training_batch(model, sess, batches, args.adver)
+        #     train_time = time() - train_begin
+        #
+        #     if epoch_count % args.verbose == 0:
+        #         _, ndcg, cur_res = output_evaluate(model, sess, dataset, train_batches, eval_feed_dicts,
+        #                                            epoch_count, batch_time, train_time, prev_acc, output_adv=0)
+        #
+        #     # print and log the best result
+        #     if max_ndcg < ndcg:
+        #         max_ndcg = ndcg
+        #         best_res['result'] = cur_res
+        #         best_res['epoch'] = epoch_count
+        #
+        #     if model.epochs == epoch_count:
+        #         print "Epoch %d is the best epoch" % best_res['epoch']
+        #         for idx, (hr_k, ndcg_k, auc_k) in enumerate(np.swapaxes(best_res['result'], 0, 1)):
+        #             res = "K = %d: HR = %.4f, NDCG = %.4f AUC = %.4f" % (idx + 1, hr_k, ndcg_k, auc_k)
+        #             print res
+        #
+        #     # save the embedding weights
+        #     if args.ckpt > 0 and epoch_count % args.ckpt == 0:
+        #         saver_ckpt.save(sess, ckpt_save_path + 'weights', global_step=epoch_count)
+        #
+        # saver_ckpt.save(sess, ckpt_save_path + 'weights', global_step=epoch_count)
 
 
 def output_evaluate(model, sess, dataset, train_batches, eval_feed_dicts, epoch_count, batch_time, train_time, prev_acc,
@@ -593,7 +602,7 @@ if __name__ == '__main__':
 
     # start training
     args.restore = True
-    training(MF_BPR, dataset, args, epoch_start=0, epoch_end=0, time_stamp=time_stamp)
+    pred = training(MF_BPR, dataset, args, epoch_start=0, epoch_end=0, time_stamp=time_stamp)
     dense_A = read_data("data/Health_Clothing/Health_user_product.txt")
     dense_B = read_data("data/Health_Clothing/Clothing_user_product.txt")
     dense_A = dense_A[int(dataset.num_users*0.75)]
@@ -601,7 +610,7 @@ if __name__ == '__main__':
     num_A = 16069
     num_B = 18226
 
-    pred = _eval(list(range(int(dataset.num_users*0.75), dataset.num_users)))
+
     print("finish cal pred")
     pred = np.array(pred)
     print(pred.shape)
