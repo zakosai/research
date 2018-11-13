@@ -490,6 +490,16 @@ def _eval_by_user(user):
 
     return hr, ndcg, auc
 
+def _eval(user):
+    predict = []
+    for u in user:
+        u_test = np.array([u] * dataset.num_items).reshape((dataset.num_items, 1))
+        i_test = np.array(range(dataset.num_items)).reshape((dataset.num_items, 1))
+        feed_dict = {_model.user_input: u_test, _model.item_input_pos: i_test}
+        pred = _sess.run(_model.output, feed_dict)
+        predict.append(pred)
+    return predict
+
 def init_logging(args, time_stamp):
     path = "Log/%s_%s/" % (strftime('%Y-%m-%d_%H', localtime()), args.task)
     if not os.path.exists(path):
@@ -584,7 +594,6 @@ if __name__ == '__main__':
     # start training
     args.restore = True
     training(MF_BPR, dataset, args, epoch_start=0, epoch_end=0, time_stamp=time_stamp)
-    sess = tf.Session()
     dense_A = read_data("data/Health_Clothing/Health_user_product.txt")
     dense_B = read_data("data/Health_Clothing/Clothing_user_product.txt")
     dense_A = dense_A[int(dataset.num_users*0.75)]
@@ -592,12 +601,7 @@ if __name__ == '__main__':
     num_A = 16069
     num_B = 18226
 
-    pred = []
-    for u in range(int(dataset.num_users*0.75), dataset.num_users):
-        u_test = np.array([u]*dataset.num_items).reshape((dataset.num_items, 1))
-        i_test = np.array(range(dataset.num_items)).reshape((dataset.num_items, 1))
-        p = sess.run(MF_BPR.output, feed_dict={MF_BPR.user_input:u_test, MF_BPR.item_input_pos:i_test})
-        p.append(pred)
+    pred = _eval(list(range(int(dataset.num_users*0.75), dataset.num_users)))
     print("finish cal pred")
     pred = np.array(pred)
     print(pred.shape)
