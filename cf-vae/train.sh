@@ -1,31 +1,21 @@
-stdbuf -oL python CCCFNET.py --A=Video --B=TV --k=50 |tee -a translation/Video_TV/CCCFNET.txt
-stdbuf -oL python CCCFNET.py --A=Drama --B=Comedy --k=50 |tee -a translation/Drama_Comedy/CCCFNET.txt
-stdbuf -oL python CCCFNET.py --A=Romance --B=Thriller --k=50 |tee -a translation/Romance_Thriller/CCCFNET.txt
-
-stdbuf -oL python adversarial_personalized_ranking/AMF.py --path=data/Health_Clothing/ --dataset=Health_Clothing \
---adv_epoch=1000 --epochs=2000 --eps=0.5 --reg_adv=1 --ckpt=1 --verbose=20 |tee -a translation/Health_Clothing/AMF.txt
-
-stdbuf -oL python adversarial_personalized_ranking/AMF.py --path=data/Video_TV/ --dataset=Video_TV \
---adv_epoch=1000 --epochs=2000 --eps=0.5 --reg_adv=1 --ckpt=1 --verbose=20 |tee -a translation/Video_TV/AMF.txt
-
-stdbuf -oL python adversarial_personalized_ranking/AMF.py --path=data/Drama_Comedy/ --dataset=Drama_Comedy \
---adv_epoch=1000 --epochs=2000 --eps=0.5 --reg_adv=1 --ckpt=1 --verbose=20 |tee -a translation/Drama_Comedy/AMF.txt
-
-stdbuf -oL python adversarial_personalized_ranking/AMF.py --path=data/Romance_Thriller/ --dataset=Romance_Thriller \
---adv_epoch=1000 --epochs=2000 --eps=0.5 --reg_adv=1 --ckpt=1 --verbose=20 |tee -a translation/Romance_Thriller/AMF.txt
-
-
-python train_dae.py --ckpt_folder=wae/Baby/8/ --data_dir=data2/Baby/ --zdim=100 \
---data_type=8 --type=text
-python train_cf_dae.py --model=0 --ckpt_folder=wae/Baby/8/ --data_dir=data2/Baby/ \
---iter=50 --data_type=8 --user_no=2792 --item_no=4897 --gridsearch=1 --zdim=100
-python wae.py --ckpt_folder=wae/Baby/8/ --data_dir=data2/Baby/ --zdim=100 \
---data_type=8 --type=text
-python train_cf_wae.py --model=0 --ckpt_folder=wae/Baby/8/ --data_dir=data2/Baby/ \
---iter=50 --data_type=8 --user_no=2792 --item_no=4897 --gridsearch=1 --zdim=100
+#stdbuf -oL python CCCFNET.py --A=Video --B=TV --k=50 |tee -a translation/Video_TV/CCCFNET.txt
+#stdbuf -oL python CCCFNET.py --A=Drama --B=Comedy --k=50 |tee -a translation/Drama_Comedy/CCCFNET.txt
+#stdbuf -oL python CCCFNET.py --A=Romance --B=Thriller --k=50 |tee -a translation/Romance_Thriller/CCCFNET.txt
+#
+#stdbuf -oL python adversarial_personalized_ranking/AMF.py --path=data/Health_Clothing/ --dataset=Health_Clothing \
+#--adv_epoch=1000 --epochs=2000 --eps=0.5 --reg_adv=1 --ckpt=1 --verbose=20 |tee -a translation/Health_Clothing/AMF.txt
+#
+#stdbuf -oL python adversarial_personalized_ranking/AMF.py --path=data/Video_TV/ --dataset=Video_TV \
+#--adv_epoch=1000 --epochs=2000 --eps=0.5 --reg_adv=1 --ckpt=1 --verbose=20 |tee -a translation/Video_TV/AMF.txt
+#
+#stdbuf -oL python adversarial_personalized_ranking/AMF.py --path=data/Drama_Comedy/ --dataset=Drama_Comedy \
+#--adv_epoch=1000 --epochs=2000 --eps=0.5 --reg_adv=1 --ckpt=1 --verbose=20 |tee -a translation/Drama_Comedy/AMF.txt
+#
+#stdbuf -oL python adversarial_personalized_ranking/AMF.py --path=data/Romance_Thriller/ --dataset=Romance_Thriller \
+#--adv_epoch=1000 --epochs=2000 --eps=0.5 --reg_adv=1 --ckpt=1 --verbose=20 |tee -a translation/Romance_Thriller/AMF.txt
 
 
-folders='Clothing Kindle Phone Video Pet Music Instrument Automotive Garden Electronics Books'
+folders='Clothing Video Pet Music Instrument Automotive Garden Electronics Books'
 rate="1 8"
 for f in $folders;
 do
