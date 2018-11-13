@@ -595,8 +595,8 @@ if __name__ == '__main__':
 
     pred = []
     for u in range(int(dataset.num_users*0.75), dataset.num_users):
-        u_test = [u]*dataset.num_items
-        i_test = list(range(dataset.num_items))
+        u_test = np.array([u]*dataset.num_items).reshape((dataset.num_items, 1))
+        i_test = np.array(range(dataset.num_items)).reshape((dataset.num_items, 1))
         p = sess.run(MF_BPR.output, feed_dict={MF_BPR.user_input:u_test, MF_BPR.item_input_pos:i_test})
         p.append(pred)
     print("finish cal pred")
@@ -620,8 +620,8 @@ if __name__ == '__main__':
     training(AMF, dataset, args, epoch_start=args.adv_epoch, epoch_end=args.epochs, time_stamp=time_stamp)
     pred = []
     for u in range(int(dataset.num_users * 0.75), dataset.num_users):
-        u_test = [u] * dataset.num_items
-        i_test = list(range(dataset.num_items))
+        u_test = np.array([u] * dataset.num_items).reshape((dataset.num_items, 1))
+        i_test = np.array(range(dataset.num_items)).reshape((dataset.num_items, 1))
         p = sess.run(AMF.output, feed_dict={AMF.user_input: u_test, AMF.item_input_pos: i_test})
         p.append(pred)
     print("finish cal pred")
