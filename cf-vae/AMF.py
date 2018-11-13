@@ -585,14 +585,14 @@ if __name__ == '__main__':
     saver_ckpt = tf.train.Saver({'embedding_P': MF_BPR.embedding_P, 'embedding_Q': MF_BPR.embedding_Q})
     # training(MF_BPR, dataset, args, epoch_start=0, epoch_end=args.adv_epoch-1, time_stamp=time_stamp)
     sess = tf.Session()
-    ckpt = "Pretrain/Health_Clothing/MF_BPR/embed_64/2018_11_08_23_38_44/"
+    ckpt = tf.train.get_checkpoint_state("Pretrain/Health_Clothing/MF_BPR/embed_64/2018_11_08_23_38_44/checkpoint")
     dense_A = read_data("data/Health_Clothing/Health_user_product.txt")
     dense_B = read_data("data/Health_Clothing/Clothing_user_product.txt")
     dense_A = dense_A[int(dataset.num_users*0.75)]
     dense_B = dense_B[int(dataset.num_users*0.75)]
     num_A = 16069
     num_B = 18226
-    saver_ckpt.restore(sess, ckpt)
+    saver_ckpt.restore(sess, ckpt.model_checkpoint_path)
 
     pred = []
     for u in range(int(dataset.num_users*0.75), dataset.num_users):
@@ -619,7 +619,8 @@ if __name__ == '__main__':
 
     # start training
     # training(AMF, dataset, args, epoch_start=args.adv_epoch, epoch_end=args.epochs, time_stamp=time_stamp)
-    ckpt = "Pretrain/Health_Clothing/APR/embed_64/2018_11_08_23_38_44/"
+    ckpt = tf.train.get_checkpoint_state("Pretrain/Health_Clothing/APR/embed_64/2018_11_08_23_38_44/checkpoint")
+    saver_ckpt.restore(sess, ckpt.model_checkpoint_path)
     pred = []
     for u in range(int(dataset.num_users * 0.75), dataset.num_users):
         u_test = [u] * dataset.num_items
