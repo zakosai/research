@@ -385,6 +385,7 @@ def load_rating(path, thred, test_size):
             l = [int(x) for x in a]
             if l[0] < thred:
                 l = [i for i in l if i < thred]
+                print(l)
                 dense_A.append(l)
             else:
                 l = [i-thred for i in l if i >= thred]
