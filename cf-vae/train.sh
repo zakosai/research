@@ -15,7 +15,7 @@
 #--adv_epoch=1000 --epochs=2000 --eps=0.5 --reg_adv=1 --ckpt=1 --verbose=20 |tee -a translation/Romance_Thriller/AMF.txt
 
 
-folders='Clothing Video Pet Music Instrument Automotive Garden Electronics Books'
+folders='Video Pet Music Instrument Automotive Garden Electronics Books'
 rate="1 8"
 for f in $folders;
 do
