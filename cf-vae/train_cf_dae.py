@@ -65,7 +65,7 @@ def load_rating(path):
     if a == []:
       l = []
     else:
-      l = [int(x) for x in a]
+      l = [int(x) for x in a[1:]]
     arr.append(l)
   return arr
 
