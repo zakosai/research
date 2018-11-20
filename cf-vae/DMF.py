@@ -205,6 +205,7 @@ def main():
             recall, _, _ = calc_recall(y_, dense_user[:100], dense_test[:100])
             print("recall val %f"%recall)
             if recall > max_recall:
+                max_recall = recall
 
                 saver.save(sess, os.path.join(checkpoint_dir, 'CCFNET-model'), i)
                 z_u = sess.run([model.z_u], feed_dict={model.user: train_user})
