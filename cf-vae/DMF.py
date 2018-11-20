@@ -165,6 +165,7 @@ def main():
     dense_user, dense_test, train_user, train_item, num_u, num_p, rating = create_dataset(dataset, type)
     train_user = np.array(train_user)
     train_item = np.array(train_item)
+    rating = np.array(rating)
 
     z_dim = 50
 
