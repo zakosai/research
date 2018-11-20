@@ -287,7 +287,7 @@ def main():
                 print("Loss test: %f, recall: %f, hit: %f, ndcg: %f" % (loss_test, recall, hit, ndcg))
             model.train = True
         if i%100 == 0:
-            model.learning_rate /= 10
+            model.learning_rate /= 2
             print("decrease lr to %f"%model.learning_rate)
 
 
