@@ -286,7 +286,7 @@ def main():
                 recall, hit, ndcg = calc_recall(y, dense_train, dense_test)
                 print("Loss test: %f, recall: %f, hit: %f, ndcg: %f" % (loss_test, recall, hit, ndcg))
             model.train = True
-        if i%100 == 0:
+        if i%100 == 0 and model.learning_rate > 1e-6:
             model.learning_rate /= 2
             print("decrease lr to %f"%model.learning_rate)
 
