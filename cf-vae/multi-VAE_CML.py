@@ -150,7 +150,6 @@ def calc_recall(pred, train, test, k=10, type=None):
     for i in range(len(pred_ab)):
         p = pred_ab[i, :k+len(train[i])]
         p = p.tolist()
-        print(p)
         for u in train[i]:
             if u in p:
                 p.remove(u)
