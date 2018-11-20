@@ -50,8 +50,8 @@ def create_dataset(dataset="Health", type=1):
 
     num_p = len(dense_item)
     num_u = len(dense_user)
-    train_user = one_hot_vector(dense_item, num_p)
-    train_item = one_hot_vector(dense_user, num_u)
+    train_user = one_hot_vector(dense_user, num_p)
+    train_item = one_hot_vector(dense_item, num_u)
 
     dense_test = read_data("data2/%s/cf-test-%dp-users.dat" % (dataset, type))
 
