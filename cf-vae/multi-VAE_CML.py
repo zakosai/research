@@ -250,7 +250,7 @@ def main():
         train_cost = 0
         for j in range(int(num_u/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
-            x = num_u[list_idx]
+            x = train[list_idx]
 
             feed = {model.x: x}
 
