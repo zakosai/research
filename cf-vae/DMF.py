@@ -190,7 +190,6 @@ def main():
                     model.rating_A:r}
 
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
-        print("Loss last batch: loss %f" % (loss))
 
         if i%10 == 0:
             # model.train = False
