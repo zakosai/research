@@ -172,7 +172,7 @@ def main():
 
 
 
-    model = CCCFNET(num_u, num_p)
+    model = CCCFNET(num_p, num_u)
     model.build_model()
 
     sess = tf.Session()
