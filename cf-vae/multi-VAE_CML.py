@@ -289,7 +289,7 @@ def main():
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Tool",
                    help='dataset name')
-parser.add_argument('--type',  type=str, default='1',
+parser.add_argument('--type',  type=int, default=1,
                    help='1p or 8p')
 parser.add_argument('--num_p', type=int, default=7780, help='number of product')
 
