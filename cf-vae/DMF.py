@@ -9,7 +9,7 @@ import os
 class CCCFNET(object):
     def __init__(self, user_dim, item_dim):
         self.user_dim = user_dim
-        self.item_A_dim = item_dim
+        self.item_dim = item_dim
         self.activation = tf.nn.relu
         self.regular = l2_regularizer(scale=0.1)
         self.layer = [200, 50]
