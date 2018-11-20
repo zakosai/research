@@ -268,7 +268,7 @@ def main():
                                               feed_dict={model.x:user_val})
 
             print(len(y_val[0]))
-            recall = calc_recall(y_val, dense_test[:100], dense_val)
+            recall = calc_recall(y_val, dense_train[:100], dense_val)
             print("Loss val: %f, recall %f" % (loss_val, recall))
             if recall > max_recall:
                 max_recall = recall
