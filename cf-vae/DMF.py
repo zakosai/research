@@ -12,7 +12,8 @@ class CCCFNET(object):
         self.item_dim = item_dim
         self.activation = tf.nn.relu
         self.regular = l2_regularizer(scale=0.1)
-        self.layer = [200, 50]
+        self.u_layer = [1024, 64]
+        self.i_layer = [512, 64]
         self.learning_rate = 1e-4
 
     def encode(self, x, dim, scope):
@@ -26,8 +27,8 @@ class CCCFNET(object):
         self.item_A = tf.placeholder(tf.float32, [None, self.item_dim], name='item_input')
         self.rating_A = tf.placeholder(tf.float32, [None], name="rating")
 
-        z_u = self.encode(self.user, self.layer, "user")
-        z_A = self.encode(self.item_A, self.layer, "item")
+        z_u = self.encode(self.user, self.u_layer, "user")
+        z_A = self.encode(self.item_A, self.i_layer, "item")
         norm_user_output = tf.sqrt(tf.reduce_sum(tf.square(z_u), axis=1))
         norm_item_output = tf.sqrt(tf.reduce_sum(tf.square(z_A), axis=1))
 
@@ -83,7 +84,7 @@ def read_data(filename):
         arr.append(l)
     return arr
 
-def calc_recall(pred, train, test, k=1000, type=None):
+def calc_recall(pred, train, test, k=10, type=None):
     pred_ab = np.argsort(-pred)
     recall = []
     ndcg = []
@@ -211,7 +212,7 @@ def main():
                 y_ = np.dot(z_u, z.T)
 
                 recall, hit, ndcg = calc_recall(y_, dense_user, dense_test)
-                print("Test: recall: %f, hit: %f, ndcg: %f"%(y_, dense_user, dense_test))
+                print("Test: recall: %f, hit: %f, ndcg: %f"%(recall, hit, ndcg))
 
 
 
