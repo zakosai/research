@@ -176,17 +176,17 @@ def main():
     saver = tf.train.Saver(max_to_keep=20)
     max_recall = 0
 
-    for i in range(0, iter):
+    for i in range(1, iter):
         shuffle_idx = np.random.permutation(len(rating))
         train_cost = 0
         for j in range(int(len(rating) / batch_size)):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
             u = train_user[rating[list_idx, 0]]
-            i = train_item[rating[list_idx, 1]]
+            v = train_item[rating[list_idx, 1]]
             r = rating[list_idx, 2]
 
             feed = {model.user: u,
-                    model.item_A: i,
+                    model.item_A: v,
                     model.rating_A:r}
 
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
