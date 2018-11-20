@@ -174,7 +174,7 @@ def calc_recall(pred, train, test, k=10, type=None):
         else:
             ndcg.append(float(actual) / best)
 
-    print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
+    # print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
 
 
     return np.mean(np.array(recall))
@@ -267,18 +267,18 @@ def main():
             loss_val, y_val = sess.run([model.loss, model.x_recon],
                                               feed_dict={model.x:user_val})
 
-            print(len(y_val[0]))
             recall = calc_recall(y_val, dense_train[:100], dense_val)
             print("Loss val: %f, recall %f" % (loss_val, recall))
             if recall > max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'multi-VAE-model'), i)
                 loss_test, y= sess.run([model.loss, model.x_recon], feed_dict={model.x: train})
-                print("Loss test: %f" % (loss_test))
+
 
                 # y_ab = y_ab[test_B]
                 # y_ba = y_ba[test_A]
-                calc_recall(y, dense_train, dense_test)
+                recall = calc_recall(y, dense_train, dense_test)
+                print("Loss test: %f, recall: %f" % (loss_test, recall))
             model.train = True
         if i%100 == 0:
             model.learning_rate /= 2
