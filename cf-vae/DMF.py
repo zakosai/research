@@ -200,7 +200,6 @@ def main():
             # print(z_u_A.shape, z_u_B.shape, z_A.shape, z_B.shape)
             z = np.array(z).reshape((num_p, 50))
             z_u = np.array(z_u).reshape((100, 50))
-            print(z.shape, z_u.shape)
             y_ = np.dot(z_u, z.T)
             recall, _, _ = calc_recall(y_, dense_user[:100], dense_test[:100])
             if recall > max_recall:
