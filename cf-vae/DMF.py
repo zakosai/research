@@ -12,8 +12,8 @@ class CCCFNET(object):
         self.item_dim = item_dim
         self.activation = tf.nn.relu
         self.regular = l2_regularizer(scale=0.1)
-        self.u_layer = [1024, 64]
-        self.i_layer = [512, 64]
+        self.u_layer = [1024, 50]
+        self.i_layer = [512, 50]
         self.learning_rate = 1e-4
 
     def encode(self, x, dim, scope):
