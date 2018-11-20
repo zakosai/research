@@ -35,7 +35,7 @@ class CCCFNET(object):
         predict = tf.reduce_sum(tf.multiply(z_u, z_A), axis=-1)/ (norm_item_output* norm_user_output)
         self.predict = tf.maximum(1e-6, predict)
 
-        self.loss = tf.reduce_sum(binary_crossentropy(self.rating_A, self.predict)) + \
+        self.loss = - tf.reduce_sum(self.rating_A * tf.log(self.predict) + (1-self.rating_A)*tf.log(1-self.predict)) + \
                     0.1 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
@@ -168,8 +168,6 @@ def main():
     rating = np.array(rating)
 
     z_dim = 50
-
-
 
 
     model = CCCFNET(num_p, num_u)
