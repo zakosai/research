@@ -58,7 +58,7 @@ def create_dataset(dataset="Health", type=1):
     rating = []
     for user_id, user in enumerate(dense_user):
         neg = set(range(num_p)) - set(user)
-        neg = np.random.permutation(neg)
+        neg = np.random.permutation(list(neg))
         for j, item_id in enumerate(user):
             rating.append([user_id, item_id, 1])
             rating.append([user_id, neg[j], 0])
