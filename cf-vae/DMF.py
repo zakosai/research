@@ -199,16 +199,16 @@ def main():
             z = sess.run([model.z_A], feed_dict={model.item_A:train_item})
             z_u = sess.run([model.z_u], feed_dict={model.user:train_user[:100]})
             # print(z_u_A.shape, z_u_B.shape, z_A.shape, z_B.shape)
-            z = np.array(z)
-            z_u = np.array(z_u)
+            z = np.array(z).reshape((num_p, 50))
+            z_u = np.array(z_u).reshape((100, 50))
             print(z.shape, z_u.shape)
             y_ = np.dot(z_u, z.T)
-            y_ = y_.reshape((y_.shape[1], y_.shape[2]))
             recall, _, _ = calc_recall(y_, dense_user[:100], dense_test[:100])
             if recall > max_recall:
 
                 saver.save(sess, os.path.join(checkpoint_dir, 'CCFNET-model'), i)
                 z_u = sess.run([model.z_u], feed_dict={model.user: train_user})
+                z_u = np.array(z_u).reshape((num_u, 50))
                 y_ = np.dot(z_u, z.T)
 
                 recall, hit, ndcg = calc_recall(y_, dense_user, dense_test)
