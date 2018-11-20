@@ -163,6 +163,8 @@ def main():
     share = 200
     checkpoint_dir = "%s/%d/"%(dataset,type)
     dense_user, dense_test, train_user, train_item, num_u, num_p, rating = create_dataset(dataset, type)
+    train_user = np.array(train_user)
+    train_item = np.array(train_item)
 
     z_dim = 50
 
