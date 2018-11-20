@@ -111,11 +111,15 @@ def create_dataset(dataset="Tool", type=1, num_p = 7780):
     return train, dense_train, dense_test
 
 def read_data(filename):
-    f = list(open(filename).readlines())
-    f = [i.split(" ") for i in f]
-    f = [[int(j) for j in i] for i in f]
-    f = [i[1:] for i in f]
-    return f
+    arr = []
+    for line in open(filename):
+        a = line.strip().split()
+        if a == []:
+            l = []
+        else:
+            l = [int(x) for x in a[1:]]
+        arr.append(l)
+    return arr
 
 def read_data2(filename):
     data = list(open(filename).readlines())
