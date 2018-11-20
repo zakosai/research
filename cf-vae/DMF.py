@@ -202,6 +202,7 @@ def main():
             z_u = np.array(z_u).reshape((100, 50))
             y_ = np.dot(z_u, z.T)
             recall, _, _ = calc_recall(y_, dense_user[:100], dense_test[:100])
+            print("recall val %f"%recall)
             if recall > max_recall:
 
                 saver.save(sess, os.path.join(checkpoint_dir, 'CCFNET-model'), i)
