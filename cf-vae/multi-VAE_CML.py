@@ -147,6 +147,7 @@ def calc_recall(pred, train, test, k=10, type=None):
     pred_ab = np.argsort(-pred)
     recall = []
     ndcg = []
+    hit = 0
     for i in range(len(pred_ab)):
         p = pred_ab[i, :k+len(train[i])]
         p = p.tolist()
@@ -159,6 +160,11 @@ def calc_recall(pred, train, test, k=10, type=None):
         #recall
         recall_val = float(len(hits)) / len(test[i])
         recall.append(recall_val)
+
+        #hit
+        hits_num = len(hits)
+        if hits_num > 0:
+            hit += 1
 
         #ncdg
         score = []
@@ -177,7 +183,7 @@ def calc_recall(pred, train, test, k=10, type=None):
     # print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
 
 
-    return np.mean(np.array(recall))
+    return np.mean(np.array(recall)), float(hit)/len(pred_ab), np.mean(ndcg)
 
 def dcg_score(y_true, y_score, k=50):
     """Discounted cumulative gain (DCG) at rank K.
@@ -267,7 +273,7 @@ def main():
             loss_val, y_val = sess.run([model.loss, model.x_recon],
                                               feed_dict={model.x:user_val})
 
-            recall = calc_recall(y_val, dense_train[:100], dense_val)
+            recall, _, _ = calc_recall(y_val, dense_train[:100], dense_val)
             print("Loss val: %f, recall %f" % (loss_val, recall))
             if recall > max_recall:
                 max_recall = recall
@@ -277,11 +283,11 @@ def main():
 
                 # y_ab = y_ab[test_B]
                 # y_ba = y_ba[test_A]
-                recall = calc_recall(y, dense_train, dense_test)
-                print("Loss test: %f, recall: %f" % (loss_test, recall))
+                recall, hit, ndcg = calc_recall(y, dense_train, dense_test)
+                print("Loss test: %f, recall: %f, hit: %f, ndcg: %f" % (loss_test, recall, hit, ndcg))
             model.train = True
         if i%100 == 0:
-            model.learning_rate /= 2
+            model.learning_rate /= 10
             print("decrease lr to %f"%model.learning_rate)
 
 
