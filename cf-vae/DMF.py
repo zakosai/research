@@ -83,7 +83,7 @@ def read_data(filename):
         arr.append(l)
     return arr
 
-def calc_recall(pred, train, test, k=10, type=None):
+def calc_recall(pred, train, test, k=1000, type=None):
     pred_ab = np.argsort(-pred)
     recall = []
     ndcg = []
