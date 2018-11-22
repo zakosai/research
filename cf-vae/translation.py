@@ -58,7 +58,8 @@ class Translation:
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
                 # y = maxout(x_, encode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.2)
+                # x_ = tf.nn.leaky_relu(x_, alpha=0.2)
+                x_ = tf.nn.sigmoid(x_)
 
                 print(x_.shape)
         return x_
@@ -87,7 +88,8 @@ class Translation:
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
                 # y = maxout(x_, decode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.2)
+                # x_ = tf.nn.leaky_relu(x_, alpha=0.2)
+                x_ = tf.nn.sigmoid(x_)
 
         return x_
 
@@ -112,7 +114,8 @@ class Translation:
                                      weights_regularizer=self.regularizer)
                 # y = maxout(x_, dim[i])
                 # x_ = tf.reshape(y, x_.shape)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.2)
+                # x_ = tf.nn.leaky_relu(x_, alpha=0.2)
+                x_ = tf.nn.sigmoid(x_)
 
         return x_
 
@@ -140,7 +143,6 @@ class Translation:
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
     def loss_reconstruct(self, x, x_recon):
-        x_recon = tf.nn.sigmoid(x_recon)
         return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
         # return tf.reduce_mean(tf.abs(x - x_recon))
         # return tf.reduce_mean(tf.reduce_sum((x-x_recon)**2, axis=1))
