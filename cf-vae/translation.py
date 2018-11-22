@@ -31,7 +31,7 @@ class Translation:
         self.lambda_3 = lambda_3
         self.lambda_4 = lambda_4
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.tanh
+        self.active_function = tf.nn.relu
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
@@ -51,7 +51,7 @@ class Translation:
         # x_ = tf.reshape(x_, (-1, 10000))
 
         # if self.train:
-        x_ = tf.nn.dropout(x_, 0.7)
+        # x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
