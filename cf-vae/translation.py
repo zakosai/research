@@ -419,11 +419,11 @@ def main():
 
     print(k)
 
-    encoding_dim_A = [600]
-    encoding_dim_B = [600]
-    share_dim = [200]
-    decoding_dim_A = [600, num_A]
-    decoding_dim_B = [600, num_B]
+    encoding_dim_A = [600, 200]
+    encoding_dim_B = [600, 200]
+    share_dim = []
+    decoding_dim_A = [200, 600, num_A]
+    decoding_dim_B = [200, 600, num_B]
 
 
     assert len(user_A) == len(user_B)
