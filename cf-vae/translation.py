@@ -487,10 +487,10 @@ def main():
                 _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
                                                         model.loss_CC], feed_dict=feed)
 
-                # sess.run([model.train_op_dis_A],feed_dict=feed)
-                # # _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen_B, model.loss_gen, model.loss_VAE,
-                # #                                            model.loss_CC], feed_dict=feed)
-                # sess.run([model.train_op_dis_B], feed_dict=feed)
+                sess.run([model.train_op_dis_A],feed_dict=feed)
+                # _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen_B, model.loss_gen, model.loss_VAE,
+                #                                            model.loss_CC], feed_dict=feed)
+                sess.run([model.train_op_dis_B], feed_dict=feed)
                 loss_dis = 0
             # print(adv_AA, adv_AB)
             # _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
