@@ -31,7 +31,7 @@ class Translation:
         self.lambda_3 = lambda_3
         self.lambda_4 = lambda_4
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.tanh
+        self.active_function = tf.nn.relu
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
@@ -241,7 +241,7 @@ class Translation:
         #                 self.loss_generator(y_BA) + self.loss_reconstruct(x_A, y_BA) + self.loss_reconstruct(x_B, y_AB)
         self.loss_gen = self.loss_VAE + 0.1 * tf.losses.get_regularization_loss() + self.loss_CC + \
                         self.loss_generator(y_AB) + self.loss_generator(y_ABA) + self.loss_generator(y_BAB) + \
-                      self.loss_generator(y_BA) + self.loss_reconstruct(x_A, y_BA) + self.loss_reconstruct(x_B, y_AB)
+                      self.loss_generator(y_BA) 
         loss_gen_A = loss_VAE_A + loss_CC_A + tf.losses.get_regularization_loss()
         loss_gen_B = loss_VAE_B + loss_CC_B + tf.losses.get_regularization_loss()
 
