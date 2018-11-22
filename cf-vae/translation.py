@@ -239,9 +239,9 @@ class Translation:
         # self.loss_gen =  loss_CC_A + loss_CC_B + 0.1 * tf.losses.get_regularization_loss() +\
         #                 self.loss_generator(y_AB) + self.loss_generator(y_ABA) + self.loss_generator(y_BAB) +\
         #                 self.loss_generator(y_BA) + self.loss_reconstruct(x_A, y_BA) + self.loss_reconstruct(x_B, y_AB)
-        self.loss_gen =  self.loss_VAE + 0.1 * tf.losses.get_regularization_loss() 
-                      #   self.loss_generator(y_AB) + self.loss_generator(y_ABA) + self.loss_generator(y_BAB) + \
-                      # self.loss_generator(y_BA) + self.loss_reconstruct(x_A, y_BA) + self.loss_reconstruct(x_B, y_AB)
+        self.loss_gen =  self.loss_VAE + 0.1 * tf.losses.get_regularization_loss() + \
+                        self.loss_generator(y_AB) + self.loss_generator(y_ABA) + self.loss_generator(y_BAB) + \
+                      self.loss_generator(y_BA) + self.loss_reconstruct(x_A, y_BA) + self.loss_reconstruct(x_B, y_AB)
         loss_gen_A = loss_VAE_A + loss_CC_A + tf.losses.get_regularization_loss()
         loss_gen_B = loss_VAE_B + loss_CC_B + tf.losses.get_regularization_loss()
 
@@ -490,10 +490,10 @@ def main():
                 _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
                                                         model.loss_CC], feed_dict=feed)
 
-                # sess.run([model.train_op_dis_A],feed_dict=feed)
-                # # _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen_B, model.loss_gen, model.loss_VAE,
-                # #                                            model.loss_CC], feed_dict=feed)
-                # sess.run([model.train_op_dis_B], feed_dict=feed)
+                sess.run([model.train_op_dis_A],feed_dict=feed)
+                # _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen_B, model.loss_gen, model.loss_VAE,
+                #                                            model.loss_CC], feed_dict=feed)
+                sess.run([model.train_op_dis_B], feed_dict=feed)
                 loss_dis = 0
             # print(adv_AA, adv_AB)
             # _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
