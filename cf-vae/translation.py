@@ -59,7 +59,7 @@ class Translation:
                 # y = maxout(x_, encode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
                 # x_ = tf.nn.leaky_relu(x_, alpha=0.2)
-                x_ = tf.nn.sigmoid(x_)
+                x_ = tf.nn.tanh(x_)
 
                 print(x_.shape)
         return x_
@@ -89,7 +89,7 @@ class Translation:
                 # y = maxout(x_, decode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
                 # x_ = tf.nn.leaky_relu(x_, alpha=0.2)
-                x_ = tf.nn.sigmoid(x_)
+                x_ = tf.nn.tanh(x_)
 
         return x_
 
@@ -115,7 +115,7 @@ class Translation:
                 # y = maxout(x_, dim[i])
                 # x_ = tf.reshape(y, x_.shape)
                 # x_ = tf.nn.leaky_relu(x_, alpha=0.2)
-                x_ = tf.nn.sigmoid(x_)
+                x_ = tf.nn.tanh(x_)
 
         return x_
 
