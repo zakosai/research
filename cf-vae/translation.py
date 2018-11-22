@@ -437,15 +437,15 @@ def main():
 
     user_A_val = user_A[train_size:train_size+val_size]
     user_B_val = user_B[train_size:train_size+val_size]
-    # user_A_test = user_A[train_size+val_size:]
-    # user_B_test = user_B[train_size+val_size:]
-    #
-    # dense_A_test = dense_A[(train_size + val_size):]
-    # dense_B_test = dense_B[(train_size + val_size):]
-    dense_A_test, dense_B_test = load_rating("data/%s_%s/cf-test-70p-users.dat"%(A, B), num_A, train_size+val_size)
-    user_A_test, user_B_test = load_rating("data/%s_%s/cf-train-70p-users.dat"%(A, B), num_A, train_size+val_size)
-    user_A_test = one_hot_vector(user_A_test, num_A)
-    user_B_test = one_hot_vector(user_B_test, num_B)
+    user_A_test = user_A[train_size+val_size:]
+    user_B_test = user_B[train_size+val_size:]
+
+    dense_A_test = dense_A[(train_size + val_size):]
+    dense_B_test = dense_B[(train_size + val_size):]
+    # dense_A_test, dense_B_test = load_rating("data/%s_%s/cf-test-70p-users.dat"%(A, B), num_A, train_size+val_size)
+    # user_A_test, user_B_test = load_rating("data/%s_%s/cf-train-70p-users.dat"%(A, B), num_A, train_size+val_size)
+    # user_A_test = one_hot_vector(user_A_test, num_A)
+    # user_B_test = one_hot_vector(user_B_test, num_B)
 
     # dense_A_test = np.array(dense_A)[test_A]
     # dense_B_test = np.array(dense_B)[test_B]
