@@ -239,9 +239,9 @@ class Translation:
         # self.loss_gen =  loss_CC_A + loss_CC_B + 0.1 * tf.losses.get_regularization_loss() +\
         #                 self.loss_generator(y_AB) + self.loss_generator(y_ABA) + self.loss_generator(y_BAB) +\
         #                 self.loss_generator(y_BA) + self.loss_reconstruct(x_A, y_BA) + self.loss_reconstruct(x_B, y_AB)
-        self.loss_gen =  0.1 * tf.losses.get_regularization_loss() + self.loss_CC + \
-                        self.loss_generator(y_AB) + self.loss_generator(y_ABA) + self.loss_generator(y_BAB) + \
-                      self.loss_generator(y_BA) + self.loss_reconstruct(x_A, y_BA) + self.loss_reconstruct(x_B, y_AB)
+        self.loss_gen =  0.1 * tf.losses.get_regularization_loss() + self.loss_CC 
+                      #   self.loss_generator(y_AB) + self.loss_generator(y_ABA) + self.loss_generator(y_BAB) + \
+                      # self.loss_generator(y_BA) + self.loss_reconstruct(x_A, y_BA) + self.loss_reconstruct(x_B, y_AB)
         loss_gen_A = loss_VAE_A + loss_CC_A + tf.losses.get_regularization_loss()
         loss_gen_B = loss_VAE_B + loss_CC_B + tf.losses.get_regularization_loss()
 
@@ -490,10 +490,10 @@ def main():
                 _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
                                                         model.loss_CC], feed_dict=feed)
 
-                sess.run([model.train_op_dis_A],feed_dict=feed)
-                # _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen_B, model.loss_gen, model.loss_VAE,
-                #                                            model.loss_CC], feed_dict=feed)
-                sess.run([model.train_op_dis_B], feed_dict=feed)
+                # sess.run([model.train_op_dis_A],feed_dict=feed)
+                # # _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen_B, model.loss_gen, model.loss_VAE,
+                # #                                            model.loss_CC], feed_dict=feed)
+                # sess.run([model.train_op_dis_B], feed_dict=feed)
                 loss_dis = 0
             # print(adv_AA, adv_AB)
             # _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
@@ -519,15 +519,13 @@ def main():
             if recall > max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
-                # loss_test_a, loss_test_b, y_ab, y_ba = sess.run(
-                #     [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
-                #  feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
-                # print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
+                loss_test_a, loss_test_b, y_ab, y_ba = sess.run(
+                    [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
+                 feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
+                print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
 
                 # y_ab = y_ab[test_B]
                 # y_ba = y_ba[test_A]
-                y_ba = sess.run(model.y_AA, feed_dict={model.x_A:user_A_test})
-                y_ab = sess.run(model.y_BB, feed_dict={model.x_B:user_B_test})
 
                 calc_recall(y_ba, dense_A_test, k, type="A")
                 calc_recall(y_ab, dense_B_test, k, type="B")
