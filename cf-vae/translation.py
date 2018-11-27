@@ -484,13 +484,13 @@ def main():
 
             if i <50:
                 _, loss_vae = sess.run([model.train_op_VAE_A, model.loss_VAE], feed_dict=feed)
-                # _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
-                loss_gen = loss_dis = loss_cc = 0
-            elif i>=50 and i < 100:
                 _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
                 loss_gen = loss_dis = loss_cc = 0
+            # elif i>=50 and i < 100:
+            #     _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
+            #     loss_gen = loss_dis = loss_cc = 0
             else:
-                model.freeze = False
+                # model.freeze = False
                 _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
                                                         model.loss_CC], feed_dict=feed)
 
