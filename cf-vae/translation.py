@@ -237,7 +237,7 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen = self.loss_VAE+ loss_CC_A + loss_CC_B + 0.1 * tf.losses.get_regularization_loss() +\
+        self.loss_gen = loss_CC_A + loss_CC_B + 0.1 * tf.losses.get_regularization_loss() +\
                         self.loss_generator(y_AB) + self.loss_generator(y_ABA) + self.loss_generator(y_BAB) +\
                         self.loss_generator(y_BA) + self.loss_reconstruct(x_A, y_BA) + self.loss_reconstruct(x_B, y_AB)
 
@@ -442,15 +442,7 @@ def main():
 
     dense_A_test = dense_A[(train_size + val_size):]
     dense_B_test = dense_B[(train_size + val_size):]
-    # dense_A_test, dense_B_test = load_rating("data/%s_%s/cf-test-70p-users.dat"%(A, B), num_A, train_size+val_size)
-    # user_A_test, user_B_test = load_rating("data/%s_%s/cf-train-70p-users.dat"%(A, B), num_A, train_size+val_size)
-    # user_A_test = one_hot_vector(user_A_test, num_A)
-    # user_B_test = one_hot_vector(user_B_test, num_B)
 
-    # dense_A_test = np.array(dense_A)[test_A]
-    # dense_B_test = np.array(dense_B)[test_B]
-    # test_A = [t - train_size - val_size for t in test_A]
-    # test_B = [t - train_size - val_size for t in test_B]
 
     model = Translation(batch_size, num_A, num_B, encoding_dim_A, decoding_dim_A, encoding_dim_B,
                         decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-3, lambda_2=1,
