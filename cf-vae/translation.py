@@ -58,8 +58,8 @@ class Translation:
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
                 # y = maxout(x_, encode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
-                # x_ = tf.nn.leaky_relu(x_, alpha=0.2)
-                x_ = tf.nn.tanh(x_)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.2)
+                # x_ = tf.nn.tanh(x_)
 
                 print(x_.shape)
         return x_
@@ -88,8 +88,8 @@ class Translation:
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
                 # y = maxout(x_, decode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
-                # x_ = tf.nn.leaky_relu(x_, alpha=0.2)
-                x_ = tf.nn.tanh(x_)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.2)
+                # x_ = tf.nn.tanh(x_)
 
         return x_
 
@@ -114,8 +114,8 @@ class Translation:
                                      weights_regularizer=self.regularizer)
                 # y = maxout(x_, dim[i])
                 # x_ = tf.reshape(y, x_.shape)
-                # x_ = tf.nn.leaky_relu(x_, alpha=0.2)
-                x_ = tf.nn.tanh(x_)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.2)
+                # x_ = tf.nn.tanh(x_)
 
         return x_
 
@@ -144,16 +144,17 @@ class Translation:
 
     def loss_reconstruct(self, x, x_recon):
         # return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
-        return tf.reduce_mean(tf.abs(x - x_recon))
+        # return tf.reduce_mean(tf.abs(x - x_recon))
         # return tf.reduce_mean(tf.reduce_sum((x-x_recon)**2, axis=1))
         # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_recon, labels=x))
 
-        # log_softmax_var = tf.nn.log_softmax(x_recon)
-        #
-        # neg_ll = -tf.reduce_mean(tf.reduce_sum(
-        #     log_softmax_var * x,
-        #     axis=-1))
-        # return neg_ll
+        log_softmax_var = tf.nn.log_softmax(x_recon)
+        ng_log_softmax_var = tf.nn.log_softmax(1-x_recon)
+
+        neg_ll = -tf.reduce_mean(tf.reduce_sum(
+            log_softmax_var * x + (1-x)*ng_log_softmax_var,
+            axis=-1))
+        return neg_ll
 
 
     def loss_recsys(self, pred, label):
