@@ -51,7 +51,7 @@ class Translation:
         # x_ = tf.reshape(x_, (-1, 10000))
 
         # if self.train:
-        x_ = tf.nn.dropout(x_, 0.7)
+        # x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
@@ -482,12 +482,12 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            if i <20:
+            if i <50:
                 _, loss_vae = sess.run([model.train_op_VAE_A, model.loss_VAE], feed_dict=feed)
                 _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
                 loss_gen = loss_dis = loss_cc = 0
-            # elif i>=50 and i < 100:
-            #     _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
+            elif i>=50 and i < 100:
+                _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
                 loss_gen = loss_dis = loss_cc = 0
             else:
                 model.freeze = False
@@ -536,7 +536,7 @@ def main():
 
             model.train = True
         if i%100 == 0:
-            model.learning_rate /= 10
+            model.learning_rate /= 2
             print("decrease lr to %f"%model.learning_rate)
 
             # pred = np.array(y_ab).flatten()
