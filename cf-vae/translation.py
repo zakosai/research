@@ -51,7 +51,7 @@ class Translation:
         # x_ = tf.reshape(x_, (-1, 10000))
 
         # if self.train:
-        # x_ = tf.nn.dropout(x_, 0.7)
+        x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
@@ -81,7 +81,7 @@ class Translation:
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
         # if self.train:
-        # x_ = tf.nn.dropout(x_, 0.7)
+        x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
@@ -98,7 +98,7 @@ class Translation:
 
         with tf.variable_scope(scope, reuse=reuse):
             # if self.train:
-            # x_ = tf.nn.dropout(x_, 0.7)
+            x_ = tf.nn.dropout(x_, 0.7)
             for i in range(len(adv_dim)-1):
                 x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
             x_ = fully_connected(x_, adv_dim[-1], scope="adv_last")
@@ -107,7 +107,7 @@ class Translation:
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
         # if self.train:
-        # x_ = tf.nn.dropout(x_, 0.7)
+        x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i],  scope="share_%d"%i,
@@ -228,10 +228,7 @@ class Translation:
         loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA) + \
                     self.lambda_4 * self.loss_reconstruct(x_A,y_ABA)
         loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB) + self.lambda_4 * self.loss_reconstruct(x_B,y_BAB)
-        # loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_AAB, z_sigma_AAB) + \
-        #             self.lambda_4 * self.loss_reconstruct(x_B, y_AAB)
-        # loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_BBA, z_sigma_BBA) + self.lambda_4 * self.loss_reconstruct(x_A,
-        #                                                                                                         y_BBA)
+
 
         self.loss_CC = loss_CC_A + loss_CC_B
 
@@ -243,11 +240,7 @@ class Translation:
         self.loss_gen =  loss_CC_A + loss_CC_B + 0.1 * tf.losses.get_regularization_loss() +\
                         self.loss_generator(y_AB) + self.loss_generator(y_ABA) + self.loss_generator(y_BAB) +\
                         self.loss_generator(y_BA) + self.loss_reconstruct(x_A, y_BA) + self.loss_reconstruct(x_B, y_AB)
-        # self.loss_gen = self.loss_VAE + 0.1 * tf.losses.get_regularization_loss() + self.loss_CC +\
-        #                 self.loss_generator(y_AB) + self.loss_generator(y_ABA) + self.loss_generator(y_BAB) + \
-        #               self.loss_generator(y_BA) + self.loss_reconstruct(x_A, y_BA) + self.loss_reconstruct(x_B, y_AB)
-        loss_gen_A = loss_VAE_A + loss_CC_A + tf.losses.get_regularization_loss()
-        loss_gen_B = loss_VAE_B + loss_CC_B + tf.losses.get_regularization_loss()
+
 
 
         self.loss_dis = loss_d_A + loss_d_B
@@ -482,7 +475,7 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            if i <50:
+            if i <20:
                 _, loss_vae = sess.run([model.train_op_VAE_A, model.loss_VAE], feed_dict=feed)
                 _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
                 loss_gen = loss_dis = loss_cc = 0
