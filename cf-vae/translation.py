@@ -152,7 +152,7 @@ class Translation:
         ng_log_softmax_var = tf.nn.log_softmax(1-x_recon)
 
         neg_ll = -tf.reduce_mean(tf.reduce_sum(
-            log_softmax_var * x + (1-x)*ng_log_softmax_var,
+            log_softmax_var * x,
             axis=-1))
         return neg_ll
 
