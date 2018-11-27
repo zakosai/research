@@ -55,8 +55,6 @@ class Translation:
         return x_
 
     def gen_z(self, h, scope, reuse=False):
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             z_mu = fully_connected(h, self.z_dim, self.active_function, scope="z_mu")
             z_sigma = fully_connected(h, self.z_dim, self.active_function, scope="z_sigma")
