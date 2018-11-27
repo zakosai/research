@@ -69,14 +69,15 @@ class Translation:
         # if self.train:
         x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
-            for i in range(len(decode_dim)):
+            for i in range(len(decode_dim)-1):
                 x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
                 # y = maxout(x_, decode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
                 x_ = tf.nn.leaky_relu(x_, alpha=0.2)
                 # x_ = tf.nn.tanh(x_)
-
+        x_ = fully_connected(x_, decode_dim[-1], scope="last_dec",
+                             weights_regularizer=self.regularizer, trainable=self.freeze)
         return x_
 
     def adversal(self, x, scope, adv_dim, reuse=False):
@@ -452,11 +453,11 @@ def main():
 
             if i <20:
                 _, loss_vae = sess.run([model.train_op_VAE_A, model.loss_VAE], feed_dict=feed)
-                # _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
-                loss_gen = loss_dis = loss_cc = 0
-            elif i>=50 and i < 100:
                 _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
                 loss_gen = loss_dis = loss_cc = 0
+            # elif i>=50 and i < 100:
+            #     _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
+            #     loss_gen = loss_dis = loss_cc = 0
             else:
                 model.freeze = False
                 _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
