@@ -35,8 +35,8 @@ class Translation:
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
 
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
@@ -46,8 +46,8 @@ class Translation:
 
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.3)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
@@ -55,6 +55,8 @@ class Translation:
         return x_
 
     def gen_z(self, h, scope, reuse=False):
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             z_mu = fully_connected(h, self.z_dim, self.active_function, scope="z_mu")
             z_sigma = fully_connected(h, self.z_dim, self.active_function, scope="z_sigma")
