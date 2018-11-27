@@ -55,7 +55,7 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
-                                     weights_regularizer=self.regularizer, trainable=self.freeze)
+                                     weights_regularizer=self.regularizer)
                 # y = maxout(x_, encode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
                 x_ = tf.nn.leaky_relu(x_, alpha=0.2)
@@ -85,7 +85,7 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
-                                     weights_regularizer=self.regularizer, trainable=self.freeze)
+                                     weights_regularizer=self.regularizer)
                 # y = maxout(x_, decode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
                 x_ = tf.nn.leaky_relu(x_, alpha=0.2)
@@ -237,7 +237,7 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen = loss_CC_A + loss_CC_B + 0.1 * tf.losses.get_regularization_loss() +\
+        self.loss_gen = self.loss_VAE + loss_CC_A + loss_CC_B + 0.1 * tf.losses.get_regularization_loss() +\
                         self.loss_generator(y_AB) + self.loss_generator(y_ABA) + self.loss_generator(y_BAB) +\
                         self.loss_generator(y_BA) + self.loss_reconstruct(x_A, y_BA) + self.loss_reconstruct(x_B, y_AB)
 
