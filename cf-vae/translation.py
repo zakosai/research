@@ -51,11 +51,11 @@ class Translation:
         # x_ = tf.reshape(x_, (-1, 10000))
 
         # if self.train:
-        x_ = tf.nn.dropout(x_, 0.5)
+        x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
-                                     weights_regularizer=self.regularizer)
+                                     weights_regularizer=self.regularizer, trainable=self.freeze)
                 # y = maxout(x_, encode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
                 x_ = tf.nn.leaky_relu(x_, alpha=0.2)
@@ -64,20 +64,6 @@ class Translation:
                 print(x_.shape)
         return x_
 
-    def maxout(self, inputs, num_units, axis=None):
-        shape = inputs.get_shape().as_list()
-        if axis is None:
-            # Assume that channel is the last dimension
-            axis = -1
-        num_channels = shape[axis]
-        if num_channels % num_units:
-            raise ValueError('number of features({}) is not a multiple of num_units({})'
-                             .format(num_channels, num_units))
-        shape[axis] = -1
-        shape += [num_channels // num_units]
-        outputs = tf.reduce_max(tf.reshape(inputs, shape), -1, keep_dims=False)
-        return outputs
-
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
         # if self.train:
@@ -85,7 +71,7 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
-                                     weights_regularizer=self.regularizer)
+                                     weights_regularizer=self.regularizer, trainable=self.freeze)
                 # y = maxout(x_, decode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
                 x_ = tf.nn.leaky_relu(x_, alpha=0.2)
@@ -198,10 +184,7 @@ class Translation:
         y_ABA = self.decode(z_ABA, "A", self.decode_dim_A, True, True)
         z_BAB, z_mu_BAB, z_sigma_BAB = self.encode(y_BA, "A", self.encode_dim_A, True, True, True)
         y_BAB = self.decode(z_BAB, "B", self.decode_dim_B, True, True)
-        # z_AAB, z_mu_AAB, z_sigma_AAB = self.encode(y_AA, "A", self.encode_dim_A, True, True, True)
-        # y_AAB = self.decode(z_AAB, "B", self.decode_dim_B, True, True)
-        # z_BBA, z_mu_BBA, z_sigma_BBA = self.encode(y_BB, "B", self.encode_dim_B, True, True, True)
-        # y_BBA = self.decode(z_BBA, "A", self.decode_dim_A, True, True)
+
 
 
         # Loss VAE
@@ -237,7 +220,7 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen = self.loss_VAE + loss_CC_A + loss_CC_B + 0.1 * tf.losses.get_regularization_loss() +\
+        self.loss_gen =  loss_CC_A + loss_CC_B + 0.1 * tf.losses.get_regularization_loss() +\
                         self.loss_generator(y_AB) + self.loss_generator(y_ABA) + self.loss_generator(y_BAB) +\
                         self.loss_generator(y_BA) + self.loss_reconstruct(x_A, y_BA) + self.loss_reconstruct(x_B, y_AB)
 
@@ -469,11 +452,11 @@ def main():
 
             if i <20:
                 _, loss_vae = sess.run([model.train_op_VAE_A, model.loss_VAE], feed_dict=feed)
+                # _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
+                loss_gen = loss_dis = loss_cc = 0
+            elif i>=50 and i < 100:
                 _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
                 loss_gen = loss_dis = loss_cc = 0
-            # elif i>=50 and i < 100:
-            #     _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
-            #     loss_gen = loss_dis = loss_cc = 0
             else:
                 model.freeze = False
                 _, loss_gen, loss_vae, loss_cc = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE,
