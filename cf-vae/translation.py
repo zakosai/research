@@ -139,7 +139,7 @@ class Translation:
         ng_log_softmax_var = tf.nn.log_softmax(1-x_recon)
 
         neg_ll = -tf.reduce_mean(tf.reduce_sum(
-            log_softmax_var * x,
+            log_softmax_var * x + (1-x)*ng_log_softmax_var,
             axis=-1))
         return neg_ll
 
@@ -379,7 +379,7 @@ def load_rating(path, thred, test_size):
     return dense_A, dense_B
 
 def main():
-    iter = 400
+    iter = 300
     batch_size= 500
     args = parser.parse_args()
     A = args.A
