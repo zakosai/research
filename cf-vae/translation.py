@@ -534,11 +534,11 @@ def main():
                 #test same domain
                 input_A_test, domain_A_test = test_same_domain(dense_A_test, num_A)
                 y_aa = sess.run(model.y_AA, feed_dict={model.x_A:input_A_test})
-                calc_recall(y_aa, dense_A_test, [50], type="A")
+                calc_recall_same_domain(y_aa, dense_A_test, [50], type="A")
 
                 input_B_test, domain_B_test = test_same_domain(dense_B_test, num_B)
                 y_bb = sess.run(model.y_BB, feed_dict={model.x_B:input_B_test})
-                calc_recall(y_bb, dense_B_test, [50], type="B")
+                calc_recall_same_domain(y_bb, dense_B_test, [50], type="B")
 
             model.train = True
         if i%100 == 0:
