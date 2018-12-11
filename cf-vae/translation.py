@@ -286,6 +286,43 @@ def test_same_domain(dense, num_product):
         dense_test[i] = d[num_input:]
     return input_user, dense_test
 
+def calc_recall_same_domain(pred, test, m=[100], type=None):
+
+    for k in m:
+        pred_ab = np.argsort(-pred)
+        recall = []
+        ndcg = []
+        for i in range(len(pred_ab)):
+            num_train = int(len(test[i])*0.8)
+            u_train = test[:num_train]
+            u_test = test[num_train:]
+            p = pred_ab[i, :(k+num_train)]
+            for t in u_train:
+                if t in p:
+                    p.remove(t)
+            p = p[:k]
+
+            hits = set(u_test) & set(p)
+
+            #recall
+            recall_val = float(len(hits)) / len(u_test)
+            recall.append(recall_val)
+
+            #ncdg
+            score = []
+            for j in range(k):
+                if p[j] in hits:
+                    score.append(1)
+                else:
+                    score.append(0)
+            actual = dcg_score(score, pred[i, p], k)
+            best = dcg_score(score, score, k)
+            if best == 0:
+                ndcg.append(0)
+            else:
+                ndcg.append(float(actual) / best)
+
+        print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
 
 def calc_recall(pred, test, m=[100], type=None):
 
