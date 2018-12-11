@@ -279,7 +279,7 @@ def one_hot_vector2(A, num_product):
 def test_same_domain(dense, num_product):
     input_user = np.zeros((len(dense), num_product))
     dense_test = [0]*len(dense)
-    for i,d in dense:
+    for i,d in enumerate(dense):
         num_input = int(len(d)*0.8)
         for j in range(0, num_input):
             input_user[i, d[j]] = 1
