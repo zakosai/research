@@ -31,7 +31,7 @@ class Translation:
         self.lambda_3 = lambda_3
         self.lambda_4 = lambda_4
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.tanh
+        self.active_function = tf.nn.relu
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
@@ -40,16 +40,6 @@ class Translation:
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
-        # ids = argsort(x_, 1)[::-1][:, :200]
-        # if "A" in scope:
-        #     #x_ = tf.multiply(tf.expand_dims(self.z_A, 0), tf.expand_dims(x_, 2))
-        #     x_ = tf.nn.embedding_lookup(self.z_A, ids)
-        # else:
-        #     #x_ = tf.multiply(tf.expand_dims(self.z_B, 0), tf.expand_dims(x_, 2))
-        #     x_ = tf.nn.embedding_lookup(self.z_B, ids)
-        # x_ = flatten(x_)
-        # x_ = tf.reshape(x_, (-1, 10000))
-
         # if self.train:
         x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
@@ -72,8 +62,6 @@ class Translation:
             for i in range(len(decode_dim)-1):
                 x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
-                # y = maxout(x_, decode_dim[i])
-                # x_ = tf.reshape(y, x_.shape)
                 x_ = tf.nn.leaky_relu(x_, alpha=0.2)
                 # x_ = tf.nn.tanh(x_)
             x_ = fully_connected(x_, decode_dim[-1], scope="last_dec",
@@ -136,7 +124,6 @@ class Translation:
         # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_recon, labels=x))
 
         log_softmax_var = tf.nn.log_softmax(x_recon)
-        ng_log_softmax_var = tf.nn.log_softmax(1-x_recon)
 
         neg_ll = -tf.reduce_mean(tf.reduce_sum(
             log_softmax_var * x,
