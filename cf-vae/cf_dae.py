@@ -538,7 +538,7 @@ class cf_vae_extend:
         ndcg_A = []
         ndcg_B = []
         for i, list_product in enumerate(test_users):
-            if list_product[0] >= thred:
+            if list_product[0] < thred:
                 real = [j for j in list_product if j >= thred]
                 pred = self.pred(i+train_val_size, "grocery", thred)
                 top_M = np.argsort(-pred)[:k]
