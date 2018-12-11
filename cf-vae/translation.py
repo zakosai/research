@@ -139,7 +139,7 @@ class Translation:
         ng_log_softmax_var = tf.nn.log_softmax(1-x_recon)
 
         neg_ll = -tf.reduce_mean(tf.reduce_sum(
-            log_softmax_var * x + (1-x)*ng_log_softmax_var,
+            log_softmax_var * x,
             axis=-1))
         return neg_ll
 
@@ -191,12 +191,6 @@ class Translation:
         # Loss VAE
         loss_VAE_A = self.lambda_1 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_2 * self.loss_reconstruct(x_A, y_AA)
         loss_VAE_B = self.lambda_1 * self.loss_kl(z_mu_B, z_sigma_B) + self.lambda_2 * self.loss_reconstruct(x_B, y_BB)
-        # if not self.freeze:
-        #     loss_VAE_A = self.lambda_1 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_2 * self.loss_reconstruct(x_A,
-        #                                                                                                          y_BA)
-        #     loss_VAE_B = self.lambda_1 * self.loss_kl(z_mu_B, z_sigma_B) + self.lambda_2 * self.loss_reconstruct(x_B,
-        #                                                                                                          y_AB)
-
         self.loss_VAE = loss_VAE_A + loss_VAE_B
 
         # Loss GAN
@@ -221,7 +215,7 @@ class Translation:
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen =  loss_CC_A + loss_CC_B + 0.1 * tf.losses.get_regularization_loss() +\
+        self.loss_gen =  self.loss_CC + 0.1 * tf.losses.get_regularization_loss() +\
                         self.loss_generator(y_AB) + self.loss_generator(y_ABA) + self.loss_generator(y_BAB) +\
                         self.loss_generator(y_BA) + self.loss_reconstruct(x_A, y_BA) + self.loss_reconstruct(x_B, y_AB)
 
@@ -233,8 +227,7 @@ class Translation:
         self.train_op_VAE_A = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_VAE_A)
         self.train_op_VAE_B = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_VAE_B)
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
-        # self.train_op_gen_A = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_gen_A)
-        # self.train_op_gen_B = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_gen_B)
+
         adv_var_A = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_A")
         adv_var_B = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_B")
         print(adv_var_A, adv_var_B)
