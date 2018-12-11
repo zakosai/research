@@ -276,6 +276,17 @@ def one_hot_vector2(A, num_product):
         one_hot[i[0], i[1]] = i[2]
     return one_hot
 
+def test_same_domain(dense, num_product):
+    input_user = np.zeros((len(dense), num_product))
+    dense_test = [0]*len(dense)
+    for i,d in dense:
+        num_input = int(len(d)*0.8)
+        for j in range(0, num_input):
+            input_user[i, d[j]] = 1
+        dense_test[i] = d[num_input:]
+    return input_user, dense_test
+
+
 def calc_recall(pred, test, m=[100], type=None):
 
     for k in m:
@@ -482,6 +493,15 @@ def main():
 
                 calc_recall(y_ba, dense_A_test, k, type="A")
                 calc_recall(y_ab, dense_B_test, k, type="B")
+
+                #test same domain
+                input_A_test, domain_A_test = test_same_domain(dense_A_test, num_A)
+                y_aa = sess.run(model.y_AA, feed_dict={model.x_A:input_A_test})
+                calc_recall(y_aa, dense_A_test, [50], type="A")
+
+                input_B_test, domain_B_test = test_same_domain(dense_B_test, num_B)
+                y_bb = sess.run(model.y_BB, feed_dict={model.x_B:input_B_test})
+                calc_recall(y_bb, dense_B_test, [50], type="B")
 
             model.train = True
         if i%100 == 0:
