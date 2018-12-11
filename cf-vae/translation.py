@@ -296,7 +296,7 @@ def calc_recall_same_domain(pred, test, m=[100], type=None):
             num_train = int(len(test[i])*0.8)
             u_train = test[i][:num_train]
             u_test = test[i][num_train:]
-            p = pred_ab[i, :(k+num_train)]
+            p = list(pred_ab[i, :(k+num_train)])
             for t in u_train:
                 if t in p:
                     p.remove(t)
