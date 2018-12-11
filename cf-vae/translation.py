@@ -336,6 +336,8 @@ def calc_recall(pred, test, m=[100], type=None):
 
             #recall
             recall_val = float(len(hits)) / len(test[i])
+            if recall_val == 1:
+                print(i, p)
             recall.append(recall_val)
 
             #ncdg
