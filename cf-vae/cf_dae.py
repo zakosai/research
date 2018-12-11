@@ -489,18 +489,142 @@ class cf_vae_extend:
             recall_avgs.append(recall_avg)
         return recall_avgs
 
-    # def predict_val(self, pred_all, train_users, test_users, file=None):
-    #     train_size = int(len(self.U) * 0.7)
-    #     val_size = int(len(self.U) * 0.05)
-    #     user_all = test_users[train_size:train_size+val_size]
+    def predict_val(self, pred_all, train_users, test_users, file=None):
+        train_size = int(len(self.U) * 0.7)
+        val_size = int(len(self.U) * 0.05)
+        user_all = test_users[train_size:train_size+val_size]
+        ground_tr_num = [len(user) for user in user_all]
+
+
+        pred_all = list(pred_all)
+
+        for m in [10, 100]:
+            print "m = " + "{:>10d}".format(m) + "done"
+            recall_vals = []
+            for i in range(len(user_all)):
+                train = train_users[i]
+                top_M = list(np.argsort(-pred_all[i])[0:(m +len(train))])
+                for u in train:
+                    if u in top_M:
+                        top_M.remove(u)
+                top_M = top_M[:m]
+                if len(top_M) != m:
+                    print(top_M, train_users[i])
+                hits = set(top_M) & set(user_all[i])   # item idex from 0
+                hits_num = len(hits)
+                try:
+                    recall_val = float(hits_num) / float(ground_tr_num[i])
+                except:
+                    recall_val = 1
+                recall_vals.append(recall_val)
+                # precision = float(hits_num) / float(m)
+                # precision_vals.append(precision)
+
+            recall_avg = np.mean(np.array(recall_vals))
+            # precision_avg = np.mean(np.array(precision_vals))
+            # # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
+            # #                        [u for u in user_all if len(u)!=0], m)
+            print recall_avg
+            if file!= None:
+                file.write("m = %d, recall = %f"%(m, recall_avg))
+            return recall_avg
+
+    def predict_test(self, test_users, thred, k=100):
+        recall_health = []
+        recall_clothing = []
+        train_val_size = int(len(self.U)*0.75)
+        hit_A = 0
+        hit_B = 0
+        ndcg_A = []
+        ndcg_B = []
+        for i, list_product in enumerate(test_users):
+            if list_product[0] >= thred:
+                real = [j for j in list_product if j >= thred]
+                pred = self.pred(i+train_val_size, "grocery", thred)
+                top_M = np.argsort(-pred)[:k]
+                top_M += thred
+                hits = set(top_M) & set(real)
+                recall = float(len(hits))/float(len(real))
+                recall_clothing.append(recall)
+
+                #hit
+                if hits > 0:
+                    hit_B += 1
+
+                #ncdg
+                score = []
+                for j in range(k):
+                    if top_M[j] in hits:
+                        score.append(1)
+                    else:
+                        score.append(0)
+                top_M -= thred
+                actual = self.dcg_score(score, pred[top_M], k)
+                best = self.dcg_score(score, score, k)
+                if best ==0:
+                    ndcg_B.append(0)
+                else:
+                    ndcg_B.append(float(actual)/best)
+            else:
+                real = [j for j in list_product if j < thred]
+                pred = self.pred(i + train_val_size, "health", thred)
+                top_M = np.argsort(-pred)[:k]
+                hits = set(top_M) & set(real)
+                recall = float(len(hits)) / float(len(real))
+                recall_health.append(recall)
+
+                # hit
+                if hits > 0:
+                    hit_A += 1
+
+                # ncdg
+                score = []
+                for j in range(k):
+                    if top_M[j] in hits:
+                        score.append(1)
+                    else:
+                        score.append(0)
+                top_M -= thred
+                actual = self.dcg_score(score, pred[top_M], k)
+                best = self.dcg_score(score, score, k)
+                if best == 0:
+                    ndcg_A.append(0)
+                else:
+                    ndcg_A.append(float(actual) / best)
+        print(len(recall_clothing), len(recall_health))
+        print("average recall A: %f, hit %f, ndcg: %f"%(np.mean(recall_health), float(hit_A)/len(recall_health),
+                                                             np.mean(ndcg_A)))
+        print("average recall B: %f, hit %f, ndcg: %f" % (
+        np.mean(recall_clothing), float(hit_B) / len(recall_clothing),
+        np.mean(ndcg_B)))
+
+    def predict_all(self):
+        train_size = int(len(self.U)*0.7)
+        val_size = int(len(self.U)*0.05)
+        return np.dot(self.U[train_size:train_size+val_size], (self.V.T))
+
+    def pred(self, u_id, p_type, thred):
+        if p_type == "health":
+            return np.dot(self.U[u_id], self.V[:thred].T)
+        else:
+            return np.dot(self.U[u_id], self.V[thred:].T)
+
+    # def predict(self, pred_all, train_users, test_users, M):
+    #     # user_all = map(add, train_users, test_users)
+    #     # user_all = np.array(user_all)    # item idex from 1
+    #     user_all = test_users
     #     ground_tr_num = [len(user) for user in user_all]
     #
     #
     #     pred_all = list(pred_all)
     #
-    #     for m in [10, 100]:
+    #     recall_avgs = []
+    #     precision_avgs = []
+    #     mapk_avgs = []
+    #     for m in range(10, 10, 10):
     #         print "m = " + "{:>10d}".format(m) + "done"
     #         recall_vals = []
+    #         apk_vals = []
     #         for i in range(len(user_all)):
     #             train = train_users[i]
     #             top_M = list(np.argsort(-pred_all[i])[0:(m +len(train))])
@@ -519,225 +643,101 @@ class cf_vae_extend:
     #             recall_vals.append(recall_val)
     #             # precision = float(hits_num) / float(m)
     #             # precision_vals.append(precision)
-    #
     #         recall_avg = np.mean(np.array(recall_vals))
     #         # precision_avg = np.mean(np.array(precision_vals))
     #         # # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
     #         # #                        [u for u in user_all if len(u)!=0], m)
+    #         mapk = np.mean(np.array(apk_vals))
     #         print recall_avg
-    #         if file!= None:
-    #             file.write("m = %d, recall = %f"%(m, recall_avg))
-    #         return recall_avg
+    #         recall_avgs.append(recall_avg)
+    #         # precision_avgs.append(precision_avg)
+    #         mapk_avgs.append(mapk)
     #
-    # def predict_test(self, test_users, thred, k=100):
-    #     recall_health = []
-    #     recall_clothing = []
-    #     train_val_size = int(len(self.U)*0.75)
-    #     hit_A = 0
-    #     hit_B = 0
-    #     ndcg_A = []
-    #     ndcg_B = []
-    #     for i, list_product in enumerate(test_users):
-    #         if list_product[0] >= thred:
-    #             real = [j for j in list_product if j >= thred]
-    #             pred = self.pred(i+train_val_size, "grocery", thred)
-    #             top_M = np.argsort(-pred)[:k]
-    #             top_M += thred
-    #             hits = set(top_M) & set(real)
-    #             recall = float(len(hits))/float(len(real))
-    #             recall_clothing.append(recall)
+    #     return recall_avgs, mapk_avgs
     #
-    #             #hit
-    #             if hits > 0:
-    #                 hit_B += 1
+    # def predict_val(self, pred_all, train_users, test_users, file=None):
+    #     user_all = test_users
+    #     ground_tr_num = [len(user) for user in user_all]
     #
-    #             #ncdg
+    #
+    #     pred_all = list(pred_all)
+    #
+    #     recall_avgs = []
+    #     precision_avgs = []
+    #     mapk_avgs = []
+    #     for m in [10]:
+    #         print "m = " + "{:>10d}".format(m) + "done"
+    #         recall_vals = []
+    #         ndcg = []
+    #         hit = 0
+    #         for i in range(len(user_all)):
+    #             train = train_users[i]
+    #             top_M = list(np.argsort(-pred_all[i])[0:(m +len(train))])
+    #             for u in train:
+    #                 if u in top_M:
+    #                     top_M.remove(u)
+    #             top_M = top_M[:m]
+    #             if len(top_M) != m:
+    #                 print(top_M, train_users[i])
+    #             hits = set(top_M) & set(user_all[i])   # item idex from 0
+    #             hits_num = len(hits)
+    #             if hits_num > 0:
+    #                 hit += 1
+    #             try:
+    #                 recall_val = float(hits_num) / float(ground_tr_num[i])
+    #             except:
+    #                 recall_val = 1
+    #             recall_vals.append(recall_val)
+    #             pred = np.array(pred_all[i])
     #             score = []
-    #             for j in range(k):
-    #                 if top_M[j] in hits:
+    #             for k in range(m):
+    #                 if top_M[k] in hits:
     #                     score.append(1)
     #                 else:
     #                     score.append(0)
-    #             top_M -= thred
-    #             actual = self.dcg_score(score, pred[top_M], k)
-    #             best = self.dcg_score(score, score, k)
+    #             actual = self.dcg_score(score, pred[top_M], m)
+    #             best = self.dcg_score(score, score, m)
     #             if best ==0:
-    #                 ndcg_B.append(0)
+    #                 ndcg.append(0)
     #             else:
-    #                 ndcg_B.append(float(actual)/best)
-    #         else:
-    #             real = [j for j in list_product if j < thred]
-    #             pred = self.pred(i + train_val_size, "health", thred)
-    #             top_M = np.argsort(-pred)[:k]
-    #             hits = set(top_M) & set(real)
-    #             recall = float(len(hits)) / float(len(real))
-    #             recall_health.append(recall)
+    #                 ndcg.append(float(actual)/best)
+    #             # precision = float(hits_num) / float(m)
+    #             # precision_vals.append(precision)
     #
-    #             # hit
-    #             if hits > 0:
-    #                 hit_A += 1
+    #         recall_avg = np.mean(np.array(recall_vals))
+    #         # precision_avg = np.mean(np.array(precision_vals))
+    #         # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
+    #         #                        [u for u in user_all if len(u)!=0], m)
     #
-    #             # ncdg
-    #             score = []
-    #             for j in range(k):
-    #                 if top_M[j] in hits:
-    #                     score.append(1)
-    #                 else:
-    #                     score.append(0)
-    #             top_M -= thred
-    #             actual = self.dcg_score(score, pred[top_M], k)
-    #             best = self.dcg_score(score, score, k)
-    #             if best == 0:
-    #                 ndcg_A.append(0)
-    #             else:
-    #                 ndcg_A.append(float(actual) / best)
-    #     print(len(recall_clothing), len(recall_health))
-    #     print("average recall A: %f, hit %f, ndcg: %f"%(np.mean(recall_health), float(hit_A)/len(recall_health),
-    #                                                          np.mean(ndcg_A)))
-    #     print("average recall B: %f, hit %f, ndcg: %f" % (
-    #     np.mean(recall_clothing), float(hit_B) / len(recall_clothing),
-    #     np.mean(ndcg_B)))
+    #         print("recall %f, hit: %f, NDCG: %f"%(recall_avg, float(hit)/len(user_all), np.mean(ndcg)))
+    #         #print recall_avg
+    #         if file != None:
+    #             file.write("m = %d, recall = %f\t"%(m, recall_avg))
+    #         # precision_avgs.append(precision_avg)
+    #         return recall_avg
+    # def dcg_score(self, y_true, y_score, k=5):
+    #     """Discounted cumulative gain (DCG) at rank K.
+    #
+    #     Parameters
+    #     ----------
+    #     y_true : array, shape = [n_samples]
+    #         Ground truth (true relevance labels).
+    #     y_score : array, shape = [n_samples, n_classes]
+    #         Predicted scores.
+    #     k : int
+    #         Rank.
+    #
+    #     Returns
+    #     -------
+    #     score : float
+    #     """
+    #     order = np.argsort(y_score)[::-1]
+    #     y_true = np.take(y_true, order[:k])
+    #
+    #     gain = 2 ** y_true - 1
+    #
+    #     discounts = np.log2(np.arange(len(y_true)) + 2)
+    #     return np.sum(gain / discounts)
     #
     # def predict_all(self):
-    #     train_size = int(len(self.U)*0.7)
-    #     val_size = int(len(self.U)*0.05)
-    #     return np.dot(self.U[train_size:train_size+val_size], (self.V.T))
-    #
-    # def pred(self, u_id, p_type, thred):
-    #     if p_type == "health":
-    #         return np.dot(self.U[u_id], self.V[:thred].T)
-    #     else:
-    #         return np.dot(self.U[u_id], self.V[thred:].T)
-
-    def predict(self, pred_all, train_users, test_users, M):
-        # user_all = map(add, train_users, test_users)
-        # user_all = np.array(user_all)    # item idex from 1
-        user_all = test_users
-        ground_tr_num = [len(user) for user in user_all]
-
-
-        pred_all = list(pred_all)
-
-        recall_avgs = []
-        precision_avgs = []
-        mapk_avgs = []
-        for m in range(10, 10, 10):
-            print "m = " + "{:>10d}".format(m) + "done"
-            recall_vals = []
-            apk_vals = []
-            for i in range(len(user_all)):
-                train = train_users[i]
-                top_M = list(np.argsort(-pred_all[i])[0:(m +len(train))])
-                for u in train:
-                    if u in top_M:
-                        top_M.remove(u)
-                top_M = top_M[:m]
-                if len(top_M) != m:
-                    print(top_M, train_users[i])
-                hits = set(top_M) & set(user_all[i])   # item idex from 0
-                hits_num = len(hits)
-                try:
-                    recall_val = float(hits_num) / float(ground_tr_num[i])
-                except:
-                    recall_val = 1
-                recall_vals.append(recall_val)
-                # precision = float(hits_num) / float(m)
-                # precision_vals.append(precision)
-            recall_avg = np.mean(np.array(recall_vals))
-            # precision_avg = np.mean(np.array(precision_vals))
-            # # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
-            # #                        [u for u in user_all if len(u)!=0], m)
-            mapk = np.mean(np.array(apk_vals))
-            print recall_avg
-            recall_avgs.append(recall_avg)
-            # precision_avgs.append(precision_avg)
-            mapk_avgs.append(mapk)
-
-        return recall_avgs, mapk_avgs
-
-    def predict_val(self, pred_all, train_users, test_users, file=None):
-        user_all = test_users
-        ground_tr_num = [len(user) for user in user_all]
-
-
-        pred_all = list(pred_all)
-
-        recall_avgs = []
-        precision_avgs = []
-        mapk_avgs = []
-        for m in [10]:
-            print "m = " + "{:>10d}".format(m) + "done"
-            recall_vals = []
-            ndcg = []
-            hit = 0
-            for i in range(len(user_all)):
-                train = train_users[i]
-                top_M = list(np.argsort(-pred_all[i])[0:(m +len(train))])
-                for u in train:
-                    if u in top_M:
-                        top_M.remove(u)
-                top_M = top_M[:m]
-                if len(top_M) != m:
-                    print(top_M, train_users[i])
-                hits = set(top_M) & set(user_all[i])   # item idex from 0
-                hits_num = len(hits)
-                if hits_num > 0:
-                    hit += 1
-                try:
-                    recall_val = float(hits_num) / float(ground_tr_num[i])
-                except:
-                    recall_val = 1
-                recall_vals.append(recall_val)
-                pred = np.array(pred_all[i])
-                score = []
-                for k in range(m):
-                    if top_M[k] in hits:
-                        score.append(1)
-                    else:
-                        score.append(0)
-                actual = self.dcg_score(score, pred[top_M], m)
-                best = self.dcg_score(score, score, m)
-                if best ==0:
-                    ndcg.append(0)
-                else:
-                    ndcg.append(float(actual)/best)
-                # precision = float(hits_num) / float(m)
-                # precision_vals.append(precision)
-
-            recall_avg = np.mean(np.array(recall_vals))
-            # precision_avg = np.mean(np.array(precision_vals))
-            # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
-            #                        [u for u in user_all if len(u)!=0], m)
-
-            print("recall %f, hit: %f, NDCG: %f"%(recall_avg, float(hit)/len(user_all), np.mean(ndcg)))
-            #print recall_avg
-            if file != None:
-                file.write("m = %d, recall = %f\t"%(m, recall_avg))
-            # precision_avgs.append(precision_avg)
-            return recall_avg
-    def dcg_score(self, y_true, y_score, k=5):
-        """Discounted cumulative gain (DCG) at rank K.
-
-        Parameters
-        ----------
-        y_true : array, shape = [n_samples]
-            Ground truth (true relevance labels).
-        y_score : array, shape = [n_samples, n_classes]
-            Predicted scores.
-        k : int
-            Rank.
-
-        Returns
-        -------
-        score : float
-        """
-        order = np.argsort(y_score)[::-1]
-        y_true = np.take(y_true, order[:k])
-
-        gain = 2 ** y_true - 1
-
-        discounts = np.log2(np.arange(len(y_true)) + 2)
-        return np.sum(gain / discounts)
-
-    def predict_all(self):
-        return np.dot(self.U, (self.V.T))
+    #     return np.dot(self.U, (self.V.T))
