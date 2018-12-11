@@ -294,8 +294,8 @@ def calc_recall_same_domain(pred, test, m=[100], type=None):
         ndcg = []
         for i in range(len(pred_ab)):
             num_train = int(len(test[i])*0.8)
-            u_train = test[:num_train]
-            u_test = test[num_train:]
+            u_train = test[i][:num_train]
+            u_test = test[i][num_train:]
             p = pred_ab[i, :(k+num_train)]
             for t in u_train:
                 if t in p:
