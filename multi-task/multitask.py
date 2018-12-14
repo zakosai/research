@@ -398,7 +398,7 @@ def main():
             itempos = dataset['item_onehot'][train[list_idx, 1]]
             tag_user = dataset['tag_user_onehot'][train[list_idx, 0]]
             tag_itempos = dataset['tag_item_onehot'][train[list_idx, 1]]
-            tag_label = dataset['tag_label'][list_idx]
+            tag_label = dataset['tag_label_train'][list_idx]
             neg_idx = np.random.randint(0, 100, size=batch_size)
             itemneg = dataset['item_onehot'][dataset['user_neg'][list_idx, neg_idx]]
 
