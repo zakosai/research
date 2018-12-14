@@ -234,6 +234,7 @@ def create_dataset_lastfm():
     tag_user_onehot = np.zeros(shape=(user_no, tag_no), dtype=np.float32)
     tag_artist_onehot = np.zeros(shape=(artist_no, tag_no), dtype=np.float32)
     tag_label_train = np.zeros(shape=(train.shape[0], tag_no), dtype=np.float32)
+    print("finish initial")
 
     # create train one hot
     index = 0
@@ -253,6 +254,7 @@ def create_dataset_lastfm():
         else:
             print(ua)
         index += 1
+    print("finish create train")
 
     # create test
     user_artist_test = {}
@@ -272,6 +274,8 @@ def create_dataset_lastfm():
             tag_test.append([tag_list])
         else:
             print(ua)
+    print("finish create test")
+
     train = train.as_matrix()
     test = test.as_matrix()
 
