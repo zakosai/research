@@ -161,7 +161,7 @@ class MultiTask:
 
         z_user, loss_kl_user = self.encode(self.user, "user", "onehot",self.encode_user, False, False, False)
         user_rec = self.decode(z_user, "user", "onehot", self.decode_user, False, False)
-        z_user_tag, loss_kl_user_tag = self.encode(self.user_tag, "tag", self.encode_tag, False, True, True)
+        z_user_tag, loss_kl_user_tag = self.encode(self.user_tag, "user", "tag", self.encode_tag, False, True, True)
         user_tag_rec = self.decode(z_user_tag, "user", "tag", self.decode_tag, False, True)
 
         z_itempos, loss_kl_itempos = self.encode(self.itempos, "item", "onehot", self.encode_item, False, False, False)
