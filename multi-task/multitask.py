@@ -314,8 +314,6 @@ def calc_recall(pred, test, m=[100], type=None):
 
             #recall
             recall_val = float(len(hits)) / len(test[i])
-            if recall_val > 0.5:
-                print(i, p, hits, type)
             recall.append(recall_val)
 
             #ncdg
@@ -422,7 +420,7 @@ def main():
             recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
 
             user = dataset['user_onehot'][dataset['test'][:,0]]
-            itempos = dataset['item_onehot'][dataset['test'][:1]]
+            itempos = dataset['item_onehot'][dataset['test'][:,1]]
             tag_user = dataset['tag_user_onehot'][dataset['test'][:,0]]
             tag_itempos = dataset['tag_item_onehot'][dataset['test'][:,1]]
             feed = {model.user: user,
