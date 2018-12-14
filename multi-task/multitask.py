@@ -310,25 +310,26 @@ def calc_recall(pred, test, m=[100], type=None):
         ndcg = []
         for i in range(len(pred_ab)):
             p = pred_ab[i]
-            hits = set(test[i]) & set(p)
+            if len(p) != 0:
+                hits = set(test[i]) & set(p)
 
-            #recall
-            recall_val = float(len(hits)) / len(test[i])
-            recall.append(recall_val)
+                #recall
+                recall_val = float(len(hits)) / len(test[i])
+                recall.append(recall_val)
 
-            #ncdg
-            score = []
-            for j in range(k):
-                if p[j] in hits:
-                    score.append(1)
+                #ncdg
+                score = []
+                for j in range(k):
+                    if p[j] in hits:
+                        score.append(1)
+                    else:
+                        score.append(0)
+                actual = dcg_score(score, pred[i, p], k)
+                best = dcg_score(score, score, k)
+                if best == 0:
+                    ndcg.append(0)
                 else:
-                    score.append(0)
-            actual = dcg_score(score, pred[i, p], k)
-            best = dcg_score(score, score, k)
-            if best == 0:
-                ndcg.append(0)
-            else:
-                ndcg.append(float(actual) / best)
+                    ndcg.append(float(actual) / best)
 
         print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
 
