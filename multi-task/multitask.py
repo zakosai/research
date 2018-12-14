@@ -63,7 +63,7 @@ class MultiTask:
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
                 x_ = tf.nn.leaky_relu(x_, alpha=0.2)
                 # x_ = tf.nn.tanh(x_)
-            x_ = fully_connected(x_, decode_dim[-1], scope="last_dec",
+            x_ = fully_connected(x_, layer[-1], scope="last_dec",
                              weights_regularizer=self.regularizer, trainable=self.freeze)
         return x_
 
