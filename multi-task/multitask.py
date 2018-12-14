@@ -236,7 +236,8 @@ def create_dataset_lastfm():
     tag_label_train = np.zeros(shape=(train.shape[0], tag_no), dtype=np.float32)
 
     # create train one hot
-    for index, ua in train.iterrows():
+    index = 0
+    for _, ua in train.iterrows():
         if ua.userID in user_id and ua.artistID in artist_id:
             uid = user_id.index(ua.userID)
             aid = artist_id.index(ua.artistID)
@@ -251,6 +252,7 @@ def create_dataset_lastfm():
                 tag_label_train[index, tid] = 1
         else:
             print(ua)
+        index += 1
 
     # create test
     user_artist_test = {}
@@ -424,7 +426,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    create_dataset_lastfm()
 
 
 
