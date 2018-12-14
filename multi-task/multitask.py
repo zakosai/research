@@ -429,6 +429,8 @@ def main():
                     model.itempos_tag: tag_itempos}
 
             tag_pred = sess.run(model.tag_pred, feed_dict=feed)
+            print(tag_pred.shape)
+            print(tag_pred[0], dataset['tag_test'][0])
             recall_tag = calc_recall(tag_pred, dataset['tag_test'], [10], "tag")
 
         if i % 100 ==0:
