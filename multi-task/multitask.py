@@ -370,8 +370,8 @@ def main():
 
     encode_user = encode_item = encode_tag = [200]
     share_dim = [100]
-    decode_user = [200, dataset['user_no']]
-    decode_item = [200, dataset['item_no']]
+    decode_user = [200, dataset['item_no']]
+    decode_item = [200, dataset['user_no']]
     decode_tag = [200, dataset['tag_no']]
 
     batch_size = 500
