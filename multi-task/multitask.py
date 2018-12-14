@@ -400,7 +400,7 @@ def main():
             tag_itempos = dataset['tag_item_onehot'][train[list_idx, 1]]
             tag_label = dataset['tag_label_train'][list_idx]
             neg_idx = np.random.randint(0, 100, size=batch_size)
-            itemneg = dataset['item_onehot'][dataset['user_neg'][list_idx, neg_idx]]
+            itemneg = dataset['item_onehot'][dataset['user_neg'][train[list_idx,0], neg_idx]]
 
             feed = {model.user: user,
                     model.itempos: itempos,
