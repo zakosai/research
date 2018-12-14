@@ -151,11 +151,11 @@ class MultiTask:
         return tf.reduce_mean(tf.squared_difference(x, 1))
 
     def build_model(self):
-        self.user = tf.placeholder(tf.float32, shape=[None, self.dim_user], name='user_input')
+        self.user = tf.placeholder(tf.float32, shape=[None, self.dim_item], name='user_input')
         self.user_tag = tf.placeholder(tf.float32, shape=[None, self.dim_tag], name='user_tag_input')
-        self.itempos = tf.placeholder(tf.float32, shape=[None, self.dim_item], name='item_pos_input')
+        self.itempos = tf.placeholder(tf.float32, shape=[None, self.dim_user], name='item_pos_input')
         self.itempos_tag = tf.placeholder(tf.float32, shape=[None, self.dim_tag], name='item_pos_tag_input')
-        self.itemneg = tf.placeholder(tf.float32, shape=[None, self.dim_item], name='item_neg_input')
+        self.itemneg = tf.placeholder(tf.float32, shape=[None, self.dim_user], name='item_neg_input')
         # self.itemneg_tag = tf.placeholder(tf.float32, shape=[None, self.dim_tag], name='item_neg_tag_input')
         self.tag = tf.placeholder(tf.float32, shape=[None, self.dim_tag], name='tag_input')
 
