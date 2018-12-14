@@ -279,6 +279,8 @@ def create_dataset_lastfm():
     train = train.as_matrix()
     test = test.as_matrix()
 
+    print("finish matrix")
+
     dataset = {'user_no': user_no,
                'item_no': artist_no,
                'tag_no': tag_no,
@@ -292,6 +294,7 @@ def create_dataset_lastfm():
                'user_item_test': user_artist_test,
                'tag_test': tag_test,
                'user_neg': user_neg}
+    print("finish dataset")
 
     return dataset
 
@@ -432,7 +435,7 @@ def main():
 
 
 if __name__ == '__main__':
-    create_dataset_lastfm()
+    main()
 
 
 
