@@ -353,8 +353,9 @@ def dcg_score(y_true, y_score, k=50):
 
 def main():
     dataset = create_dataset_lastfm()
-    assert len(dataset['tag_label_train']) == len(dataset['train'])
     print("finish create dataset")
+    print(len(dataset['tag_label_train']),len(dataset['train']))
+
 
     encode_user = encode_item = encode_tag = [200]
     share_dim = [100]
