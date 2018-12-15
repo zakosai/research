@@ -444,7 +444,7 @@ def main():
             print("Loss lass batch: loss pretrained %f"%loss_pretrained)
 
         if i % 10 == 0 and i > 50:
-            # model.train = False
+            model.train = False
             print("Loss lass batch: Loss gen %f, loss dis %f"%(loss_gen, loss_dis))
 
             # test
