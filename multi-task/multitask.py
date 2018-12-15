@@ -311,6 +311,7 @@ def calc_recall(pred, test, m=[100], type=None):
         for i in range(len(pred_ab)):
             p = pred_ab[i]
             if len(test[i]) != 0:
+                print(p, test[i])
                 hits = set(test[i]) & set(p)
 
                 #recall
@@ -416,9 +417,9 @@ def main():
             print("Loss lass batch: Loss gen %f, loss dis %f"%(loss_gen, loss_dis))
 
             # test
-            user_id = dataset['user_item_test'].keys()
-            item_pred = sess.run(model.user_rec, feed_dict={model.user: dataset['user_onehot'][user_id]})
-            recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
+            # user_id = dataset['user_item_test'].keys()
+            # item_pred = sess.run(model.user_rec, feed_dict={model.user: dataset['user_onehot'][user_id]})
+            # recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
 
             user = dataset['user_onehot'][dataset['test'][:,0]]
             itempos = dataset['item_onehot'][dataset['test'][:,1]]
