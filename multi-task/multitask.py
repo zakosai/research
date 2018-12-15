@@ -273,11 +273,13 @@ def create_dataset_lastfm():
 
             tag_list = list(user_tags.loc[(user_tags.userID == ua.userID) & (user_tags.artistID == ua.artistID)][
                                 'tagID'])
-            tag_list = [tag_id.index(t) for t in tag_list]
-            tag_test.append([tag_list])
+            if len(tag_list) != 0:
+                tag_list = [tag_id.index(t) for t in tag_list]
+                tag_test.append(tag_list)
+                test_matrix.append([uid, aid])
         else:
             print(ua)
-        test_matrix.append([uid, aid])
+
     print("finish create test")
 
     train = np.array(train_matrix)
