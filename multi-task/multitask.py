@@ -196,7 +196,7 @@ class MultiTask:
                                self.lambda_2 * loss_kl_itempos_tag
 
         #Loss tag pred
-        loss_tag = self.lambda_3 * tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=self.tag_pred,
+        loss_tag = self.lambda_3 * tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=tag_pred,
                                                                                           labels=self.tag))
 
         #Loss GAN
