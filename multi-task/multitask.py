@@ -48,7 +48,7 @@ class MultiTask:
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
                 # y = maxout(x_, encode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.2)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.1)
                 # x_ = tf.nn.tanh(x_)
 
                 print(x_.shape)
@@ -62,7 +62,7 @@ class MultiTask:
             for i in range(len(layer)-1):
                 x_ = fully_connected(x_, layer[i], scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.2)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.1)
                 # x_ = tf.nn.tanh(x_)
             x_ = fully_connected(x_, layer[-1], scope="last_dec",
                              weights_regularizer=self.regularizer, trainable=self.freeze)
@@ -89,7 +89,7 @@ class MultiTask:
                                      weights_regularizer=self.regularizer)
                 # y = maxout(x_, dim[i])
                 # x_ = tf.reshape(y, x_.shape)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.2)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.1)
                 # x_ = tf.nn.tanh(x_)
 
         return x_
