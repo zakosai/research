@@ -184,10 +184,10 @@ class MultiTask:
         tag_concat = tf.concat([user_tag_rec, itempos_tag_rec], axis=1)
         tag_pred = self.mlp(tag_concat, "tag", self.tag_pred_layer)
 
-        ratingpos_concat = tf.concat([user_rec, itempos_rec], axis=1)
+        ratingpos_concat = tf.concat([z_user, z_itempos], axis=1)
         ratingpos_pred = self.adversal(ratingpos_concat, "rating", self.rating_pred_layer)
 
-        ratingneg_concat = tf.concat([user_rec, itemneg_rec], axis=1)
+        ratingneg_concat = tf.concat([z_user, z_itemneg], axis=1)
         ratingneg_pred = self.adversal(ratingneg_concat, "rating", self.rating_pred_layer, True)
 
 
