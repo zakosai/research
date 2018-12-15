@@ -305,7 +305,7 @@ def create_dataset_lastfm():
                'tag_test': tag_test,
                'user_neg': user_neg}
     print("finish dataset")
-    h5f = h5py.File('hetrec2011-2k/train_test.h5', 'w')
+    h5f = h5py.File('hetrec2011-lastfm-2k/train_test.h5', 'w')
     h5f.create_dataset('dataset_1', data=dataset)
     h5f.close()
 
