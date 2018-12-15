@@ -152,13 +152,13 @@ class MultiTask:
         return tf.reduce_mean(tf.squared_difference(x, 1))
 
     def build_model(self):
-        self.user = tf.placeholder(tf.int8, shape=[None, self.dim_item], name='user_input')
-        self.user_tag = tf.placeholder(tf.int8, shape=[None, self.dim_tag], name='user_tag_input')
-        self.itempos = tf.placeholder(tf.int8, shape=[None, self.dim_user], name='item_pos_input')
-        self.itempos_tag = tf.placeholder(tf.int8, shape=[None, self.dim_tag], name='item_pos_tag_input')
-        self.itemneg = tf.placeholder(tf.int8, shape=[None, self.dim_user], name='item_neg_input')
+        self.user = tf.placeholder(tf.float32, shape=[None, self.dim_item], name='user_input')
+        self.user_tag = tf.placeholder(tf.float32, shape=[None, self.dim_tag], name='user_tag_input')
+        self.itempos = tf.placeholder(tf.float32, shape=[None, self.dim_user], name='item_pos_input')
+        self.itempos_tag = tf.placeholder(tf.float32, shape=[None, self.dim_tag], name='item_pos_tag_input')
+        self.itemneg = tf.placeholder(tf.float32, shape=[None, self.dim_user], name='item_neg_input')
         # self.itemneg_tag = tf.placeholder(tf.float32, shape=[None, self.dim_tag], name='item_neg_tag_input')
-        self.tag = tf.placeholder(tf.int8, shape=[None, self.dim_tag], name='tag_input')
+        self.tag = tf.placeholder(tf.float32, shape=[None, self.dim_tag], name='tag_input')
 
         z_user, loss_kl_user = self.encode(self.user, "user", "onehot",self.encode_user, False, False, False)
         user_rec = self.decode(z_user, "user", "onehot", self.decode_user, False, False)
@@ -370,7 +370,9 @@ def dcg_score(y_true, y_score, k=50):
 
 
 def main():
-    dataset = create_dataset_lastfm()
+    # dataset = create_dataset_lastfm()
+    f = open("hetrec2011-lastfm-2k/dataset.pkl", 'rb')
+    dataset = pickle.load(f)
     print("finish create dataset")
     print(len(dataset['tag_label_train']),len(dataset['train']))
 
