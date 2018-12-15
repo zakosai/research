@@ -96,6 +96,8 @@ class MultiTask:
 
     def mlp(self, x, scope, layer, reuse=False):
         x_ = x
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="%s_%d"%(scope, i), weights_regularizer=self.regularizer)
@@ -238,7 +240,7 @@ def create_dataset_lastfm():
 
     # Divide train test
     user_artist = user_artist.loc[(user_artist['userID'].isin(user_id)) & (user_artist['artistID'].isin(artist_id))]
-    test = user_artist.sample(frac=0.3)
+    test = user_artist.sample(frac=0.2)
     train = user_artist.loc[~user_artist.index.isin(test.index)]
 
     # initial one hot
@@ -382,9 +384,9 @@ def dcg_score(y_true, y_score, k=50):
 
 
 def main():
-    # dataset = create_dataset_lastfm()
-    f = open("hetrec2011-lastfm-2k/dataset.pkl", 'rb')
-    dataset = pickle.load(f)
+    dataset = create_dataset_lastfm()
+    # f = open("hetrec2011-lastfm-2k/dataset.pkl", 'rb')
+    # dataset = pickle.load(f)
     print("finish create dataset")
     print(len(dataset['tag_label_train']),len(dataset['train']))
 
