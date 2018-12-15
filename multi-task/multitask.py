@@ -25,7 +25,7 @@ class MultiTask:
         self.tag_pred_layer = tag_pred_layer
         self.rating_pred_layer = rating_pred_layer
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.sigmoid
+        self.active_function = tf.nn.tanh
         self.z_dim = z_dim
         self.eps = eps
         self.share_dim = share_dim
@@ -305,9 +305,7 @@ def create_dataset_lastfm():
                'tag_test': tag_test,
                'user_neg': user_neg}
     print("finish dataset")
-    # h5f = h5py.File('hetrec2011-lastfm-2k/train_test.h5', 'w')
-    # h5f.create_dataset('dataset_1', data=dataset)
-    # h5f.close()
+
 
     return dataset
 
