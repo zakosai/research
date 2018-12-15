@@ -201,7 +201,7 @@ class MultiTask:
         loss_rating_dis = self.lambda_4 * self.loss_discriminator(ratingpos_pred, ratingneg_pred)
 
         self.loss_gen = loss_vae_user + loss_vae_itempos +loss_vae_itemneg + loss_vae_user_tag + loss_vae_itempos_tag\
-                        + loss_tag + self.loss_generator(ratingpos_pred)
+                        + loss_tag + self.loss_generator(ratingpos_pred) +  0.1 * tf.losses.get_regularization_loss()
         self.loss_dis = loss_rating_dis
 
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
