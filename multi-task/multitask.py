@@ -7,6 +7,7 @@ import numpy as np
 import os
 import argparse
 import pandas as pd
+import h5py
 
 class MultiTask:
     def __init__(self, dim_user, dim_item, dim_tag, encode_user, encode_item, encode_tag, decode_user, decode_item,
@@ -304,7 +305,9 @@ def create_dataset_lastfm():
                'tag_test': tag_test,
                'user_neg': user_neg}
     print("finish dataset")
-    np.save("hetrec2011-lastfm-2k/train_test.npy", dataset)
+    h5f = h5py.File('hetrec2011-2k/train_test.h5', 'w')
+    h5f.create_dataset('dataset_1', data=dataset)
+    h5f.close()
 
     return dataset
 
