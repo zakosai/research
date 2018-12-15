@@ -164,12 +164,16 @@ class MultiTask:
         user_rec = self.decode(z_user, "user", "onehot", self.decode_user, False, False)
         z_user_tag, loss_kl_user_tag = self.encode(self.user_tag, "user", "tag", self.encode_tag, False, True, True)
         user_tag_rec = self.decode(z_user_tag, "user", "tag", self.decode_tag, False, True)
+        user_fake = self.decode(z_user_tag, "user", "onehot", self.decode_user, True, True)
+        user_tag_fake = self.decode(z_user, "user", "tag", self.decode_tag, True, True)
 
         z_itempos, loss_kl_itempos = self.encode(self.itempos, "item", "onehot", self.encode_item, False, False, False)
         itempos_rec = self.decode(z_itempos, "item", "onehot", self.decode_item, False, False)
         z_itempos_tag, loss_kl_itempos_tag = self.encode(self.itempos_tag, "item", "tag", self.encode_tag, False,
                                                          True, True)
         itempos_tag_rec = self.decode(z_itempos_tag, "item", "tag", self.decode_tag, False, True)
+        itempos_fake = self.decode(z_itempos_tag, "item", "onehot", self.decode_item, True, True)
+        item_tag_fake = self.decode(z_itempos, "item", "tag", self.decode_tag, True, True)
 
         z_itemneg, loss_kl_itemneg = self.encode(self.itemneg, "item", "onehot", self.encode_item, True, True, True)
         itemneg_rec = self.decode(z_itemneg, "item", "onehot", self.decode_item, True, True)
@@ -201,10 +205,18 @@ class MultiTask:
         #Loss GAN
         loss_rating_dis = self.lambda_4 * self.loss_discriminator(ratingpos_pred, ratingneg_pred)
 
+        self.loss_pretrained = loss_vae_user + loss_vae_user_tag + loss_vae_itempos + loss_vae_itempos_tag + \
+                               loss_vae_itemneg +  0.1 * tf.losses.get_regularization_loss() + self.lambda_1 * \
+                               (self.loss_reconstruct(self.user, user_fake) +
+                                self.loss_reconstruct(self.user_tag, user_tag_fake) +
+                                self.loss_reconstruct(self.itempos, itempos_fake) +
+                                self.loss_reconstruct(self.itempos_tag, item_tag_fake))
+
         self.loss_gen = loss_vae_user + loss_vae_itempos +loss_vae_itemneg + loss_vae_user_tag + loss_vae_itempos_tag\
                         + loss_tag + self.loss_generator(ratingpos_pred) + 0.1 * tf.losses.get_regularization_loss()
         self.loss_dis = loss_rating_dis
 
+        self.train_op_pretrained = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_pretrained)
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
 
@@ -418,10 +430,16 @@ def main():
                     model.itempos_tag: tag_itempos,
                     model.tag: tag_label}
 
-            _, loss_gen = sess.run([model.train_op_gen, model.loss_gen], feed_dict=feed)
-            _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
+            if i < 50:
+                _, loss_pretrained = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
+            else:
+                _, loss_gen = sess.run([model.train_op_gen, model.loss_gen], feed_dict=feed)
+                _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
 
-        if i % 10 == 0:
+        if i %10 == 0 and i <=50:
+            print("Loss lass batch: loss pretrained %f"%loss_pretrained)
+
+        if i % 10 == 0 and i > 50:
             model.train = False
             print("Loss lass batch: Loss gen %f, loss dis %f"%(loss_gen, loss_dis))
 
@@ -444,6 +462,7 @@ def main():
 
         if i % 100 ==0:
             model.learning_rate /= 10
+            print(model.learning_rate)
 
 
 
