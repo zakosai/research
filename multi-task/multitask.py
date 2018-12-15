@@ -304,7 +304,7 @@ def create_dataset_lastfm():
                'tag_test': tag_test,
                'user_neg': user_neg}
     print("finish dataset")
-    np.savez("hetrec2011-lastfm-2k/train_test.npz", dataset)
+    np.save("hetrec2011-lastfm-2k/train_test.npy", dataset)
 
     return dataset
 
