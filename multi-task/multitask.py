@@ -12,7 +12,7 @@ import pickle
 class MultiTask:
     def __init__(self, dim_user, dim_item, dim_tag, encode_user, encode_item, encode_tag, decode_user, decode_item,
                  decode_tag, tag_pred_layer, rating_pred_layer, z_dim, share_dim, learning_rate=1e-4, eps=1e-10,
-                 lambda_1=100, lambda_2=0.1, lambda_3=100, lambda_4=1):
+                 lambda_1=1, lambda_2=0.1, lambda_3=1, lambda_4=1):
         self.dim_user = dim_user
         self.dim_item = dim_item
         self.dim_tag = dim_tag
@@ -40,8 +40,8 @@ class MultiTask:
 
     def enc(self, x, scope, layer, reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.5)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="enc_%d"%i,
@@ -56,8 +56,8 @@ class MultiTask:
 
     def dec(self, x, scope, layer, reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)-1):
                 x_ = fully_connected(x_, layer[i], scope="dec_%d" % i,
@@ -73,7 +73,7 @@ class MultiTask:
 
         with tf.variable_scope(scope, reuse=reuse):
             # if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+            # x_ = tf.nn.dropout(x_, 0.7)
             for i in range(len(layer)-1):
                 x_ = fully_connected(x_, layer[i], self.active_function, scope="adv_%d" % i)
             x_ = fully_connected(x_, layer[-1], scope="adv_last")
@@ -81,8 +81,8 @@ class MultiTask:
 
     def share_layer(self, x, scope, layer, reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i],  scope="share_%d"%i,
@@ -96,8 +96,8 @@ class MultiTask:
 
     def mlp(self, x, scope, layer, reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="%s_%d"%(scope, i), weights_regularizer=self.regularizer)
