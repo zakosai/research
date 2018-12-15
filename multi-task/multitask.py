@@ -11,7 +11,7 @@ import pandas as pd
 class MultiTask:
     def __init__(self, dim_user, dim_item, dim_tag, encode_user, encode_item, encode_tag, decode_user, decode_item,
                  decode_tag, tag_pred_layer, rating_pred_layer, z_dim, share_dim, learning_rate=1e-4, eps=1e-10,
-                 lambda_1=1, lambda_2=1, lambda_3=1, lambda_4=1):
+                 lambda_1=0.1, lambda_2=100, lambda_3=100, lambda_4=1):
         self.dim_user = dim_user
         self.dim_item = dim_item
         self.dim_tag = dim_tag
@@ -434,8 +434,6 @@ def main():
                     model.itempos_tag: tag_itempos}
 
             tag_pred = sess.run(model.tag_pred, feed_dict=feed)
-            print(tag_pred.shape)
-            print(tag_pred[0], dataset['tag_test'][0])
             recall_tag = calc_recall(tag_pred, dataset['tag_test'], [10], "tag")
 
         if i % 100 ==0:
