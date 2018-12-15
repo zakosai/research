@@ -40,8 +40,8 @@ class MultiTask:
 
     def enc(self, x, scope, layer, reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="enc_%d"%i,
@@ -54,8 +54,8 @@ class MultiTask:
 
     def dec(self, x, scope, layer, reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="dec_%d" % i,
@@ -70,8 +70,8 @@ class MultiTask:
         x_ = x
 
         with tf.variable_scope(scope, reuse=reuse):
-            if self.train:
-                x_ = tf.nn.dropout(x_, 0.7)
+            # if self.train:
+            #     x_ = tf.nn.dropout(x_, 0.7)
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="adv_%d" % i)
                 x_ = tf.nn.leaky_relu(x_, alpha=0.5)
@@ -81,8 +81,8 @@ class MultiTask:
 
     def share_layer(self, x, scope, layer, reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i],  scope="share_%d"%i,
@@ -96,8 +96,8 @@ class MultiTask:
 
     def mlp(self, x, scope, layer, reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="%s_%d"%(scope, i), weights_regularizer=self.regularizer)
