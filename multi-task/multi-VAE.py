@@ -7,7 +7,7 @@ import numpy as np
 import os
 import argparse
 import pandas as pd
-
+import pickle
 
 class Translation:
     def __init__(self, batch_size, dim, encode_dim, decode_dim, z_dim, eps=1e-10,
@@ -231,8 +231,8 @@ def main():
     iter = 3000
     batch_size= 500
     args = parser.parse_args()
-    dataset = args.data
-    dataset = create_dataset_lastfm()
+    f = open("hetrec2011-lastfm-2k/dataset.pkl", 'rb')
+    dataset = pickle.load(f)
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']

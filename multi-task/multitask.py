@@ -40,27 +40,27 @@ class MultiTask:
 
     def enc(self, x, scope, layer, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.5)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
                 # y = maxout(x_, encode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.3)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
                 # x_ = self.active_function(x_)
         return x_
 
     def dec(self, x, scope, layer, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.3)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
                 # x_ = self.active_function(x_)
             # x_ = fully_connected(x_, layer[-1], scope="last_dec",
             #                  weights_regularizer=self.regularizer, trainable=self.freeze)
@@ -70,38 +70,38 @@ class MultiTask:
         x_ = x
 
         with tf.variable_scope(scope, reuse=reuse):
-            # if self.train:
-            # x_ = tf.nn.dropout(x_, 0.7)
+            if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="adv_%d" % i)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.3)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
                 # x_ = self.active_function(x_)
             # x_ = fully_connected(x_, layer[-1], scope="adv_last")
         return x_
 
     def share_layer(self, x, scope, layer, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i],  scope="share_%d"%i,
                                      weights_regularizer=self.regularizer)
                 # y = maxout(x_, dim[i])
                 # x_ = tf.reshape(y, x_.shape)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.3)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
                 # x_ = self.active_function(x_)
 
         return x_
 
     def mlp(self, x, scope, layer, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="%s_%d"%(scope, i), weights_regularizer=self.regularizer)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.3)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
                 # x_ = self.active_function(x_)
         return x_
 
@@ -444,7 +444,7 @@ def main():
             print("Loss lass batch: loss pretrained %f"%loss_pretrained)
 
         if i % 10 == 0 and i > 50:
-            model.train = False
+            # model.train = False
             print("Loss lass batch: Loss gen %f, loss dis %f"%(loss_gen, loss_dis))
 
             # test
