@@ -248,15 +248,17 @@ def create_dataset_lastfm():
             artist_onehot[aid, uid] = 1
             tag_list = list(user_tags.loc[(user_tags.userID == ua.userID) & (user_tags.artistID == ua.artistID)][
                                 'tagID'])
-            for i in tag_list:
-                tid = tag_id.index(i)
-                tag_user_onehot[uid, tid] = 1
-                tag_artist_onehot[aid, tid] = 1
-                tag_label_train[index, tid] = 1
+            if len(tag_list != 0):
+                train_matrix.append([uid, aid])
+                for i in tag_list:
+                    tid = tag_id.index(i)
+                    tag_user_onehot[uid, tid] = 1
+                    tag_artist_onehot[aid, tid] = 1
+                    tag_label_train[index, tid] = 1
         else:
             print(ua)
         index += 1
-        train_matrix.append([uid, aid])
+
     print("finish create train")
 
     # create test
@@ -313,7 +315,6 @@ def calc_recall(pred, test, m=[100], type=None):
         for i in range(len(pred_ab)):
             p = pred_ab[i]
             if len(test[i]) != 0:
-                print(p, test[i])
                 hits = set(test[i]) & set(p)
 
                 #recall
@@ -419,9 +420,9 @@ def main():
             print("Loss lass batch: Loss gen %f, loss dis %f"%(loss_gen, loss_dis))
 
             # test
-            # user_id = dataset['user_item_test'].keys()
-            # item_pred = sess.run(model.user_rec, feed_dict={model.user: dataset['user_onehot'][user_id]})
-            # recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
+            user_id = dataset['user_item_test'].keys()
+            item_pred = sess.run(model.user_rec, feed_dict={model.user: dataset['user_onehot'][user_id]})
+            recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
 
             user = dataset['user_onehot'][dataset['test'][:,0]]
             itempos = dataset['item_onehot'][dataset['test'][:,1]]
