@@ -182,7 +182,7 @@ class MultiTask:
         ratingpos_pred = self.adversal(ratingpos_concat, "rating", self.rating_pred_layer)
 
         ratingneg_concat = tf.concat([user_rec, itemneg_rec], axis=1)
-        ratingneg_pred = self.adversal(ratingneg_concat, "rating", self.rating_pred_layer)
+        ratingneg_pred = self.adversal(ratingneg_concat, "rating", self.rating_pred_layer, True)
 
 
         #Loss Function #
