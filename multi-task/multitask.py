@@ -431,17 +431,17 @@ def main():
                     model.user_tag: tag_user,
                     model.itempos_tag: tag_itempos,
                     model.tag: tag_label}
+            #
+            # if i < 50:
+            #     _, loss_pretrained = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
+            # else:
+            _, loss_gen = sess.run([model.train_op_gen, model.loss_gen], feed_dict=feed)
+            _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
 
-            if i < 50:
-                _, loss_pretrained = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
-            else:
-                _, loss_gen = sess.run([model.train_op_gen, model.loss_gen], feed_dict=feed)
-                _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
+        # if i %10 == 0 and i <=50:
+        #     print("Loss lass batch: loss pretrained %f"%loss_pretrained)
 
-        if i %10 == 0 and i <=50:
-            print("Loss lass batch: loss pretrained %f"%loss_pretrained)
-
-        if i % 10 == 0 and i > 50:
+        if i % 10 == 0:
             model.train = False
             print("Loss lass batch: Loss gen %f, loss dis %f"%(loss_gen, loss_dis))
 
