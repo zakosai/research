@@ -269,7 +269,7 @@ def main():
         if i%10 == 0:
             model.train = False
             x = dataset['user_onehot'][dataset['user_item_test'].keys()]
-            item_pred = sess.run([ model.x_recon],
+            item_pred = sess.run(model.x_recon,
                                               feed_dict={model.x:x})
 
             recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
