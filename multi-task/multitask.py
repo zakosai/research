@@ -48,7 +48,7 @@ class MultiTask:
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
                 # y = maxout(x_, encode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.1)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.01)
                 # x_ = tf.nn.tanh(x_)
 
                 print(x_.shape)
@@ -62,7 +62,7 @@ class MultiTask:
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.1)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.01)
                 # x_ = tf.nn.tanh(x_)
             # x_ = fully_connected(x_, layer[-1], scope="last_dec",
             #                  weights_regularizer=self.regularizer, trainable=self.freeze)
@@ -76,7 +76,7 @@ class MultiTask:
             # x_ = tf.nn.dropout(x_, 0.7)
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="adv_%d" % i)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.1)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.01)
             # x_ = fully_connected(x_, layer[-1], scope="adv_last")
         return x_
 
@@ -90,7 +90,7 @@ class MultiTask:
                                      weights_regularizer=self.regularizer)
                 # y = maxout(x_, dim[i])
                 # x_ = tf.reshape(y, x_.shape)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.1)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.01)
                 # x_ = tf.nn.tanh(x_)
 
         return x_
@@ -102,7 +102,7 @@ class MultiTask:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="%s_%d"%(scope, i), weights_regularizer=self.regularizer)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.2)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.01)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
