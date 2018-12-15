@@ -24,7 +24,7 @@ class MultiTask:
         self.tag_pred_layer = tag_pred_layer
         self.rating_pred_layer = rating_pred_layer
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.tanh
+        self.active_function = tf.nn.sigmoid
         self.z_dim = z_dim
         self.eps = eps
         self.share_dim = share_dim
@@ -195,7 +195,8 @@ class MultiTask:
                                self.lambda_2 * loss_kl_itempos_tag
 
         #Loss tag pred
-        loss_tag = self.lambda_3 * self.loss_reconstruct(self.tag, tag_pred)
+        loss_tag = self.lambda_3 * tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=self.tag_pred,
+                                                                                          labels=self.tag))
 
         #Loss GAN
         loss_rating_dis = self.lambda_4 * self.loss_discriminator(ratingpos_pred, ratingneg_pred)
@@ -303,6 +304,7 @@ def create_dataset_lastfm():
                'tag_test': tag_test,
                'user_neg': user_neg}
     print("finish dataset")
+    np.savez("hetrec2011-lastfm-2k/train_test.npz", dataset)
 
     return dataset
 
