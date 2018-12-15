@@ -464,7 +464,7 @@ def main():
             tag_pred = sess.run(model.tag_pred, feed_dict=feed)
             recall_tag = calc_recall(tag_pred, dataset['tag_test'], [10], "tag")
 
-        if i % 100 ==0:
+        if i % 100 ==0 and model.learning_rate > 1e-6:
             model.learning_rate /= 10
             print(model.learning_rate)
 
