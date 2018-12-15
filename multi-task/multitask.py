@@ -248,7 +248,7 @@ def create_dataset_lastfm():
             artist_onehot[aid, uid] = 1
             tag_list = list(user_tags.loc[(user_tags.userID == ua.userID) & (user_tags.artistID == ua.artistID)][
                                 'tagID'])
-            if len(tag_list != 0):
+            if len(tag_list) != 0:
                 train_matrix.append([uid, aid])
                 for i in tag_list:
                     tid = tag_id.index(i)
