@@ -7,7 +7,7 @@ import numpy as np
 import os
 import argparse
 import pandas as pd
-import h5py
+import pickle
 
 class MultiTask:
     def __init__(self, dim_user, dim_item, dim_tag, encode_user, encode_item, encode_tag, decode_user, decode_item,
@@ -99,7 +99,7 @@ class MultiTask:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="%s_%d"%(scope, i), weights_regularizer=self.regularizer)
-                x_ = self.active_function(x_)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.2)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
@@ -152,13 +152,13 @@ class MultiTask:
         return tf.reduce_mean(tf.squared_difference(x, 1))
 
     def build_model(self):
-        self.user = tf.placeholder(tf.float32, shape=[None, self.dim_item], name='user_input')
-        self.user_tag = tf.placeholder(tf.float32, shape=[None, self.dim_tag], name='user_tag_input')
-        self.itempos = tf.placeholder(tf.float32, shape=[None, self.dim_user], name='item_pos_input')
-        self.itempos_tag = tf.placeholder(tf.float32, shape=[None, self.dim_tag], name='item_pos_tag_input')
-        self.itemneg = tf.placeholder(tf.float32, shape=[None, self.dim_user], name='item_neg_input')
+        self.user = tf.placeholder(tf.int8, shape=[None, self.dim_item], name='user_input')
+        self.user_tag = tf.placeholder(tf.int8, shape=[None, self.dim_tag], name='user_tag_input')
+        self.itempos = tf.placeholder(tf.int8, shape=[None, self.dim_user], name='item_pos_input')
+        self.itempos_tag = tf.placeholder(tf.int8, shape=[None, self.dim_tag], name='item_pos_tag_input')
+        self.itemneg = tf.placeholder(tf.int8, shape=[None, self.dim_user], name='item_neg_input')
         # self.itemneg_tag = tf.placeholder(tf.float32, shape=[None, self.dim_tag], name='item_neg_tag_input')
-        self.tag = tf.placeholder(tf.float32, shape=[None, self.dim_tag], name='tag_input')
+        self.tag = tf.placeholder(tf.int8, shape=[None, self.dim_tag], name='tag_input')
 
         z_user, loss_kl_user = self.encode(self.user, "user", "onehot",self.encode_user, False, False, False)
         user_rec = self.decode(z_user, "user", "onehot", self.decode_user, False, False)
@@ -179,10 +179,10 @@ class MultiTask:
         tag_pred = self.mlp(tag_concat, "tag", self.tag_pred_layer)
 
         ratingpos_concat = tf.concat([user_rec, itempos_rec], axis=1)
-        ratingpos_pred = self.mlp(ratingpos_concat, "rating", self.rating_pred_layer)
+        ratingpos_pred = self.adversal(ratingpos_concat, "rating", self.rating_pred_layer)
 
         ratingneg_concat = tf.concat([user_rec, itemneg_rec], axis=1)
-        ratingneg_pred = self.mlp(ratingneg_concat, "rating", self.rating_pred_layer, True)
+        ratingneg_pred = self.adversal(ratingneg_concat, "rating", self.rating_pred_layer)
 
 
         #Loss Function #
@@ -196,8 +196,7 @@ class MultiTask:
                                self.lambda_2 * loss_kl_itempos_tag
 
         #Loss tag pred
-        loss_tag = self.lambda_3 * tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=tag_pred,
-                                                                                          labels=self.tag))
+        loss_tag = self.lambda_3 * self.loss_reconstruct(self.tag, tag_pred)
 
         #Loss GAN
         loss_rating_dis = self.lambda_4 * self.loss_discriminator(ratingpos_pred, ratingneg_pred)
@@ -231,11 +230,11 @@ def create_dataset_lastfm():
     train = user_artist.loc[~user_artist.index.isin(test.index)]
 
     # initial one hot
-    user_onehot = np.zeros(shape=(user_no, artist_no), dtype=np.float32)
-    artist_onehot = np.zeros(shape=(artist_no, user_no), dtype=np.float32)
-    tag_user_onehot = np.zeros(shape=(user_no, tag_no), dtype=np.float32)
-    tag_artist_onehot = np.zeros(shape=(artist_no, tag_no), dtype=np.float32)
-    tag_label_train = np.zeros(shape=(train.shape[0], tag_no), dtype=np.float32)
+    user_onehot = np.zeros(shape=(user_no, artist_no), dtype=np.int8)
+    artist_onehot = np.zeros(shape=(artist_no, user_no), dtype=np.int8)
+    tag_user_onehot = np.zeros(shape=(user_no, tag_no), dtype=np.int8)
+    tag_artist_onehot = np.zeros(shape=(artist_no, tag_no), dtype=np.int8)
+    tag_label_train = np.zeros(shape=(train.shape[0], tag_no), dtype=np.int8)
     train_matrix = []
     test_matrix = []
     print("finish initial")
@@ -305,6 +304,8 @@ def create_dataset_lastfm():
                'tag_test': tag_test,
                'user_neg': user_neg}
     print("finish dataset")
+    f = open("hetrec2011-lastfm-2k/dataset.pkl", "wb")
+    pickle.dump(dataset, f)
 
 
     return dataset
