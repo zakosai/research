@@ -400,7 +400,7 @@ def main():
     decode_tag = [200, dataset['tag_no']]
 
     batch_size = 500
-    epoches = 600
+    epoches = 3000
 
 
     model = MultiTask(dataset['user_no'], dataset['item_no'], dataset['tag_no'], encode_user, encode_item, encode_tag,
