@@ -208,14 +208,14 @@ class MultiTask:
         loss_rating_dis = self.lambda_4 * self.loss_discriminator(ratingpos_pred, ratingneg_pred)
 
         self.loss_pretrained = loss_vae_user + loss_vae_user_tag + loss_vae_itempos + loss_vae_itempos_tag + \
-                               loss_vae_itemneg +  0.1 * tf.losses.get_regularization_loss() + self.lambda_1 * \
+                               loss_vae_itemneg +  0.01 * tf.losses.get_regularization_loss() + self.lambda_1 * \
                                (self.loss_reconstruct(self.user, user_fake) +
                                 self.loss_reconstruct(self.user_tag, user_tag_fake) +
                                 self.loss_reconstruct(self.itempos, itempos_fake) +
                                 self.loss_reconstruct(self.itempos_tag, item_tag_fake))
 
         self.loss_gen = loss_vae_user + loss_vae_itempos +loss_vae_itemneg + loss_vae_user_tag + loss_vae_itempos_tag\
-                        + loss_tag + self.loss_generator(ratingpos_pred) + 0.1 * tf.losses.get_regularization_loss()
+                        + loss_tag + self.loss_generator(ratingpos_pred) + 0.01 * tf.losses.get_regularization_loss()
         self.loss_dis = loss_rating_dis
 
         self.train_op_pretrained = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_pretrained)
@@ -431,17 +431,17 @@ def main():
                     model.user_tag: tag_user,
                     model.itempos_tag: tag_itempos,
                     model.tag: tag_label}
-            #
-            # if i < 50:
-            #     _, loss_pretrained = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
-            # else:
-            _, loss_gen = sess.run([model.train_op_gen, model.loss_gen], feed_dict=feed)
-            _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
 
-        # if i %10 == 0 and i <=50:
-        #     print("Loss lass batch: loss pretrained %f"%loss_pretrained)
+            if i < 50:
+                _, loss_pretrained = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
+            else:
+                _, loss_gen = sess.run([model.train_op_gen, model.loss_gen], feed_dict=feed)
+                _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
 
-        if i % 10 == 0:
+        if i %10 == 0 and i <=50:
+            print("Loss lass batch: loss pretrained %f"%loss_pretrained)
+
+        if i % 10 == 0 and i > 50:
             model.train = False
             print("Loss lass batch: Loss gen %f, loss dis %f"%(loss_gen, loss_dis))
 
