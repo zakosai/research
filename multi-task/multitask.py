@@ -453,7 +453,8 @@ def main():
                 user_id = [u] * dataset['item_no']
                 pred = sess.run(model.user_rec, feed_dict={model.user: dataset['user_onehot'][user_id],
                                                                 model.itempos:dataset['item_onehot']})
-                pred = sum(pred, [])
+                pred = [item for sublist in pred for item in sublist]
+
                 print(pred)
                 item_pred.append(pred)
             recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
