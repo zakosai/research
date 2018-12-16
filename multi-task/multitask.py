@@ -453,6 +453,7 @@ def main():
                 user_id = [u] * dataset['item_no']
                 pred = sess.run(model.user_rec, feed_dict={model.user: dataset['user_onehot'][user_id],
                                                                 model.itempos:dataset['item_onehot']})
+                print(pred)
                 pred = list(np.array(pred).reshape(dataset['item_no']))
                 item_pred.append(pred)
             recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
