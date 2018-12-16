@@ -222,10 +222,11 @@ class MultiTask:
                         0.01 * tf.losses.get_regularization_loss()
         self.loss_dis = loss_rating_dis
 
+        adv_var = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="rating")
         self.train_op_pretrained = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_pretrained)
         self.train_op_tag = tf.train.AdamOptimizer(1e-5).minimize(loss_tag)
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
-        self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
+        self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis, var_list=adv_var)
 
         self.user_rec = user_rec
         self.tag_pred = tag_pred
