@@ -185,11 +185,13 @@ class MultiTask:
         tag_concat = tf.concat([user_tag_rec, itempos_tag_rec], axis=1)
         tag_pred = self.mlp(tag_concat, "tag", self.tag_pred_layer)
 
-        ratingpos_concat = tf.concat([z_user, z_itempos], axis=1)
-        ratingpos_pred = self.adversal(ratingpos_concat, "rating", self.rating_pred_layer)
-
-        ratingneg_concat = tf.concat([z_user, z_itemneg], axis=1)
-        ratingneg_pred = self.adversal(ratingneg_concat, "rating", self.rating_pred_layer, True)
+        # ratingpos_concat = tf.concat([z_user, z_itempos], axis=1)
+        # ratingpos_pred = self.adversal(ratingpos_concat, "rating", self.rating_pred_layer)
+        #
+        # ratingneg_concat = tf.concat([z_user, z_itemneg], axis=1)
+        # ratingneg_pred = self.adversal(ratingneg_concat, "rating", self.rating_pred_layer, True)
+        ratingpos_pred = tf.reduce_sum(tf.multiply(z_user, z_itempos), 1, keep_dims=True)
+        ratingneg_pred = tf.reduce_sum(tf.multiply(z_user, z_itemneg), 1, keep_dims=True)
 
 
         #Loss Function #
@@ -225,9 +227,9 @@ class MultiTask:
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
 
-        self.user_rec = user_rec
+        self.user_rec = z_user
         self.tag_pred = tag_pred
-        self.item_rec = itempos_rec
+        self.item_rec = z_itempos
 
 
 def create_dataset_lastfm():
@@ -456,8 +458,8 @@ def main():
             #     user_id = [u] * dataset['item_no']
             item_pred = sess.run(model.user_rec, feed_dict={model.user: dataset['user_onehot'][user_id]})
             user_pred = sess.run(model.item_rec, feed_dict={model.itempos: dataset['item_onehot']})
-            user_pred = user_pred[:, user_id]
-            item_pred = item_pred * user_pred.T
+            # user_pred = user_pred[:, user_id]
+            item_pred = np.dot(item_pred, user_pred.T)
             #     pred = [item for sublist in pred for item in sublist]
             #
             #     item_pred.append(pred)
