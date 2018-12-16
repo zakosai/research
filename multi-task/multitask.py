@@ -447,7 +447,7 @@ def main():
 
             # test
             user_id = dataset['user_item_test'].keys()
-            print(len(dataset['user_teim_test']))
+            print(len(dataset['user_item_test']))
             item_pred = []
             for u in dataset['user_item_test'].values():
                 user_id = [u] * dataset['item_no']
