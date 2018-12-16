@@ -437,6 +437,7 @@ def main():
 
             if i < 100:
                 _, loss_pretrained = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
+                sess.run(model.train_op_tag, feed_dict=feed)
                 loss_gen = loss_dis = 0
             else:
                 _, loss_gen = sess.run([model.train_op_gen, model.loss_gen], feed_dict=feed)
