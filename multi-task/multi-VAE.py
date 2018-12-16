@@ -268,11 +268,11 @@ def main():
         # Validation Process
         if i%10 == 0:
             model.train = False
-            x = dataset['user_onehot'][dataset['user_item_test'].keys()]
+            x = dataset['user_onehot'][dataset['user_item_test'].keys()][:100]
             item_pred = sess.run(model.x_recon,
                                               feed_dict={model.x:x})
 
-            recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
+            recall_item = calc_recall(item_pred, dataset['user_item_test'].values()[:100], [50], "item")
             model.train = True
         if i%100 == 0 and model.learning_rate > 1e-6:
             model.learning_rate /= 10
