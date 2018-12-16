@@ -25,7 +25,7 @@ class MultiTask:
         self.tag_pred_layer = tag_pred_layer
         self.rating_pred_layer = rating_pred_layer
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.tanh
+        self.active_function = tf.nn.sigmoid
         self.z_dim = z_dim
         self.eps = eps
         self.share_dim = share_dim
