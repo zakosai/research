@@ -11,7 +11,7 @@ import pickle
 
 class MultiTask:
     def __init__(self, dim_user, dim_item, dim_tag, encode_user, encode_item, encode_tag, decode_user, decode_item,
-                 decode_tag, tag_pred_layer, rating_pred_layer, z_dim, share_dim, learning_rate=1e-3, eps=1e-10,
+                 decode_tag, tag_pred_layer, rating_pred_layer, z_dim, share_dim, learning_rate=1e-4, eps=1e-10,
                  lambda_1=1, lambda_2=0.1, lambda_3=10, lambda_4=1):
         self.dim_user = dim_user
         self.dim_item = dim_item
@@ -40,8 +40,8 @@ class MultiTask:
 
     def enc(self, x, scope, layer, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="enc_%d"%i,
@@ -54,8 +54,8 @@ class MultiTask:
 
     def dec(self, x, scope, layer, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="dec_%d" % i,
@@ -70,8 +70,8 @@ class MultiTask:
         x_ = x
 
         with tf.variable_scope(scope, reuse=reuse):
-            # if self.train:
-            #     x_ = tf.nn.dropout(x_, 0.7)
+            if self.train:
+                x_ = tf.nn.dropout(x_, 0.7)
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="adv_%d" % i)
                 x_ = tf.nn.leaky_relu(x_, alpha=0.5)
@@ -81,8 +81,8 @@ class MultiTask:
 
     def share_layer(self, x, scope, layer, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i],  scope="share_%d"%i,
@@ -96,8 +96,8 @@ class MultiTask:
 
     def mlp(self, x, scope, layer, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="%s_%d"%(scope, i), weights_regularizer=self.regularizer)
@@ -224,7 +224,7 @@ class MultiTask:
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
 
-        self.user_rec = user_rec
+        self.user_rec = ratingpos_pred
         self.tag_pred = tag_pred
 
 
@@ -434,20 +434,28 @@ def main():
                     model.itempos_tag: tag_itempos,
                     model.tag: tag_label}
 
-            if i < 100:
+            if i < 20:
                 _, loss_pretrained = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
                 loss_gen = loss_dis = 0
             else:
                 _, loss_gen = sess.run([model.train_op_gen, model.loss_gen], feed_dict=feed)
                 _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
 
-        if i % 10 == 0:
+        if i % 10 == 0 and i > 20:
             model.train = False
             print("Loss lass batch: Loss gen %f, loss dis %f"%(loss_gen, loss_dis))
 
             # test
             user_id = dataset['user_item_test'].keys()
-            item_pred = sess.run(model.user_rec, feed_dict={model.user: dataset['user_onehot'][user_id]})
+            print(len(dataset['user_teim_test']))
+            item_pred = []
+            for u in dataset['user_item_test'].values():
+                user_id = [u] * dataset['item_no']
+                pred = sess.run(model.user_rec, feed_dict={model.user: dataset['user_onehot'][user_id],
+                                                                model.itempos:dataset['item_onehot']})
+                pred = list(np.array(pred).reshape(dataset['item_no']))
+                item_pred.append(pred)
+            print(pred.shape)
             recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
 
             user = dataset['user_onehot'][dataset['test'][:,0]]
@@ -461,10 +469,12 @@ def main():
 
             tag_pred = sess.run(model.tag_pred, feed_dict=feed)
             recall_tag = calc_recall(tag_pred, dataset['tag_test'], [10], "tag")
+            model.train = True
 
         if i % 100 ==0 and model.learning_rate > 1e-6:
             model.learning_rate /= 10
             print(model.learning_rate)
+
 
 
 
