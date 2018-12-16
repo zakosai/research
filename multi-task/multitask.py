@@ -447,9 +447,9 @@ def main():
 
             # test
             user_id = dataset['user_item_test'].keys()
-            print(len(dataset['user_item_test']))
+            print(len(dataset['user_item_test'].keys()))
             item_pred = []
-            for u in dataset['user_item_test'].values():
+            for u in dataset['user_item_test'].keys():
                 user_id = [u] * dataset['item_no']
                 pred = sess.run(model.user_rec, feed_dict={model.user: dataset['user_onehot'][user_id],
                                                                 model.itempos:dataset['item_onehot']})
