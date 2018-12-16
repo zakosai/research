@@ -462,7 +462,7 @@ def main():
             #
             #     item_pred.append(pred)
             # item_pred = np.array(item_pred)
-            recall_item = calc_recall(item_pred, dataset['user_item_test'].values()[:100], [50], "item")
+            recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
 
             user = dataset['user_onehot'][dataset['test'][:,0]]
             itempos = dataset['item_onehot'][dataset['test'][:,1]]
