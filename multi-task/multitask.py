@@ -25,7 +25,7 @@ class MultiTask:
         self.tag_pred_layer = tag_pred_layer
         self.rating_pred_layer = rating_pred_layer
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.sigmoid
+        self.active_function = tf.nn.tanh
         self.z_dim = z_dim
         self.eps = eps
         self.share_dim = share_dim
@@ -74,7 +74,7 @@ class MultiTask:
                 x_ = tf.nn.dropout(x_, 0.7)
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="adv_%d" % i)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+                # x_ = tf.nn.leaky_relu(x_, alpha=0.5)
                 x_ = self.active_function(x_)
             # x_ = fully_connected(x_, layer[-1], scope="adv_last")
         return x_
