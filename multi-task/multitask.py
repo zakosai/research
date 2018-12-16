@@ -215,7 +215,8 @@ class MultiTask:
                                 self.loss_reconstruct(self.itempos, itempos_fake) +
                                 self.loss_reconstruct(self.itempos_tag, item_tag_fake)) + loss_tag
 
-        self.loss_gen = loss_tag + self.lambda_4 * self.loss_generator(ratingpos_pred) + \
+        self.loss_gen = loss_vae_user + loss_vae_user_tag + loss_vae_itempos + loss_vae_itempos_tag + \
+                               loss_vae_itemneg + loss_tag + self.lambda_4 * self.loss_generator(ratingpos_pred) + \
                         0.01 * tf.losses.get_regularization_loss()
         self.loss_dis = loss_rating_dis
 
