@@ -72,11 +72,11 @@ class MultiTask:
         with tf.variable_scope(scope, reuse=reuse):
             if self.train:
                 x_ = tf.nn.dropout(x_, 0.7)
-            for i in range(len(layer)):
+            for i in range(len(layer)-1):
                 x_ = fully_connected(x_, layer[i], scope="adv_%d" % i)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
-                # x_ = self.active_function(x_)
-            # x_ = fully_connected(x_, layer[-1], scope="adv_last")
+                # x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+                x_ = self.active_function(x_)
+            x_ = fully_connected(x_, layer[-1], scope="adv_last")
         return x_
 
     def share_layer(self, x, scope, layer, reuse=False):
@@ -438,14 +438,14 @@ def main():
                     model.itempos_tag: tag_itempos,
                     model.tag: tag_label}
 
-            if i < 20:
+            if i < 50:
                 _, loss_pretrained = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
                 loss_gen = loss_dis = 0
             else:
                 _, loss_gen = sess.run([model.train_op_gen, model.loss_gen], feed_dict=feed)
                 _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
 
-        if i % 10 == 0 and i > 20:
+        if i % 10 == 0 and i > 50:
             model.train = False
             print("Loss lass batch: Loss gen %f, loss dis %f"%(loss_gen, loss_dis))
 
