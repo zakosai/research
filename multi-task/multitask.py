@@ -225,8 +225,9 @@ class MultiTask:
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
 
-        self.user_rec = ratingpos_pred
+        self.user_rec = user_rec
         self.tag_pred = tag_pred
+        self.item_rec = itempos_rec
 
 
 def create_dataset_lastfm():
@@ -448,17 +449,19 @@ def main():
 
             # test
             user_id = dataset['user_item_test'].keys()
-            print(len(dataset['user_item_test'].keys()))
 
-            item_pred = []
-            for u in dataset['user_item_test'].keys()[:100]:
-                user_id = [u] * dataset['item_no']
-                pred = sess.run(model.user_rec, feed_dict={model.user: dataset['user_onehot'][user_id],
-                                                                model.itempos:dataset['item_onehot']})
-                pred = [item for sublist in pred for item in sublist]
 
-                item_pred.append(pred)
-            item_pred = np.array(item_pred)
+            # item_pred = []
+            # for u in dataset['user_item_test'].keys()[:100]:
+            #     user_id = [u] * dataset['item_no']
+            item_pred = sess.run(model.user_rec, feed_dict={model.user: dataset['user_onehot'][user_id]})
+            user_pred = sess.run(model.item_rec, feed_dict={model.itempos: dataset['item_onehot']})
+            user_pred = user_pred[:, user_id]
+            item_pred = item_pred + user_pred.T
+            #     pred = [item for sublist in pred for item in sublist]
+            #
+            #     item_pred.append(pred)
+            # item_pred = np.array(item_pred)
             recall_item = calc_recall(item_pred, dataset['user_item_test'].values()[:100], [50], "item")
 
             user = dataset['user_onehot'][dataset['test'][:,0]]
