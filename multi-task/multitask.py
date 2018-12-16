@@ -72,11 +72,11 @@ class MultiTask:
         with tf.variable_scope(scope, reuse=reuse):
             if self.train:
                 x_ = tf.nn.dropout(x_, 0.7)
-            for i in range(len(layer)-1):
+            for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="adv_%d" % i)
                 x_ = tf.nn.leaky_relu(x_, alpha=0.5)
-                # x_ = self.active_function(x_)
-            x_ = fully_connected(x_, layer[-1], scope="adv_last")
+                x_ = self.active_function(x_)
+            # x_ = fully_connected(x_, layer[-1], scope="adv_last")
         return x_
 
     def share_layer(self, x, scope, layer, reuse=False):
