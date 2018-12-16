@@ -457,7 +457,7 @@ def main():
             item_pred = sess.run(model.user_rec, feed_dict={model.user: dataset['user_onehot'][user_id]})
             user_pred = sess.run(model.item_rec, feed_dict={model.itempos: dataset['item_onehot']})
             user_pred = user_pred[:, user_id]
-            item_pred = item_pred + user_pred.T
+            item_pred = item_pred * user_pred.T
             #     pred = [item for sublist in pred for item in sublist]
             #
             #     item_pred.append(pred)
