@@ -11,7 +11,7 @@ import pickle
 
 class MultiTask:
     def __init__(self, dim_user, dim_item, dim_tag, encode_user, encode_item, encode_tag, decode_user, decode_item,
-                 decode_tag, tag_pred_layer, rating_pred_layer, z_dim, share_dim, learning_rate=1e-4, eps=1e-10,
+                 decode_tag, tag_pred_layer, rating_pred_layer, z_dim, share_dim, learning_rate=1e-3, eps=1e-10,
                  lambda_1=1, lambda_2=0.1, lambda_3=10, lambda_4=1):
         self.dim_user = dim_user
         self.dim_item = dim_item
@@ -213,7 +213,7 @@ class MultiTask:
                                (self.loss_reconstruct(self.user, user_fake) +
                                 self.loss_reconstruct(self.user_tag, user_tag_fake) +
                                 self.loss_reconstruct(self.itempos, itempos_fake) +
-                                self.loss_reconstruct(self.itempos_tag, item_tag_fake)) + loss_tag
+                                self.loss_reconstruct(self.itempos_tag, item_tag_fake))
 
         self.loss_gen = loss_vae_user + loss_vae_itempos +loss_vae_itemneg + loss_vae_user_tag + loss_vae_itempos_tag\
                         + loss_tag + self.lambda_4 * self.loss_generator(ratingpos_pred) + \
@@ -221,6 +221,7 @@ class MultiTask:
         self.loss_dis = loss_rating_dis
 
         self.train_op_pretrained = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_pretrained)
+        self.train_op_tag = tf.train.AdamOptimizer(1e-5).minimize(loss_tag)
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis)
 
