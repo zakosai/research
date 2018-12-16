@@ -455,7 +455,6 @@ def main():
                                                                 model.itempos:dataset['item_onehot']})
                 pred = [item for sublist in pred for item in sublist]
 
-                print(pred)
                 item_pred.append(pred)
             recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
 
