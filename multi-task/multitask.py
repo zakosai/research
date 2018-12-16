@@ -75,7 +75,7 @@ class MultiTask:
             for i in range(len(layer)):
                 x_ = fully_connected(x_, layer[i], scope="adv_%d" % i)
                 # x_ = tf.nn.leaky_relu(x_, alpha=0.5)
-                x_ = self.active_function(x_)
+                # x_ = self.active_function(x_)
             # x_ = fully_connected(x_, layer[-1], scope="adv_last")
         return x_
 
