@@ -455,7 +455,6 @@ def main():
                                                                 model.itempos:dataset['item_onehot']})
                 pred = list(np.array(pred).reshape(dataset['item_no']))
                 item_pred.append(pred)
-            print(pred.shape)
             recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
 
             user = dataset['user_onehot'][dataset['test'][:,0]]
