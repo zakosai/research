@@ -456,6 +456,7 @@ def main():
                 pred = [item for sublist in pred for item in sublist]
 
                 item_pred.append(pred)
+            item_pred = np.array(item_pred)
             recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
 
             user = dataset['user_onehot'][dataset['test'][:,0]]
