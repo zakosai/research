@@ -274,7 +274,7 @@ def main():
 
         # Validation Process
         if i%10 == 0:
-            model.train = False
+            model.train = True
             x = dataset['user_onehot'][dataset['user_item_test'].keys()]
             item_pred = sess.run(model.x_recon,
                                               feed_dict={model.x:x})
