@@ -71,7 +71,7 @@ class Translation:
         h, en_out = self.enc(x, "encode", dim)
         z, z_mu, z_sigma = self.gen_z(h, "VAE")
         loss_kl = self.loss_kl(z_mu, z_sigma)
-        en_out = en_out[::-1]
+        en_out = tf.reverse(en_out, axis=0)
         y = self.dec(x, "decode", self.decode_dim, en_out)
         return y, loss_kl
 
