@@ -447,6 +447,7 @@ def main():
             else:
                 # _, loss_vae = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
                 _, loss_gen = sess.run([model.train_op_gen, model.loss_gen], feed_dict=feed)
+                _, loss_gen = sess.run([model.train_op_gen, model.loss_gen], feed_dict=feed)
                 _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
                 loss_vae = 0
 
