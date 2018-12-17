@@ -210,12 +210,11 @@ class MultiTask:
         #Loss GAN
         loss_rating_dis = self.lambda_4 * self.loss_discriminator(ratingpos_pred, ratingneg_pred)
 
-        self.loss_pretrained = loss_vae_user + loss_vae_user_tag + loss_vae_itempos + loss_vae_itempos_tag + \
-                               loss_vae_itemneg +  0.01 * tf.losses.get_regularization_loss() + self.lambda_1 * \
+        self.loss_pretrained = loss_vae_user + loss_vae_user_tag \
+                                +  0.01 * tf.losses.get_regularization_loss() + self.lambda_1 * \
                                (self.loss_reconstruct(self.user, user_fake) +
-                                self.loss_reconstruct(self.user_tag, user_tag_fake) +
-                                self.loss_reconstruct(self.itempos, itempos_fake) +
-                                self.loss_reconstruct(self.itempos_tag, item_tag_fake)) + loss_tag
+                                self.loss_reconstruct(self.user_tag, user_tag_fake))
+
 
         self.loss_gen = loss_vae_user + loss_vae_user_tag + loss_vae_itempos + loss_vae_itempos_tag + \
                                loss_vae_itemneg + loss_tag + self.lambda_4 * self.loss_generator(ratingpos_pred) + \
@@ -439,7 +438,7 @@ def main():
                     model.itempos_tag: tag_itempos,
                     model.tag: tag_label}
 
-            if i < 0:
+            if i < 100:
                 _, loss_pretrained = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
                 loss_gen = loss_dis = 0
             else:
