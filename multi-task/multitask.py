@@ -57,13 +57,13 @@ class MultiTask:
         if self.train:
             x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
-            for i in range(len(layer)):
+            for i in range(len(layer)-1):
                 x_ = fully_connected(x_, layer[i], scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
                 x_ = tf.nn.leaky_relu(x_, alpha=0.5)
                 # x_ = self.active_function(x_)
-            # x_ = fully_connected(x_, layer[-1], scope="last_dec",
-            #                  weights_regularizer=self.regularizer, trainable=self.freeze)
+            x_ = fully_connected(x_, layer[-1], scope="last_dec",
+                             weights_regularizer=self.regularizer, trainable=self.freeze)
         return x_
 
     def adversal(self, x, scope, layer, reuse=False):
@@ -99,10 +99,11 @@ class MultiTask:
         if self.train:
             x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
-            for i in range(len(layer)):
+            for i in range(len(layer)-1):
                 x_ = fully_connected(x_, layer[i], scope="%s_%d"%(scope, i), weights_regularizer=self.regularizer)
                 x_ = tf.nn.leaky_relu(x_, alpha=0.5)
                 # x_ = self.active_function(x_)
+            x_ = fully_connected(x_, layer[-1], scope="last_dec", weights_regularizer=self.regularizer)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
