@@ -48,8 +48,8 @@ class MultiTask:
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
                 # y = maxout(x_, encode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
-                # x_ = tf.nn.leaky_relu(x_, alpha=0.5)
-                x_ = self.active_function(x_)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+                # x_ = self.active_function(x_)
         return x_
 
     def dec(self, x, scope, layer, reuse=False):
@@ -60,8 +60,8 @@ class MultiTask:
             for i in range(len(layer)-1):
                 x_ = fully_connected(x_, layer[i], scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
-                # x_ = tf.nn.leaky_relu(x_, alpha=0.5)
-                x_ = self.active_function(x_)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+                # x_ = self.active_function(x_)
             x_ = fully_connected(x_, layer[-1], scope="last_dec",
                              weights_regularizer=self.regularizer, trainable=self.freeze)
         return x_
@@ -74,8 +74,8 @@ class MultiTask:
                 x_ = tf.nn.dropout(x_, 0.7)
             for i in range(len(layer)-1):
                 x_ = fully_connected(x_, layer[i], scope="adv_%d" % i)
-                # x_ = tf.nn.leaky_relu(x_, alpha=0.5)
-                x_ = self.active_function(x_)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+                # x_ = self.active_function(x_)
             x_ = fully_connected(x_, layer[-1], scope="adv_last")
         return x_
 
@@ -89,8 +89,8 @@ class MultiTask:
                                      weights_regularizer=self.regularizer)
                 # y = maxout(x_, dim[i])
                 # x_ = tf.reshape(y, x_.shape)
-                # x_ = tf.nn.leaky_relu(x_, alpha=0.5)
-                x_ = self.active_function(x_)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+                # x_ = self.active_function(x_)
 
         return x_
 
@@ -101,8 +101,8 @@ class MultiTask:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(layer)-1):
                 x_ = fully_connected(x_, layer[i], scope="%s_%d"%(scope, i), weights_regularizer=self.regularizer)
-                # x_ = tf.nn.leaky_relu(x_, alpha=0.5)
-                x_ = self.active_function(x_)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+                # x_ = self.active_function(x_)
             x_ = fully_connected(x_, layer[-1], scope="last_dec", weights_regularizer=self.regularizer)
         return x_
 
@@ -132,18 +132,17 @@ class MultiTask:
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
     def loss_reconstruct(self, x, x_recon):
-        x = self.active_function(x_recon)
         # return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
         # return tf.reduce_mean(tf.abs(x - x_recon))
         # return tf.reduce_mean(tf.reduce_sum((x-x_recon)**2, axis=1))
-        return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_recon, labels=x))
+        # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_recon, labels=x))
 
-        # log_softmax_var = tf.nn.log_softmax(x_recon)
+        log_softmax_var = tf.nn.log_softmax(x_recon)
 
-        # neg_ll = -tf.reduce_mean(tf.reduce_sum(
-        #     log_softmax_var * x,
-        #     axis=-1))
-        # return neg_ll
+        neg_ll = -tf.reduce_mean(tf.reduce_sum(
+            log_softmax_var * x,
+            axis=-1))
+        return neg_ll
 
 
     def loss_recsys(self, pred, label):
@@ -408,7 +407,7 @@ def main():
     decode_item = [200, dataset['user_no']]
     decode_tag = [200, dataset['tag_no']]
 
-    batch_size = 256
+    batch_size = 512
     epoches = 3000
 
 
@@ -486,7 +485,7 @@ def main():
 
             tag_pred = sess.run(model.tag_pred, feed_dict=feed)
             recall_tag = calc_recall(tag_pred, dataset['tag_test'], [10], "tag")
-            # model.train = True
+            model.train = True
 
         if i % 100 ==0 and model.learning_rate > 1e-6:
             model.learning_rate /= 10
