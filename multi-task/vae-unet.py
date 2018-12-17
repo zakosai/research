@@ -37,8 +37,8 @@ class Translation:
         x_ = x
         en_out = []
 
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.3)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
@@ -49,8 +49,8 @@ class Translation:
 
     def dec(self, x, scope, decode_dim, en_out, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.3)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 if i > 0:
@@ -69,10 +69,11 @@ class Translation:
 
     def encode(self, x, dim):
         h, en_out = self.enc(x, "encode", dim)
-        z, z_mu, z_sigma = self.gen_z(h, "VAE")
-        loss_kl = self.loss_kl(z_mu, z_sigma)
+        # z, z_mu, z_sigma = self.gen_z(h, "VAE")
+        # loss_kl = self.loss_kl(z_mu, z_sigma)
+        loss_kl = 0
         en_out = en_out[::-1]
-        y = self.dec(z, "decode", self.decode_dim, en_out)
+        y = self.dec(h, "decode", self.decode_dim, en_out)
         return y, loss_kl
 
     def decode(self, x, dim):
@@ -101,7 +102,7 @@ class Translation:
         self.x_recon = x_recon
 
         # Loss VAE
-        self.loss = self.lambda_1 *loss_kl + self.lambda_2 * self.loss_reconstruct(x,x_recon) + \
+        self.loss = self.lambda_2 * self.loss_reconstruct(x,x_recon) + \
                     tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
