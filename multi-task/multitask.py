@@ -406,7 +406,7 @@ def main():
     decode_item = [600, dataset['user_no']]
     decode_tag = [600, dataset['tag_no']]
 
-    batch_size = 512
+    batch_size = 256
     epoches = 3000
 
 
