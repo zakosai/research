@@ -443,13 +443,13 @@ def main():
                 _, loss_pretrained = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
                 loss_gen = loss_dis = 0
             else:
-                _, loss_vae = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict= feed)
+                _, loss_vae = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
                 _, loss_gen = sess.run([model.train_op_gen, model.loss_gen], feed_dict=feed)
                 _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
 
         if i % 10 == 0 and i > 0:
             model.train = False
-            print("Loss lass batch: Loss gen %f, loss dis %f, loss vae %f"%(loss_gen, loss_dis, loss_pretrained))
+            print("Loss lass batch: Loss gen %f, loss dis %f, loss vae %f"%(loss_gen, loss_dis, loss_vae))
 
             # test
             user_id = dataset['user_item_test'].keys()
