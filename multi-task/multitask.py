@@ -219,7 +219,8 @@ class MultiTask:
                                 self.loss_reconstruct(self.itempos_tag, item_tag_fake)) + loss_tag
 
 
-        self.loss_gen =  loss_tag + self.lambda_4 * self.loss_generator(ratingpos_pred) + \
+        self.loss_gen =  loss_vae_user + loss_vae_user_tag + loss_vae_itempos + loss_vae_itempos_tag + \
+                               loss_vae_itemneg + loss_tag + self.lambda_4 * self.loss_generator(ratingpos_pred) + \
                         0.01 * tf.losses.get_regularization_loss()
         self.loss_dis = loss_rating_dis
 
@@ -444,10 +445,10 @@ def main():
                 _, loss_pretrained = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
                 loss_gen = loss_dis = 0
             else:
-                _, loss_vae = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
-                # _, loss_gen = sess.run([model.train_op_gen, model.loss_gen], feed_dict=feed)
+                # _, loss_vae = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
+                _, loss_gen = sess.run([model.train_op_gen, model.loss_gen], feed_dict=feed)
                 _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
-                loss_gen = 0
+                loss_vae = 0
 
         if i % 10 == 0 and i > 0:
             model.train = False
