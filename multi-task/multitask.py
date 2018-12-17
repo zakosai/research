@@ -210,10 +210,12 @@ class MultiTask:
         #Loss GAN
         loss_rating_dis = self.lambda_4 * self.loss_discriminator(ratingpos_pred, ratingneg_pred)
 
-        self.loss_pretrained = loss_vae_user + loss_vae_user_tag \
-                                +  0.01 * tf.losses.get_regularization_loss() + self.lambda_1 * \
+        self.loss_pretrained = loss_vae_user + loss_vae_user_tag + loss_vae_itempos + loss_vae_itempos_tag + \
+                               loss_vae_itemneg +  0.01 * tf.losses.get_regularization_loss() + self.lambda_1 * \
                                (self.loss_reconstruct(self.user, user_fake) +
-                                self.loss_reconstruct(self.user_tag, user_tag_fake))
+                                self.loss_reconstruct(self.user_tag, user_tag_fake) +
+                                self.loss_reconstruct(self.itempos, itempos_fake) +
+                                self.loss_reconstruct(self.itempos_tag, item_tag_fake)) + loss_tag
 
 
         self.loss_gen = loss_vae_user + loss_vae_user_tag + loss_vae_itempos + loss_vae_itempos_tag + \
@@ -229,7 +231,7 @@ class MultiTask:
 
         self.user_rec = user_rec
         self.tag_pred = tag_pred
-        self.item_rec = z_itempos
+        self.item_rec = itempos_rec
 
 
 def create_dataset_lastfm():
@@ -438,7 +440,7 @@ def main():
                     model.itempos_tag: tag_itempos,
                     model.tag: tag_label}
 
-            if i < 100:
+            if i < 20:
                 _, loss_pretrained = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
                 loss_gen = loss_dis = 0
             else:
@@ -456,9 +458,10 @@ def main():
             # item_pred = []
             # for u in dataset['user_item_test'].keys()[:100]:
             #     user_id = [u] * dataset['item_no']
-            item_pred = sess.run(model.user_rec, feed_dict={model.user: dataset['user_onehot'][user_id]})
-            # user_pred = sess.run(model.item_rec, feed_dict={model.itempos: dataset['item_onehot']})
-            # user_pred = user_pred[:, user_id]
+            # item_pred = sess.run(model.user_rec, feed_dict={model.user: dataset['user_onehot'][user_id]})
+            user_pred = sess.run(model.item_rec, feed_dict={model.itempos: dataset['item_onehot']})
+            user_pred = user_pred[:, user_id]
+            item_pred = user_pred.T
             # item_pred = np.dot(item_pred, user_pred.T)
             #     pred = [item for sublist in pred for item in sublist]
             #
