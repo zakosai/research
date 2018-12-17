@@ -400,8 +400,8 @@ def main():
     print(len(dataset['tag_label_train']),len(dataset['train']))
 
 
-    encode_user = encode_item = encode_tag = [200]
-    share_dim = [100]
+    encode_user = encode_item = encode_tag = [100]
+    share_dim = [50]
     decode_user = [100, dataset['item_no']]
     decode_item = [100, dataset['user_no']]
     decode_tag = [100, dataset['tag_no']]
