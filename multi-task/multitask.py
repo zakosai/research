@@ -448,7 +448,6 @@ def main():
                 _, loss_vae = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
                 _, loss_gen, loss = sess.run([model.train_op_gen, model.loss_gen, model.loss], feed_dict=feed)
                 _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
-                loss_vae = 0
 
         if i % 10 == 0 and i > 20:
             model.train = False
