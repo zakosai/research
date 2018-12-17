@@ -440,7 +440,7 @@ def main():
                     model.itempos_tag: tag_itempos,
                     model.tag: tag_label}
 
-            if i < 20:
+            if i < 100:
                 _, loss_pretrained = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
                 loss_gen = loss_dis = 0
             else:
