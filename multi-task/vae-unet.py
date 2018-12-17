@@ -72,7 +72,7 @@ class Translation:
         z, z_mu, z_sigma = self.gen_z(h, "VAE")
         loss_kl = self.loss_kl(z_mu, z_sigma)
         en_out = en_out[::-1]
-        y = self.dec(x, "decode", dim, en_out)
+        y = self.dec(x, "decode", self.decode_dim, en_out)
         return y, loss_kl
 
     def decode(self, x, dim):
