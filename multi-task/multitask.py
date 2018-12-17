@@ -12,7 +12,7 @@ import pickle
 class MultiTask:
     def __init__(self, dim_user, dim_item, dim_tag, encode_user, encode_item, encode_tag, decode_user, decode_item,
                  decode_tag, tag_pred_layer, rating_pred_layer, z_dim, share_dim, learning_rate=1e-4, eps=1e-10,
-                 lambda_1=1, lambda_2=1, lambda_3=100, lambda_4=100):
+                 lambda_1=1, lambda_2=1, lambda_3=1, lambda_4=1):
         self.dim_user = dim_user
         self.dim_item = dim_item
         self.dim_tag = dim_tag
@@ -220,15 +220,14 @@ class MultiTask:
 
         self.loss = [loss_vae_user, loss_vae_user_tag, loss_vae_itempos, loss_vae_itempos_tag, loss_tag,
                      self.loss_generator(ratingpos_pred), loss_kl_user]
-        self.loss_gen =  loss_vae_user + loss_vae_user_tag + loss_vae_itempos + loss_vae_itempos_tag + \
-                               loss_vae_itemneg + loss_tag + self.lambda_4 * self.loss_generator(ratingpos_pred) + \
+        self.loss_gen = loss_tag + self.lambda_4 * self.loss_generator(ratingpos_pred) + \
                         0.01 * tf.losses.get_regularization_loss()
         self.loss_dis = loss_rating_dis
 
         adv_var = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="rating")
         self.train_op_pretrained = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_pretrained)
         self.train_op_tag = tf.train.AdamOptimizer(1e-5).minimize(loss_tag)
-        self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
+        self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate/10).minimize(self.loss_gen)
         self.train_op_dis = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_dis, var_list=adv_var)
 
         self.user_rec = user_rec
@@ -446,7 +445,7 @@ def main():
                 _, loss_pretrained = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
                 loss_gen = loss_dis = 0
             else:
-                # _, loss_vae = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
+                _, loss_vae = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
                 _, loss_gen, loss = sess.run([model.train_op_gen, model.loss_gen, model.loss], feed_dict=feed)
                 _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
                 loss_vae = 0
