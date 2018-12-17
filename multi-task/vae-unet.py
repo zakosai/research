@@ -54,7 +54,7 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 if i > 0:
-                    x_ = tf.concat([x_, en_out[i]], axis=1)
+                    x_ = tf.concat([x_, en_out[i-1]], axis=1)
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
         return x_
