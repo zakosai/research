@@ -212,7 +212,7 @@ class MultiTask:
         loss_rating_dis = self.lambda_4 * self.loss_discriminator(ratingpos_pred, ratingneg_pred)
 
         self.loss_pretrained = loss_vae_user + loss_vae_user_tag + loss_vae_itempos + loss_vae_itempos_tag + \
-                               loss_vae_itemneg +  0.0 * tf.losses.get_regularization_loss() + self.lambda_1 * \
+                               loss_vae_itemneg +  0.1 * tf.losses.get_regularization_loss() + self.lambda_1 * \
                                (self.loss_reconstruct(self.user, user_fake) +
                                 self.loss_reconstruct(self.user_tag, user_tag_fake) +
                                 self.loss_reconstruct(self.itempos, itempos_fake) +
