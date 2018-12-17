@@ -441,7 +441,7 @@ def main():
                     model.itempos_tag: tag_itempos,
                     model.tag: tag_label}
 
-            if i < 0:
+            if i < 20:
                 _, loss_pretrained = sess.run([model.train_op_pretrained, model.loss_pretrained], feed_dict=feed)
                 loss_gen = loss_dis = 0
             else:
@@ -450,7 +450,7 @@ def main():
                 _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
                 loss_vae = 0
 
-        if i % 10 == 0 and i > 0:
+        if i % 10 == 0 and i > 20:
             model.train = False
             print("Loss lass batch: Loss gen %f, loss dis %f, loss vae %f"%(loss_gen, loss_dis, loss_vae))
 
@@ -483,7 +483,7 @@ def main():
 
             tag_pred = sess.run(model.tag_pred, feed_dict=feed)
             recall_tag = calc_recall(tag_pred, dataset['tag_test'], [10], "tag")
-            model.train = True
+            # model.train = True
 
         if i % 100 ==0 and model.learning_rate > 1e-6:
             model.learning_rate /= 10
