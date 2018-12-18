@@ -249,7 +249,7 @@ def main():
     num_u = dataset['user_no']
     num_t = dataset['tag_no']
     encoding_dim = [600, 200]
-    decoding_dim = [200, 600, num_p]
+    decoding_dim = [200, 600, num_u]
 
     z_dim = 50
 
