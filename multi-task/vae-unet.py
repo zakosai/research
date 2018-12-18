@@ -95,7 +95,7 @@ class Translation:
         self.y = tf.placeholder(tf.float32, [None, self.dim], name='label')
 
 
-        x = tf.concat([self.x, self.y], axis=1)
+        # x = tf.concat([self.x, self.y], axis=1)
 
         # VAE for domain A
         x_recon, loss_kl = self.encode(x, self.encode_dim)
