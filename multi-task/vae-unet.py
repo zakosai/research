@@ -286,8 +286,8 @@ def main():
         # Validation Process
         if i%10 == 0:
             model.train = True
-            x = dataset['tag_user_onehot'][dataset['user_item_test'].keys()]
-            y = user_item[dataset['user_item_test'].keys()]
+            x = user_item[dataset['user_item_test'].keys()]
+            y = dataset['user_onehot'][dataset['user_item_test'].keys()]
             item_pred = sess.run(model.x_recon,
                                               feed_dict={model.x:x, model.y:y})
 
