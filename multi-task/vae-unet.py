@@ -92,7 +92,7 @@ class Translation:
 
     def build_model(self):
         self.x = tf.placeholder(tf.float32, [None, self.tag_dim], name='input')
-        self.y = tf.placeholder(tf.float32, [None, self.dim], name="label")
+        self.y = tf.placeholder(tf.float32, [None, self.dim], name='label')
 
 
         x = tf.concat([self.x, self.y], axis=1)
@@ -277,8 +277,9 @@ def main():
         if i%10 == 0:
             model.train = True
             x = dataset['tag_user_onehot'][dataset['user_item_test'].keys()]
+            y = dataset['user_onehot'][dataset['user_item_test'].keys()]
             item_pred = sess.run(model.x_recon,
-                                              feed_dict={model.x:x})
+                                              feed_dict={model.x:x, model.y:y})
 
             recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
             model.train = True
