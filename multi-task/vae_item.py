@@ -253,12 +253,12 @@ def main():
 
     z_dim = 50
 
-    user_item = np.zeros((num_u, 2350))
-    for i in range(num_u):
-        idx = np.where(dataset['user_onehot'][i] == 1)
-        u_c = content[idx]
-        u_c = u_c.flatten()
-        user_item[i, :len(u_c)] = u_c
+    # user_item = np.zeros((num_u, 2350))
+    # for i in range(num_u):
+    #     idx = np.where(dataset['user_onehot'][i] == 1)
+    #     u_c = content[idx]
+    #     u_c = u_c.flatten()
+    #     user_item[i, :len(u_c)] = u_c
 
 
 
