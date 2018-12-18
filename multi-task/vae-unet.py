@@ -91,7 +91,7 @@ class Translation:
         # return tf.reduce_mean(tf.abs(x - x_recon))
 
     def build_model(self):
-        self.x = tf.placeholder(tf.float32, [None, 2350], name='input')
+        self.x = tf.placeholder(tf.float32, [None, None], name='input')
         self.y = tf.placeholder(tf.float32, [None, self.dim], name='label')
 
 
