@@ -1,20 +1,14 @@
 import tensorflow as tf
 import os
 from tensorbayes.layers import dense, placeholder, conv2d, conv2d_transpose, max_pool
-from tensorbayes.utils import progbar
-from tensorbayes.tfutils import softmax_cross_entropy_with_two_logits
+
 from keras.backend import binary_crossentropy
-from keras.layers import Input, Dense, Lambda, Flatten, Reshape
-from keras import metrics
-from keras import backend as K
+
 import numpy as np
 import time
-from vae import vanilla_vae
 import scipy
 import scipy.io as sio
-from operator import add
-from resnet_model import conv2d_fixed_padding, building_block, block_layer
-import ml_metrics
+
 import math
 import tensorflow.contrib.layers as slim
 
