@@ -20,13 +20,13 @@ parser.add_argument('--ckpt_folder',  type=str, default='pre_model/exp1/',
                    help='where model is stored')
 parser.add_argument('--initial',  type=bool, default=True,
                    help='where model is stored')
-parser.add_argument('--iter',  type=int, default=30,
+parser.add_argument('--iter',  type=int, default=50,
                    help='where model is stored')
 parser.add_argument('--data_dir',  type=str, default='data/amazon',
                    help='where model is stored')
 parser.add_argument('--zdim',  type=int, default=50,
                    help='where model is stored')
-parser.add_argument('--gridsearch',  type=int, default=0,
+parser.add_argument('--gridsearch',  type=int, default=1,
                    help='gridsearch or not')
 parser.add_argument('--data_type',  type=str, default='5',
                    help='gridsearch or not')
