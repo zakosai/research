@@ -297,7 +297,7 @@ def main():
             item_pred = item_pred[:, dataset['user_item_test'].keys()]
             item_pred = item_pred.T
             recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
-            if recall_item > max_recall and recall_item> 0.3:
+            if recall_item > max_recall and recall_item> 0.1:
                 np.save("hetrec2011-lastfm-2k/exp1/item.npy", z)
             model.train = True
         if i%100 == 0 and model.learning_rate > 1e-6:
