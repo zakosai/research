@@ -96,7 +96,7 @@ class Translation:
 
 
         x = tf.concat([self.x, self.y], axis=1)
-        x = self.x
+        # x = self.x
         # VAE for domain A
         x_recon, loss_kl = self.encode(x, self.encode_dim)
         self.x_recon = x_recon
