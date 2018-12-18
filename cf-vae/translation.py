@@ -205,7 +205,7 @@ class Translation:
         # self.loss_gen =  self.loss_CC + 0.1 * tf.losses.get_regularization_loss() +\
         #                 self.loss_generator(y_AB) + self.loss_generator(y_ABA) + self.loss_generator(y_BAB) +\
         #                 self.loss_generator(y_BA) + self.loss_reconstruct(x_A, y_BA) + self.loss_reconstruct(x_B, y_AB)
-        self.loss_gen = self.loss_VAE + self.loss_CC + 0.1 * tf.losses.get_regularization_loss() - loss_d_A - loss_d_B
+        self.loss_gen = self.loss_VAE + self.loss_CC + 0.1 * tf.losses.get_regularization_loss() + loss_d_A + loss_d_B
 
 
 
