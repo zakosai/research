@@ -239,6 +239,7 @@ def main():
     args = parser.parse_args()
     f = open("hetrec2011-lastfm-2k/dataset.pkl", 'rb')
     dataset = pickle.load(f)
+    content = np.load("hetrec2011-lastfm-2k/exp1/text.npz")
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
@@ -247,6 +248,15 @@ def main():
     decoding_dim = [200, 600, num_p]
 
     z_dim = 50
+
+    user_item = np.zeros((num_u, 2350))
+    for i in range(num_u):
+        idx = np.where(dataset['user_onehot'][i] == 1)
+        u_c = content[idx]
+        u_c = u_c.flatten()
+        user_item[i, :len(u_c)] = u_c
+
+
 
 
     model = Translation(batch_size, num_p,num_t, encoding_dim, decoding_dim, z_dim)
@@ -263,7 +273,7 @@ def main():
         for j in range(int(num_u/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             y = dataset['user_onehot'][list_idx]
-            x = dataset['tag_user_onehot'][list_idx]
+            x = user_item[list_idx]
 
             feed = {model.x: x, model.y:y}
 
@@ -277,7 +287,7 @@ def main():
         if i%10 == 0:
             model.train = True
             x = dataset['tag_user_onehot'][dataset['user_item_test'].keys()]
-            y = dataset['user_onehot'][dataset['user_item_test'].keys()]
+            y = user_item[dataset['user_item_test'].keys()]
             item_pred = sess.run(model.x_recon,
                                               feed_dict={model.x:x, model.y:y})
 
