@@ -39,7 +39,7 @@ else:
 # data = np.delete(data, [7,8,9,10,11], axis=1)
 
 idx = np.random.rand(data.shape[0]) < 0.8
-train_X = data[idx]
+train_X = data
 test_X = data[~idx]
 # print(train_X[0])
 #
