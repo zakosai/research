@@ -91,7 +91,7 @@ class Translation:
         # return tf.reduce_mean(tf.abs(x - x_recon))
 
     def build_model(self):
-        self.x = tf.placeholder(tf.float32, [None, self.tag_dim], name='input')
+        self.x = tf.placeholder(tf.float32, [None, 2350], name='input')
         self.y = tf.placeholder(tf.float32, [None, self.dim], name='label')
 
 
@@ -239,7 +239,7 @@ def main():
     args = parser.parse_args()
     f = open("hetrec2011-lastfm-2k/dataset.pkl", 'rb')
     dataset = pickle.load(f)
-    content = np.load("hetrec2011-lastfm-2k/exp1/text.npy")
+    content = np.load("hetrec2011-lastfm-2k/exp1/text.np")
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
