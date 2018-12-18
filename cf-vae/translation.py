@@ -10,7 +10,7 @@ import argparse
 
 class Translation:
     def __init__(self, batch_size, dim_A, dim_B, encode_dim_A, decode_dim_A, encode_dim_B, decode_dim_B, adv_dim_A,
-                 adv_dim_B, z_dim, share_dim, z_A=None, z_B=None, eps=1e-10, lambda_0=0.1, lambda_1=0.1, lambda_2=100,
+                 adv_dim_B, z_dim, share_dim, z_A=None, z_B=None, eps=1e-10, lambda_0=1, lambda_1=0.1, lambda_2=100,
                  lambda_3=0.01,
                  lambda_4=100, learning_rate=1e-4):
         self.batch_size = batch_size
@@ -205,7 +205,7 @@ class Translation:
         # self.loss_gen =  self.loss_CC + 0.1 * tf.losses.get_regularization_loss() +\
         #                 self.loss_generator(y_AB) + self.loss_generator(y_ABA) + self.loss_generator(y_BAB) +\
         #                 self.loss_generator(y_BA) + self.loss_reconstruct(x_A, y_BA) + self.loss_reconstruct(x_B, y_AB)
-        self.loss_gen = self.loss_CC + 0.1 * tf.losses.get_regularization_loss() - loss_d_A - loss_d_B
+        self.loss_gen = self.loss_VAE + self.loss_CC + 0.1 * tf.losses.get_regularization_loss() - loss_d_A - loss_d_B
 
 
 
