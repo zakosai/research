@@ -61,7 +61,7 @@ def load_cvae_data(data_dir):
 def load_rating(path):
     arr = []
     for line in path:
-        idx = list(np.where(line == 1))
+        idx = np.where(line == 1)[0].tolist()
         arr.append(idx)
     return arr
 
