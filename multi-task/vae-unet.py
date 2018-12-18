@@ -39,7 +39,7 @@ class Translation:
         en_out = []
 
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.5)
+            x_ = tf.nn.dropout(x_, 0.1)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
@@ -95,7 +95,7 @@ class Translation:
         self.y = tf.placeholder(tf.float32, [None, self.dim], name='label')
 
 
-        # x = tf.concat([self.x, self.y], axis=1)
+        x = tf.concat([self.x, self.y], axis=1)
         x = self.x
         # VAE for domain A
         x_recon, loss_kl = self.encode(x, self.encode_dim)
