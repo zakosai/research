@@ -239,7 +239,7 @@ def main():
     args = parser.parse_args()
     f = open("hetrec2011-lastfm-2k/dataset.pkl", 'rb')
     dataset = pickle.load(f)
-    content = np.load("hetrec2011-lastfm-2k/exp1/text.np")
+    content = np.load("hetrec2011-lastfm-2k/exp1/text.npy")
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
