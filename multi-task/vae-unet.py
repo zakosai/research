@@ -103,7 +103,7 @@ class Translation:
 
         # Loss VAE
         self.loss = self.lambda_2 * self.loss_reconstruct(self.y,x_recon) + \
-                    tf.losses.get_regularization_loss()
+                    0.1 *tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
@@ -249,10 +249,10 @@ def main():
 
     z_dim = 50
 
-    user_item = np.zeros((num_u, 2350))
+    user_item = np.zeros((num_u, num_u*47))
     for i in range(num_u):
         idx = np.where(dataset['user_onehot'][i] == 1)
-        u_c = content[idx]
+        u_c = dataset['item_onehot'][idx]
         u_c = u_c.flatten()
         user_item[i, :len(u_c)] = u_c
 
