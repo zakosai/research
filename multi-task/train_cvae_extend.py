@@ -45,16 +45,16 @@ gs = args.gridsearch
 print(model_type)
 
 def load_cvae_data(data_dir):
-  data = {}
   variables = load_npz(os.path.join(data_dir,"mult_nor.npz"))
-  data["content"] = variables.toarray()
+
   dataset = pickle.load("hetrec2011-lastfm-2k/dataset.pkl")
+  dataset["content"] = variables.toarray()
 
-  data["train_users"] = load_rating(dataset['user_onehot'])
-  data["train_items"] = load_rating(dataset['item_onehot'])
-  data["test_users"] = dataset['user_item_test']
+  dataset["train_users"] = load_rating(dataset['user_onehot'])
+  dataset["train_items"] = load_rating(dataset['item_onehot'])
+  dataset["test_users"] = dataset['user_item_test']
 
-  return data
+  return dataset
 
 
 def load_rating(path):
@@ -110,7 +110,9 @@ if gs == 1:
             for r in [0.1, 1, 10]:
                 params.lambda_r = r
                 if i > -1:
-                    model = cf_vae_extend(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,
+                    model = cf_vae_extend(num_users=data['user_no'], num_items=data['item_no'],
+                                          num_factors=num_factors,
+                                          params=params,
                                           input_dim=dim, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200,
                                                                                                              400,dim],
                                           decoding_dims_str=[200, 4526], loss_type='cross_entropy',
