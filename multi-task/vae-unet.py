@@ -10,12 +10,13 @@ import pandas as pd
 import pickle
 
 class Translation:
-    def __init__(self, batch_size, dim, encode_dim, decode_dim, z_dim, eps=1e-10,
+    def __init__(self, batch_size, dim, tag_dim, encode_dim, decode_dim, z_dim, eps=1e-10,
                  lambda_0=10, lambda_1=0.1, lambda_2=100,
                  lambda_3=0.1,
                  lambda_4=100, learning_rate=1e-4):
         self.batch_size = batch_size
         self.dim = dim
+        self.tag_dim = tag_dim
         self.encode_dim = encode_dim
         self.decode_dim = decode_dim
         self.z_dim = z_dim
@@ -26,7 +27,7 @@ class Translation:
         self.lambda_3 = lambda_3
         self.lambda_4 = lambda_4
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.sigmoid
+        self.active_function = tf.nn.tanh
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
@@ -47,14 +48,12 @@ class Translation:
                 en_out.append(x_)
         return x_, en_out
 
-    def dec(self, x, scope, decode_dim, en_out, reuse=False):
+    def dec(self, x, scope, decode_dim,reuse=False):
         x_ = x
         if self.train:
             x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                if i > 0:
-                    x_ = tf.concat([x_, en_out[i-1]], axis=1)
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
         return x_
@@ -69,11 +68,9 @@ class Translation:
 
     def encode(self, x, dim):
         h, en_out = self.enc(x, "encode", dim)
-        # z, z_mu, z_sigma = self.gen_z(h, "VAE")
-        # loss_kl = self.loss_kl(z_mu, z_sigma)
-        loss_kl = 0
-        en_out = en_out[::-1]
-        y = self.dec(h, "decode", self.decode_dim, en_out)
+        z, z_mu, z_sigma = self.gen_z(h, "VAE")
+        loss_kl = self.loss_kl(z_mu, z_sigma)
+        y = self.dec(h, "decode", self.decode_dim)
         return y, loss_kl
 
     def decode(self, x, dim):
@@ -94,16 +91,18 @@ class Translation:
         # return tf.reduce_mean(tf.abs(x - x_recon))
 
     def build_model(self):
-        self.x = tf.placeholder(tf.float32, [None, self.dim], name='input')
+        self.x = tf.placeholder(tf.float32, [None, self.tag_dim], name='input')
+        self.y = tf.placeholder(tf.float32, [None, self.dim], name="label")
 
-        x = self.x
+
+        x = tf.concat([self.x, self.y], axis=1)
 
         # VAE for domain A
         x_recon, loss_kl = self.encode(x, self.encode_dim)
         self.x_recon = x_recon
 
         # Loss VAE
-        self.loss = self.lambda_2 * self.loss_reconstruct(x,x_recon) + \
+        self.loss = self.lambda_2 * self.loss_reconstruct(self.y,x_recon) + \
                     tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
@@ -243,13 +242,14 @@ def main():
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
+    num_t = dataset['tag_no']
     encoding_dim = [600, 200]
     decoding_dim = [200, 600, num_p]
 
     z_dim = 50
 
 
-    model = Translation(batch_size, num_p, encoding_dim, decoding_dim, z_dim)
+    model = Translation(batch_size, num_p,num_t, encoding_dim, decoding_dim, z_dim)
     model.build_model()
 
     sess = tf.Session()
@@ -262,9 +262,10 @@ def main():
         train_cost = 0
         for j in range(int(num_u/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
-            x = dataset['user_onehot'][list_idx]
+            y = dataset['user_onehot'][list_idx]
+            x = dataset['tag_user_onehot'][list_idx]
 
-            feed = {model.x: x}
+            feed = {model.x: x, model.y:y}
 
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
@@ -275,7 +276,7 @@ def main():
         # Validation Process
         if i%10 == 0:
             model.train = True
-            x = dataset['user_onehot'][dataset['user_item_test'].keys()]
+            x = dataset['tag_user_onehot'][dataset['user_item_test'].keys()]
             item_pred = sess.run(model.x_recon,
                                               feed_dict={model.x:x})
 
