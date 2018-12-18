@@ -97,4 +97,5 @@ class vanilla_vae:
             saver.restore(sess, ckpt_file)
 
         z_mu = sess.run(z_mu, feed_dict={x_:x_input})
-        np.savez(os.path.join(self.ckpt, scope), z_mu)
+        print(z_mu.shape)
+        np.save(os.path.join(self.ckpt, scope), z_mu)
