@@ -47,7 +47,8 @@ print(model_type)
 def load_cvae_data(data_dir):
   variables = load_npz(os.path.join(data_dir,"mult_nor.npz"))
 
-  dataset = pickle.load("hetrec2011-lastfm-2k/dataset.pkl")
+  f = open("hetrec2011-lastfm-2k/dataset.pkl", 'rb')
+  dataset = pickle.load(f)
   dataset["content"] = variables.toarray()
 
   dataset["train_users"] = load_rating(dataset['user_onehot'])
