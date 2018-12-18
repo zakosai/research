@@ -239,7 +239,8 @@ def main():
     args = parser.parse_args()
     f = open("hetrec2011-lastfm-2k/dataset.pkl", 'rb')
     dataset = pickle.load(f)
-    content = np.load("hetrec2011-lastfm-2k/exp1/item.npy")
+    content = np.load("hetrec2011-lastfm-2k/exp1/item.npz")
+    content = content['rec']
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
@@ -252,7 +253,7 @@ def main():
     user_item = np.zeros((num_u, num_u*47))
     for i in range(num_u):
         idx = np.where(dataset['user_onehot'][i] == 1)
-        u_c = dataset['item_onehot'][idx]
+        u_c = content[idx]
         u_c = u_c.flatten()
         user_item[i, :len(u_c)] = u_c
 
