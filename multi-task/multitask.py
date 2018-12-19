@@ -248,7 +248,7 @@ def create_dataset_lastfm():
 
     # Divide train test
     user_artist = user_artist.loc[(user_artist['userID'].isin(user_id)) & (user_artist['artistID'].isin(artist_id))]
-    test = user_artist.sample(frac=0.2)
+    test = user_artist.sample(frac=0.3)
     train = user_artist.loc[~user_artist.index.isin(test.index)]
 
     # initial one hot
