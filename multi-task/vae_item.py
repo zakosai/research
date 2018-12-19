@@ -299,7 +299,7 @@ def main():
             item_pred = item[:, dataset['user_item_test'].keys()]
             item_pred = item_pred.T
             recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
-            if recall_item > max_recall and recall_item> 0.017:
+            if recall_item > max_recall and recall_item> 0.01:
                 np.savez(os.path.join(folder, "item.npz"), z=z, rec=item)
             model.train = True
         if i%100 == 0 and model.learning_rate > 1e-6:
