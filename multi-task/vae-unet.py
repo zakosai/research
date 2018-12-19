@@ -304,11 +304,11 @@ def main():
                 max_recall = recall_item
                 if i > 1000:
                     if max_recall < 0.1:
-                        _, result = calc_recall(item_pred, dataset['user_item_test'].values(), [10, 20, 30, 40, 50],
-                                                "item")
-                    else:
                         _, result = calc_recall(item_pred, dataset['user_item_test'].values(),
                                                 [50, 100, 150, 200, 250, 300], "item")
+                    else:
+                        _, result = calc_recall(item_pred, dataset['user_item_test'].values(),
+                                                [10, 20, 30, 40, 50, 60], "item")
 
 
         if i%100 == 0 and model.learning_rate > 1e-6:
