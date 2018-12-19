@@ -240,7 +240,7 @@ def main():
     iter = 3000
     batch_size= 500
     args = parser.parse_args()
-    f = open("hetrec2011-lastfm-2k/dataset.pkl", 'rb')
+    f = open(args.data, 'rb')
     dataset = pickle.load(f)
     content = load_npz("hetrec2011-lastfm-2k/mult_nor.npz")
     content = content.toarray()
@@ -297,8 +297,8 @@ def main():
             item_pred = item[:, dataset['user_item_test'].keys()]
             item_pred = item_pred.T
             recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
-            if recall_item > max_recall and recall_item> 0.197:
-                np.savez("hetrec2011-lastfm-2k/exp1/item.npz", z=z, rec=item)
+            if recall_item > max_recall and recall_item> 0.017:
+                np.savez(args.data.split(".")[0] + "_item.npz", z=z, rec=item)
             model.train = True
         if i%100 == 0 and model.learning_rate > 1e-6:
             model.learning_rate /= 10
