@@ -10,13 +10,13 @@ import pandas as pd
 import pickle
 
 class Translation:
-    def __init__(self, batch_size, dim, tag_dim, encode_dim, decode_dim, z_dim, eps=1e-10,
+    def __init__(self, batch_size, x_dim, y_dim, encode_dim, decode_dim, z_dim, eps=1e-10,
                  lambda_0=10, lambda_1=0.1, lambda_2=100,
                  lambda_3=0.1,
                  lambda_4=100, learning_rate=1e-4):
         self.batch_size = batch_size
-        self.dim = dim
-        self.tag_dim = tag_dim
+        self.x_dim = x_dim
+        self.y_dim = y_dim
         self.encode_dim = encode_dim
         self.decode_dim = decode_dim
         self.z_dim = z_dim
@@ -91,8 +91,8 @@ class Translation:
         # return tf.reduce_mean(tf.abs(x - x_recon))
 
     def build_model(self):
-        self.x = tf.placeholder(tf.float32, [None, self.tag_dim*47], name='input')
-        self.y = tf.placeholder(tf.float32, [None, self.dim], name='label')
+        self.x = tf.placeholder(tf.float32, [None, self.x_dim], name='input')
+        self.y = tf.placeholder(tf.float32, [None, self.y_dim], name='label')
 
 
         x = tf.concat([self.x, self.y], axis=1)
@@ -253,8 +253,9 @@ def main():
     decoding_dim = [200, 600, num_p]
 
     z_dim = 50
-
-    user_item = np.zeros((num_u, num_u*47))
+    max_item = max(np.sum(dataset['user_onehot'], axis=1))
+    x_dim = num_u * max_item
+    user_item = np.zeros((num_u,x_dim))
     for i in range(num_u):
         idx = np.where(dataset['user_onehot'][i] == 1)
         u_c = content[idx]
@@ -264,7 +265,7 @@ def main():
 
 
 
-    model = Translation(batch_size, num_p,num_u, encoding_dim, decoding_dim, z_dim)
+    model = Translation(batch_size, x_dim, num_p, encoding_dim, decoding_dim, z_dim)
     model.build_model()
 
     sess = tf.Session()
