@@ -331,7 +331,7 @@ def create_dataset_lastfm():
                'tag_test': tag_test,
                'user_neg': user_neg}
     print("finish dataset")
-    f = open("data/lastfm/dataset_1.pkl", "wb")
+    f = open("data/lastfm/dataset_2.pkl", "wb")
     pickle.dump(dataset, f)
 
 
