@@ -3,6 +3,8 @@
 mkdir experiment/delicious
 python vae.py --ckpt_folder=experiment/delicious/ --data_dir=data/delicious/
 python train_cvae_extend.py --ckpt_folder=experiment/delicious/ --data_dir=data/delicious/
+python vae-unet.py --data_dir=data/delicious/dataset.pkl --ckpt_folder=experiment/delicious/
+
 
 mkdir experiment/tool
 python multi-VAE.py --data_dir=data/tool/dataset.pkl --ckpt_folder=experiment/tool/
