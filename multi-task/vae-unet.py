@@ -316,7 +316,7 @@ def main():
 
 
     print(max_recall)
-    np.save(args.data.split(".")[0] + "_result.npy", result)
+    np.save(args.data.split(".")[0] + "_result_convae.npy", result)
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Tool",
