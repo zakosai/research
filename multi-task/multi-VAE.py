@@ -36,8 +36,8 @@ class Translation:
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
 
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.3)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
@@ -47,8 +47,8 @@ class Translation:
 
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.3)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
@@ -103,8 +103,8 @@ class Translation:
 
 
 def create_dataset_lastfm():
-    user_tags = pd.read_table("hetrec2011-lastfm-2k/user_taggedartists.dat")
-    user_artist = pd.read_table("hetrec2011-lastfm-2k/user_artists.dat")
+    user_tags = pd.read_table("data/lastfm/user_taggedartists.dat")
+    user_artist = pd.read_table("data/lastfm-lastfm-2k/user_artists.dat")
     user_id = list(set(user_tags.userID))
     artist_id = list(set(user_tags.artistID))
 
@@ -231,7 +231,7 @@ def main():
     iter = 3000
     batch_size= 500
     args = parser.parse_args()
-    f = open("hetrec2011-lastfm-2k/dataset.pkl", 'rb')
+    f = open(args.data, 'rb')
     dataset = pickle.load(f)
 
     num_p = dataset['item_no']
