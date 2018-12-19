@@ -164,6 +164,7 @@ def create_dataset_lastfm():
     return dataset
 
 def calc_recall(pred, test, m=[100], type=None):
+    result = {}
 
     for k in m:
         pred_ab = np.argsort(-pred)[:, :k]
@@ -191,11 +192,13 @@ def calc_recall(pred, test, m=[100], type=None):
                     ndcg.append(0)
                 else:
                     ndcg.append(float(actual) / best)
+        result['recall@%d'%k] = np.mean(recall)
+        result['ndcg@%d' % k] = np.mean(ndcg)
 
         print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
 
 
-    return np.mean(np.array(recall))
+    return np.mean(np.array(recall)), result
 
 def dcg_score(y_true, y_score, k=50):
     """Discounted cumulative gain (DCG) at rank K.
@@ -272,7 +275,16 @@ def main():
             item_pred = sess.run(model.x_recon,
                                               feed_dict={model.x:x})
 
-            recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
+            recall_item , _= calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
+            if recall_item > max_recall:
+                max_recall = recall_item
+                if i > 1000:
+                    if max_recall < 0.1:
+                        _, result = calc_recall(item_pred, dataset['user_item_test'].values(), [10, 20, 30, 40, 50],
+                                                "item")
+                    else:
+                        _, result = calc_recall(item_pred, dataset['user_item_test'].values(),
+                                                [50, 100, 150, 200, 250, 300], "item")
             model.train = True
         if i%100 == 0 and model.learning_rate > 1e-6:
             model.learning_rate /= 10
@@ -280,6 +292,7 @@ def main():
 
 
     print(max_recall)
+    np.save(args.data.split(".")[0] + "_result.npy", result)
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Tool",
