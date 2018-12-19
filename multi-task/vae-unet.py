@@ -244,7 +244,7 @@ def main():
     forder = args.data.split("/")[:-1]
     forder = "/".join(forder)
     content = np.load(os.path.join(forder, "item.npz"))
-    content = content['rec']
+    content = content['z']
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
