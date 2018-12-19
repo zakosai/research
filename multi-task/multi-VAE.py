@@ -292,12 +292,14 @@ def main():
 
 
     print(max_recall)
+    f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
+    f.write("Best recall Multi-VAE: %f"%max_recall)
     np.save(args.data.split(".")[0] + "_result_multivae.npy", result)
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Tool",
                    help='dataset name')
-parser.add_argument('--type',  type=int, default=1,
+parser.add_argument('--ckpt',  type=str, default="experiment/delicious",
                    help='1p or 8p')
 parser.add_argument('--num_p', type=int, default=7780, help='number of product')
 

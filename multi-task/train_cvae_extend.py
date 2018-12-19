@@ -28,12 +28,8 @@ parser.add_argument('--zdim',  type=int, default=50,
                    help='where model is stored')
 parser.add_argument('--gridsearch',  type=int, default=1,
                    help='gridsearch or not')
-parser.add_argument('--data_type',  type=str, default='5',
-                   help='gridsearch or not')
-parser.add_argument('--user_no',  type=int, default=6040,
-                   help='gridsearch or not')
-parser.add_argument('--item_no',  type=int, default=3883,
-                   help='gridsearch or not')
+
+
 args = parser.parse_args()
 model_type = args.model
 ckpt = args.ckpt_folder
@@ -47,7 +43,7 @@ print(model_type)
 def load_cvae_data(data_dir):
   variables = load_npz(os.path.join(data_dir,"mult_nor.npz"))
 
-  f = open("hetrec2011-lastfm-2k/dataset.pkl", 'rb')
+  f = open(os.path.join(data_dir,"dataset.pkl"), 'rb')
   dataset = pickle.load(f)
   dataset["content"] = variables.toarray()
 

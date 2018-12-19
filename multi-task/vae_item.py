@@ -272,6 +272,7 @@ def main():
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(max_to_keep=20)
     max_recall = 0
+    result = {}
 
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(num_p)
@@ -299,8 +300,11 @@ def main():
             item_pred = item[:, dataset['user_item_test'].keys()]
             item_pred = item_pred.T
             recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
-            if recall_item > max_recall and recall_item> 0.09:
-                np.savez(os.path.join(folder, "item.npz"), z=z, rec=item)
+            if recall_item > max_recall:
+               max_recall = recall_item
+               result['z'] = z
+               result['rec'] = item
+
             model.train = True
         if i%100 == 0 and model.learning_rate > 1e-6:
             model.learning_rate /= 10
@@ -308,11 +312,14 @@ def main():
 
 
     print(max_recall)
+    f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
+    f.write("Best recall vae_item: %f" % max_recall)
+    np.savez(os.path.join(folder, "item.npz"), z=result['z'], rec=result['rec'])
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Tool",
                    help='dataset name')
-parser.add_argument('--type',  type=int, default=1,
+parser.add_argument('--ckpt',  type=str, default="experiment/delicious",
                    help='1p or 8p')
 parser.add_argument('--num_p', type=int, default=7780, help='number of product')
 
