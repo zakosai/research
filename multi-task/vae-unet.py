@@ -236,7 +236,7 @@ def calc_rmse(pred, test):
     return np.sqrt(np.mean((test-pred)**2))
 
 def main():
-    iter = 30
+    iter = 3000
     batch_size= 500
     args = parser.parse_args()
     f = open(args.data, 'rb')
