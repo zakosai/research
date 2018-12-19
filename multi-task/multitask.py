@@ -397,9 +397,9 @@ def dcg_score(y_true, y_score, k=50):
 
 
 def main():
-    # dataset = create_dataset_lastfm()
-    f = open("hetrec2011-lastfm-2k/dataset.pkl", 'rb')
-    dataset = pickle.load(f)
+    dataset = create_dataset_lastfm()
+    # f = open("hetrec2011-lastfm-2k/dataset.pkl", 'rb')
+    # dataset = pickle.load(f)
     print("finish create dataset")
     print(len(dataset['tag_label_train']),len(dataset['train']))
 
