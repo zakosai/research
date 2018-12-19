@@ -239,9 +239,11 @@ def main():
     iter = 3000
     batch_size= 500
     args = parser.parse_args()
-    f = open("hetrec2011-lastfm-2k/dataset.pkl", 'rb')
+    f = open(args.data, 'rb')
     dataset = pickle.load(f)
-    content = np.load("hetrec2011-lastfm-2k/exp1/item.npz")
+    forder = args.data.split("/")[:-1]
+    forder = "/".join(forder)
+    content = np.load(os.path.join(forder, "item.npz"))
     content = content['rec']
 
     num_p = dataset['item_no']

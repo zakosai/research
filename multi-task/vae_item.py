@@ -242,7 +242,9 @@ def main():
     args = parser.parse_args()
     f = open(args.data, 'rb')
     dataset = pickle.load(f)
-    content = load_npz("hetrec2011-lastfm-2k/mult_nor.npz")
+    folder = args.data.split("/")[:-1]
+    folder = "/".join(folder)
+    content = load_npz(os.path.join(folder, "mult_nor.npz"))
     content = content.toarray()
 
     num_p = dataset['item_no']
@@ -298,7 +300,7 @@ def main():
             item_pred = item_pred.T
             recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
             if recall_item > max_recall and recall_item> 0.017:
-                np.savez(args.data.split(".")[0] + "_item.npz", z=z, rec=item)
+                np.savez(os.path.join(folder, "item.npz"), z=z, rec=item)
             model.train = True
         if i%100 == 0 and model.learning_rate > 1e-6:
             model.learning_rate /= 10
