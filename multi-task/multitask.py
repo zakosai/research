@@ -236,9 +236,8 @@ class MultiTask:
 
 
 def create_dataset_lastfm():
-    user_tags = pd.read_table("hetrec2011-lastfm-2k/user_taggedartists.dat")
-    user_artist = pd.read_table("hetrec2011-lastfm-2k/user_artists.dat")
-    user_neg = np.genfromtxt("hetrec2011-lastfm-2k/user_neg_100.txt", dtype=np.int32, delimiter=',')
+    user_tags = pd.read_table("data/lastfm/user_taggedartists.dat")
+    user_artist = pd.read_table("data/lastfm/user_artists.dat")
     user_id = list(set(user_tags.userID))
     artist_id = list(set(user_tags.artistID))
     tag_id = list(set(user_tags.tagID))
@@ -307,6 +306,11 @@ def create_dataset_lastfm():
             print(ua)
 
     print("finish create test")
+    user_neg = []
+    for i in user_onehot:
+        item = np.where(i == 0)[0].tolist()
+        item = np.random.permutation(item)
+        user_neg.append(item[:100])
 
     train = np.array(train_matrix)
     test = np.array(test_matrix)
@@ -327,7 +331,7 @@ def create_dataset_lastfm():
                'tag_test': tag_test,
                'user_neg': user_neg}
     print("finish dataset")
-    f = open("hetrec2011-lastfm-2k/dataset.pkl", "wb")
+    f = open("data/lastfm/dataset_1.pkl", "wb")
     pickle.dump(dataset, f)
 
 
