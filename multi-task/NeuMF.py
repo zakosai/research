@@ -7,20 +7,13 @@ He Xiangnan et al. Neural Collaborative Filtering. In WWW 2017.
 '''
 import numpy as np
 
-import theano
-import theano.tensor as T
-import keras
+
 from keras import backend as K
-from keras import initializers
 from keras.regularizers import l1, l2
 from keras.models import Sequential, Model
-from keras.layers.core import Dense, Lambda, Activation
 from keras.layers import Embedding, Input, Dense, merge, Reshape, Merge, Flatten, Dropout
 from keras.optimizers import Adagrad, Adam, SGD, RMSprop
-from evaluate import evaluate_model
-from Dataset import Dataset
 from time import time
-import sys
 import GMF, MLP
 import argparse
 import pickle
@@ -231,7 +224,7 @@ if __name__ == '__main__':
     topK = 10
     evaluation_threads = 1#mp.cpu_count()
     print("NeuMF arguments: %s " %(args))
-    dataset = pickle.load(open(os.path.join(args.data, "dataset.pkl"), "rb"))
+    dataset = pickle.load(open(args.data, "rb"))
     model_out_file = os.path.join(args.ckpt, "NeuMF.h5")
 
     # Loading data
@@ -306,4 +299,4 @@ if __name__ == '__main__':
         print("The best NeuMF model is saved to %s" %(model_out_file))
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
     f.write("Best recall NeuMF: %f" % max_recall)
-    np.save(args.data.split(".")[0] + "_result_convae.npy", result)
+    np.save(args.data.split(".")[0] + "_result_NeuMF.npy", result)
