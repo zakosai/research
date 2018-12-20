@@ -1,28 +1,18 @@
 #!/usr/bin/env bash
-
-mkdir experiment/delicious
-python vae.py --ckpt_folder=experiment/delicious/ --data_dir=data/delicious/
-python train_cvae_extend.py --ckpt_folder=experiment/delicious/ --data_dir=data/delicious/
-python vae-unet.py --data_dir=data/delicious/dataset.pkl --ckpt_folder=experiment/delicious/
-
-
+dir='lastfm delicious tool outdoor grocery'
+for d in $dir
+do
 mkdir experiment/tool
-python multi-VAE.py --data_dir=data/tool/dataset.pkl --ckpt_folder=experiment/tool/
-python vae_item.py --data_dir=data/tool/dataset.pkl --ckpt_folder=experiment/tool/
-python vae-unet.py --data_dir=data/tool/dataset.pkl --ckpt_folder=experiment/tool/
-python vae.py --ckpt_folder=experiment/tool/ --data_dir=data/tool/
-python train_cvae_extend.py --ckpt_folder=experiment/tool/ --data_dir=data/tool/
+python multi-VAE.py --data=data/$d/dataset.pkl --ckpt=experiment/$d/
+python vae_item.py --data=data/$d/dataset.pkl --ckpt=experiment/$d/
+python vae-unet.py --data=data/$d/dataset.pkl --ckpt=experiment/$d/
+python train_cvae_extend.py --ckpt_folder=experiment/$d/ --data_dir=data/$d/
+python NeuMF.py --data=data/$d/dataset.pkl --ckpt=experiment/$d/
+python FM.py --data=data/$d/dataset.pkl --ckpt=experiment/$d/
+python MLP.py --data=data/$d/dataset.pkl --ckpt=experiment/$d/
+python GMF.py --data=data/$d/dataset.pkl --ckpt=experiment/$d/
+python NeuMF.py --data=data/$d/dataset.pkl --ckpt=experiment/$d/ --mf_pretrain=experiment/$d/GMF.h5 \
+--mlp_pretrain=experiment/$d/MLP.h5
 
-mkdir experiment/outdoor
-python multi-VAE.py --data_dir=data/outdoor/dataset.pkl --ckpt_folder=experiment/outdoor/
-python vae_item.py --data_dir=data/outdoor/dataset.pkl --ckpt_folder=experiment/outdoor/
-python vae-unet.py --data_dir=data/outdoor/dataset.pkl --ckpt_folder=experiment/outdoor/
-python vae.py --ckpt_folder=experiment/outdoor/ --data_dir=data/outdoor/
-python train_cvae_extend.py --ckpt_folder=experiment/outdoor/ --data_dir=data/outdoor/
+done
 
-mkdir experiment/grocery
-python multi-VAE.py --data_dir=data/grocery/dataset.pkl --ckpt_folder=experiment/grocery/
-python vae_item.py --data_dir=data/grocery/dataset.pkl --ckpt_folder=experiment/grocery/
-python vae-unet.py --data_dir=data/grocery/dataset.pkl --ckpt_folder=experiment/grocery/
-python vae.py --ckpt_folder=experiment/grocery/ --data_dir=data/grocery/
-python train_cvae_extend.py --ckpt_folder=experiment/grocery/ --data_dir=data/grocery/

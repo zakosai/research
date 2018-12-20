@@ -223,7 +223,10 @@ if __name__ == '__main__':
     evaluation_threads = 1#mp.cpu_count()
     print("NeuMF arguments: %s " %(args))
     dataset = pickle.load(open(args.data, "rb"))
-    model_out_file = os.path.join(args.ckpt, "NeuMF.h5")
+    if mf_pretrain != '':
+        model_out_file = os.path.join(args.ckpt, "NeuMF_pretrained.h5")
+    else:
+        model_out_file = os.path.join(args.ckpt, "NeuMF.h5")
 
     # Loading data
     t1 = time()
@@ -297,5 +300,9 @@ if __name__ == '__main__':
     if args.out > 0:
         print("The best NeuMF model is saved to %s" %(model_out_file))
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
-    f.write("Best recall NeuMF: %f" % max_recall)
-    np.save(args.data.split(".")[0] + "_result_NeuMF.npy", result)
+    if mf_pretrain != '':
+        f.write("Best recall NeuMF pretrained: %f" % max_recall)
+        np.save(args.data.split(".")[0] + "_result_NeuMF_pretrained.npy", result)
+    else:
+        f.write("Best recall NeuMF: %f" % max_recall)
+        np.save(args.data.split(".")[0] + "_result_NeuMF.npy", result)

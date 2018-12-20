@@ -224,6 +224,7 @@ if __name__ == '__main__':
                 user = [i] * num_items
                 item = list(range(num_items))
                 predict = model.predict([np.array(user), np.array(item)], batch_size=1000, verbose=0)
+                predict = [item for sublist in predict for item in sublist]
                 pred.append(predict)
             recall, _ = calc_recall(np.array(pred), dataset['user_item_test'].values(), [50])
             if recall > max_recall:
