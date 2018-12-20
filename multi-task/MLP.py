@@ -83,21 +83,19 @@ def get_model(num_users, num_items, layers = [20,10], reg_layers=[0,0]):
     
     return model
 
-def get_train_instances(train, num_negatives):
+def get_train_instances(train, num_negatives, dataset):
     user_input, item_input, labels = [],[],[]
-    num_users = train.shape[0]
-    for (u, i) in train.keys():
+    num_users = dataset['user_no']
+    for (u, i) in train:
         # positive instance
         user_input.append(u)
         item_input.append(i)
         labels.append(1)
         # negative instances
         for t in xrange(num_negatives):
-            j = np.random.randint(num_items)
-            while train.has_key((u, j)):
-                j = np.random.randint(num_items)
+            j = np.random.randint(0, 100)
             user_input.append(u)
-            item_input.append(j)
+            item_input.append(dataset['user_neg'][u][j])
             labels.append(0)
     return user_input, item_input, labels
 
@@ -211,7 +209,7 @@ if __name__ == '__main__':
     for epoch in xrange(epochs):
         t1 = time()
         # Generate training instances
-        user_input, item_input, labels = get_train_instances(train, num_negatives)
+        user_input, item_input, labels = get_train_instances(train, num_negatives, dataset)
     
         # Training        
         hist = model.fit([np.array(user_input), np.array(item_input)], #input
