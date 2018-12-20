@@ -254,13 +254,19 @@ def main():
 
     z_dim = 50
     max_item = max(np.sum(dataset['user_onehot'], axis=1))
-    x_dim = z_dim * max_item
+    x_dim = z_dim * num_p
     user_item = np.zeros((num_u,x_dim))
+    # for i in range(num_u):
+    #     idx = np.where(dataset['user_onehot'][i] == 1)
+    #     u_c = content[idx]
+    #     u_c = u_c.flatten()
+    #     user_item[i, :len(u_c)] = u_c
+
     for i in range(num_u):
-        idx = np.where(dataset['user_onehot'][i] == 1)
-        u_c = content[idx]
-        u_c = u_c.flatten()
-        user_item[i, :len(u_c)] = u_c
+        u_c = np.multiply(dataset['user_onehot'][i], content.T)
+        u_c = u_c.T.flatten()
+        user_item[i] = u_c
+
 
 
 
