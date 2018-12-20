@@ -151,7 +151,7 @@ def calc_recall(pred, test, m=[100], type=None):
         recall = []
         ndcg = []
         for i in range(len(pred_ab)):
-            p = pred_ab[i]
+            p = list(pred_ab[i])
             if len(test[i]) != 0:
                 hits = set(test[i]) & set(p)
 
