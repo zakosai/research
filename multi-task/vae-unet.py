@@ -324,8 +324,8 @@ def main():
 
     print(max_recall)
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
-    f.write("Best recall ConVAE: %f" % max_recall)
-    np.save(args.data.split(".")[0] + "_result_convae.npy", result)
+    f.write("Best recall ConVAE: %f\n" % max_recall)
+    np.save(os.path.join(args.ckpt, "result_convae.npy"), result)
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Tool",

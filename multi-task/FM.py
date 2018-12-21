@@ -108,8 +108,8 @@ def main():
         _, result = calc_recall(np.array(y_pred), dataset['user_item_test'].values(), [10, 20, 30, 40, 50, 60])
 
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
-    f.write("Best recall FM: %f" % recall)
-    np.save(args.data.split(".")[0] + "_result_FM.npy", result)
+    f.write("Best recall FM: %f\n" % recall)
+    np.save(os.path.join(args.ckpt, "result_FM.npy"), result)
 
 
 

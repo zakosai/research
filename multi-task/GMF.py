@@ -233,5 +233,5 @@ if __name__ == '__main__':
     if args.out > 0:
         print("The best NeuMF model is saved to %s" % (model_out_file))
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
-    f.write("Best recall NeuMF: %f" % max_recall)
-    np.save(args.data.split(".")[0] + "_result_GMF.npy", result)
+    f.write("Best recall GMF: %f\n" % max_recall)
+    np.save(os.path.join(args.ckpt, "result_GMF.npy"), result)

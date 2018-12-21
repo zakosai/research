@@ -313,7 +313,7 @@ def main():
 
     print(max_recall)
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
-    f.write("Best recall vae_item: %f" % max_recall)
+    f.write("Best recall vae-item: %f\n" % max_recall)
     np.savez(os.path.join(folder, "item.npz"), z=result['z'], rec=result['rec'])
 
 parser = argparse.ArgumentParser(description='Process some integers.')

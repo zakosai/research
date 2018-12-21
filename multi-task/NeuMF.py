@@ -301,8 +301,8 @@ if __name__ == '__main__':
         print("The best NeuMF model is saved to %s" %(model_out_file))
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
     if mf_pretrain != '':
-        f.write("Best recall NeuMF pretrained: %f" % max_recall)
-        np.save(args.data.split(".")[0] + "_result_NeuMF_pretrained.npy", result)
+        f.write("Best recall NeuMF pretrained: %f\n" % max_recall)
+        np.save(os.path.join(args.ckpt, "result_NeuMF_pretrained.npy"), result)
     else:
-        f.write("Best recall NeuMF: %f" % max_recall)
-        np.save(args.data.split(".")[0] + "_result_NeuMF.npy", result)
+        f.write("Best recall NeuMF: %f\n" % max_recall)
+        np.save(os.path.join(args.ckpt, "result_NeuMF.npy"), result)

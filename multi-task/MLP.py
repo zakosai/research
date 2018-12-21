@@ -162,7 +162,6 @@ def dcg_score(y_true, y_score, k=50):
 
 if __name__ == '__main__':
     args = parse_args()
-    path = args.path
     dataset = args.dataset
     layers = eval(args.layers)
     reg_layers = eval(args.reg_layers)
@@ -176,7 +175,7 @@ if __name__ == '__main__':
     topK = 10
     evaluation_threads = 1 #mp.cpu_count()
     print("MLP arguments: %s " %(args))
-    model_out_file = 'Pretrain/%s_MLP_%s_%d.h5' %(args.dataset, args.layers, time())
+    model_out_file = os.path.join(args.ckpt, "MLP.h5")
     
     # Loading data
     t1 = time()
@@ -242,5 +241,5 @@ if __name__ == '__main__':
     if args.out > 0:
         print("The best NeuMF model is saved to %s" % (model_out_file))
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
-    f.write("Best recall NeuMF: %f" % max_recall)
-    np.save(args.data.split(".")[0] + "_result_MLP.npy", result)
+    f.write("Best recall MLP: %f\n" % max_recall)
+    np.save(os.path.join(args.ckpt, "result_MLP.npy"), result)
