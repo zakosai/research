@@ -162,7 +162,6 @@ def dcg_score(y_true, y_score, k=50):
 
 if __name__ == '__main__':
     args = parse_args()
-    dataset = args.dataset
     layers = eval(args.layers)
     reg_layers = eval(args.reg_layers)
     num_negatives = args.num_neg
