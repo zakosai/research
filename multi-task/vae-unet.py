@@ -248,7 +248,6 @@ def main():
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
-    num_t = dataset['tag_no']
     encoding_dim = [600, 200]
     decoding_dim = [200, 600, num_p]
 
