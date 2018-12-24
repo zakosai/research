@@ -12,13 +12,12 @@ from scipy.sparse import load_npz
 
 
 class Translation:
-    def __init__(self, batch_size, dim, tag_dim, encode_dim, decode_dim, z_dim, eps=1e-10,
+    def __init__(self, batch_size, dim, encode_dim, decode_dim, z_dim, eps=1e-10,
                  lambda_0=10, lambda_1=0.1, lambda_2=100,
                  lambda_3=0.1,
                  lambda_4=100, learning_rate=1e-4):
         self.batch_size = batch_size
         self.dim = dim
-        self.tag_dim = tag_dim
         self.encode_dim = encode_dim
         self.decode_dim = decode_dim
         self.z_dim = z_dim
@@ -249,7 +248,6 @@ def main():
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
-    num_t = dataset['tag_no']
     encoding_dim = [600, 200]
     decoding_dim = [200, 600, num_u]
 
@@ -265,7 +263,7 @@ def main():
 
 
 
-    model = Translation(batch_size, num_u,num_t, encoding_dim, decoding_dim, z_dim)
+    model = Translation(batch_size, num_u, encoding_dim, decoding_dim, z_dim)
     model.build_model()
 
     sess = tf.Session()
