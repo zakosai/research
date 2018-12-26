@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-python vae.py  --ckpt_folder=experiment/outdoor/ --data_dir=data/outdoor/
-python train_cvae_extend.py --ckpt_folder=experiment/outdoor/ --data_dir=data/outdoor/
+
 
 
 #dir='tool outdoor grocery'
@@ -22,4 +21,7 @@ python train_cvae_extend.py --ckpt_folder=experiment/outdoor/ --data_dir=data/ou
 #
 #
 #done
-
+python vae_item.py --data=data/grocery/dataset.pkl --ckpt=experiment/grocery/
+python vae-unet.py --data=data/grocery/dataset.pkl --ckpt=experiment/grocery/
+python vae.py  --ckpt_folder=experiment/outdoor/ --data_dir=data/outdoor/
+python train_cvae_extend.py --ckpt_folder=experiment/outdoor/ --data_dir=data/outdoor/
