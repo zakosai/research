@@ -168,10 +168,10 @@ class Translation:
         adv_AB = self.adversal(y_AB, "adv_B", self.adv_dim_B, reuse=True)
 
         # Cycle - Consistency
-        z_ABA, z_mu_ABA, z_sigma_ABA = self.encode(y_AB, "B", self.encode_dim_B, True, True, True)
-        y_ABA = self.decode(z_ABA, "A", self.decode_dim_A, True, True)
-        z_BAB, z_mu_BAB, z_sigma_BAB = self.encode(y_BA, "A", self.encode_dim_A, True, True, True)
-        y_BAB = self.decode(z_BAB, "B", self.decode_dim_B, True, True)
+        # z_ABA, z_mu_ABA, z_sigma_ABA = self.encode(y_AB, "B", self.encode_dim_B, True, True, True)
+        # y_ABA = self.decode(z_ABA, "A", self.decode_dim_A, True, True)
+        # z_BAB, z_mu_BAB, z_sigma_BAB = self.encode(y_BA, "A", self.encode_dim_A, True, True, True)
+        # y_BAB = self.decode(z_BAB, "B", self.decode_dim_B, True, True)
 
 
 
