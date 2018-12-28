@@ -41,14 +41,14 @@ class Translation:
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.5)
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
                 # y = maxout(x_, encode_dim[i])
                 # x_ = tf.reshape(y, x_.shape)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.2)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
                 # x_ = tf.nn.tanh(x_)
 
                 print(x_.shape)
@@ -62,7 +62,7 @@ class Translation:
             for i in range(len(decode_dim)-1):
                 x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer, trainable=self.freeze)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.2)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
                 # x_ = tf.nn.tanh(x_)
             x_ = fully_connected(x_, decode_dim[-1], scope="last_dec",
                              weights_regularizer=self.regularizer, trainable=self.freeze)
@@ -89,7 +89,7 @@ class Translation:
                                      weights_regularizer=self.regularizer)
                 # y = maxout(x_, dim[i])
                 # x_ = tf.reshape(y, x_.shape)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.2)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
                 # x_ = tf.nn.tanh(x_)
 
         return x_
