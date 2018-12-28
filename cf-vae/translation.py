@@ -198,6 +198,8 @@ class Translation:
 
         self.loss_val_a = self.lambda_4 * self.loss_reconstruct(x_A, y_BA)
         self.loss_val_b = self.lambda_4 * self.loss_reconstruct(x_B, y_AB)
+        self.loss_CC = self.loss_val_a + self.loss_val_b
+
         self.y_BA = y_BA
         self.y_AB = y_AB
 
