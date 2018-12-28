@@ -190,8 +190,9 @@ class Translation:
         self.y_BB = y_BB
 
         # Loss cycle - consistency (CC)
-        loss_CC_A = self.lambda_4 * self.loss_reconstruct(x_A,y_BA)
-        loss_CC_B = self.lambda_4 * self.loss_reconstruct(x_B,y_AB)
+        loss_CC_A = self.lambda_3 * self.loss_kl(z_mu_ABA, z_sigma_ABA) + \
+                    self.lambda_4 * self.loss_reconstruct(x_A,y_BA)
+        loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB) + self.lambda_4 * self.loss_reconstruct(x_B,y_AB)
 
 
         self.loss_CC = loss_CC_A + loss_CC_B
