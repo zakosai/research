@@ -190,18 +190,18 @@ class Translation:
         self.y_BB = y_BB
 
         # Loss cycle - consistency (CC)
-        loss_CC_A = self.lambda_4 * self.loss_reconstruct(x_A,y_BA)
-        loss_CC_B = self.lambda_4 * self.loss_reconstruct(x_B,y_AB)
+        # loss_CC_A = self.lambda_4 * self.loss_reconstruct(x_A,y_BA)
+        # loss_CC_B = self.lambda_4 * self.loss_reconstruct(x_B,y_AB)
 
 
-        self.loss_CC = loss_CC_A + loss_CC_B
+        # self.loss_CC = loss_CC_A + loss_CC_B
 
         self.loss_val_a = self.lambda_4 * self.loss_reconstruct(x_A, y_BA)
         self.loss_val_b = self.lambda_4 * self.loss_reconstruct(x_B, y_AB)
         self.y_BA = y_BA
         self.y_AB = y_AB
 
-        self.loss_gen =  self.loss_CC + 0.1 * tf.losses.get_regularization_loss() +\
+        self.loss_gen =  self.loss_val_a + self.loss_val_b + 0.1 * tf.losses.get_regularization_loss() +\
                         self.loss_generator(y_AB) + self.loss_generator(y_BA)
         # self.loss_gen = drself.loss_CC + 0.1 * tf.losses.get_regularization_loss() - loss_d_A - loss_d_B
 
