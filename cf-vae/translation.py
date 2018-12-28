@@ -168,10 +168,10 @@ class Translation:
         adv_AB = self.adversal(y_AB, "adv_B", self.adv_dim_B, reuse=True)
 
         # Cycle - Consistency
-        # z_ABA, z_mu_ABA, z_sigma_ABA = self.encode(y_AB, "B", self.encode_dim_B, True, True, True)
-        # y_ABA = self.decode(z_ABA, "A", self.decode_dim_A, True, True)
-        # z_BAB, z_mu_BAB, z_sigma_BAB = self.encode(y_BA, "A", self.encode_dim_A, True, True, True)
-        # y_BAB = self.decode(z_BAB, "B", self.decode_dim_B, True, True)
+        z_ABA, z_mu_ABA, z_sigma_ABA = self.encode(y_AB, "B", self.encode_dim_B, True, True, True)
+        y_ABA = self.decode(z_ABA, "A", self.decode_dim_A, True, True)
+        z_BAB, z_mu_BAB, z_sigma_BAB = self.encode(y_BA, "A", self.encode_dim_A, True, True, True)
+        y_BAB = self.decode(z_BAB, "B", self.decode_dim_B, True, True)
 
 
 
@@ -202,7 +202,8 @@ class Translation:
         self.y_AB = y_AB
 
         self.loss_gen =  self.loss_CC + 0.1 * tf.losses.get_regularization_loss() +\
-                        self.loss_generator(y_AB) + self.loss_generator(y_BA)
+                        self.loss_generator(y_AB) + self.loss_generator(y_ABA) + self.loss_generator(y_BAB) +\
+                        self.loss_generator(y_BA)
         # self.loss_gen = drself.loss_CC + 0.1 * tf.losses.get_regularization_loss() - loss_d_A - loss_d_B
 
 
