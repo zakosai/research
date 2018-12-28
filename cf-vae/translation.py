@@ -529,8 +529,8 @@ def main():
                 # y_ab = y_ab[test_B]
                 # y_ba = y_ba[test_A]
 
-                calc_recall(y_ba, dense_A_test, [50], type="A")
-                calc_recall(y_ab, dense_B_test, [50], type="B")
+                calc_recall(y_ba, dense_A_test, k, type="A")
+                calc_recall(y_ab, dense_B_test, k, type="B")
 
                 #test same domain
                 # input_A_test, domain_A_test = test_same_domain(dense_A_test, num_A)
