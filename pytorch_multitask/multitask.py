@@ -8,11 +8,11 @@ import argparse
 import os
 
 class MultiTask(nn.Module):
-    def __init__(self, enc_layers, dim_in, z_dim, dec_layers, lambda_1=1, lambda_2=100):
+    def __init__(self, enc_layers, dim_in, z_dim, dec_layers, dev, lambda_1=1, lambda_2=100):
         super(MultiTask, self).__init__()
-        self.eps = 1e-10
-        self.lambda_1 = lambda_1
-        self.lambda_2 = lambda_2
+        self.eps = torch.tensor(1e-10, device=dev)
+        self.lambda_1 = torch.tensor(lambda_1, device=dev)
+        self.lambda_2 = torch.tensor(lambda_2, device=dev)
 
         module_enc_list = []
         dim_in = dim_in
@@ -136,10 +136,13 @@ def main():
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
-    encoding_dim = [600, 200]
-    decoding_dim = [200, 600, num_p]
+    dev = torch.device(
+        "cuda") if torch.cuda.is_available() else torch.device("cpu")
 
-    z_dim = 50
+    encoding_dim = torch.tensor([600, 200], device=dev)
+    decoding_dim = torch.tensor([200, 600, num_p], device=dev)
+
+    z_dim = torch.tensor(50, device=dev)
     max_item = max(np.sum(dataset['user_onehot'], axis=1))
     x_dim = z_dim * max_item
     user_item = np.zeros((num_u,x_dim))
@@ -150,6 +153,7 @@ def main():
         user_item[i, :len(u_c)] = u_c
 
     dim_in = x_dim + num_p
+    dim_in = torch.tensor(dim_in, device=dev)
     model = MultiTask(encoding_dim, dim_in, z_dim, decoding_dim)
     opt = optim.Adam(model.parameters(), lr=1e-4)
 
@@ -161,9 +165,6 @@ def main():
     train_ds = TensorDataset(x_train, y_train)
     train_dl = DataLoader(train_ds, batch_size=batch_size)
 
-    print(torch.cuda.is_available())
-    dev = torch.device(
-        "cuda") if torch.cuda.is_available() else torch.device("cpu")
     model.to(dev)
     model = model.cuda()
 
