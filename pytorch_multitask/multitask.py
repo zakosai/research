@@ -10,11 +10,10 @@ import os
 class MultiTask(nn.Module):
     def __init__(self, enc_layers, dim_in, z_dim, dec_layers, dev, lambda_1=1, lambda_2=100):
         super(MultiTask, self).__init__()
-        self.eps = torch.tensor(1e-10, device=dev)
-        self.lambda_1 = torch.tensor(lambda_1, device=dev)
-        self.lambda_2 = torch.tensor(lambda_2, device=dev)
-        enc_layers = torch.tensor(enc_layers, device=dev)
-        dec_layers = torch.tensor(dec_layers, device=dev)
+        self.eps = 1e-10
+        self.lambda_1 = lambda_1
+        self.lambda_2 = lambda_2
+
 
         module_enc_list = []
         for i in range(len(enc_layers)):
