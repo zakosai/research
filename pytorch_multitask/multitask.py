@@ -165,7 +165,7 @@ def main():
     train_dl = DataLoader(train_ds, batch_size=batch_size)
 
     model.to(dev)
-
+    max_recall = 0
     for epoch in range(epoches):
         for xb, yb in train_dl:
             xb, yb = xb.to(dev), yb.to(dev)
