@@ -46,6 +46,7 @@ class MultiTask(nn.Module):
 
     def foward(self, x, y):
         x_ = torch.cat((x, y), dim=1)
+        print(x.size())
         x_ = self.enc(x_)
         mu = self.mu(x_)
         sigma = self.sigma(x_)
