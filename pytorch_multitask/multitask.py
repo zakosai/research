@@ -153,8 +153,8 @@ def main():
     opt = optim.Adam(model.parameters(), lr=1e-4)
 
 
-    x_test = user_item[dataset['user_item_test'].keys()]
-    y_test = dataset['user_onehot'][dataset['user_item_test'].keys()]
+    x_test = user_item[list(dataset['user_item_test'].keys())]
+    y_test = dataset['user_onehot'][list(dataset['user_item_test'].keys())]
     x_train, y_train, x_test, y_test = map(torch.tensor, (user_item, dataset['user_onehot'], x_test, y_test))
     train_ds = TensorDataset(x_train, y_train)
     train_dl = DataLoader(train_ds, batch_size=batch_size)
@@ -170,16 +170,16 @@ def main():
         if epoch%10 == 0:
             item_pred, loss = model(x_test, y_test)
 
-            recall_item, _ = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
+            recall_item, _ = calc_recall(item_pred, list(dataset['user_item_test'].values()), [50], "item")
             model.train = True
 
             if recall_item > max_recall:
                 max_recall = recall_item
                 if max_recall < 0.1:
-                    _, result = calc_recall(item_pred, dataset['user_item_test'].values(),
+                    _, result = calc_recall(item_pred, list(dataset['user_item_test'].values()),
                                             [50, 100, 150, 200, 250, 300], "item")
                 else:
-                    _, result = calc_recall(item_pred, dataset['user_item_test'].values(),
+                    _, result = calc_recall(item_pred, list(dataset['user_item_test'].values()),
                                             [10, 20, 30, 40, 50, 60], "item")
 
 
