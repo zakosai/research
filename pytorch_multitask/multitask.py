@@ -173,12 +173,12 @@ def main():
             loss.backward()
             opt.step()
             opt.zero_grad()
-        print("loss last batch: %f", loss)
+        print("loss last batch: %f", loss.item())
 
         if epoch%10 == 0:
             x_test, y_test = x_test.to(dev), y_test.to(dev)
             item_pred, loss = model(x_test, y_test)
-            item_pred = item_pred.numpy()
+            item_pred = item_pred.detach.numpy()
             recall_item, _ = calc_recall(item_pred, list(dataset['user_item_test'].values()), [50], "item")
             model.train = True
 
