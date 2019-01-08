@@ -9,6 +9,7 @@ import os
 
 class MultiTask(nn.Module):
     def __init__(self, enc_layers, dim_in, z_dim, dec_layers, lambda_1=1, lambda_2=100):
+        super().__init__()
         self.enc_layers = enc_layers
         self.z_dim = z_dim
         self.eps = 1e-10
