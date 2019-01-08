@@ -152,7 +152,11 @@ def main():
     model = MultiTask(encoding_dim, dim_in, z_dim, decoding_dim)
     opt = optim.Adam(model.parameters(), lr=1e-4)
 
-    train_ds = TensorDataset(user_item, dataset['user_onehot'])
+
+    x_test = user_item[dataset['user_item_test'].keys()]
+    y_test = dataset['user_onehot'][dataset['user_item_test'].keys()]
+    x_train, y_train, x_test, y_test = map(torch.tensor, (user_item, dataset['user_onehot'], x_test, y_test))
+    train_ds = TensorDataset(x_train, y_train)
     train_dl = DataLoader(train_ds, batch_size=batch_size)
 
     for epoch in range(epoches):
@@ -164,9 +168,7 @@ def main():
         print("loss last batch: %f", loss)
 
         if epoch%10 == 0:
-            x = user_item[dataset['user_item_test'].keys()]
-            y = dataset['user_onehot'][dataset['user_item_test'].keys()]
-            item_pred, loss = model(x, y)
+            item_pred, loss = model(x_test, y_test)
 
             recall_item, _ = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
             model.train = True
