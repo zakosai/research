@@ -9,31 +9,24 @@ import os
 
 class MultiTask(nn.Module):
     def __init__(self, enc_layers, dim_in, z_dim, dec_layers, lambda_1=1, lambda_2=100):
-        super().__init__()
-        self.enc_layers = enc_layers
-        self.z_dim = z_dim
-        self.eps = 1e-10
-        self.dec_layers = dec_layers
-        self.lambda_1 = lambda_1
-        self.lambda_2 = lambda_2
-
+        super(MultiTask, self).__init__()
         module_enc_list = []
         dim_in = dim_in
-        for i in range(len(self.enc_layers)):
-            module_enc_list.extend([nn.Linear(dim_in, self.enc_layers[i]),
+        for i in range(len(enc_layers)):
+            module_enc_list.extend([nn.Linear(dim_in, enc_layers[i]),
                                 nn.LeakyReLU(0.5)])
-            dim_in = self.enc_layers[i]
+            dim_in = enc_layers[i]
         self.enc = nn.Sequential(*module_enc_list)
 
         self.mu = nn.Linear(dim_in, z_dim)
         self.sigma = nn.Linear(dim_in, z_dim)
 
         module_dec_list = []
-        dim_in = self.z_dim
-        for i in range(len(self.dec_layers)):
-            module_dec_list.extend([nn.Linear(dim_in, self.dec_layers[i]),
+        dim_in = z_dim
+        for i in range(len(dec_layers)):
+            module_dec_list.extend([nn.Linear(dim_in, dec_layers[i]),
                                     nn.LeakyReLU(0.5)])
-            dim_in = self.dec_layers[i]
+            dim_in = dec_layers[i]
         self.dec = nn.Sequential(*module_dec_list)
 
         self.log_softmax = nn.LogSoftmax(dim_in)
