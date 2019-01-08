@@ -163,10 +163,11 @@ def main():
     dev = torch.device(
         "cuda") if torch.cuda.is_available() else torch.device("cpu")
     model.to(dev)
-    model = model.cuda(dev)
+    model = model.cuda()
 
     for epoch in range(epoches):
         for xb, yb in train_dl:
+            xb, yb = xb.to(dev), yb.to(dev)
             y_pred, loss = model(xb, yb)
             loss.backward()
             opt.step()
