@@ -10,6 +10,7 @@ import os
 class MultiTask(nn.Module):
     def __init__(self, enc_layers, dim_in, z_dim, dec_layers, lambda_1=1, lambda_2=100):
         super(MultiTask, self).__init__()
+        self.eps = 1e-10
         module_enc_list = []
         dim_in = dim_in
         for i in range(len(enc_layers)):
