@@ -147,7 +147,8 @@ def main():
         u_c = u_c.flatten()
         user_item[i, :len(u_c)] = u_c
 
-    model = MultiTask.__init__(encoding_dim, x_dim+num_p, z_dim, decoding_dim)
+    model = MultiTask()
+    model.__init__(encoding_dim, x_dim+num_p, z_dim, decoding_dim)
     opt = optim.Adam(model.parameters(), lr=1e-4)
 
     train_ds = TensorDataset(user_item, dataset['user_onehot'])
