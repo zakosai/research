@@ -53,7 +53,12 @@ class MultiTask(nn.Module):
         self.z = mu + torch.sqrt(torch.max(torch.exp(sigma), eps)) * e
         y_ = self.dec(self.z)
         y_softmax = self.log_softmax(y_)
-        self.loss = self.lambda_1 * self.kl_loss(mu, sigma) + self.lambda_2 * self.reconstruction_loss(y, y_softmax)
+
+        l2_loss = torch.tensor(0, device=dev)
+        for p in self.parameters():
+            l2_loss += p.norm(2)
+        self.loss = self.lambda_1 * self.kl_loss(mu, sigma) + self.lambda_2 * self.reconstruction_loss(y, y_softmax) \
+                    + 0.5 * l2_loss
         return y_, self.loss
 
 
@@ -173,9 +178,9 @@ def main():
             loss.backward()
             opt.step()
             opt.zero_grad()
-        print("loss last batch: %f", loss.item())
 
         if epoch%10 == 0:
+            print("loss last batch: %f", loss.item())
             x_test, y_test = x_test.to(dev), y_test.to(dev)
             item_pred, loss = model(x_test, y_test)
             item_pred = item_pred.cpu().detach().numpy()
