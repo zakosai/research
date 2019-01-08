@@ -45,7 +45,8 @@ class MultiTask(nn.Module):
         mu = self.mu(x_)
         sigma = self.sigma(x_)
         e = torch.randn(mu.size())
-        self.z = mu + torch.sqrt(torch.max(torch.exp(sigma), self.eps)) * e
+        eps = torch.zeros(sigma.size()) + self.eps
+        self.z = mu + torch.sqrt(torch.max(torch.exp(sigma), eps)) * e
         y_ = self.dec(self.z)
         y_softmax = self.log_softmax(y_)
         self.loss = self.lambda_1 * self.kl_loss(mu, sigma) + self.lambda_2 * self.reconstruction_loss(y, y_softmax)
