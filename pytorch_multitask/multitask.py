@@ -25,6 +25,9 @@ class MultiTask(nn.Module):
             dim_in = self.enc_layers[i]
         self.enc = nn.Sequential(*module_enc_list)
 
+        self.mu = nn.Linear(dim_in, z_dim)
+        self.sigma = nn.Linear(dim_in, z_dim)
+
         module_dec_list = []
         dim_in = self.z_dim
         for i in range(len(self.dec_layers)):
@@ -33,8 +36,6 @@ class MultiTask(nn.Module):
             dim_in = self.dec_layers[i]
         self.dec = nn.Sequential(*module_dec_list)
 
-        self.mu = nn.Linear(dim_in, z_dim)
-        self.sigma = nn.Linear(dim_in, z_dim)
         self.log_softmax = nn.LogSoftmax(dim_in)
 
     def kl_loss(self, mu, sigma):
@@ -42,7 +43,6 @@ class MultiTask(nn.Module):
 
     def reconstruction_loss(self, y, y_pred):
         return -torch.mean(torch.sum(y_pred*y, dim=-1))
-
 
     def foward(self, x, y):
         x_ = torch.cat((x, y), dim=1)
