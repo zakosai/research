@@ -54,7 +54,10 @@ class MultiTask(nn.Module):
         y_ = self.dec(self.z)
         y_softmax = self.log_softmax(y_)
         self.loss = self.lambda_1 * self.kl_loss(mu, sigma) + self.lambda_2 * self.reconstruction_loss(y, y_softmax)
-        return y_, self.loss
+        return y_
+
+    def total_loss(self):
+        return self.loss
 
 def calc_recall(pred, test, m=[100], type=None):
     result = {}
@@ -162,14 +165,16 @@ def main():
 
     for epoch in range(epoches):
         for xb, yb in train_dl:
-            y_pred, loss = model(xb, yb)
+            y_pred = model(xb, yb)
+            loss = model.total_loss()
             loss.backward()
             opt.step()
             opt.zero_grad()
         print("loss last batch: %f", loss)
 
         if epoch%10 == 0:
-            item_pred, loss = model(x_test, y_test)
+            item_pred = model(x_test, y_test)
+            loss = model.total_loss()
 
             recall_item, _ = calc_recall(item_pred, list(dataset['user_item_test'].values()), [50], "item")
             model.train = True
