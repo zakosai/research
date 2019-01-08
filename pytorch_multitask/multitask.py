@@ -54,7 +54,7 @@ class MultiTask(nn.Module):
         y_ = self.dec(self.z)
         y_softmax = self.log_softmax(y_)
 
-        l2_loss = torch.tensor(0, device=dev)
+        l2_loss = 0
         for p in self.parameters():
             l2_loss += p.norm(2)
         self.loss = self.lambda_1 * self.kl_loss(mu, sigma) + self.lambda_2 * self.reconstruction_loss(y, y_softmax) \
