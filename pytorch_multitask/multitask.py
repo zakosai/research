@@ -28,7 +28,7 @@ class MultiTask(nn.Module):
         module_dec_list = []
         dim_in = self.z_dim
         for i in range(len(self.dec_layers)):
-            module_dec_list.extend([nn.Linear(dim_in), self.dec_layers[i],
+            module_dec_list.extend([nn.Linear(dim_in, self.dec_layers[i]),
                                     nn.LeakyReLU(0.5)])
             dim_in = self.dec_layers[i]
         self.dec = nn.Sequential(*module_dec_list)
