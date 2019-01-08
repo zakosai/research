@@ -13,9 +13,10 @@ class MultiTask(nn.Module):
         self.eps = torch.tensor(1e-10, device=dev)
         self.lambda_1 = torch.tensor(lambda_1, device=dev)
         self.lambda_2 = torch.tensor(lambda_2, device=dev)
+        enc_layers = torch.tensor(enc_layers, device=dev)
+        dec_layers = torch.tensor(dec_layers, device=dev)
 
         module_enc_list = []
-        dim_in = dim_in
         for i in range(len(enc_layers)):
             module_enc_list.extend([nn.Linear(dim_in, enc_layers[i]),
                                 nn.LeakyReLU(0.5)])
@@ -139,10 +140,10 @@ def main():
     dev = torch.device(
         "cuda") if torch.cuda.is_available() else torch.device("cpu")
 
-    encoding_dim = torch.tensor([600, 200], device=dev)
-    decoding_dim = torch.tensor([200, 600, num_p], device=dev)
+    encoding_dim = [600, 200]
+    decoding_dim = [200, 600, num_p]
 
-    z_dim = torch.tensor(50, device=dev)
+    z_dim = 50
     max_item = max(np.sum(dataset['user_onehot'], axis=1))
     x_dim = z_dim * max_item
     user_item = np.zeros((num_u,x_dim))
@@ -153,7 +154,6 @@ def main():
         user_item[i, :len(u_c)] = u_c
 
     dim_in = x_dim + num_p
-    dim_in = torch.tensor(dim_in, device=dev)
     model = MultiTask(encoding_dim, dim_in, z_dim, decoding_dim, dev)
     opt = optim.Adam(model.parameters(), lr=1e-4)
 
