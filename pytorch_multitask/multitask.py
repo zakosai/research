@@ -13,7 +13,7 @@ class MultiTask(nn.Module):
         self.eps = 1e-10
         self.lambda_1 = lambda_1
         self.lambda_2 = lambda_2
-        
+
         module_enc_list = []
         dim_in = dim_in
         for i in range(len(enc_layers)):
@@ -43,7 +43,6 @@ class MultiTask(nn.Module):
 
     def forward(self, x,y):
         x_ = torch.cat((x, y), dim=1)
-        print(x.size())
         x_ = self.enc(x_)
         mu = self.mu(x_)
         sigma = self.sigma(x_)
@@ -55,8 +54,6 @@ class MultiTask(nn.Module):
         self.loss = self.lambda_1 * self.kl_loss(mu, sigma) + self.lambda_2 * self.reconstruction_loss(y, y_softmax)
         return y_, self.loss
 
-    def total_loss(self):
-        return self.loss
 
 def calc_recall(pred, test, m=[100], type=None):
     result = {}
@@ -162,6 +159,11 @@ def main():
     train_ds = TensorDataset(x_train, y_train)
     train_dl = DataLoader(train_ds, batch_size=batch_size)
 
+    print(torch.cuda.is_available())
+    dev = torch.device(
+        "cuda") if torch.cuda.is_available() else torch.device("cpu")
+    model.to(dev)
+
     for epoch in range(epoches):
         for xb, yb in train_dl:
             y_pred, loss = model(xb, yb)
@@ -172,7 +174,7 @@ def main():
 
         if epoch%10 == 0:
             item_pred, loss = model(x_test, y_test)
-
+            item_pred = item_pred.numpy()
             recall_item, _ = calc_recall(item_pred, list(dataset['user_item_test'].values()), [50], "item")
             model.train = True
 
