@@ -154,8 +154,9 @@ def main():
 
 
     x_test = user_item[list(dataset['user_item_test'].keys())]
-    y_test = dataset['user_onehot'][list(dataset['user_item_test'].keys())]
-    x_train, y_train, x_test, y_test = map(torch.tensor, (user_item, dataset['user_onehot'], x_test, y_test))
+    y_test = dataset['user_onehot'][list(dataset['user_item_test'].keys())].astype(np.uint8)
+    x_train, y_train, x_test, y_test = map(torch.tensor, (user_item, dataset['user_onehot'].astype(np.uint8), x_test,
+                                                          y_test))
     train_ds = TensorDataset(x_train, y_train)
     train_dl = DataLoader(train_ds, batch_size=batch_size)
 
