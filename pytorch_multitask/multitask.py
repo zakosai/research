@@ -8,7 +8,7 @@ import argparse
 import os
 
 class MultiTask(nn.Module):
-    def __init__(self, enc_layers, dim_in, z_dim, dec_layers, dev, lambda_1=1, lambda_2=100):
+    def __init__(self, enc_layers, dim_in, z_dim, dec_layers, dev, lambda_1=0.1, lambda_2=100):
         super(MultiTask, self).__init__()
         self.eps = 1e-10
         self.lambda_1 = lambda_1
@@ -58,7 +58,7 @@ class MultiTask(nn.Module):
         for p in self.parameters():
             l2_loss += p.norm(2)
         self.loss = self.lambda_1 * self.kl_loss(mu, sigma) + self.lambda_2 * self.reconstruction_loss(y, y_softmax) \
-                    + 0.5 * l2_loss
+                    + 0.1 * l2_loss
         return y_, self.loss
 
 
