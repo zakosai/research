@@ -37,7 +37,7 @@ class MultiTask(nn.Module):
     def reconstruction_loss(self, y, y_pred):
         return -torch.mean(torch.sum(y_pred*y, dim=-1))
 
-    def foward(self, x, y):
+    def forward(self, x,y):
         x_ = torch.cat((x, y), dim=1)
         print(x.size())
         x_ = self.enc(x_)
@@ -48,7 +48,7 @@ class MultiTask(nn.Module):
         y_ = self.dec(self.z)
         y_softmax = self.log_softmax(y_)
         self.loss = self.lambda_1 * self.kl_loss(mu, sigma) + self.lambda_2 * self.reconstruction_loss(y, y_softmax)
-        return y_
+        return y_, self.loss
 
     def total_loss(self):
         return self.loss
@@ -159,16 +159,14 @@ def main():
 
     for epoch in range(epoches):
         for xb, yb in train_dl:
-            y_pred = model(xb, yb)
-            loss = model.total_loss()
+            y_pred, loss = model(xb, yb)
             loss.backward()
             opt.step()
             opt.zero_grad()
         print("loss last batch: %f", loss)
 
         if epoch%10 == 0:
-            item_pred = model(x_test, y_test)
-            loss = model.total_loss()
+            item_pred, loss = model(x_test, y_test)
 
             recall_item, _ = calc_recall(item_pred, list(dataset['user_item_test'].values()), [50], "item")
             model.train = True
