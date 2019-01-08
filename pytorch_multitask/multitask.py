@@ -42,12 +42,14 @@ class MultiTask(nn.Module):
         return -torch.mean(torch.sum(y_pred*y, dim=-1))
 
     def forward(self, x,y):
+        dev = torch.device(
+            "cuda") if torch.cuda.is_available() else torch.device("cpu")
         x_ = torch.cat((x, y), dim=1)
         x_ = self.enc(x_)
         mu = self.mu(x_)
         sigma = self.sigma(x_)
-        e = torch.randn(mu.size())
-        eps = torch.zeros(sigma.size()) + self.eps
+        e = torch.randn(mu.size()).to(dev)
+        eps = (torch.zeros(sigma.size()) + self.eps).to(dev)
         self.z = mu + torch.sqrt(torch.max(torch.exp(sigma), eps)) * e
         y_ = self.dec(self.z)
         y_softmax = self.log_softmax(y_)
