@@ -163,6 +163,7 @@ def main():
     dev = torch.device(
         "cuda") if torch.cuda.is_available() else torch.device("cpu")
     model.to(dev)
+    model = model.cuda(dev)
 
     for epoch in range(epoches):
         for xb, yb in train_dl:
