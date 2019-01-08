@@ -154,7 +154,7 @@ def main():
 
     dim_in = x_dim + num_p
     dim_in = torch.tensor(dim_in, device=dev)
-    model = MultiTask(encoding_dim, dim_in, z_dim, decoding_dim)
+    model = MultiTask(encoding_dim, dim_in, z_dim, decoding_dim, dev)
     opt = optim.Adam(model.parameters(), lr=1e-4)
 
 
