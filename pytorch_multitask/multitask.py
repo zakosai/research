@@ -48,8 +48,8 @@ class MultiTask(nn.Module):
         x_ = self.enc(x_)
         mu = self.mu(x_)
         sigma = self.sigma(x_)
-        e = torch.randn(mu.size()).to(dev)
-        eps = (torch.zeros(sigma.size()) + self.eps).to(dev)
+        e = torch.randn(mu.size(), device=dev)
+        eps = torch.zeros(sigma.size(), device=dev) + self.eps
         self.z = mu + torch.sqrt(torch.max(torch.exp(sigma), eps)) * e
         y_ = self.dec(self.z)
         y_softmax = self.log_softmax(y_)
