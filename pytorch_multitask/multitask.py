@@ -165,7 +165,6 @@ def main():
     train_dl = DataLoader(train_ds, batch_size=batch_size)
 
     model.to(dev)
-    model = model.cuda()
 
     for epoch in range(epoches):
         for xb, yb in train_dl:
@@ -177,6 +176,7 @@ def main():
         print("loss last batch: %f", loss)
 
         if epoch%10 == 0:
+            x_test, y_test = x_test.to(dev), y_test.to(dev)
             item_pred, loss = model(x_test, y_test)
             item_pred = item_pred.numpy()
             recall_item, _ = calc_recall(item_pred, list(dataset['user_item_test'].values()), [50], "item")
