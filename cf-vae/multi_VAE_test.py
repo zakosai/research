@@ -1,4 +1,4 @@
-from multi-VAE import Translation, create_dataset, calc_recall
+from multiVAE import Translation, create_dataset, calc_recall
 import tensorflow as tf
 import numpy as np
 import argparse
