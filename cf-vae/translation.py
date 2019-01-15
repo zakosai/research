@@ -429,11 +429,11 @@ def main():
 
     print(k)
 
-    encoding_dim_A = [600]
-    encoding_dim_B = [600]
-    share_dim = [200]
-    decoding_dim_A = [600, num_A]
-    decoding_dim_B = [600, num_B]
+    encoding_dim_A = [dim]
+    encoding_dim_B = [dim]
+    share_dim = [share]
+    decoding_dim_A = [dim, num_A]
+    decoding_dim_B = [share, num_B]
 
 
     assert len(user_A) == len(user_B)
@@ -480,7 +480,7 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            if i <20:
+            if i <50:
                 _, loss_vae = sess.run([model.train_op_VAE_A, model.loss_VAE], feed_dict=feed)
                 _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
                 loss_gen = loss_dis = loss_cc = 0
