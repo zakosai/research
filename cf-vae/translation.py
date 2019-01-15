@@ -118,10 +118,6 @@ class Translation:
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
     def loss_reconstruct(self, x, x_recon):
-        # return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(x, x_recon), axis=1))
-        # return tf.reduce_mean(tf.abs(x - x_recon))
-        # return tf.reduce_mean(tf.reduce_sum((x-x_recon)**2, axis=1))
-        # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_recon, labels=x))
 
         log_softmax_var = tf.nn.log_softmax(x_recon)
 
@@ -159,12 +155,12 @@ class Translation:
 
         # Adversal
         y_BA = self.decode(z_B, "A", self.decode_dim_A, True, True)
-        adv_AA = self.adversal(x_A, "adv_A", self.adv_dim_A)
+        adv_AA = self.adversal(y_AA, "adv_A", self.adv_dim_A)
         adv_BA = self.adversal(y_BA, "adv_A", self.adv_dim_A, reuse=True)
 
 
         y_AB = self.decode(z_A, "B", self.decode_dim_B, True, True)
-        adv_BB = self.adversal(x_B, "adv_B", self.adv_dim_B)
+        adv_BB = self.adversal(y_BB, "adv_B", self.adv_dim_B)
         adv_AB = self.adversal(y_AB, "adv_B", self.adv_dim_B, reuse=True)
 
         # Cycle - Consistency
@@ -468,7 +464,7 @@ def main():
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
-    saver = tf.train.Saver(max_to_keep=20)
+    saver = tf.train.Saver(max_to_keep=3)
     max_recall = 0
     dense_A_val = dense_A[train_size:train_size+val_size]
     dense_B_val = dense_B[train_size:train_size+val_size]
@@ -524,7 +520,7 @@ def main():
                                                                                recall))
             if recall > max_recall:
                 max_recall = recall
-                saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
+                saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'))
                 loss_test_a, loss_test_b, y_ab, y_ba = sess.run(
                     [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
                  feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
@@ -535,6 +531,12 @@ def main():
 
                 calc_recall(y_ba, dense_A_test, k, type="A")
                 calc_recall(y_ab, dense_B_test, k, type="B")
+                pred = np.argsort(-pred)[:, :10]
+                f = open(os.path.join(checkpoint_dir, "predict.txt"), "w")
+                for p in pred:
+                    w = [str(i) for i in p]
+                    f.write(','.join(w))
+                    f.write("\n")
 
                 #test same domain
                 # input_A_test, domain_A_test = test_same_domain(dense_A_test, num_A)
