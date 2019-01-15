@@ -537,12 +537,16 @@ class cf_vae_extend:
         hit_B = 0
         ndcg_A = []
         ndcg_B = []
+        f = open("predict_cdae.txt", "w")
         for i, list_product in enumerate(test_users):
             if list_product[0] < thred:
                 real = [j for j in list_product if j >= thred]
                 pred = self.pred(i+train_val_size, "grocery", thred)
                 top_M = np.argsort(-pred)[:k]
                 top_M += thred
+                str_top = [str[m] for m in top_M]
+                f.write(','.join(str_top))
+                f.write("\n")
                 hits = set(top_M) & set(real)
                 recall = float(len(hits))/float(len(real))
                 recall_clothing.append(recall)
@@ -569,6 +573,9 @@ class cf_vae_extend:
                 real = [j for j in list_product if j < thred]
                 pred = self.pred(i + train_val_size, "health", thred)
                 top_M = np.argsort(-pred)[:k]
+                str_top = [str[m] for m in top_M]
+                f.write(','.join(str_top))
+                f.write("\n")
                 hits = set(top_M) & set(real)
                 recall = float(len(hits)) / float(len(real))
                 recall_health.append(recall)
@@ -592,6 +599,7 @@ class cf_vae_extend:
                 else:
                     ndcg_A.append(float(actual) / best)
         print(len(recall_clothing), len(recall_health))
+        f.close()
         print("average recall A: %f, hit %f, ndcg: %f"%(np.mean(recall_health), float(hit_A)/len(recall_health),
                                                              np.mean(ndcg_A)))
         print("average recall B: %f, hit %f, ndcg: %f" % (
