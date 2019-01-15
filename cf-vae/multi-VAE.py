@@ -35,8 +35,8 @@ class Translation:
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
 
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
@@ -46,8 +46,8 @@ class Translation:
 
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
@@ -278,7 +278,7 @@ def main():
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
-    saver = tf.train.Saver(max_to_keep=20)
+    saver = tf.train.Saver(max_to_keep=3)
     max_recall = 0
     dense_A_val = dense_A[train_size:train_size+val_size]
     dense_B_val = dense_B[train_size:train_size+val_size]
@@ -310,15 +310,30 @@ def main():
             print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall))
             if recall > max_recall:
                 max_recall = recall
-                saver.save(sess, os.path.join(checkpoint_dir, 'multi-VAE-model'), i)
+                saver.save(sess, os.path.join(checkpoint_dir, 'multi-VAE-model'))
                 loss_test_a, y_b= sess.run([model.loss, model.x_recon], feed_dict={model.x: user_test_A})
                 loss_test_b, y_a = sess.run([model.loss, model.x_recon], feed_dict={model.x: user_test_B})
                 print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
+
 
                 # y_ab = y_ab[test_B]
                 # y_ba = y_ba[test_A]
                 calc_recall(y_a[:, :num_A], dense_A_test, k, "A")
                 calc_recall(y_b[:, num_A:], dense_B_test, k, "B")
+                pred = np.argsort(-y_a[:, :num_A])[:, :10]
+                f = open(os.path.join(checkpoint_dir, "predict_%s_multiVAE.txt" % A), "w")
+                for p in pred:
+                    w = [str(i) for i in p]
+                    f.write(','.join(w))
+                    f.write("\n")
+                f.close()
+                pred = np.argsort(-y_b[:, num_A:])[:, :10]
+                f = open(os.path.join(checkpoint_dir, "predict_%s_multiVAE.txt" % B), "w")
+                for p in pred:
+                    w = [str(i) for i in p]
+                    f.write(','.join(w))
+                    f.write("\n")
+                f.close()
             model.train = True
         if i%100 == 0:
             model.learning_rate /= 2
