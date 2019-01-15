@@ -531,12 +531,20 @@ def main():
 
                 calc_recall(y_ba, dense_A_test, k, type="A")
                 calc_recall(y_ab, dense_B_test, k, type="B")
-                pred = np.argsort(-pred)[:, :10]
-                f = open(os.path.join(checkpoint_dir, "predict.txt"), "w")
+                pred = np.argsort(-y_ba)[:, :10]
+                f = open(os.path.join(checkpoint_dir, "predict_%s.txt"%A), "w")
                 for p in pred:
                     w = [str(i) for i in p]
                     f.write(','.join(w))
                     f.write("\n")
+                f.close()
+                pred = np.argsort(-y_ab)[:, :10]
+                f = open(os.path.join(checkpoint_dir, "predict_%s.txt" % B), "w")
+                for p in pred:
+                    w = [str(i) for i in p]
+                    f.write(','.join(w))
+                    f.write("\n")
+                f.close()
 
                 #test same domain
                 # input_A_test, domain_A_test = test_same_domain(dense_A_test, num_A)
