@@ -573,7 +573,7 @@ class cf_vae_extend:
                 real = [j for j in list_product if j < thred]
                 pred = self.pred(i + train_val_size, "health", thred)
                 top_M = np.argsort(-pred)[:k]
-                str_top = [str[m] for m in top_M]
+                str_top = [str(m) for m in top_M]
                 f.write(','.join(str_top))
                 f.write("\n")
                 hits = set(top_M) & set(real)
