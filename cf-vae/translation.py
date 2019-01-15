@@ -433,7 +433,7 @@ def main():
     encoding_dim_B = [dim]
     share_dim = [share]
     decoding_dim_A = [dim, num_A]
-    decoding_dim_B = [share, num_B]
+    decoding_dim_B = [dim, num_B]
 
 
     assert len(user_A) == len(user_B)
