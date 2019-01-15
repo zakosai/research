@@ -544,7 +544,7 @@ class cf_vae_extend:
                 pred = self.pred(i+train_val_size, "grocery", thred)
                 top_M = np.argsort(-pred)[:k]
                 top_M += thred
-                str_top = [str[m] for m in top_M]
+                str_top = [str(m) for m in top_M]
                 f.write(','.join(str_top))
                 f.write("\n")
                 hits = set(top_M) & set(real)
