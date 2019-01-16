@@ -71,6 +71,7 @@ class Translation:
         h, en_out = self.enc(x, "encode", dim)
         z, z_mu, z_sigma = self.gen_z(h, "VAE")
         loss_kl = self.loss_kl(z_mu, z_sigma)
+        h = tf.concat([z, self.y], axis=1)
         y = self.dec(h, "decode", self.decode_dim)
         return y, loss_kl, z_mu
 
@@ -241,6 +242,7 @@ def main():
     args = parser.parse_args()
     f = open(args.data, 'rb')
     dataset = pickle.load(f)
+    f.close()
     folder = args.data.split("/")[:-1]
     folder = "/".join(folder)
     content = load_npz(os.path.join(folder, "mult_nor.npz"))
