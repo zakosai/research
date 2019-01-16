@@ -276,7 +276,7 @@ def main():
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
-    saver = tf.train.Saver(max_to_keep=20)
+    saver = tf.train.Saver(max_to_keep=3)
     max_recall = 0
 
     for i in range(1, iter):
@@ -308,12 +308,11 @@ def main():
 
             if recall_item > max_recall:
                 max_recall = recall_item
-                if max_recall < 0.1:
-                    _, result = calc_recall(item_pred, dataset['user_item_test'].values(),
+                _, result = calc_recall(item_pred, dataset['user_item_test'].values(),
                                             [50, 100, 150, 200, 250, 300], "item")
-                else:
-                    _, result = calc_recall(item_pred, dataset['user_item_test'].values(),
-                                            [10, 20, 30, 40, 50, 60], "item")
+                saver.save(sess, os.path.join(args.ckpt, 'conVAE-model'))
+
+
 
 
         if i%100 == 0 and model.learning_rate > 1e-6:

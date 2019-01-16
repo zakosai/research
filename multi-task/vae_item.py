@@ -270,7 +270,7 @@ def main():
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
-    saver = tf.train.Saver(max_to_keep=20)
+    saver = tf.train.Saver(max_to_keep=3)
     max_recall = 0
     result = {}
 
@@ -304,6 +304,8 @@ def main():
                max_recall = recall_item
                result['z'] = z
                result['rec'] = item
+               saver.save(sess, os.path.join(args.ckpt, 'translation-model'))
+
 
             model.train = True
         if i%100 == 0 and model.learning_rate > 1e-6:
