@@ -194,6 +194,7 @@ def main():
     val_position = int(len(user)*0.7)
     test_position = int(len(user)*0.75)
     test_size = len(user) - test_position
+    val_size = len(user) - val_position -test_position
 
 
 
@@ -229,8 +230,8 @@ def main():
             # model.train = False
             # print("Loss last batch: loss %f" % (loss))
 
-            u_A_val = np.concatenate((user[val_position:, :num_A], np.zeros((test_size, num_B))), axis=-1)
-            u_B_val = np.concatenate((np.zeros((test_size, num_A)), user[val_position:, num_A:]), axis=-1)
+            u_A_val = np.concatenate((user[val_position:, :num_A], np.zeros((test_size+val_size, num_B))), axis=-1)
+            u_B_val = np.concatenate((np.zeros((test_size+val_size, num_A)), user[val_position:, num_A:]), axis=-1)
             print(u_A_val.shape, u_B_val.shape)
 
             z_A, z_B = sess.run([model.z_A, model.z_B], feed_dict={model.item_A:item_A,
