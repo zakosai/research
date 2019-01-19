@@ -191,6 +191,7 @@ def main():
     decoding_dim_B = [dim, num_B]
     z_dim = 50
     train_size = len(triple)
+    val_position = int(len(user)*0.7)
     test_position = int(len(user)*0.75)
     test_size = len(user) - test_position
 
@@ -228,8 +229,8 @@ def main():
             # model.train = False
             # print("Loss last batch: loss %f" % (loss))
 
-            u_A_val = np.concatenate((user[test_position:, :num_A], np.zeros((test_size, num_B))), axis=-1)
-            u_B_val = np.concatenate((np.zeros((test_size, num_A)), user[test_position:, num_A:]), axis=-1)
+            u_A_val = np.concatenate((user[val_position:, :num_A], np.zeros((test_size, num_B))), axis=-1)
+            u_B_val = np.concatenate((np.zeros((test_size, num_A)), user[val_position:, num_A:]), axis=-1)
             print(u_A_val.shape, u_B_val.shape)
 
             z_A, z_B = sess.run([model.z_A, model.z_B], feed_dict={model.item_A:item_A,
@@ -243,10 +244,30 @@ def main():
             y_ba = y_ba.reshape((y_ba.shape[1], y_ba.shape[2]))
             print(y_ab.shape, y_ba.shape)
 
-            saver.save(sess, os.path.join(checkpoint_dir, 'CCFNET-model'), i)
+            recall = calc_recall(y_ba[:-test_position], dense_A[val_position:test_position], [50]) + \
+                    calc_recall(y_ab[:-test_position], dense_B[val_position:test_position], [50])
 
-            calc_recall(y_ba, dense_A[test_position:], k, "A")
-            calc_recall(y_ab, dense_B[test_position:], k, "B")
+            if recall > max_recall:
+                max_recall = recall
+
+                saver.save(sess, os.path.join(checkpoint_dir, 'CCFNET-model'), i)
+
+                calc_recall(y_ba[-test_position:], dense_A[test_position:], k, "A")
+                calc_recall(y_ab[-test_position:], dense_B[test_position:], k, "B")
+                pred = np.argsort(-y_ba)[:, :10]
+                f = open(os.path.join(checkpoint_dir, "predict_CCCFNET_%s.txt" % A), "w")
+                for p in pred:
+                    w = [str(i) for i in p]
+                    f.write(','.join(w))
+                    f.write("\n")
+                f.close()
+                pred = np.argsort(-y_ab)[:, :10]
+                f = open(os.path.join(checkpoint_dir, "predict_CCCFNET_%s.txt" % B), "w")
+                for p in pred:
+                    w = [str(i) for i in p]
+                    f.write(','.join(w))
+                    f.write("\n")
+                f.close()
 
 
 
