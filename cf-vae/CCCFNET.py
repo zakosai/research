@@ -244,18 +244,18 @@ def main():
             y_ab = y_ab.reshape((y_ab.shape[1], y_ab.shape[2]))
             y_ba = y_ba.reshape((y_ba.shape[1], y_ba.shape[2]))
             print(y_ab.shape, y_ba.shape)
-            print(len(y_ba[:val_position-test_position]), len(dense_A[val_position:test_position]))
+            print(len(y_ba[:val_size]), len(dense_A[val_position:test_position]))
 
-            recall = calc_recall(y_ba[:val_position-test_position], dense_A[val_position:test_position], [50]) + \
-                    calc_recall(y_ab[:val_position-test_position], dense_B[val_position:test_position], [50])
+            recall = calc_recall(y_ba[:val_size], dense_A[val_position:test_position], [50]) + \
+                    calc_recall(y_ab[:val_size], dense_B[val_position:test_position], [50])
 
             if recall > max_recall:
                 max_recall = recall
 
                 saver.save(sess, os.path.join(checkpoint_dir, 'CCFNET-model'), i)
 
-                calc_recall(y_ba[val_position-test_position:], dense_A[test_position:], k, "A")
-                calc_recall(y_ab[val_position-test_position:], dense_B[test_position:], k, "B")
+                calc_recall(y_ba[val_size:], dense_A[test_position:], k, "A")
+                calc_recall(y_ab[val_size:], dense_B[test_position:], k, "B")
                 pred = np.argsort(-y_ba)[:, :10]
                 f = open(os.path.join(checkpoint_dir, "predict_CCCFNET_%s.txt" % A), "w")
                 for p in pred:
