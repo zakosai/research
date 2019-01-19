@@ -244,6 +244,7 @@ def main():
             y_ab = y_ab.reshape((y_ab.shape[1], y_ab.shape[2]))
             y_ba = y_ba.reshape((y_ba.shape[1], y_ba.shape[2]))
             print(y_ab.shape, y_ba.shape)
+            print(len(y_ba[:-test_position, :]), len(dense_A[val_position:test_position]))
 
             recall = calc_recall(y_ba[:-test_position], dense_A[val_position:test_position], [50]) + \
                     calc_recall(y_ab[:-test_position], dense_B[val_position:test_position], [50])
