@@ -194,7 +194,7 @@ def main():
     val_position = int(len(user)*0.7)
     test_position = int(len(user)*0.75)
     test_size = len(user) - test_position
-    val_size = len(user) - val_position -test_position
+    val_size = len(user) - val_position -test_size
 
 
 
