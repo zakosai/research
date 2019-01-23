@@ -276,10 +276,6 @@ def main():
 
 
 
-
-
-
-
     model = Translation(batch_size, dataset['tag_no'], encoding_dim, decoding_dim, z_dim)
     model.build_model()
 
@@ -313,6 +309,7 @@ def main():
             y = dataset['tag_item_onehot'][test_tag_id]
             item, z = sess.run([model.x_recon,model.z],
                                               feed_dict={model.x:x, model.y:y})
+            print(item.shape)
             # item_pred = item[:, dataset['user_item_test'].keys()]
             # item_pred = item_pred.T
             # recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
