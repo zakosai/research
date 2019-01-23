@@ -8,7 +8,7 @@ import numpy as np
 import time
 import os
 from scipy.sparse import load_npz
-
+import argparse
 class vanilla_vae:
     """
     build a vanilla vae
