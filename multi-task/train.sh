@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #python vae.py  --ckpt_folder=experiment/lastfm/ --data_dir=data/lastfm/
-#python train_cvae_extend.py --ckpt_folder=experiment/lastfm/ --data_dir=data/lastfm/
+python train_cf_dae.py --ckpt_folder=experiment/lastfm/ --data_dir=data/lastfm/
 
 
 
