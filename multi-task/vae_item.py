@@ -264,6 +264,7 @@ def main():
     #     user_item[i, :len(u_c)] = u_c
     test_tag_id = []
     test_tag_y = []
+    print(test_tag_y)
 
     for i in range(len(dataset['test'])):
         try:
