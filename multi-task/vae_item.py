@@ -264,7 +264,6 @@ def main():
     #     user_item[i, :len(u_c)] = u_c
     test_tag_id = []
     test_tag_y = []
-    print(test_tag_y)
 
     for i in range(len(dataset['test'])):
         try:
@@ -275,6 +274,7 @@ def main():
             test_tag_id.append(dataset['test'][i,1])
             test_tag_y.append(dataset['tag_test'][i])
 
+    print(test_tag_y)
 
 
     model = Translation(batch_size, dataset['tag_no'], encoding_dim, decoding_dim, z_dim)
