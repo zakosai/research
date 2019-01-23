@@ -39,24 +39,25 @@ class Translation:
         x_ = x
         en_out = []
 
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.5)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                x_ = batch_norm(x_, decay=0.995)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
                 en_out.append(x_)
         return x_, en_out
 
     def dec(self, x, scope, decode_dim,reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.5)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
+                x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
@@ -251,7 +252,7 @@ def main():
     num_p = dataset['item_no']
     num_u = dataset['user_no']
     encoding_dim = [600, 200]
-    decoding_dim = [200, 600, num_u]
+    decoding_dim = [200, 600, dataset['tag_no']]
 
     z_dim = 50
 
@@ -261,6 +262,20 @@ def main():
     #     u_c = content[idx]
     #     u_c = u_c.flatten()
     #     user_item[i, :len(u_c)] = u_c
+    test_tag_id = []
+    test_tag_y = []
+
+    for i in range(len(dataset['test'])):
+        try:
+            idx = test_tag_id.index(dataset['test'][i, 1])
+            test_tag_y[idx] += dataset['tag_test'][i]
+            test_tag_y[idx] = [set(test_tag_y[idx])]
+        except:
+            test_tag_id.append(dataset['test'][i,1])
+            test_tag_y.append(dataset['tag_test'][i])
+
+
+
 
 
 
@@ -279,7 +294,7 @@ def main():
         train_cost = 0
         for j in range(int(num_u/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
-            y = dataset['item_onehot'][list_idx]
+            y = dataset['tag_item_onehot'][list_idx]
             x = content[list_idx]
 
             feed = {model.x: x, model.y:y}
@@ -293,18 +308,20 @@ def main():
         # Validation Process
         if i%10 == 0:
             model.train = True
-            x = content
-            y = dataset['item_onehot']
+            x = content[test_tag_id]
+            # y = dataset['item_tag']
+            y = dataset['tag_item_onehot'][test_tag_id]
             item, z = sess.run([model.x_recon,model.z],
                                               feed_dict={model.x:x, model.y:y})
-            item_pred = item[:, dataset['user_item_test'].keys()]
-            item_pred = item_pred.T
-            recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
+            # item_pred = item[:, dataset['user_item_test'].keys()]
+            # item_pred = item_pred.T
+            # recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
+            recall_item = calc_recall(item, test_tag_y, [50], "item")
             if recall_item > max_recall:
                max_recall = recall_item
                result['z'] = z
                result['rec'] = item
-               saver.save(sess, os.path.join(args.ckpt, 'translation-model'))
+               saver.save(sess, os.path.join(args.ckpt, 'translation-model-tag'))
 
 
             model.train = True
@@ -315,8 +332,8 @@ def main():
 
     print(max_recall)
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
-    f.write("Best recall vae-item: %f\n" % max_recall)
-    np.savez(os.path.join(folder, "item.npz"), z=result['z'], rec=result['rec'])
+    f.write("Best recall vae-item tag: %f\n" % max_recall)
+    np.savez(os.path.join(folder, "item_tag.npz"), z=result['z'], rec=result['rec'])
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Tool",
