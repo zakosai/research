@@ -74,7 +74,7 @@ def load_cvae_data(data_dir):
   dataset["train_users"] = train_item
   dataset["train_items"] = train_tag
   dataset["test_users"] = dataset['user_item_test']
-  return data
+  return dataset
 
 
 def load_rating(path):
