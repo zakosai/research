@@ -8,6 +8,8 @@ import os
 import argparse
 import pandas as pd
 import pickle
+from scipy.sparse import load_npz
+
 
 class Translation:
     def __init__(self, batch_size, x_dim, y_dim, encode_dim, decode_dim, z_dim, eps=1e-10,
@@ -244,8 +246,10 @@ def main():
     dataset = pickle.load(f)
     forder = args.data.split("/")[:-1]
     forder = "/".join(forder)
-    content = np.load(os.path.join(forder, "item.npz"))
-    content = content['z']
+    # content = np.load(os.path.join(forder, "item.npz"))
+    # content = content['z']
+    content = load_npz(os.path.join(forder, "mult_nor.npz"))
+    content = content.toarray()
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
@@ -254,7 +258,7 @@ def main():
 
     z_dim = 50
     max_item = max(np.sum(dataset['user_onehot'], axis=1))
-    x_dim = z_dim * max_item
+    x_dim = 8000 * max_item
     user_item = np.zeros((num_u,x_dim))
     for i in range(num_u):
         idx = np.where(dataset['user_onehot'][i] == 1)
@@ -310,7 +314,7 @@ def main():
                 max_recall = recall_item
                 _, result = calc_recall(item_pred, dataset['user_item_test'].values(),
                                             [50, 100, 150, 200, 250, 300], "item")
-                saver.save(sess, os.path.join(args.ckpt, 'conVAE-model'))
+                saver.save(sess, os.path.join(args.ckpt, 'conVAE-model2'))
 
 
 
@@ -323,7 +327,7 @@ def main():
     print(max_recall)
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
     f.write("Best recall ConVAE: %f\n" % max_recall)
-    np.save(os.path.join(args.ckpt, "result_convae.npy"), result)
+    np.save(os.path.join(args.ckpt, "result_convae2.npy"), result)
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Tool",
