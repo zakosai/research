@@ -280,7 +280,7 @@ def main():
 
 
 
-    model = Translation(batch_size, num_u, encoding_dim, decoding_dim, z_dim)
+    model = Translation(batch_size, dataset['tag_no'], encoding_dim, decoding_dim, z_dim)
     model.build_model()
 
     sess = tf.Session()
