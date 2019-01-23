@@ -270,7 +270,7 @@ def main():
             idx = test_tag_id.index(dataset['test'][i, 1])
             print(test_tag_y[idx], dataset['tag_test'][i])
             test_tag_y[idx] += dataset['tag_test'][i]
-            test_tag_y[idx] = [set(test_tag_y[idx])]
+            test_tag_y[idx] = list(set(test_tag_y[idx]))
             print(test_tag_y[idx])
         except:
             test_tag_id.append(dataset['test'][i,1])
