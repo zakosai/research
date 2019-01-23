@@ -66,7 +66,7 @@ def load_cvae_data(data_dir):
       else:
           train_item[item_id].append(tag_id)
 
-      if train_tag == 0:
+      if train_tag[tag_id] == 0:
           train_tag[tag_id] = [item_id]
       else:
           train_tag[tag_id].append(item_id)
