@@ -68,6 +68,13 @@ def load_cvae_data(data_dir):
           train_tag[tag_id] = [item_id]
       else:
           train_tag[tag_id].append(item_id)
+  for i in range(len(train_item)):
+      if train_item[i] == 0:
+          train_item[i] = []
+  for i in range(len(train_tag)):
+      if train_tag[i] == 0:
+          train_tag[i] = []
+
 
   dataset["train_users"] = train_item
   dataset["train_items"] = train_tag
