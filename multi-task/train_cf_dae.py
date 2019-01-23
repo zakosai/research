@@ -46,14 +46,12 @@ gs = args.gridsearch
 print(model_type)
 
 def load_cvae_data(data_dir):
-  data = {}
-  # variables = scipy.io.loadmat(data_dir + "mult_nor.mat")
-  # data["content"] = variables['X']
-  variables = load_npz(os.path.join(data_dir,"mult_nor.npz"))
-  data["content"] = variables.toarray()
+
 
   f = open(os.path.join(data_dir,"dataset.pkl"), 'rb')
   dataset = pickle.load(f)
+  variables = load_npz(os.path.join(data_dir, "mult_nor.npz"))
+  dataset["content"] = variables.toarray()
 
   train_item = [0] * dataset['item_no']
   train_tag = [0] * dataset['tag_no']
