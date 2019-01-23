@@ -274,7 +274,8 @@ def main():
             test_tag_id.append(dataset['test'][i,1])
             test_tag_y.append(dataset['tag_test'][i])
 
-    print(test_tag_y)
+    print(len(test_tag_y), len(test_tag_id))
+
 
 
     model = Translation(batch_size, dataset['tag_no'], encoding_dim, decoding_dim, z_dim)
