@@ -1,6 +1,5 @@
 import tensorflow as tf
 from tensorflow.contrib.layers import fully_connected, flatten, batch_norm
-from tensorflow import sigmoid
 import tensorflow.keras.backend as K
 from tensorflow.contrib.framework import argsort
 import numpy as np
@@ -46,7 +45,7 @@ class Translation:
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                x_ = batch_norm(x_, decay=0.995)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
                 en_out.append(x_)
         return x_, en_out
 
@@ -56,8 +55,9 @@ class Translation:
             x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
+                x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
@@ -246,10 +246,10 @@ def main():
     dataset = pickle.load(f)
     forder = args.data.split("/")[:-1]
     forder = "/".join(forder)
-    # content = np.load(os.path.join(forder, "item.npz"))
-    # content = content['z']
-    content = load_npz(os.path.join(forder, "mult_nor.npz"))
-    content = content.toarray()
+    content = np.load(os.path.join(forder, "item_tag.npz"))
+    content = content['z']
+    # content = load_npz(os.path.join(forder, "mult_nor.npz"))
+    # content = content.toarray()
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
@@ -258,7 +258,7 @@ def main():
 
     z_dim = 50
     max_item = max(np.sum(dataset['user_onehot'], axis=1))
-    x_dim = 8000 * max_item
+    x_dim = z_dim * max_item
     user_item = np.zeros((num_u,x_dim))
     for i in range(num_u):
         idx = np.where(dataset['user_onehot'][i] == 1)
