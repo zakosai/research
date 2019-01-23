@@ -120,7 +120,7 @@ tf.set_random_seed(0)
 # images = np.fromfile(os.path.join(data_dir,"images.bin"), dtype=np.uint8)
 # img = images.reshape((13791, 32, 32, 3))
 # img = img.astype(np.float32)/255
-num_factors = zdim
+num_factors = 50
 best_recall = 0
 best_hyper = []
 dim = data['content'].shape[1]
@@ -136,11 +136,9 @@ if gs == 1:
             for r in [0.1, 1, 10]:
                 params.lambda_r = r
                 if i > -1:
-                    model = cf_vae_extend(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,
-                                          input_dim=dim, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200,
-                                                                                                               400,
-                                                                                                               dim],
-                                          decoding_dims_str=[200, 4526], loss_type='cross_entropy',
+                    model = cf_vae_extend(num_users=data['item_no'], num_items=data['tag_no'], num_factors=num_factors,
+                                          params=params,input_dim=dim, encoding_dims=[400, 200], z_dim=zdim,
+                                          decoding_dims=[200,400,dim], decoding_dims_str=[200, 4526], loss_type='cross_entropy',
                                           model = model_type, ckpt_folder=ckpt)
                     model.fit(data["train_users"], data["train_items"], data["content"], params, data["test_users"])
                     model.save_model(os.path.join(ckpt,"cf_dae_%d_%d.mat"%(model_type, i)))
