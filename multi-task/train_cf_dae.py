@@ -157,7 +157,7 @@ if gs == 1:
                                           params=params,input_dim=dim, encoding_dims=[400, 200], z_dim=zdim,
                                           decoding_dims=[200,400,dim], decoding_dims_str=[200, 4526], loss_type='cross_entropy',
                                           model = model_type, ckpt_folder=ckpt)
-                    model.fit(data["train_users"], data["train_items"], data["content"], params, data["test_users"])
+                    model.fit(data["train_users"], data["train_items"], data["content"], params, data["test_item_tag"])
                     model.save_model(os.path.join(ckpt,"cf_dae_%d_%d.mat"%(model_type, i)))
                     # model.load_model("cf_vae.mat")
                     f = open(os.path.join(ckpt, "result_cdae_%d.txt"%model_type), 'a')
