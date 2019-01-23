@@ -308,16 +308,16 @@ def main():
         # Validation Process
         if i%10 == 0:
             model.train = True
-            x = content[test_tag_id]
+            x = content
             # y = dataset['item_tag']
-            y = dataset['tag_item_onehot'][test_tag_id]
+            y = dataset['tag_item_onehot']
             item, z = sess.run([model.x_recon,model.z],
                                               feed_dict={model.x:x, model.y:y})
             print(item.shape)
             # item_pred = item[:, dataset['user_item_test'].keys()]
             # item_pred = item_pred.T
             # recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
-            recall_item = calc_recall(item, test_tag_y, [50], "item")
+            recall_item = calc_recall(item[test_tag_id], test_tag_y, [50], "item")
             if recall_item > max_recall:
                max_recall = recall_item
                result['z'] = z
