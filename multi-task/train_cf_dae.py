@@ -83,7 +83,7 @@ def load_cvae_data(data_dir):
   test_tag_id = []
   test_tag_y = []
 
-  min_len = min(len(dataset['test'], dataset['tag_test']))
+  min_len = min(len(dataset['test']), len(dataset['tag_test']))
 
   for i in range(min_len):
       try:
