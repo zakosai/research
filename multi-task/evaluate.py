@@ -17,7 +17,7 @@ parser.add_argument('--data_dir',  type=str, default='data/amazon',
                    help='where model is stored')
 parser.add_argument('--mat_file',  type=str, default='cf_vae_1.mat',
                    help='where model is stored')
-parser.add_argument('--type',  type=str, default=15,
+parser.add_argument('--type',  type=str, default=1,
                    help='where model is stored')
 
 args = parser.parse_args()
@@ -109,7 +109,7 @@ params.C_b = 0.01
 params.max_iter_m = 1
 
 
-data = load_cvae_data(data_dir)
+
 num_factors = 50
 model = cf_vae_extend(num_users=5584, num_items=13790, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000], decoding_dims_str=[100,200, 1863],
@@ -120,13 +120,17 @@ model = cf_vae_extend(num_users=5584, num_items=13790, num_factors=num_factors, 
 # print(d)
 model.load_model(os.path.join(ckpt, extend_file))
 pred = model.predict_all()
-pred_all = pred[data["test_item_id"]]
-train_test = [data["train_users"][i] for i in data["test_item_id"]]
-recall = model.predict_val(pred_all, train_test, data["test_item_tag"])
+if args.type == 1:
+    data = load_cvae_data(data_dir)
+    pred_all = pred[data["test_item_id"]]
+    train_test = [data["train_users"][i] for i in data["test_item_id"]]
+    recall = model.predict_val(pred_all, train_test, data["test_item_tag"])
+else:
+    data = load_cvae_data2(data_dir)
 
-# train_user = []
-# for i in data['test_users'].keys():
-#     train_user.append(data['train_users'][i])
-# pred_all = model.predict_all()
-# pred_all = pred_all[data['test_users'].keys()]
-# recall = model.predict_val(pred_all, train_user, data["test_users"].values())
+    train_user = []
+    for i in data['test_users'].keys():
+        train_user.append(data['train_users'][i])
+    pred_all = model.predict_all()
+    pred_all = pred_all[data['test_users'].keys()]
+    recall = model.predict_val(pred_all, train_user, data["test_users"].values())
