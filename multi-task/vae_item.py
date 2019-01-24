@@ -239,7 +239,7 @@ def calc_rmse(pred, test):
 
 def main():
     iter = 1500
-    batch_size= 50
+    batch_size= 1
     args = parser.parse_args()
     f = open(args.data, 'rb')
     dataset = pickle.load(f)
@@ -252,7 +252,7 @@ def main():
     num_p = dataset['item_no']
     num_u = dataset['user_no']
     encoding_dim = [600, 200]
-    decoding_dim = [200, 600, dataset['tag_no']]
+    decoding_dim = [100, 600, dataset['tag_no']]
 
     z_dim = 50
 
@@ -270,17 +270,11 @@ def main():
     for i in range(min_len):
         try:
             idx = test_tag_id.index(dataset['test'][i, 1])
-            print(test_tag_y[idx], dataset['tag_test'][i])
             test_tag_y[idx] += dataset['tag_test'][i]
             test_tag_y[idx] = list(set(test_tag_y[idx]))
-            print(test_tag_y[idx])
         except:
             test_tag_id.append(dataset['test'][i,1])
             test_tag_y.append(dataset['tag_test'][i])
-
-    print(len(test_tag_y), len(test_tag_id))
-
-
 
     model = Translation(batch_size, dataset['tag_no'], encoding_dim, decoding_dim, z_dim)
     model.build_model()
