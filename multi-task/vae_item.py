@@ -239,7 +239,7 @@ def calc_rmse(pred, test):
 
 def main():
     iter = 1500
-    batch_size= 100
+    batch_size= 50
     args = parser.parse_args()
     f = open(args.data, 'rb')
     dataset = pickle.load(f)
