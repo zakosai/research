@@ -3,7 +3,7 @@ __author__ = 'linh'
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.sparse import load_npz
-from cf_dae import cf_vae_extend, params
+from cf_vae_cpmf_extend import cf_vae_extend, params
 import argparse
 import os
 import scipy
@@ -78,6 +78,28 @@ def load_cvae_data(data_dir):
   dataset["test_item_tag"] = test_tag_y
   return dataset
 
+def load_cvae_data2(data_dir):
+  variables = load_npz(os.path.join(data_dir,"mult_nor.npz"))
+
+  f = open(os.path.join(data_dir,"dataset.pkl"), 'rb')
+  dataset = pickle.load(f)
+  dataset["content"] = variables.toarray()
+
+
+
+  dataset["train_users"] = load_rating(dataset['user_onehot'])
+  dataset["train_items"] = load_rating(dataset['item_onehot'])
+  dataset["test_users"] = dataset['user_item_test']
+
+  return dataset
+def load_rating(path):
+    arr = []
+    for line in path:
+        idx = np.where(line == 1)[0].tolist()
+        arr.append(idx)
+    return arr
+
+
 params = params()
 params.lambda_u = 1
 params.lambda_v = 10
@@ -87,7 +109,7 @@ params.C_b = 0.01
 params.max_iter_m = 1
 
 
-data = load_cvae_data(data_dir)
+data = load_cvae_data2(data_dir)
 num_factors = 50
 model = cf_vae_extend(num_users=5584, num_items=13790, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000], decoding_dims_str=[100,200, 1863],
@@ -97,70 +119,14 @@ model = cf_vae_extend(num_users=5584, num_items=13790, num_factors=num_factors, 
 # d = os.path.join(ckpt, "vae.mat")
 # print(d)
 model.load_model(os.path.join(ckpt, extend_file))
-pred = model.predict_all()
-pred_all = pred[data["test_item_id"]]
-train_test = [data["train_users"][i] for i in data["test_item_id"]]
-recall = model.predict_val(pred_all, train_test, data["test_item_tag"])
-
-# model.load_model(os.path.join(ckpt, "vae_user.mat"))
 # pred = model.predict_all()
-# model.predict_val(pred, data['train_users'], data['test_users'])
-#
-# model.load_model(os.path.join(ckpt, "dae.mat"))
-# # model.load_model("cf_vae.mat")
-# pred = model.predict_all()
-# model.predict_val(pred, data['train_users'], data['test_users'])
-#
-# plt.figure()
-# plt.ylabel("Recall@M")
-# plt.xlabel("M")
-# plt.plot(np.arange(10, 100, 10), recalls_2, '-r', label="our model")
-# plt.plot(np.arange(10, 100, 10),recalls_1, '-b', label="CVAE")
-# plt.plot(np.arange(10,100, 10), recalls, '-g', label="CDL")
-#
-# # plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="zdim=500")
-#
-# plt.legend(loc='upper left')
-# data_dir = data_dir.split("/")[1]
-# ckpt = ckpt.split("/")[-1]
-# plt.savefig("result/recall_10_%s_%s.png"%(data_dir, ckpt))
-# plt.close()
+# pred_all = pred[data["test_item_id"]]
+# train_test = [data["train_users"][i] for i in data["test_item_id"]]
+# recall = model.predict_val(pred_all, train_test, data["test_item_tag"])
 
-# plt.figure()
-# plt.ylabel("Precision@M")
-# plt.xlabel("M")
-# plt.plot(np.arange(1, 10, 1),precision, '-b', label="cvae")
-# plt.plot(np.arange(1, 10, 1), precision_1, '-r', label="img-extend")
-# # plt.plot(np.arange(5, 40, 5), recalls_2, '-g', label="zdim=500")
-
-# plt.legend(loc='upper left')
-# plt.savefig("result/precision_test.png")
-# plt.close()
-#
-# plt.figure()
-# plt.ylabel("MAP@M")
-# plt.xlabel("M")
-# plt.plot(np.arange(1, 10, 1),mapks_1, '-r', label="our proposed")
-# plt.plot(np.arange(1, 10, 1), mapks, '-b', label="CVAE")
-# plt.plot(np.arange(1, 10, 1), mapks_2, '-g', label="CDL")
-# #
-# plt.legend(loc='upper left')
-# plt.savefig("result/map_10_%s_%s.png"%(data_dir, ckpt))
-# plt.close()
-
-# for j in [0, 1, 3]:
-#     i = 0
-#     recalls = []
-#     for u in [0.1, 1, 10]:
-#         for v in [1, 10, 100]:
-#             for r in [0.1, 1, 10]:
-#                 model.load_model(os.path.join(ckpt, "cf_vae_%d_%d.mat"%(j, i)))
-#                 pred = model.predict_all()
-#                 f = open(os.path.join(ckpt, "result_10_%d.txt"%j), 'a')
-#                 f.write("-----------%f----------%f----------%f\n"%(u,v,r))
-#                 model.predict_val(pred, data["train_users"], data["test_users"], f)
-#                 f.write("\n")
-#                 f.close()
-#                 print(u, v, r)
-#                 i += 1
-
+train_user = []
+for i in data['test_users'].keys():
+    train_user.append(data['train_users'][i])
+pred_all = model.predict_all()
+pred_all = pred_all[data['test_users'].keys()]
+recall = model.predict_val(pred_all, train_user, data["test_users"].values())
