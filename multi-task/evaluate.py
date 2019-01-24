@@ -90,7 +90,7 @@ data = load_cvae_data(data_dir)
 num_factors = 50
 model = cf_vae_extend(num_users=5584, num_items=13790, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000], decoding_dims_str=[100,200, 1863],
-    loss_type='cross_entropy', encoding_dims_str=[200,100])
+    loss_type='cross_entropy')
 
 
 # d = os.path.join(ckpt, "vae.mat")
