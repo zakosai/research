@@ -555,8 +555,7 @@ class cf_vae_extend:
         recall_avgs = []
         precision_avgs = []
         mapk_avgs = []
-        print("abc")
-        for m in [10, 20, 30, 40]:
+        for m in range(10, 50, 10):
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
             ndcg = []
@@ -605,7 +604,7 @@ class cf_vae_extend:
             if file != None:
                 file.write("m = %d, recall = %f\t"%(m, recall_avg))
             # precision_avgs.append(precision_avg)
-            return recall_avg
+        return recall_avg
     def dcg_score(self, y_true, y_score, k=5):
         """Discounted cumulative gain (DCG) at rank K.
 
