@@ -3,10 +3,10 @@ import tensorflow as tf
 import numpy as np
 import argparse
 import os
+import pickle
 
 
 def main():
-    iter = 3000
     batch_size = 500
     args = parser.parse_args()
     f = open(args.data, 'rb')
@@ -41,8 +41,7 @@ def main():
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(max_to_keep=20)
-    checkpoint_dir = args.ckpt
-    saver.restore(sess, os.path.join(checkpoint_dir, args.ckpt))
+    saver.restore(sess, args.ckpt)
     x = user_item[dataset['user_item_test'].keys()]
     y = dataset['user_onehot'][dataset['user_item_test'].keys()]
     item_pred = sess.run(model.x_recon,
@@ -60,7 +59,7 @@ parser.add_argument('--data',  type=str, default="Tool",
                    help='dataset name')
 parser.add_argument('--ckpt',  type=str, default="experiment/delicious",
                    help='1p or 8p')
-parser.add_argument('--num_p', type=int, default=7780, help='number of product')
+parser.add_argument('--ckpt', type=int, default=7780, help='number of product')
 
 
 if __name__ == '__main__':
