@@ -36,9 +36,8 @@ def main():
     model = Translation(batch_size, x_dim, num_p, encoding_dim, decoding_dim, z_dim)
     model.build_model()
 
-    model.build_model()
-
     sess = tf.Session()
+    sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(max_to_keep=20)
     saver.restore(sess, args.ckpt)
     x = user_item[dataset['user_item_test'].keys()]
