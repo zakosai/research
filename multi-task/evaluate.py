@@ -98,7 +98,7 @@ model = cf_vae_extend(num_users=5584, num_items=13790, num_factors=num_factors, 
 model.load_model(os.path.join(ckpt, extend_file))
 pred = model.predict_all()
 pred_all = pred[data["test_item_id"]]
-train_test = [data["train_users"][i] for i in data["test_item_id"]]g
+train_test = [data["train_users"][i] for i in data["test_item_id"]]
 recall = model.predict_val(pred_all, train_test, data["test_item_tag"])
 
 # model.load_model(os.path.join(ckpt, "vae_user.mat"))
