@@ -59,7 +59,6 @@ parser.add_argument('--data',  type=str, default="Tool",
                    help='dataset name')
 parser.add_argument('--ckpt',  type=str, default="experiment/delicious",
                    help='1p or 8p')
-parser.add_argument('--ckpt', type=int, default=7780, help='number of product')
 
 
 if __name__ == '__main__':
