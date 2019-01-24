@@ -329,16 +329,16 @@ def main():
     f.write("Best recall ConVAE: %f\n" % max_recall)
     np.save(os.path.join(args.ckpt, "result_convae2.npy"), result)
 
-parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument('--data',  type=str, default="Tool",
-                   help='dataset name')
-parser.add_argument('--ckpt',  type=str, default="experiment/delicious",
-                   help='1p or 8p')
-parser.add_argument('--num_p', type=int, default=7780, help='number of product')
-
-
-if __name__ == '__main__':
-    main()
+# parser = argparse.ArgumentParser(description='Process some integers.')
+# parser.add_argument('--data',  type=str, default="Tool",
+#                    help='dataset name')
+# parser.add_argument('--ckpt',  type=str, default="experiment/delicious",
+#                    help='1p or 8p')
+# parser.add_argument('--num_p', type=int, default=7780, help='number of product')
+#
+#
+# if __name__ == '__main__':
+#     main()
 
 
 
