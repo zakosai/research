@@ -265,7 +265,9 @@ def main():
     test_tag_id = []
     test_tag_y = []
 
-    for i in range(len(dataset['test'])):
+    min_len = min(len(dataset['test'], dataset['tag_test']))
+
+    for i in range(min_len):
         try:
             idx = test_tag_id.index(dataset['test'][i, 1])
             print(test_tag_y[idx], dataset['tag_test'][i])
