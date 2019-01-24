@@ -39,7 +39,6 @@ def main():
     model.build_model()
 
     sess = tf.Session()
-    sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(max_to_keep=20)
     saver.restore(sess, args.ckpt)
     x = user_item[dataset['user_item_test'].keys()]
