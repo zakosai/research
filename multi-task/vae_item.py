@@ -240,7 +240,7 @@ def calc_rmse(pred, test):
 
 def main():
     iter = 1500
-    batch_size= 100
+    batch_size= 500
     args = parser.parse_args()
     f = open(args.data, 'rb')
     dataset = pickle.load(f)
@@ -315,8 +315,12 @@ def main():
                 y = dataset['tag_item_onehot'][batch_size*j:idx]
                 item_b, z_b = sess.run([model.x_recon,model.z],
                                                   feed_dict={model.x:x, model.y:y})
-                item = np.concatenate((item, item_b), axis=0)
-                z = np.concatenate((z, z_b), axis=0)
+                if j == 0:
+                    item = item_b
+                    z = z_b
+                else:
+                    item = np.concatenate((item, item_b), axis=0)
+                    z = np.concatenate((z, z_b), axis=0)
             print(item.shape)
             # item_pred = item[:, dataset['user_item_test'].keys()]
             # item_pred = item_pred.T
