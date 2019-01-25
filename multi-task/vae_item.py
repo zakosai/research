@@ -40,7 +40,7 @@ class Translation:
         en_out = []
 
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+            x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
@@ -52,7 +52,7 @@ class Translation:
     def dec(self, x, scope, decode_dim,reuse=False):
         x_ = x
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+            x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
@@ -174,7 +174,7 @@ def create_dataset_lastfm():
     return dataset
 
 def calc_recall(pred, test, m=[100], type=None):
-
+    result = {}
     for k in m:
         pred_ab = np.argsort(-pred)[:, :k]
         recall = []
@@ -203,9 +203,10 @@ def calc_recall(pred, test, m=[100], type=None):
                     ndcg.append(float(actual) / best)
 
         print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
+        result['recall@%d' % k] = np.mean(recall)
+        result['ndcg@%d' % k] = np.mean(ndcg)
 
-
-    return np.mean(np.array(recall))
+    return np.mean(np.array(recall)), result
 
 def dcg_score(y_true, y_score, k=50):
     """Discounted cumulative gain (DCG) at rank K.
@@ -313,9 +314,10 @@ def main():
             # item_pred = item[:, dataset['user_item_test'].keys()]
             # item_pred = item_pred.T
             # recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
-            recall_item = calc_recall(item[test_tag_id], test_tag_y, [10], "item")
+            recall_item, _ = calc_recall(item[test_tag_id], test_tag_y, [10], "item")
             if recall_item > max_recall:
                max_recall = recall_item
+               _, result = calc_recall(item[test_tag_id], test_tag_y, [10, 20, 30, 40, 50], "item")
                result['z'] = z
                result['rec'] = item
                saver.save(sess, os.path.join(args.ckpt, 'translation-model-tag'))
@@ -330,7 +332,7 @@ def main():
     print(max_recall)
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
     f.write("Best recall vae-item tag: %f\n" % max_recall)
-    np.savez(os.path.join(folder, "item_tag.npz"), z=result['z'], rec=result['rec'])
+    np.save(os.path.join(folder, "item_tag.npy"), result)
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Tool",
