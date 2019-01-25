@@ -40,7 +40,7 @@ class Translation:
         en_out = []
 
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.5)
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
@@ -52,7 +52,7 @@ class Translation:
     def dec(self, x, scope, decode_dim,reuse=False):
         x_ = x
         if self.train:
-            x_ = tf.nn.dropout(x_, 0.5)
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i],self.active_function, scope="dec_%d" % i,
@@ -304,7 +304,7 @@ def main():
 
         # Validation Process
         if i%10 == 0:
-            model.train = True
+            model.train = False
             x = content
             # y = dataset['item_tag']
             y = dataset['tag_item_onehot']
