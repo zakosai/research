@@ -325,7 +325,7 @@ def main():
             # item_pred = item[:, dataset['user_item_test'].keys()]
             # item_pred = item_pred.T
             # recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
-            recall_item, _ = calc_recall(item[test_tag_id], test_tag_y, [10], "item")
+            recall_item, _ = calc_recall(item[test.keys()], test.values(), [10], "item")
             if recall_item > max_recall:
                max_recall = recall_item
                _, result = calc_recall(item[test.keys()], test.values(), [10, 20, 30, 40, 50], "item")
