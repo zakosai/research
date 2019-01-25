@@ -12,11 +12,11 @@
 dir='delicious'
 for d in $dir
 do
+python vae_item.py --data=data/$d/dataset.pkl --ckpt=experiment/$d/
 python dae.py  --ckpt_folder=experiment/$d/ --data_dir=data/$d/
 python train_cf_dae.py --ckpt_folder=experiment/$d/ --data_dir=data/$d/ --gridsearch=1
 python vae.py  --ckpt_folder=experiment/$d/ --data_dir=data/$d/
 python train_cvae_extend.py --ckpt_folder=experiment/$d/ --data_dir=data/$d/
-python vae_item.py --data=data/$d/dataset.pkl --ckpt=experiment/$d/
 python vae-unet.py --data=data/$d/dataset.pkl --ckpt=experiment/$d/
 python NeuMF.py --data=data/$d/dataset.pkl --ckpt=experiment/$d/
 python FM.py --data=data/$d/dataset.pkl --ckpt=experiment/$d/
