@@ -83,18 +83,18 @@ def load_cvae_data(data_dir):
   test_tag_id = []
   test_tag_y = []
 
-  min_len = min(len(dataset['test']), len(dataset['tag_test']))
-
-  for i in range(min_len):
-      try:
-          idx = test_tag_id.index(dataset['test'][i, 1])
-          test_tag_y[idx] += dataset['tag_test'][i]
-          print(test_tag_y[idx])
-      except:
-          test_tag_id.append(dataset['test'][i, 1])
-          test_tag_y.append(dataset['tag_test'][i])
-  dataset["test_item_id"] = test_tag_id
-  dataset["test_item_tag"] = test_tag_y
+  # min_len = min(len(dataset['test']), len(dataset['tag_test']))
+  #
+  # for i in range(min_len):
+  #     try:
+  #         idx = test_tag_id.index(dataset['test'][i, 1])
+  #         test_tag_y[idx] += dataset['tag_test'][i]
+  #         print(test_tag_y[idx])
+  #     except:
+  #         test_tag_id.append(dataset['test'][i, 1])
+  #         test_tag_y.append(dataset['tag_test'][i])
+  # dataset["test_item_id"] = test_tag_id
+  # dataset["test_item_tag"] = test_tag_y
   return dataset
 
 
@@ -140,7 +140,7 @@ num_factors = 50
 best_recall = 0
 best_hyper = []
 dim = data['content'].shape[1]
-train_test = [data["train_users"][i] for i in data["test_item_id"]]
+train_test = [data["train_users"][i] for i in data['tag_test'].keys()]
 
 
 if gs == 1:
@@ -163,9 +163,9 @@ if gs == 1:
                     f = open(os.path.join(ckpt, "result_cdae_%d.txt"%model_type), 'a')
                     f.write("%d-----------%f----------%f----------%f\n"%(i,u,v,r))
                     pred_all = model.predict_all()
-                    pred_all = pred_all[data["test_item_id"]]
+                    pred_all = pred_all[data["tag_test"].keys()]
 
-                    recall = model.predict_val(pred_all, train_test, data["test_item_tag"], f)
+                    recall = model.predict_val(pred_all, train_test, data['tag_test'].values(), f)
                     f.write("\n")
                     f.close()
                     if recall > best_recall:
