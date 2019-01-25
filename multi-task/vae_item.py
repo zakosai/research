@@ -290,7 +290,7 @@ def main():
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(num_p)
         train_cost = 0
-        for j in range(int(num_u/batch_size)):
+        for j in range(int(num_p/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             y = dataset['tag_item_onehot'][list_idx]
             x = content[list_idx]
@@ -306,11 +306,17 @@ def main():
         # Validation Process
         if i%10 == 0:
             model.train = False
-            x = content
-            # y = dataset['item_tag']
-            y = dataset['tag_item_onehot']
-            item, z = sess.run([model.x_recon,model.z],
-                                              feed_dict={model.x:x, model.y:y})
+            item = []
+            z = []
+            for j in range(int(num_p / batch_size)):
+                idx = min(batch_size*(j+1), num_p)
+                x = content[batch_size*j:idx]
+                # y = dataset['item_tag']
+                y = dataset['tag_item_onehot'][batch_size*j:idx]
+                item_b, z_b = sess.run([model.x_recon,model.z],
+                                                  feed_dict={model.x:x, model.y:y})
+                item = np.concatenate((item, item_b), axis=0)
+                z = np.concatenate((z, z_b), axis=0)
             print(item.shape)
             # item_pred = item[:, dataset['user_item_test'].keys()]
             # item_pred = item_pred.T
