@@ -256,6 +256,7 @@ def main():
     decoding_dim = [200, 600, dataset['tag_no']]
 
     z_dim = 50
+    test = dataset['tag_test']
 
     # user_item = np.zeros((num_u, 2350))
     # for i in range(num_u):
@@ -266,16 +267,16 @@ def main():
     test_tag_id = []
     test_tag_y = []
 
-    min_len = min(len(dataset['test']), len(dataset['tag_test']))
-
-    for i in range(min_len):
-        try:
-            idx = test_tag_id.index(dataset['test'][i, 1])
-            test_tag_y[idx] += dataset['tag_test'][i]
-            test_tag_y[idx] = list(set(test_tag_y[idx]))
-        except:
-            test_tag_id.append(dataset['test'][i,1])
-            test_tag_y.append(dataset['tag_test'][i])
+    # min_len = min(len(dataset['test']), len(dataset['tag_test']))
+    #
+    # for i in range(min_len):
+    #     try:
+    #         idx = test_tag_id.index(dataset['test'][i, 1])
+    #         test_tag_y[idx] += dataset['tag_test'][i]
+    #         test_tag_y[idx] = list(set(test_tag_y[idx]))
+    #     except:
+    #         test_tag_id.append(dataset['test'][i,1])
+    #         test_tag_y.append(dataset['tag_test'][i])
 
     model = Translation(batch_size, dataset['tag_no'], encoding_dim, decoding_dim, z_dim)
     model.build_model()
@@ -317,7 +318,7 @@ def main():
             recall_item, _ = calc_recall(item[test_tag_id], test_tag_y, [10], "item")
             if recall_item > max_recall:
                max_recall = recall_item
-               _, result = calc_recall(item[test_tag_id], test_tag_y, [10, 20, 30, 40, 50], "item")
+               _, result = calc_recall(item[test.keys()], test.values(), [10, 20, 30, 40, 50], "item")
                result['z'] = z
                result['rec'] = item
                saver.save(sess, os.path.join(args.ckpt, 'translation-model-tag'))
