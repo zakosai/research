@@ -520,7 +520,7 @@ class cf_vae_extend:
         recall_avgs = []
         precision_avgs = []
         mapk_avgs = []
-        for m in [50, 100, 150, 200, 250]:
+        for m in [50]:
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
             ndcg = []

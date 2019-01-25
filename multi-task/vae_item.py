@@ -239,7 +239,7 @@ def calc_rmse(pred, test):
     return np.sqrt(np.mean((test-pred)**2))
 
 def main():
-    iter = 1500
+    iter = 500
     batch_size= 500
     args = parser.parse_args()
     f = open(args.data, 'rb')
@@ -328,7 +328,7 @@ def main():
             recall_item, _ = calc_recall(item[test.keys()], test.values(), [10], "item")
             if recall_item > max_recall:
                max_recall = recall_item
-               _, result = calc_recall(item[test.keys()], test.values(), [10, 20, 30, 40, 50], "item")
+               _, result = calc_recall(item[test.keys()], test.values(), [50, 100, 150, 200, 250], "item")
                result['z'] = z
                result['rec'] = item
                saver.save(sess, os.path.join(args.ckpt, 'translation-model-tag'))
