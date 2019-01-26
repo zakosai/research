@@ -29,7 +29,7 @@ parser.add_argument('--zdim',  type=int, default=50,
                    help='where model is stored')
 parser.add_argument('--gridsearch',  type=int, default=0,
                    help='gridsearch or not')
-parser.add_argument('--data_type',  type=str, default='5',
+parser.add_argument('--mat_file',  type=int, default=0,
                    help='gridsearch or not')
 parser.add_argument('--user_no',  type=int, default=6040,
                    help='gridsearch or not')
@@ -180,13 +180,21 @@ if gs == 1:
                                                                                    best_hyper[2]))
     f.close()
 else:
-    model = cf_vae_extend(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,
-                          input_dim=8000, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200, 400, 8000],
+    u = [0.1, 1, 10]
+    v = [1,10, 100]
+    r = [0.1, 1, 10]
+    params.lambda_u = u[int(args.mat_file/9)]
+    params.lambda_v = v[int((args.mat_file%9)/3)]
+    params.lambda_r = r[int(args.mat_file%3)]
+
+    model = cf_vae_extend(num_users=data['item_no'], num_items=data['tag_no'], num_factors=num_factors, params=params,
+                          input_dim=dim, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200, 400, dim],
                           decoding_dims_str=[200, 4526], loss_type='cross_entropy',
                           model=model_type, ckpt_folder=ckpt)
-    model.fit(data["train_users"], data["train_items"], data["content"],params, data["test_users"])
+    model.fit(data["train_users"], data["train_items"], data["content"], params, data["tag_test"].keys())
     model.save_model(os.path.join(ckpt,"cf_dae_%d.mat"%(model_type)))
     #model.load_model(os.path.join(ckpt, "cf_dae_0.mat"))
     pred = model.predict_all()
-    model.predict_val(pred, data["train_users"], data["test_users"])
+    pred_all = pred[data["tag_test"].keys()]
+    recall = model.predict_val(pred_all, train_test, data['tag_test'].values())
 
