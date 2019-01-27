@@ -59,7 +59,7 @@ class Translation:
                 x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
                 # x_ = tf.nn.leaky_relu(x_, alpha=0.1)
-                x = tf.nn.relu(x)
+                x_ = tf.nn.relu(x_)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
