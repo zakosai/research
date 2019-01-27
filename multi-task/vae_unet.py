@@ -12,7 +12,7 @@ from scipy.sparse import load_npz
 
 class Translation:
     def __init__(self, batch_size, x_dim, y_dim, encode_dim, decode_dim, z_dim, eps=1e-10,
-                 lambda_0=10, lambda_1=0.1, lambda_2=10,
+                 lambda_0=10, lambda_1=0.1, lambda_2=100,
                  lambda_3=0.1,
                  lambda_4=100, learning_rate=1e-4):
         self.batch_size = batch_size
@@ -253,8 +253,8 @@ def main():
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
-    encoding_dim = [600, 200]
-    decoding_dim = [200, 600, num_p]
+    encoding_dim = [200, 100]
+    decoding_dim = [100, 200, num_p]
 
     z_dim = 50
     max_item = max(np.sum(dataset['user_onehot'], axis=1))
