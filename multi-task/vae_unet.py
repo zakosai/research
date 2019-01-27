@@ -58,7 +58,7 @@ class Translation:
                 x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
                 x_ = tf.nn.leaky_relu(x_, alpha=0.1)
-            x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
+            x_ = fully_connected(x_, decode_dim[-1], scope="dec_last",
                                  weights_regularizer=self.regularizer)
         return x_
 
