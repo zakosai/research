@@ -308,9 +308,7 @@ def main():
                 if j == 0:
                     item = item_b
                 else:
-                    print(item.shape, item_b.shape)
                     item = np.concatenate((item, item_b), axis=0)
-            print(item.shape)
             # item_pred = item[:, dataset['user_item_test'].keys()]
             # item_pred = item_pred.T
             # recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
