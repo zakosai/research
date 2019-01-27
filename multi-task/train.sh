@@ -3,7 +3,7 @@
 #python vae-unet.py --data=data/lastfm/dataset.pkl --ckpt=experiment/lastfm/
 #python vae-unet.py --data=data/delicious/dataset.pkl --ckpt=experiment/delicious/
 
-python vae_unet.py --data=data/delicious/dataset.pkl --ckpt=experiment/delicious/
+#python vae_unet.py --data=data/delicious/dataset.pkl --ckpt=experiment/delicious/
 
 dir='lastfm delicious'
 for d in $dir
