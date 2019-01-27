@@ -35,6 +35,7 @@ def main():
 
     model = Translation(batch_size, x_dim, num_p, encoding_dim, decoding_dim, z_dim)
     model.build_model()
+    model.train = False
 
     sess = tf.Session()
     saver = tf.train.Saver(max_to_keep=20)

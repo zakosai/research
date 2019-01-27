@@ -301,7 +301,7 @@ def main():
 
         # Validation Process
         if i%10 == 0:
-            model.train = True
+            model.train = False
             x = user_item[dataset['user_item_test'].keys()]
             y = dataset['user_onehot'][dataset['user_item_test'].keys()]
             item_pred = sess.run(model.x_recon,
