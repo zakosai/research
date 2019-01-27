@@ -1,13 +1,13 @@
 import tensorflow as tf
 from tensorflow.contrib.layers import fully_connected, flatten, batch_norm
-from tensorflow import sigmoid
-import tensorflow.keras.backend as K
-from tensorflow.contrib.framework import argsort
+
 import numpy as np
 import os
 import argparse
 import pandas as pd
 import pickle
+from scipy.sparse import load_npz
+
 
 class Translation:
     def __init__(self, batch_size, dim, encode_dim, decode_dim, z_dim, eps=1e-10,
@@ -102,9 +102,10 @@ class Translation:
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
 
+
 def create_dataset_lastfm():
-    user_tags = pd.read_table("data/lastfm/user_taggedartists.dat")
-    user_artist = pd.read_table("data/lastfm-lastfm-2k/user_artists.dat")
+    user_tags = pd.read_table("hetrec2011-lastfm-2k/user_taggedartists.dat")
+    user_artist = pd.read_table("hetrec2011-lastfm-2k/user_artists.dat")
     user_id = list(set(user_tags.userID))
     artist_id = list(set(user_tags.artistID))
 
@@ -165,7 +166,6 @@ def create_dataset_lastfm():
 
 def calc_recall(pred, test, m=[100], type=None):
     result = {}
-
     for k in m:
         pred_ab = np.argsort(-pred)[:, :k]
         recall = []
@@ -192,11 +192,10 @@ def calc_recall(pred, test, m=[100], type=None):
                     ndcg.append(0)
                 else:
                     ndcg.append(float(actual) / best)
-        result['recall@%d'%k] = np.mean(recall)
-        result['ndcg@%d' % k] = np.mean(ndcg)
 
         print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
-
+        result['recall@%d' % k] = np.mean(recall)
+        result['ndcg@%d' % k] = np.mean(ndcg)
 
     return np.mean(np.array(recall)), result
 
@@ -231,36 +230,63 @@ def calc_rmse(pred, test):
     return np.sqrt(np.mean((test-pred)**2))
 
 def main():
-    iter = 3000
+    iter = 500
     batch_size= 500
     args = parser.parse_args()
     f = open(args.data, 'rb')
     dataset = pickle.load(f)
+    f.close()
+    folder = args.data.split("/")[:-1]
+    folder = "/".join(folder)
+    content = load_npz(os.path.join(folder, "mult_nor.npz"))
+    content = content.toarray()
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
     encoding_dim = [600, 200]
-    decoding_dim = [200, 600, num_p]
+    decoding_dim = [200, 600, dataset['tag_no']]
 
     z_dim = 50
+    test = dataset['tag_test']
 
+    # user_item = np.zeros((num_u, 2350))
+    # for i in range(num_u):
+    #     idx = np.where(dataset['user_onehot'][i] == 1)
+    #     u_c = content[idx]
+    #     u_c = u_c.flatten()
+    #     user_item[i, :len(u_c)] = u_c
+    test_tag_id = []
+    test_tag_y = []
 
-    model = Translation(batch_size, num_p, encoding_dim, decoding_dim, z_dim)
+    # min_len = min(len(dataset['test']), len(dataset['tag_test']))
+    #
+    # for i in range(min_len):
+    #     try:
+    #         idx = test_tag_id.index(dataset['test'][i, 1])
+    #         test_tag_y[idx] += dataset['tag_test'][i]
+    #         test_tag_y[idx] = list(set(test_tag_y[idx]))
+    #     except:
+    #         test_tag_id.append(dataset['test'][i,1])
+    #         test_tag_y.append(dataset['tag_test'][i])
+
+    model = Translation(batch_size, dataset['tag_no'], encoding_dim, decoding_dim, z_dim)
     model.build_model()
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
-    saver = tf.train.Saver(max_to_keep=20)
+    saver = tf.train.Saver(max_to_keep=3)
     max_recall = 0
+    result = {}
 
     for i in range(1, iter):
-        shuffle_idx = np.random.permutation(num_u)
+        shuffle_idx = np.random.permutation(num_p)
         train_cost = 0
-        for j in range(int(num_u/batch_size)):
+        for j in range(int(num_p/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
-            x = dataset['user_onehot'][list_idx]
+            y = dataset['tag_item_onehot'][list_idx]
+            x = content[list_idx]
 
-            feed = {model.x: x}
+            feed = {model.x: x, model.y:y}
 
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
@@ -271,17 +297,33 @@ def main():
         # Validation Process
         if i%10 == 0:
             model.train = False
-            x = dataset['user_onehot'][dataset['user_item_test'].keys()]
-            item_pred = sess.run(model.x_recon,
-                                              feed_dict={model.x:x})
-
-            recall_item , _= calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
+            item = []
+            z = []
+            for j in range(int(num_p / batch_size)+1):
+                idx = min(batch_size*(j+1), num_p)
+                x = content[batch_size*j:idx]
+                # y = dataset['item_tag']
+                y = dataset['tag_item_onehot'][batch_size*j:idx]
+                item_b, z_b = sess.run([model.x_recon,model.z],
+                                                  feed_dict={model.x:x, model.y:y})
+                if j == 0:
+                    item = item_b
+                    z = z_b
+                else:
+                    item = np.concatenate((item, item_b), axis=0)
+                    z = np.concatenate((z, z_b), axis=0)
+            print(item.shape)
+            # item_pred = item[:, dataset['user_item_test'].keys()]
+            # item_pred = item_pred.T
+            # recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
+            recall_item, _ = calc_recall(item[test.keys()], test.values(), [50], "item")
             if recall_item > max_recall:
-                max_recall = recall_item
-                _, result = calc_recall(item_pred, dataset['user_item_test'].values(),
-                                        [50, 100, 150, 200, 250, 300], "item")
-                saver.save(sess, os.path.join(args.ckpt, 'multi-VAE'))
-        model.train = True
+               max_recall = recall_item
+               _, result = calc_recall(item[test.keys()], test.values(), [50, 100, 150, 200, 250], "item")
+               saver.save(sess, os.path.join(args.ckpt, 'multi-vae-item'))
+
+
+            model.train = True
         if i%100 == 0 and model.learning_rate > 1e-6:
             model.learning_rate /= 10
             print("decrease lr to %f"%model.learning_rate)
@@ -289,8 +331,8 @@ def main():
 
     print(max_recall)
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
-    f.write("Best recall Multi-VAE: %f"%max_recall)
-    np.save(os.path.join(args.ckpt, "result_multi-vae.npy"), result)
+    f.write("Best recall multi-vae-item tag: %f\n" % max_recall)
+    np.save(os.path.join(folder, "multi-vae-item.npy"), result)
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Tool",
