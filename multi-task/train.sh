@@ -11,7 +11,7 @@ do
 #python vae_item.py --data=data/$d/dataset.pkl --ckpt=experiment/$d/
 python vae.py  --ckpt_folder=experiment/$d/ --data_dir=data/$d/
 python train_cvae_extend.py --ckpt_folder=experiment/$d/ --data_dir=data/$d/
-python vae_unet.py --data=data/$d/dataset.pkl --ckpt=experiment/$d/
+#python vae_unet.py --data=data/$d/dataset.pkl --ckpt=experiment/$d/
 #python dae.py  --ckpt_folder=experiment/$d/ --data_dir=data/$d/
 #python train_cf_dae.py --ckpt_folder=experiment/$d/ --data_dir=data/$d/ --gridsearch=1
 python NeuMF.py --data=data/$d/dataset.pkl --ckpt=experiment/$d/
