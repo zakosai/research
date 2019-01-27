@@ -283,10 +283,10 @@ def main():
         train_cost = 0
         for j in range(int(num_p/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
-            y = dataset['tag_item_onehot'][list_idx]
-            x = content[list_idx]
+            x = dataset['tag_item_onehot'][list_idx]
+            # x = content[list_idx]
 
-            feed = {model.x: x, model.y:y}
+            feed = {model.x: x}
 
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
@@ -301,17 +301,15 @@ def main():
             z = []
             for j in range(int(num_p / batch_size)+1):
                 idx = min(batch_size*(j+1), num_p)
-                x = content[batch_size*j:idx]
+                # x = content[batch_size*j:idx]
                 # y = dataset['item_tag']
-                y = dataset['tag_item_onehot'][batch_size*j:idx]
-                item_b, z_b = sess.run([model.x_recon,model.z],
-                                                  feed_dict={model.x:x, model.y:y})
+                x = dataset['tag_item_onehot'][batch_size*j:idx]
+                item_b= sess.run([model.x_recon],
+                                                  feed_dict={model.x:x})
                 if j == 0:
                     item = item_b
-                    z = z_b
                 else:
                     item = np.concatenate((item, item_b), axis=0)
-                    z = np.concatenate((z, z_b), axis=0)
             print(item.shape)
             # item_pred = item[:, dataset['user_item_test'].keys()]
             # item_pred = item_pred.T
