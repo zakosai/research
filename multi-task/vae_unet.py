@@ -54,7 +54,7 @@ class Translation:
         if self.train:
             x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
-            for i in range(len(decode_dim)-1):
+            for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i],self.active_function, scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
                 # x_ = tf.nn.leaky_relu(x_, alpha=0.1)
