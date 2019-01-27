@@ -45,7 +45,7 @@ class Translation:
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.2)
                 en_out.append(x_)
         return x_, en_out
 
@@ -57,7 +57,7 @@ class Translation:
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.2)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
