@@ -303,7 +303,7 @@ def main():
                 # x = content[batch_size*j:idx]
                 # y = dataset['item_tag']
                 x = dataset['tag_item_onehot'][batch_size*j:idx]
-                item_b= sess.run([model.x_recon],
+                item_b= sess.run(model.x_recon,
                                                   feed_dict={model.x:x})
                 if j == 0:
                     item = item_b
