@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 import scipy.io
 import matplotlib.pyplot as plt
-from cf_vae_cpmf_extend import cf_vae_extend, params
+from cf_dae import cf_vae_extend, params
 from scipy.sparse import load_npz
 import  argparse
 import os
