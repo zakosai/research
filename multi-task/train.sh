@@ -4,10 +4,6 @@
 #python vae-unet.py --data=data/delicious/dataset.pkl --ckpt=experiment/delicious/
 
 python vae_unet.py --data=data/delicious/dataset.pkl --ckpt=experiment/delicious/
-python vae.py  --ckpt_folder=experiment/delicious/ --data_dir=data/delicious/
-python train_cf_dae.py --ckpt_folder=experiment/delicious/ --data_dir=data/delicious/ --gridsearch=1
-
-
 
 dir='lastfm delicious'
 for d in $dir
@@ -31,6 +27,9 @@ python multi-vae-item.py --data=data/$d/dataset.pkl --ckpt=experiment/$d/
 ##
 ##
 done
+
+python vae.py  --ckpt_folder=experiment/delicious/ --data_dir=data/delicious/
+python train_cf_dae.py --ckpt_folder=experiment/delicious/ --data_dir=data/delicious/ --gridsearch=1
 #python vae_item.py --data=data/grocery/dataset.pkl --ckpt=experiment/grocery/
 #python vae-unet.py --data=data/grocery/dataset.pkl --ckpt=experiment/grocery/
 #python vae.py  --ckpt_folder=experiment/outdoor/ --data_dir=data/outdoor/
