@@ -336,7 +336,7 @@ def main():
                result['z'] = z
                result['rec'] = item
                saver.save(sess, os.path.join(args.ckpt, 'translation-model-implicit'))
-               np.savez(os.path.join(folder, "item-implicit.npz"), result)
+               np.save(os.path.join(folder, "item-implicit.npy"), result)
 
 
             model.train = True
