@@ -278,7 +278,7 @@ def main():
     #         test_tag_id.append(dataset['test'][i,1])
     #         test_tag_y.append(dataset['tag_test'][i])
 
-    model = Translation(batch_size, dataset['tag_no'], encoding_dim, decoding_dim, z_dim)
+    model = Translation(batch_size, dataset['user_no'], encoding_dim, decoding_dim, z_dim)
     model.build_model()
 
     sess = tf.Session()
@@ -292,7 +292,7 @@ def main():
         train_cost = 0
         for j in range(int(num_p/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
-            y = dataset['tag_item_onehot'][list_idx]
+            y = dataset['item_onehot'][list_idx]
             x = content[list_idx]
 
             feed = {model.x: x, model.y:y}
@@ -312,7 +312,7 @@ def main():
                 idx = min(batch_size*(j+1), num_p)
                 x = content[batch_size*j:idx]
                 # y = dataset['item_tag']
-                y = dataset['tag_item_onehot'][batch_size*j:idx]
+                y = dataset['item_onehot'][batch_size*j:idx]
                 item_b, z_b = sess.run([model.x_recon,model.z],
                                                   feed_dict={model.x:x, model.y:y})
                 if j == 0:
@@ -331,7 +331,7 @@ def main():
                _, result = calc_recall(item[test.keys()], test.values(), [50, 100, 150, 200, 250], "item")
                result['z'] = z
                result['rec'] = item
-               saver.save(sess, os.path.join(args.ckpt, 'translation-model-tag'))
+               saver.save(sess, os.path.join(args.ckpt, 'translation-model'))
 
 
             model.train = True
@@ -342,8 +342,8 @@ def main():
 
     print(max_recall)
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
-    f.write("Best recall vae-item tag: %f\n" % max_recall)
-    np.save(os.path.join(folder, "item_tag.npy"), result)
+    f.write("Best recall vae-item: %f\n" % max_recall)
+    np.save(os.path.join(folder, "item.npy"), result)
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Tool",
