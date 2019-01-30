@@ -44,9 +44,9 @@ class Translation:
             x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = fully_connected(x_, encode_dim[i],self.active_function, scope="enc_%d"%i,
+                x_ = fully_connected(x_, encode_dim[i],scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                # x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
                 en_out.append(x_)
         return x_, en_out
 
@@ -56,9 +56,9 @@ class Translation:
             x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                x_ = fully_connected(x_, decode_dim[i], self.active_function,scope="dec_%d" % i,
+                x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
-                # x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
@@ -85,13 +85,13 @@ class Translation:
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
     def loss_reconstruct(self, x, x_recon):
-        # log_softmax_var = tf.nn.log_softmax(x_recon)
+        log_softmax_var = tf.nn.log_softmax(x_recon)
         #
         # neg_ll = -tf.reduce_mean(tf.reduce_sum(
         #     log_softmax_var * x,
         #     axis=-1))
         # return neg_ll
-        return losses.squared_hinge(x, x_recon)
+        return losses.squared_hinge(x, log_softmax_var)
 
         # return tf.reduce_mean(tf.abs(x - x_recon))
 
@@ -258,7 +258,7 @@ def main():
     encoding_dim = [600, 200]
     decoding_dim = [200, 600, num_p]
 
-    z_dim = 100
+    z_dim = 50
     max_item = max(np.sum(dataset['user_onehot'], axis=1))
     x_dim =  num_u * max_item
     user_item = np.zeros((num_u,x_dim))
