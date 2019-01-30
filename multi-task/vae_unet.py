@@ -330,6 +330,7 @@ def main():
                 _, result = calc_recall(item_pred, dataset['user_item_test'].values(),
                                             [50, 100, 150, 200, 250, 300], "item")
                 saver.save(sess, os.path.join(args.ckpt, 'conVAE-model'))
+                np.save(os.path.join(args.ckpt, "pred.npy"), item_pred)
 
 
 
