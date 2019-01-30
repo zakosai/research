@@ -8,6 +8,7 @@ import argparse
 import pandas as pd
 import pickle
 from scipy.sparse import load_npz
+from keras import losses
 
 
 class Translation:
@@ -84,12 +85,13 @@ class Translation:
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
     def loss_reconstruct(self, x, x_recon):
-        log_softmax_var = tf.nn.log_softmax(x_recon)
-
-        neg_ll = -tf.reduce_mean(tf.reduce_sum(
-            log_softmax_var * x,
-            axis=-1))
-        return neg_ll
+        # log_softmax_var = tf.nn.log_softmax(x_recon)
+        #
+        # neg_ll = -tf.reduce_mean(tf.reduce_sum(
+        #     log_softmax_var * x,
+        #     axis=-1))
+        # return neg_ll
+        return losses.categorical_hinge(x, x_recon)
 
         # return tf.reduce_mean(tf.abs(x - x_recon))
 
@@ -258,11 +260,11 @@ def main():
 
     z_dim = 100
     max_item = max(np.sum(dataset['user_onehot'], axis=1))
-    x_dim =  8000 * max_item
+    x_dim =  num_u * max_item
     user_item = np.zeros((num_u,x_dim))
     for i in range(num_u):
         idx = np.where(dataset['user_onehot'][i] == 1)
-        u_c = content[idx]
+        u_c = dataset['item_onehot'][idx]
         u_c = u_c.flatten()
         user_item[i, :len(u_c)] = u_c
 
