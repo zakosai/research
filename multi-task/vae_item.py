@@ -312,7 +312,7 @@ def main():
             z = []
             for j in range(int(num_p / batch_size)+1):
                 idx = min(batch_size*(j+1), num_p)
-                x = dataset['user_onehot'][batch_size*j:idx]
+                x = content[batch_size*j:idx]
                 # y = dataset['item_tag']
                 y = dataset['item_onehot'][batch_size*j:idx]
                 item_b, z_b = sess.run([model.x_recon,model.z],
