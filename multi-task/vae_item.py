@@ -322,13 +322,15 @@ def main():
                     item = np.concatenate((item, item_b), axis=0)
                     z = np.concatenate((z, z_b), axis=0)
             print(item.shape)
-            # item_pred = item[:, dataset['user_item_test'].keys()]
-            # item_pred = item_pred.T
-            # recall_item = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
-            recall_item, _ = calc_recall(item[test.keys()], test.values(), [50], "item")
+            item_pred = item[:, dataset['user_item_test'].keys()]
+            item_pred = item_pred.T
+            recall_item, _ = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
+            # recall_item, _ = calc_recall(item[test.keys()], test.values(), [50], "item")
             if recall_item > max_recall:
                max_recall = recall_item
-               _, result = calc_recall(item[test.keys()], test.values(), [50, 100, 150, 200, 250], "item")
+               # _, result = calc_recall(item[test.keys()], test.values(), [50, 100, 150, 200, 250], "item")
+               recall_item, _ = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
+
                result['z'] = z
                result['rec'] = item
                saver.save(sess, os.path.join(args.ckpt, 'translation-model'))
