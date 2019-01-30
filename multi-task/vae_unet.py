@@ -44,9 +44,9 @@ class Translation:
             x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
+                x_ = fully_connected(x_, encode_dim[i],self.active_function, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+                # x_ = tf.nn.leaky_relu(x_, alpha=0.5)
                 en_out.append(x_)
         return x_, en_out
 
@@ -56,9 +56,9 @@ class Translation:
             x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
+                x_ = fully_connected(x_, decode_dim[i], self.active_function,scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+                # x_ = tf.nn.leaky_relu(x_, alpha=0.5)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
@@ -91,7 +91,7 @@ class Translation:
         #     log_softmax_var * x,
         #     axis=-1))
         # return neg_ll
-        return losses.hinge(x, x_recon)
+        return losses.squared_hinge(x, x_recon)
 
         # return tf.reduce_mean(tf.abs(x - x_recon))
 
