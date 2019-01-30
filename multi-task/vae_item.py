@@ -12,12 +12,13 @@ from scipy.sparse import load_npz
 
 
 class Translation:
-    def __init__(self, batch_size, dim, encode_dim, decode_dim, z_dim, eps=1e-10,
+    def __init__(self, batch_size, dim_x, dim, encode_dim, decode_dim, z_dim, eps=1e-10,
                  lambda_0=10, lambda_1=0.1, lambda_2=100,
                  lambda_3=0.1,
                  lambda_4=100, learning_rate=1e-4):
         self.batch_size = batch_size
         self.dim = dim
+        self.dim_x = dim_x
         self.encode_dim = encode_dim
         self.decode_dim = decode_dim
         self.z_dim = z_dim
@@ -94,7 +95,7 @@ class Translation:
         # return tf.reduce_mean(tf.abs(x - x_recon))
 
     def build_model(self):
-        self.x = tf.placeholder(tf.float32, [None, 8000], name='input')
+        self.x = tf.placeholder(tf.float32, [None, self.dim_x], name='input')
         self.y = tf.placeholder(tf.float32, [None, self.dim], name='label')
 
 
@@ -253,7 +254,7 @@ def main():
     num_p = dataset['item_no']
     num_u = dataset['user_no']
     encoding_dim = [600, 200]
-    decoding_dim = [200, 600, dataset['user_no']]
+    decoding_dim = [200, 600, num_u]
 
     z_dim = 50
     test = dataset['tag_test']
@@ -278,7 +279,7 @@ def main():
     #         test_tag_id.append(dataset['test'][i,1])
     #         test_tag_y.append(dataset['tag_test'][i])
 
-    model = Translation(batch_size, dataset['user_no'], encoding_dim, decoding_dim, z_dim)
+    model = Translation(batch_size, num_p, num_u, encoding_dim, decoding_dim, z_dim)
     model.build_model()
 
     sess = tf.Session()
@@ -293,7 +294,7 @@ def main():
         for j in range(int(num_p/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             y = dataset['item_onehot'][list_idx]
-            x = content[list_idx]
+            x = dataset['user_onehot'][list_idx]
 
             feed = {model.x: x, model.y:y}
 
@@ -310,7 +311,7 @@ def main():
             z = []
             for j in range(int(num_p / batch_size)+1):
                 idx = min(batch_size*(j+1), num_p)
-                x = content[batch_size*j:idx]
+                x = dataset['user_onehot'][batch_size*j:idx]
                 # y = dataset['item_tag']
                 y = dataset['item_onehot'][batch_size*j:idx]
                 item_b, z_b = sess.run([model.x_recon,model.z],
@@ -329,7 +330,7 @@ def main():
             if recall_item > max_recall:
                max_recall = recall_item
                # _, result = calc_recall(item[test.keys()], test.values(), [50, 100, 150, 200, 250], "item")
-               recall_item, _ = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
+               recall_item, _ = calc_recall(item_pred, dataset['user_item_test'].values(), [50, 100, 150, 200, 250], "item")
 
                result['z'] = z
                result['rec'] = item
