@@ -97,8 +97,8 @@ class Translation:
         # print(x.shape, x_recon.shape, log_softmax_var.shape)
         # return losses.categorical_hinge(x, x_recon)
 
-        # return tf.reduce_mean(tf.abs(x - x_recon))
-        return losses.binary_crossentropy(x, x_recon)
+        return tf.reduce_mean(tf.abs(x - x_recon))
+        # return losses.binary_crossentropy(x, x_recon)
 
     def build_model(self):
         self.x = tf.placeholder(tf.float32, [None, self.x_dim], name='input')
