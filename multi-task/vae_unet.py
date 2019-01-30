@@ -246,10 +246,10 @@ def main():
     dataset = pickle.load(f)
     forder = args.data.split("/")[:-1]
     forder = "/".join(forder)
-    content = np.load(os.path.join(forder, "item_tag.npz"))
-    content = content['z']
-    # content = load_npz(os.path.join(forder, "mult_nor.npz"))
-    # content = content.toarray()
+    # content = np.load(os.path.join(forder, "item_tag.npz"))
+    # content = content['z']
+    content = load_npz(os.path.join(forder, "mult_nor.npz"))
+    content = content.toarray()
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
@@ -262,7 +262,7 @@ def main():
     user_item = np.zeros((num_u,x_dim))
     for i in range(num_u):
         idx = np.where(dataset['user_onehot'][i] == 1)
-        u_c = dataset['item_onehot'][idx]
+        u_c = content[idx]
         u_c = u_c.flatten()
         user_item[i, :len(u_c)] = u_c
 
@@ -314,7 +314,7 @@ def main():
                 max_recall = recall_item
                 _, result = calc_recall(item_pred, dataset['user_item_test'].values(),
                                             [50, 100, 150, 200, 250, 300], "item")
-                saver.save(sess, os.path.join(args.ckpt, 'conVAE-model_implicit'))
+                saver.save(sess, os.path.join(args.ckpt, 'conVAE-model'))
 
 
 
@@ -326,8 +326,8 @@ def main():
 
     print(max_recall)
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
-    f.write("Best recall ConVAE implicit: %f\n" % max_recall)
-    np.save(os.path.join(args.ckpt, "result_convae_implicit.npy"), result)
+    f.write("Best recall ConVAE: %f\n" % max_recall)
+    np.save(os.path.join(args.ckpt, "result_convae.npy"), result)
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Tool",
