@@ -282,6 +282,7 @@ def main():
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(max_to_keep=3)
     max_recall = 0
+    len_test = len(dataset['user_item_test'].keys())
 
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(num_u)
@@ -302,10 +303,17 @@ def main():
         # Validation Process
         if i%10 == 0:
             model.train = False
-            x = user_item[dataset['user_item_test'].keys()]
-            y = dataset['user_onehot'][dataset['user_item_test'].keys()]
-            item_pred = sess.run(model.x_recon,
-                                              feed_dict={model.x:x, model.y:y})
+            item_pred = []
+            for j in range(int(len_test / batch_size)+1):
+                idx = min(batch_size*(j+1), len_test)
+                x = user_item[dataset['user_item_test'].keys()][batch_size*j:idx]
+                y = dataset['user_onehot'][dataset['user_item_test'].keys()][batch_size*j:idx]
+                pred = sess.run(model.x_recon,
+                                                  feed_dict={model.x:x, model.y:y})
+                if j == 0:
+                    item_pred = pred
+                else:
+                    item_pred = np.concatenate((item_pred, pred ), axis=0)
 
             recall_item, _ = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
             model.train = True
