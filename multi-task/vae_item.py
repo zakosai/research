@@ -306,7 +306,6 @@ def main():
         #                                                                         loss_vae, loss_gan, loss_cc))
 
         # Validation Process
-        infer = {}
         if i%10 == 0:
             model.train = False
             item = []
@@ -333,7 +332,7 @@ def main():
                max_recall = recall_item
                # _, result = calc_recall(item[test.keys()], test.values(), [50, 100, 150, 200, 250], "item")
                _, result = calc_recall(item_pred, dataset['user_item_test'].values(), [50, 100, 150, 200, 250], "item")
-
+               infer = {}
                infer['z'] = z
                infer['rec'] = item
                saver.save(sess, os.path.join(args.ckpt, 'translation-model-implicit'))
