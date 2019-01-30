@@ -334,7 +334,7 @@ def main():
 
                result['z'] = z
                result['rec'] = item
-               saver.save(sess, os.path.join(args.ckpt, 'translation-model'))
+               saver.save(sess, os.path.join(args.ckpt, 'translation-model-implicit'))
 
 
             model.train = True
@@ -345,8 +345,8 @@ def main():
 
     print(max_recall)
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
-    f.write("Best recall vae-item: %f\n" % max_recall)
-    np.save(os.path.join(folder, "item.npy"), result)
+    f.write("Best recall vae-item -implicit: %f\n" % max_recall)
+    np.save(os.path.join(folder, "item-implicit.npy"), result)
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Tool",
