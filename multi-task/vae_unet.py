@@ -55,10 +55,13 @@ class Translation:
         if self.train:
             x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
-            for i in range(len(decode_dim)):
+            for i in range(len(decode_dim)-1):
                 x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
                 x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+            x_ = fully_connected(x_, decode_dim[-1], scope="last_dec",
+                                 weights_regularizer=self.regularizer)
+            x_ = tf.nn.log_softmax(x_)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
@@ -85,7 +88,7 @@ class Translation:
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
     def loss_reconstruct(self, x, x_recon):
-        log_softmax_var = tf.nn.log_softmax(x_recon)
+        # log_softmax_var = tf.nn.log_softmax(x_recon)
         #
         neg_ll = -tf.reduce_mean(tf.reduce_sum(
             log_softmax_var * x,
