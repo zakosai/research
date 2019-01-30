@@ -29,7 +29,7 @@ class Translation:
         self.lambda_3 = lambda_3
         self.lambda_4 = lambda_4
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.sigmoid
+        self.active_function = tf.nn.tanh
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
@@ -44,9 +44,9 @@ class Translation:
             x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = fully_connected(x_, encode_dim[i],scope="enc_%d"%i,
+                x_ = fully_connected(x_, encode_dim[i], self.active_function,scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+                # x_ = tf.nn.leaky_relu(x_, alpha=0.5)
                 en_out.append(x_)
         return x_, en_out
 
@@ -56,9 +56,9 @@ class Translation:
             x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)-1):
-                x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
+                x_ = fully_connected(x_, decode_dim[i], self.active_function,scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
-                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+                # x_ = tf.nn.leaky_relu(x_, alpha=0.5)
             x_ = fully_connected(x_, decode_dim[-1], scope="last_dec",
                                  weights_regularizer=self.regularizer)
             x_ = tf.nn.log_softmax(x_)
@@ -95,10 +95,10 @@ class Translation:
         #     axis=-1))
         # return neg_ll
         # print(x.shape, x_recon.shape, log_softmax_var.shape)
-        return losses.categorical_hinge(x, x_recon)
+        # return losses.categorical_hinge(x, x_recon)
 
         # return tf.reduce_mean(tf.abs(x - x_recon))
-        # return losses.binary_crossentropy(x, x_recon)
+        return losses.binary_crossentropy(x, x_recon)
 
     def build_model(self):
         self.x = tf.placeholder(tf.float32, [None, self.x_dim], name='input')
