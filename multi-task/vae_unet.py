@@ -249,10 +249,10 @@ def main():
     dataset = pickle.load(f)
     forder = args.data.split("/")[:-1]
     forder = "/".join(forder)
-    # content = np.load(os.path.join(forder, "item_tag.npz"))
-    # content = content['z']
-    content = load_npz(os.path.join(forder, "mult_nor.npz"))
-    content = content.toarray()
+    content = np.load(os.path.join(forder, "item-implicit.npz"))
+    content = content['z']
+    # content = load_npz(os.path.join(forder, "mult_nor.npz"))
+    # content = content.toarray()
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
@@ -261,7 +261,7 @@ def main():
 
     z_dim = 50
     max_item = max(np.sum(dataset['user_onehot'], axis=1))
-    x_dim =  8000 * max_item
+    x_dim =  50 * max_item
     user_item = np.zeros((num_u,x_dim))
     for i in range(num_u):
         idx = np.where(dataset['user_onehot'][i] == 1)
