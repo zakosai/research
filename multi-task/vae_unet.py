@@ -91,7 +91,7 @@ class Translation:
         #     log_softmax_var * x,
         #     axis=-1))
         # return neg_ll
-        return losses.squared_hinge(x, x_recon)
+        return losses.hinge(x, x_recon)
 
         # return tf.reduce_mean(tf.abs(x - x_recon))
 
