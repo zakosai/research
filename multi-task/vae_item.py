@@ -306,6 +306,7 @@ def main():
         #                                                                         loss_vae, loss_gan, loss_cc))
 
         # Validation Process
+        infer = {}
         if i%10 == 0:
             model.train = False
             item = []
@@ -333,10 +334,10 @@ def main():
                # _, result = calc_recall(item[test.keys()], test.values(), [50, 100, 150, 200, 250], "item")
                _, result = calc_recall(item_pred, dataset['user_item_test'].values(), [50, 100, 150, 200, 250], "item")
 
-               result['z'] = z
-               result['rec'] = item
+               infer['z'] = z
+               infer['rec'] = item
                saver.save(sess, os.path.join(args.ckpt, 'translation-model-implicit'))
-               np.save(os.path.join(folder, "item-implicit.npy"), result)
+               np.save(os.path.join(folder, "item-implicit.npy"), infer)
 
 
             model.train = True
