@@ -44,9 +44,9 @@ class Translation:
             x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = fully_connected(x_, encode_dim[i], self.active_function,scope="enc_%d"%i,
+                x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                # x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
                 en_out.append(x_)
         return x_, en_out
 
@@ -56,9 +56,9 @@ class Translation:
             x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)-1):
-                x_ = fully_connected(x_, decode_dim[i], self.active_function,scope="dec_%d" % i,
+                x_ = fully_connected(x_, decode_dim[i],scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
-                # x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
             x_ = fully_connected(x_, decode_dim[-1], scope="last_dec",
                                  weights_regularizer=self.regularizer)
             x_ = tf.nn.log_softmax(x_)
@@ -90,14 +90,14 @@ class Translation:
     def loss_reconstruct(self, x, x_recon):
         # log_softmax_var = tf.nn.log_softmax(x_recon)
         #
-        # neg_ll = -tf.reduce_mean(tf.reduce_sum(
-        #     x_recon * x,
-        #     axis=-1))
-        # return neg_ll
+        neg_ll = -tf.reduce_mean(tf.reduce_sum(
+            x_recon * x,
+            axis=-1))
+        return neg_ll
         # print(x.shape, x_recon.shape, log_softmax_var.shape)
         # return losses.categorical_hinge(x, x_recon)
 
-        return tf.reduce_mean(tf.abs(x - x_recon))
+        # return tf.reduce_mean(tf.abs(x - x_recon))
         # return losses.binary_crossentropy(x, x_recon)
 
     def build_model(self):
