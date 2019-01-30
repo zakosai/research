@@ -90,14 +90,15 @@ class Translation:
     def loss_reconstruct(self, x, x_recon):
         # log_softmax_var = tf.nn.log_softmax(x_recon)
         #
-        neg_ll = -tf.reduce_mean(tf.reduce_sum(
-            x_recon * x,
-            axis=-1))
-        return neg_ll
+        # neg_ll = -tf.reduce_mean(tf.reduce_sum(
+        #     x_recon * x,
+        #     axis=-1))
+        # return neg_ll
         # print(x.shape, x_recon.shape, log_softmax_var.shape)
         # return losses.categorical_hinge(x, log_softmax_var)
 
         # return tf.reduce_mean(tf.abs(x - x_recon))
+        return losses.binary_crossentropy(x, x_recon)
 
     def build_model(self):
         self.x = tf.placeholder(tf.float32, [None, self.x_dim], name='input')
