@@ -9,7 +9,7 @@ import argparse
 import pandas as pd
 import pickle
 from scipy.sparse import load_npz
-
+from keras import losses
 
 class Translation:
     def __init__(self, batch_size, dim_x, dim, encode_dim, decode_dim, z_dim, eps=1e-10,
@@ -86,11 +86,12 @@ class Translation:
 
     def loss_reconstruct(self, x, x_recon):
         log_softmax_var = tf.nn.log_softmax(x_recon)
-
-        neg_ll = -tf.reduce_mean(tf.reduce_sum(
-            log_softmax_var * x,
-            axis=-1))
-        return neg_ll
+        #
+        # neg_ll = -tf.reduce_mean(tf.reduce_sum(
+        #     log_softmax_var * x,
+        #     axis=-1))
+        # return neg_ll
+        return losses.categorical_hinge(x, log_softmax_var)
 
         # return tf.reduce_mean(tf.abs(x - x_recon))
 
@@ -279,7 +280,7 @@ def main():
     #         test_tag_id.append(dataset['test'][i,1])
     #         test_tag_y.append(dataset['tag_test'][i])
 
-    model = Translation(batch_size, num_p, num_u, encoding_dim, decoding_dim, z_dim)
+    model = Translation(batch_size, 8000, num_u, encoding_dim, decoding_dim, z_dim)
     model.build_model()
 
     sess = tf.Session()
@@ -294,7 +295,7 @@ def main():
         for j in range(int(num_p/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             y = dataset['item_onehot'][list_idx]
-            x = dataset['user_onehot'][list_idx]
+            x =content[list_idx]
 
             feed = {model.x: x, model.y:y}
 
