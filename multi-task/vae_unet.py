@@ -258,11 +258,11 @@ def main():
 
     z_dim = 100
     max_item = max(np.sum(dataset['user_onehot'], axis=1))
-    x_dim = z_dim * max_item
+    x_dim =  num_u * max_item
     user_item = np.zeros((num_u,x_dim))
     for i in range(num_u):
         idx = np.where(dataset['user_onehot'][i] == 1)
-        u_c = content[idx]
+        u_c = dataset['item_onehot'][idx]
         u_c = u_c.flatten()
         user_item[i, :len(u_c)] = u_c
 
@@ -314,7 +314,7 @@ def main():
                 max_recall = recall_item
                 _, result = calc_recall(item_pred, dataset['user_item_test'].values(),
                                             [50, 100, 150, 200, 250, 300], "item")
-                saver.save(sess, os.path.join(args.ckpt, 'conVAE-model2'))
+                saver.save(sess, os.path.join(args.ckpt, 'conVAE-model_implicit'))
 
 
 
@@ -326,8 +326,8 @@ def main():
 
     print(max_recall)
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
-    f.write("Best recall ConVAE: %f\n" % max_recall)
-    np.save(os.path.join(args.ckpt, "result_convae2.npy"), result)
+    f.write("Best recall ConVAE implicit: %f\n" % max_recall)
+    np.save(os.path.join(args.ckpt, "result_convae_implicit.npy"), result)
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Tool",
