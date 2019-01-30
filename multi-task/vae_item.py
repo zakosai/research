@@ -253,7 +253,7 @@ def main():
     num_p = dataset['item_no']
     num_u = dataset['user_no']
     encoding_dim = [600, 200]
-    decoding_dim = [200, 600, dataset['tag_no']]
+    decoding_dim = [200, 600, dataset['user_no']]
 
     z_dim = 50
     test = dataset['tag_test']
