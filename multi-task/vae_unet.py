@@ -96,7 +96,7 @@ class Translation:
         #     log_softmax_var * x,
         #     axis=-1))
         # return neg_ll
-        return tf.losses.softmax_cross_entropy(x, x_recon)
+        return tf.losses.sigmoid_cross_entropy(x, x_recon)
         # print(x.shape, x_recon.shape, log_softmax_var.shape)
         # return losses.categorical_hinge(x, x_recon)
 
