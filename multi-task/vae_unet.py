@@ -13,7 +13,7 @@ from keras import losses
 
 class Translation:
     def __init__(self, batch_size, x_dim, y_dim, encode_dim, decode_dim, z_dim, eps=1e-10,
-                 lambda_0=10, lambda_1=1, lambda_2=100,
+                 lambda_0=10, lambda_1=0.1, lambda_2=100,
                  lambda_3=0.1,
                  lambda_4=100, learning_rate=1e-4):
         self.batch_size = batch_size
@@ -117,7 +117,7 @@ class Translation:
 
         # Loss VAE
         self.loss = self.lambda_2 * self.loss_reconstruct(self.y_label,x_recon) + \
-                    0.1 *tf.losses.get_regularization_loss() 
+                    0.1 *tf.losses.get_regularization_loss() + self.lambda_1 * loss_kl
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
