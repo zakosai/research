@@ -339,10 +339,10 @@ def main():
             item_pred = []
             for j in range(int(len_test / batch_size)+1):
                 idx = min(batch_size*(j+1), len_test)
-                x = user_item[dataset['user_item_test'].keys()][batch_size*j:idx]
-                y = dataset['user_onehot'][dataset['user_item_test'].keys()][batch_size*j:idx]
+                x_test = user_item[dataset['user_item_test'].keys()][batch_size*j:idx]
+                y_test = dataset['user_onehot'][dataset['user_item_test'].keys()][batch_size*j:idx]
                 pred = sess.run(model.x_recon,
-                                                  feed_dict={model.x:x, model.y:y})
+                                                  feed_dict={model.x:x_test, model.y:y_test})
                 if j == 0:
                     item_pred = pred
                 else:
