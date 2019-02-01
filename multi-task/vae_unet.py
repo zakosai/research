@@ -68,8 +68,8 @@ class Translation:
 
     def gen_z(self, h, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
-            z_mu = fully_connected(h, self.z_dim, scope="z_mu")
-            z_sigma = fully_connected(h, self.z_dim, scope="z_sigma")
+            z_mu = fully_connected(h, self.z_dim, scope="z_mu", weights_regularizer=self.regularizer)
+            z_sigma = fully_connected(h, self.z_dim, scope="z_sigma", weights_regularizer=self.regularizer)
             e = tf.random_normal(tf.shape(z_mu))
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
         return z, z_mu, z_sigma
@@ -116,7 +116,7 @@ class Translation:
 
         # Loss VAE
         self.loss = self.lambda_2 * self.loss_reconstruct(self.y_label,x_recon) + \
-                    0.1 *tf.losses.get_regularization_loss()
+                    0.1 *tf.losses.get_regularization_loss() + self.lambda_1 * loss_kl
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
