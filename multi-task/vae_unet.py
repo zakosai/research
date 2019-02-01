@@ -13,7 +13,7 @@ from keras import losses
 
 class Translation:
     def __init__(self, batch_size, x_dim, y_dim, encode_dim, decode_dim, z_dim, eps=1e-10,
-                 lambda_0=10, lambda_1=0.1, lambda_2=100,
+                 lambda_0=10, lambda_1=10, lambda_2=100,
                  lambda_3=0.1,
                  lambda_4=100, learning_rate=1e-4):
         self.batch_size = batch_size
