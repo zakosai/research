@@ -40,8 +40,8 @@ class Translation:
         x_ = x
         en_out = []
 
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.5)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
@@ -52,8 +52,8 @@ class Translation:
 
     def dec(self, x, scope, decode_dim,reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.5)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)-1):
                 x_ = fully_connected(x_, decode_dim[i],scope="dec_%d" % i,
@@ -253,10 +253,8 @@ def re(x, y, no=1, zdim=50):
     flag = 0
     for i in range(len(re_y)):
         no_item = len(np.where(idx[0]==i)[0])
-        try:
-            rd = np.random.randint(0, no_item, no)
-        except:
-            print(no_item, i, idx[0][flag:])
+        n = int(no_item*no/10)
+        rd = np.random.randint(0, no_item, n)
         rd = rd + flag
         re_y[i, idx[1][rd]] = 0
         for j in rd:
@@ -323,7 +321,7 @@ def main():
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             y_b = y[list_idx]
             x_b = x[list_idx]
-            re_x, re_y = re(x_b, y_b, 2, num_u)
+            re_x, re_y = re(x_b, y_b, 3, num_u)
 
             feed = {model.x: re_x, model.y:re_y, model.y_label:y_b}
 
