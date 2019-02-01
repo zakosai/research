@@ -274,7 +274,7 @@ def main():
     dataset = pickle.load(f)
     forder = args.data.split("/")[:-1]
     forder = "/".join(forder)
-    content = np.load(os.path.join(args.ckpt, "item.npy"))
+    content = np.load(os.path.join(args.ckpt, "text.npy"))
     # content = content['z']
     # content = load_npz(os.path.join(forder, "mult_nor.npz"))
     # content = content.toarray()
