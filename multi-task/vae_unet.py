@@ -98,7 +98,7 @@ class Translation:
         # return neg_ll
         # return tf.losses.sigmoid_cross_entropy(x, x_recon)
         # print(x.shape, x_recon.shape, log_softmax_var.shape)
-        return -losses.categorical_hinge(x, log_softmax_var)
+        return losses.categorical_hinge(x, log_softmax_var)
 
         # return tf.reduce_mean(tf.abs(x - x_recon))
         # return -losses.binary_crossentropy(x, log_softmax_var)
@@ -117,7 +117,7 @@ class Translation:
 
         # Loss VAE
         self.loss = self.lambda_2 * self.loss_reconstruct(self.y_label,x_recon) + \
-                    0.1 *tf.losses.get_regularization_loss() + self.lambda_1 * loss_kl
+                    0.1 *tf.losses.get_regularization_loss() 
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
