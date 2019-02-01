@@ -13,7 +13,7 @@ from keras import losses
 
 class Translation:
     def __init__(self, batch_size, x_dim, y_dim, encode_dim, decode_dim, z_dim, eps=1e-10,
-                 lambda_0=10, lambda_1=10, lambda_2=100,
+                 lambda_0=10, lambda_1=1, lambda_2=100,
                  lambda_3=0.1,
                  lambda_4=100, learning_rate=1e-4):
         self.batch_size = batch_size
@@ -87,7 +87,7 @@ class Translation:
         return y
 
     def loss_kl(self, mu, sigma):
-        return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
+        return -0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
     def loss_reconstruct(self, x, x_recon):
         log_softmax_var = tf.nn.log_softmax(x_recon)
