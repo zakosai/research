@@ -256,7 +256,7 @@ def re(x, y, no=1, zdim=50):
         try:
             rd = np.random.randint(0, no_item, no)
         except:
-            print(no_item, i, idx[1][flag:])
+            print(no_item, i, idx[0][flag:])
         rd = rd + flag
         re_y[i, idx[1][rd]] = 0
         for j in rd:
