@@ -258,9 +258,9 @@ def re(x, y, no=1, zdim=50):
         n = int(no_item*no/10)
         rd = np.random.randint(0, no_item, n)
         for j in rd:
-            re_x[i, j*zdim:(j+1)*zdim] = np.random.uniform(0, 0.1, size=zdim)
+            re_x[i, j*zdim:(j+1)*zdim] = np.random.uniform(0, 0.2, size=zdim)
         rd = rd + flag
-        re_y[i, idx[1][rd]] = np.random.uniform(0, 0.1, size=n)
+        re_y[i, idx[1][rd]] = np.random.uniform(0, 0.2, size=n)
         flag += no_item
     return re_x, re_y
 
