@@ -297,6 +297,10 @@ def main():
     #     u_c = np.multiply(dataset['user_onehot'][i], content.T)
     #     u_c = u_c.T.flatten()
     #     user_item[i] = u_c
+    l = [107, 178, 571, 928, 1151, 1187, 1209, 1447, 1562, 1878]
+    num_u_train = num_u - len(l)
+    y = dataset['user_onehot'][~l, :]
+    x = user_item[~l, :l]
 
 
 
@@ -312,15 +316,15 @@ def main():
     len_test = len(dataset['user_item_test'].keys())
 
     for i in range(1, iter):
-        shuffle_idx = np.random.permutation(num_u)
+        shuffle_idx = np.random.permutation(num_u_train)
         train_cost = 0
-        for j in range(int(num_u/batch_size)):
+        for j in range(int(num_u_train/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
-            y = dataset['user_onehot'][list_idx]
-            x = user_item[list_idx]
-            re_x, re_y = re(x, y, 2, num_u)
+            y_b = y[list_idx]
+            x_b = x[list_idx]
+            re_x, re_y = re(x_b, y_b, 2, num_u)
 
-            feed = {model.x: re_x, model.y:re_y, model.y_label:y}
+            feed = {model.x: re_x, model.y:re_y, model.y_label:y_b}
 
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
