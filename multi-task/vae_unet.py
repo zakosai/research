@@ -256,9 +256,9 @@ def re(x, y, no=1, zdim=50):
         n = int(no_item*no/10)
         rd = np.random.randint(0, no_item, n)
         for j in rd:
-            re_x[i, j*zdim:(j+1)*zdim] = np.random.uniform(size=zdim)
+            re_x[i, j*zdim:(j+1)*zdim] = np.random.uniform(0, 0.1, size=zdim)
         rd = rd + flag
-        re_y[i, idx[1][rd]] = np.random.uniform(size=n)
+        re_y[i, idx[1][rd]] = np.random.uniform(0, 0.1, size=n)
         flag += no_item
     return re_x, re_y
 
@@ -323,7 +323,7 @@ def main():
             x_b = x[list_idx]
             re_x, re_y = re(x_b, y_b, 3, num_u)
 
-            feed = {model.x: x_b, model.y:y_b, model.y_label:y_b}
+            feed = {model.x: re_x, model.y:re_y, model.y_label:y_b}
 
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
