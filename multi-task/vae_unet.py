@@ -274,10 +274,10 @@ def main():
     dataset = pickle.load(f)
     forder = args.data.split("/")[:-1]
     forder = "/".join(forder)
-    content = np.load(os.path.join(args.ckpt, "text.npy"))
+    # content = np.load(os.path.join(args.ckpt, "text.npy"))
     # content = content['z']
-    # content = load_npz(os.path.join(forder, "mult_nor.npz"))
-    # content = content.toarray()
+    content = load_npz(os.path.join(forder, "mult_nor.npz"))
+    content = content.toarray()
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
@@ -286,7 +286,7 @@ def main():
 
     z_dim = 50
     max_item = max(np.sum(dataset['user_onehot'], axis=1))
-    x_dim =  z_dim * max_item
+    x_dim =  8000 * max_item
     user_item = np.zeros((num_u,x_dim))
     for i in range(num_u):
         idx = np.where(dataset['user_onehot'][i] == 1)
@@ -324,7 +324,7 @@ def main():
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             y_b = y[list_idx]
             x_b = x[list_idx]
-            re_x, re_y = re(x_b, y_b, 3, z_dim)
+            re_x, re_y = re(x_b, y_b, 3, 8000)
 
             feed = {model.x: re_x, model.y:re_y, model.y_label:y_b}
 
