@@ -298,9 +298,10 @@ def main():
     #     u_c = u_c.T.flatten()
     #     user_item[i] = u_c
     l = [107, 178, 571, 928, 1151, 1187, 1209, 1447, 1562, 1878]
-    num_u_train = num_u - len(l)
-    y = dataset['user_onehot'][~l, :]
-    x = user_item[~l, :l]
+    l = list(set(range(num_u)) - set(l))
+    num_u_train = len(l)
+    y = dataset['user_onehot'][l, :]
+    x = user_item[l, :l]
 
 
 
