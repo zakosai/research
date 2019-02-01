@@ -253,7 +253,10 @@ def re(x, y, no=1, zdim=50):
     flag = 0
     for i in range(len(re_y)):
         no_item = len(np.where(idx[0]==i)[0])
-        rd = np.random.randint(0, no_item, no)
+        try:
+            rd = np.random.randint(0, no_item, no)
+        except:
+            print(no_item, i, idx[1][flag:])
         rd = rd + flag
         re_y[i, idx[1][rd]] = 0
         for j in rd:
