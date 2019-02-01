@@ -258,6 +258,7 @@ def re(x, y, no=1, zdim=50):
         re_y[i, idx[1][rd]] = 0
         for j in rd:
             re_x[i, j*zdim:(j+1)*zdim] = 0
+        flag += no_item
     return re_x, re_y
 
 
