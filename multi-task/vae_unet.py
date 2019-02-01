@@ -98,10 +98,10 @@ class Translation:
         # return neg_ll
         # return tf.losses.sigmoid_cross_entropy(x, x_recon)
         # print(x.shape, x_recon.shape, log_softmax_var.shape)
-        # return losses.categorical_hinge(x, x_recon)
+        return losses.categorical_hinge(x, log_softmax_var)
 
         # return tf.reduce_mean(tf.abs(x - x_recon))
-        return -losses.binary_crossentropy(x, log_softmax_var)
+        # return -losses.binary_crossentropy(x, log_softmax_var)
 
     def build_model(self):
         self.x = tf.placeholder(tf.float32, [None, self.x_dim], name='input')
