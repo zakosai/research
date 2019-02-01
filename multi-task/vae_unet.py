@@ -255,10 +255,10 @@ def re(x, y, no=1, zdim=50):
         no_item = len(np.where(idx[0]==i)[0])
         n = int(no_item*no/10)
         rd = np.random.randint(0, no_item, n)
-        rd = rd + flag
-        re_y[i, idx[1][rd]] = np.random.uniform(size=n)
         for j in rd:
             re_x[i, j*zdim:(j+1)*zdim] = np.random.uniform(size=zdim)
+        rd = rd + flag
+        re_y[i, idx[1][rd]] = np.random.uniform(size=n)
         flag += no_item
     return re_x, re_y
 
