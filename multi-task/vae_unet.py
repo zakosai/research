@@ -256,7 +256,7 @@ def re(x, y, no=1, zdim=50):
         rd = np.random.randint(0, no_item, no)
         rd = rd + flag
         re_y[i, idx[1][rd]] = 0
-        for j in idx:
+        for j in rd:
             re_x[i, j*zdim:(j+1)*zdim] = 0
     return re_x, re_y
 
