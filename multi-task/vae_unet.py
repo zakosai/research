@@ -301,7 +301,7 @@ def main():
     l = list(set(range(num_u)) - set(l))
     num_u_train = len(l)
     y = dataset['user_onehot'][l, :]
-    x = user_item[l, :l]
+    x = user_item[l, :]
 
 
 
