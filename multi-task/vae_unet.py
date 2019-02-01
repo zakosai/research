@@ -362,7 +362,7 @@ def main():
 
 
 
-        if i%100 == 0 and model.learning_rate > 1e-6:
+        if i%100 == 0:
             model.learning_rate /= 10
             print("decrease lr to %f"%model.learning_rate)
 
