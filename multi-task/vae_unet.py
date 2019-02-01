@@ -40,6 +40,8 @@ class Translation:
         x_ = x
         en_out = []
 
+        noise = tf.random_normal(x_.shape, stddev=0.1)
+        x_ = x_ + noise
         # if self.train:
         #     x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
