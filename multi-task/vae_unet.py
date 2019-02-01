@@ -44,8 +44,7 @@ class Translation:
         #     x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                if self.train:
-                    x_ = tf.nn.dropout(x_, 0.5)
+
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
                 x_ = tf.nn.leaky_relu(x_, alpha=0.5)
@@ -57,8 +56,7 @@ class Translation:
 
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
-                if self.train:
-                    x_ = tf.nn.dropout(x_, 0.5)
+
                 x_ = fully_connected(x_, decode_dim[i],scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
                 x_ = tf.nn.leaky_relu(x_, alpha=0.5)
@@ -323,7 +321,7 @@ def main():
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             y_b = y[list_idx]
             x_b = x[list_idx]
-            re_x, re_y = re(x_b, y_b, 3, num_u)
+            re_x, re_y = re(x_b, y_b, 1, num_u)
 
             feed = {model.x: re_x, model.y:re_y, model.y_label:y_b}
 
