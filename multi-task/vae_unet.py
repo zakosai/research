@@ -321,7 +321,7 @@ def main():
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             y_b = y[list_idx]
             x_b = x[list_idx]
-            re_x, re_y = re(x_b, y_b, 1, num_u)
+            re_x, re_y = re(x_b, y_b, 5, num_u)
 
             feed = {model.x: re_x, model.y:re_y, model.y_label:y_b}
 
