@@ -49,7 +49,7 @@ class Translation:
 
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                x_ = tf.nn.leaky_relu(x_, alpha=1)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
                 en_out.append(x_)
         return x_, en_out
 
@@ -61,7 +61,7 @@ class Translation:
 
                 x_ = fully_connected(x_, decode_dim[i],scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
-                x_ = tf.nn.leaky_relu(x_, alpha=1)
+                x_ = tf.nn.leaky_relu(x_, alpha=0.5)
             # x_ = fully_connected(x_, decode_dim[-1], scope="last_dec",
             #                      weights_regularizer=self.regularizer)
         return x_
@@ -274,10 +274,10 @@ def main():
     dataset = pickle.load(f)
     forder = args.data.split("/")[:-1]
     forder = "/".join(forder)
-    content = np.load(os.path.join(forder, "item-implicit.npy"))
+    # content = np.load(os.path.join(forder, "item-implicit.npy"))
     # content = content['z']
-    # content = load_npz(os.path.join(forder, "mult_nor.npz"))
-    # content = content.toarray()
+    content = load_npz(os.path.join(forder, "mult_nor.npz"))
+    content = content.toarray()
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
@@ -286,11 +286,11 @@ def main():
 
     z_dim = 50
     max_item = max(np.sum(dataset['user_onehot'], axis=1))
-    x_dim =  num_u * max_item
+    x_dim =  z_dim * max_item
     user_item = np.zeros((num_u,x_dim))
     for i in range(num_u):
         idx = np.where(dataset['user_onehot'][i] == 1)
-        u_c = dataset['item_onehot'][idx]
+        u_c = content[idx]
         u_c = u_c.flatten()
         user_item[i, :len(u_c)] = u_c
 
@@ -324,7 +324,7 @@ def main():
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             y_b = y[list_idx]
             x_b = x[list_idx]
-            re_x, re_y = re(x_b, y_b, 3, num_u)
+            re_x, re_y = re(x_b, y_b, 3, z_dim)
 
             feed = {model.x: re_x, model.y:re_y, model.y_label:y_b}
 
