@@ -103,6 +103,7 @@ class Translation:
     def build_model(self):
         self.x = tf.placeholder(tf.float32, [None, self.x_dim], name='input')
         self.y = tf.placeholder(tf.float32, [None, self.y_dim], name='label')
+        self.y_label = tf.placeholder(tf.float32, [None, self.y_dim], name='real_label')
 
 
         x = tf.concat([self.x, self.y], axis=1)
@@ -112,7 +113,7 @@ class Translation:
         self.x_recon = x_recon
 
         # Loss VAE
-        self.loss = self.lambda_2 * self.loss_reconstruct(self.y,x_recon) + \
+        self.loss = self.lambda_2 * self.loss_reconstruct(self.y_label,x_recon) + \
                     0.1 *tf.losses.get_regularization_loss() + self.lambda_1*loss_kl
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
@@ -245,6 +246,21 @@ def calc_rmse(pred, test):
     test = test[idx]
     return np.sqrt(np.mean((test-pred)**2))
 
+def re(x, y, no=1, zdim=50):
+    re_x = x.copy()
+    re_y = y.copy()
+    idx = np.where(y == 1)
+    flag = 0
+    for i in range(len(re_y)):
+        no_item = len(np.where(idx[0]==i)[0])
+        rd = np.random.randint(0, no_item, no)
+        rd = rd + flag
+        re_y[i, idx[1][rd]] = 0
+        for j in idx:
+            re_x[i, j*zdim:(j+1)*zdim] = 0
+    return re_x, re_y
+
+
 def main():
     iter = 1500
     batch_size= 500
@@ -265,11 +281,11 @@ def main():
 
     z_dim = 50
     max_item = max(np.sum(dataset['user_onehot'], axis=1))
-    x_dim =  50 * max_item
+    x_dim =  num_u * max_item
     user_item = np.zeros((num_u,x_dim))
     for i in range(num_u):
         idx = np.where(dataset['user_onehot'][i] == 1)
-        u_c = content[idx]
+        u_c = dataset['item_onehot'][idx]
         u_c = u_c.flatten()
         user_item[i, :len(u_c)] = u_c
 
@@ -298,8 +314,9 @@ def main():
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             y = dataset['user_onehot'][list_idx]
             x = user_item[list_idx]
+            re_x, re_y = re(x, y, 2, num_u)
 
-            feed = {model.x: x, model.y:y}
+            feed = {model.x: re_x, model.y:re_y, model.y_label:y}
 
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
@@ -329,8 +346,8 @@ def main():
                 max_recall = recall_item
                 _, result = calc_recall(item_pred, dataset['user_item_test'].values(),
                                             [50, 100, 150, 200, 250, 300], "item")
-                saver.save(sess, os.path.join(args.ckpt, 'conVAE-model'))
-                np.save(os.path.join(args.ckpt, "pred.npy"), item_pred)
+                saver.save(sess, os.path.join(args.ckpt, 'conVAE-model-implicit'))
+                np.save(os.path.join(args.ckpt, "pred_implicit.npy"), item_pred)
 
 
 
@@ -342,8 +359,8 @@ def main():
 
     print(max_recall)
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
-    f.write("Best recall ConVAE: %f\n" % max_recall)
-    np.save(os.path.join(args.ckpt, "result_convae.npy"), result)
+    f.write("Best recall ConVAE implicit: %f\n" % max_recall)
+    np.save(os.path.join(args.ckpt, "result_convae_implicit.npy"), result)
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Tool",
