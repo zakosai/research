@@ -90,12 +90,13 @@ class Translation:
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
     def loss_reconstruct(self, x, x_recon):
-        log_softmax_var = tf.nn.log_softmax(x_recon)
-        #
-        neg_ll = -tf.reduce_mean(tf.reduce_sum(
-            log_softmax_var * x,
-            axis=-1))
-        return neg_ll
+        # log_softmax_var = tf.nn.log_softmax(x_recon)
+        # #
+        # neg_ll = -tf.reduce_mean(tf.reduce_sum(
+        #     log_softmax_var * x,
+        #     axis=-1))
+        # return neg_ll
+        return tf.losses.softmax_cross_entropy(x, x_recon)
         # print(x.shape, x_recon.shape, log_softmax_var.shape)
         # return losses.categorical_hinge(x, x_recon)
 
