@@ -259,9 +259,9 @@ def re(x, y, no=1, zdim=50):
         n = int(no_item*no/10)
         rd = np.random.randint(0, no_item, n)
         for j in rd:
-            re_x[i, j*zdim:(j+1)*zdim] = np.random.uniform(0, 0.2, size=zdim)
+            re_x[i, j*zdim:(j+1)*zdim] = np.random.uniform(0.1, 0.2, size=zdim)
         rd = rd + flag
-        re_y[i, idx[1][rd]] = np.random.uniform(0, 0.2, size=n)
+        re_y[i, idx[1][rd]] = np.random.uniform(0.1, 0.2, size=n)
         flag += no_item
     return re_x, re_y
 
@@ -286,11 +286,11 @@ def main():
 
     z_dim = 50
     max_item = max(np.sum(dataset['user_onehot'], axis=1))
-    x_dim =  8000 * max_item
+    x_dim =  num_u * max_item
     user_item = np.zeros((num_u,x_dim))
     for i in range(num_u):
         idx = np.where(dataset['user_onehot'][i] == 1)
-        u_c = content[idx]
+        u_c = dataset['item_onehot'][idx]
         u_c = u_c.flatten()
         user_item[i, :len(u_c)] = u_c
 
@@ -324,7 +324,7 @@ def main():
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             y_b = y[list_idx]
             x_b = x[list_idx]
-            re_x, re_y = re(x_b, y_b, 3, 8000)
+            re_x, re_y = re(x_b, y_b, 3, num_u)
 
             feed = {model.x: re_x, model.y:re_y, model.y_label:y_b}
 
@@ -347,7 +347,7 @@ def main():
                 if j == 0:
                     item_pred = pred
                 else:
-                    item_pred = np.concatenate((item_pred, pred ), axis=0)
+                    item_pred = np.concatenate((item_pred, pred), axis=0)
 
             recall_item, _ = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
             model.train = True
