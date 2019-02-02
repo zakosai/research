@@ -13,7 +13,7 @@ from keras import losses
 
 class Translation:
     def __init__(self, batch_size, x_dim, y_dim, encode_dim, decode_dim, z_dim, eps=1e-10,
-                 lambda_0=10, lambda_1=0.1, lambda_2=100,
+                 lambda_0=10, lambda_1=1, lambda_2=100,
                  lambda_3=0.1,
                  lambda_4=100, learning_rate=1e-4):
         self.batch_size = batch_size
@@ -92,13 +92,13 @@ class Translation:
     def loss_reconstruct(self, x, x_recon):
         log_softmax_var = tf.nn.log_softmax(x_recon)
         # #
-        # neg_ll = -tf.reduce_mean(tf.reduce_sum(
-        #     log_softmax_var * x,
-        #     axis=-1))
-        # return neg_ll
+        neg_ll = -tf.reduce_mean(tf.reduce_sum(
+            log_softmax_var * x,
+            axis=-1))
+        return neg_ll
         # return tf.losses.sigmoid_cross_entropy(x, x_recon)
         # print(x.shape, x_recon.shape, log_softmax_var.shape)
-        return losses.categorical_hinge(x, log_softmax_var)
+        # return losses.categorical_hinge(x, log_softmax_var)
 
         # return tf.reduce_mean(tf.abs(x - x_recon))
         # return -losses.binary_crossentropy(x, log_softmax_var)
