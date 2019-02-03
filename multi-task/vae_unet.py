@@ -276,8 +276,8 @@ def main():
     forder = "/".join(forder)
     # content = np.load(os.path.join(args.ckpt, "text.npy"))
     # content = content['z']
-    content = load_npz(os.path.join(forder, "mult_nor.npz"))
-    content = content.toarray()
+    # content = load_npz(os.path.join(forder, "mult_nor.npz"))
+    # content = content.toarray()
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
