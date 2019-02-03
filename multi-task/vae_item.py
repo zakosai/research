@@ -73,7 +73,8 @@ class Translation:
         h, en_out = self.enc(x, "encode", dim)
         z, z_mu, z_sigma = self.gen_z(h, "VAE")
         loss_kl = self.loss_kl(z_mu, z_sigma)
-        h = tf.concat([z, self.y], axis=1)
+        # h = tf.concat([z, self.y], axis=1)
+        h = z
         y = self.dec(h, "decode", self.decode_dim)
         return y, loss_kl, z_mu
 
@@ -96,12 +97,12 @@ class Translation:
         # return tf.reduce_mean(tf.abs(x - x_recon))
 
     def build_model(self):
-        self.x = tf.placeholder(tf.float32, [None, self.dim_x], name='input')
+        # self.x = tf.placeholder(tf.float32, [None, self.dim_x], name='input')
         self.y = tf.placeholder(tf.float32, [None, self.dim], name='label')
 
 
-        x = tf.concat([self.x, self.y], axis=1)
-        # x = self.x
+        # x = tf.concat([self.x, self.y], axis=1)
+        x = self.y
         # VAE for domain A
         x_recon, loss_kl, z_mu = self.encode(x, self.encode_dim)
         self.x_recon = x_recon
@@ -249,8 +250,8 @@ def main():
     f.close()
     folder = args.data.split("/")[:-1]
     folder = "/".join(folder)
-    content = load_npz(os.path.join(folder, "mult_nor.npz"))
-    content = content.toarray()
+    # content = load_npz(os.path.join(folder, "mult_nor.npz"))
+    # content = content.toarray()
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
@@ -295,9 +296,9 @@ def main():
         for j in range(int(num_p/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             y = dataset['item_onehot'][list_idx]
-            x =content[list_idx]
+            # x =content[list_idx]
 
-            feed = {model.x: x, model.y:y}
+            feed = { model.y:y}
 
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
@@ -312,11 +313,11 @@ def main():
             z = []
             for j in range(int(num_p / batch_size)+1):
                 idx = min(batch_size*(j+1), num_p)
-                x = content[batch_size*j:idx]
+                # x = content[batch_size*j:idx]
                 # y = dataset['item_tag']
                 y = dataset['item_onehot'][batch_size*j:idx]
                 item_b, z_b = sess.run([model.x_recon,model.z],
-                                                  feed_dict={model.x:x, model.y:y})
+                                                  feed_dict={model.y:y})
                 if j == 0:
                     item = item_b
                     z = z_b
