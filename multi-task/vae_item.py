@@ -97,12 +97,12 @@ class Translation:
         # return tf.reduce_mean(tf.abs(x - x_recon))
 
     def build_model(self):
-        # self.x = tf.placeholder(tf.float32, [None, self.dim_x], name='input')
+        self.x = tf.placeholder(tf.float32, [None, self.dim], name='input')
         self.y = tf.placeholder(tf.float32, [None, self.dim], name='label')
 
 
-        # x = tf.concat([self.x, self.y], axis=1)
-        x = self.y
+        x = tf.concat([self.x, self.y], axis=1)
+        # x = self.y
         # VAE for domain A
         x_recon, loss_kl, z_mu = self.encode(x, self.encode_dim)
         self.x_recon = x_recon
@@ -298,7 +298,7 @@ def main():
             y = dataset['item_onehot'][list_idx]
             # x =content[list_idx]
 
-            feed = { model.y:y}
+            feed = { model.x:y, model.y:y}
 
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
@@ -317,7 +317,7 @@ def main():
                 # y = dataset['item_tag']
                 y = dataset['item_onehot'][batch_size*j:idx]
                 item_b, z_b = sess.run([model.x_recon,model.z],
-                                                  feed_dict={model.y:y})
+                                                  feed_dict={model.x:y, model.y:y})
                 if j == 0:
                     item = item_b
                     z = z_b
@@ -348,7 +348,7 @@ def main():
 
     print(max_recall)
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
-    f.write("Best recall vae-item -implicit: %f\n" % max_recall)
+    f.write("Best recall vae-item-implicit: %f\n" % max_recall)
     # np.save(os.path.join(folder, "item-implicit.npy"), result)
 
 parser = argparse.ArgumentParser(description='Process some integers.')
