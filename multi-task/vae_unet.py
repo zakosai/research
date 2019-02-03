@@ -337,12 +337,12 @@ def main():
             y_b = dataset['user_onehot'][list_idx]
             x_b = user_item[list_idx]
             # re_x, re_y = re(x_b, y_b, 3, num_u)
-            # user_item = np.zeros((batch_size, max_item, num_u))
-            # for i in range(batch_size):
-            #     idx = np.where(dataset['user_onehot'][list_idx[i]] == 1)[0]
-            #     u_c = dataset['item_onehot'][idx]
-            #     user_item[i, :(len(idx)), :] = u_c
-            # x_b = user_item
+            user_item = np.zeros((batch_size, max_item, num_u))
+            for i in range(batch_size):
+                idx = np.where(dataset['user_onehot'][list_idx[i]] == 1)[0]
+                u_c = dataset['item_onehot'][idx]
+                user_item[i, :(len(idx)), :] = u_c
+            x_b = user_item
             feed = {model.x: x_b, model.y:y_b, model.y_label:y_b}
 
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
@@ -357,8 +357,14 @@ def main():
             item_pred = []
             for j in range(int(len_test / batch_size)+1):
                 idx = min(batch_size*(j+1), len_test)
-                x_test = user_item[dataset['user_item_test'].keys()][batch_size*j:idx]
+                # x_test = user_item[dataset['user_item_test'].keys()][batch_size*j:idx]
                 y_test = dataset['user_onehot'][dataset['user_item_test'].keys()][batch_size*j:idx]
+                user_item = np.zeros((idx - batch_size*j, max_item, num_u))
+                for i in range(batch_size*j, idx):
+                    idx = np.where(dataset['user_onehot'][dataset['user_item_test'].keys()[i]] == 1)[0]
+                    u_c = dataset['item_onehot'][idx]
+                    user_item[i, :(len(idx)), :] = u_c
+                x_test = user_item
                 pred = sess.run(model.x_recon,
                                                   feed_dict={model.x:x_test, model.y:y_test})
                 if j == 0:
