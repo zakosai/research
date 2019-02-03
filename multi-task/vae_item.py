@@ -259,7 +259,7 @@ def main():
     decoding_dim = [200, 600, num_u]
 
     z_dim = 50
-    test = dataset['tag_test']
+    # test = dataset['tag_test']
 
     # user_item = np.zeros((num_u, 2350))
     # for i in range(num_u):
