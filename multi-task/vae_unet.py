@@ -46,7 +46,7 @@ class Translation:
         # if self.train:
         #     x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
-            filter = tf.zeros(([1, self.num_u, 50]))
+            filter = tf.get_variable("v", [1, self.num_u, 50], regularizer=self.regularizer, trainable=True)
             x_ = tf.nn.conv1d(x_, filter, stride=1, padding="VALID", use_cudnn_on_gpu=True)
             x_ = tf.nn.leaky_relu(x_, alpha=0.5)
             print(x_.shape)
