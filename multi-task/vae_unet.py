@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.contrib.layers import fully_connected, flatten, batch_norm
+from tensorflow.contrib.layers import fully_connected, flatten, batch_norm, conv1d
 import tensorflow.keras.backend as K
 from tensorflow.contrib.framework import argsort
 import numpy as np
@@ -45,6 +45,8 @@ class Translation:
         # if self.train:
         #     x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
+            x_ = conv1d(x_, 1, kernel_size=(1, self.y_dim))
+            x_ = tf.concat([x_, self.y], axis=1)
             for i in range(len(encode_dim)):
 
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
@@ -104,13 +106,13 @@ class Translation:
         # return -losses.binary_crossentropy(x, log_softmax_var)
 
     def build_model(self):
-        self.x = tf.placeholder(tf.float32, [None, self.x_dim], name='input')
+        self.x = tf.placeholder(tf.float32, [None, self.x_dim, self.y_dim], name='input')
         self.y = tf.placeholder(tf.float32, [None, self.y_dim], name='label')
         self.y_label = tf.placeholder(tf.float32, [None, self.y_dim], name='real_label')
 
 
-        x = tf.concat([self.x, self.y], axis=1)
-        # x = self.x
+        # x = tf.concat([self.x, self.y], axis=1)
+        x = self.x
         # VAE for domain A
         x_recon, loss_kl = self.encode(x, self.encode_dim)
         self.x_recon = x_recon
@@ -286,13 +288,18 @@ def main():
 
     z_dim = 50
     max_item = max(np.sum(dataset['user_onehot'], axis=1))
-    x_dim =  num_u * max_item
-    user_item = np.zeros((num_u,x_dim))
+    # x_dim =  num_u * max_item
+    # user_item = np.zeros((num_u,x_dim))
+    # for i in range(num_u):
+    #     idx = np.where(dataset['user_onehot'][i] == 1)
+    #     u_c = dataset['item_onehot'][idx]
+    #     u_c = u_c.flatten()
+    #     user_item[i, :len(u_c)] = u_c
+    user_item = np.zeros((num_u, max_item, num_u))
     for i in range(num_u):
         idx = np.where(dataset['user_onehot'][i] == 1)
         u_c = dataset['item_onehot'][idx]
-        u_c = u_c.flatten()
-        user_item[i, :len(u_c)] = u_c
+        user_item[i, :(len(idx)), :] = u_c
 
     # for i in range(num_u):
     #     u_c = np.multiply(dataset['user_onehot'][i], content.T)
@@ -308,7 +315,7 @@ def main():
 
 
 
-    model = Translation(batch_size, x_dim, num_p, encoding_dim, decoding_dim, z_dim)
+    model = Translation(batch_size, max_item, num_p, encoding_dim, decoding_dim, z_dim)
     model.build_model()
 
     sess = tf.Session()
