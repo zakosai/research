@@ -49,6 +49,7 @@ class Translation:
             x_ = tf.nn.conv1d(x_, filter, stride=1, padding="VALID")
             x_ = tf.nn.leaky_relu(x_, alpha=0.5)
             print(x_.shape)
+            x_ = tf.reshape(x_, [-1, self.x_dim])
             x_ = tf.concat([x_, self.y], axis=1)
             for i in range(len(encode_dim)):
 
