@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.contrib.layers import fully_connected, flatten, batch_norm, conv1d
+from tensorflow.contrib.layers import fully_connected, flatten, batch_norm, conv
 import tensorflow.keras.backend as K
 from tensorflow.contrib.framework import argsort
 import numpy as np
@@ -45,7 +45,9 @@ class Translation:
         # if self.train:
         #     x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
-            x_ = conv1d(x_, 1, kernel_size=(1, self.y_dim))
+            x_ = tf.nn.conv1d(x_, 1, stride=1, padding='SAME')
+            x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+            print(x_.shape)
             x_ = tf.concat([x_, self.y], axis=1)
             for i in range(len(encode_dim)):
 
