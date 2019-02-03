@@ -321,7 +321,7 @@ def main():
 
 
 
-    model = Translation(batch_size, max_item, num_p, num_u, encoding_dim, decoding_dim, z_dim)
+    model = Translation(batch_size, x_dim, num_p, num_u, encoding_dim, decoding_dim, z_dim)
     model.build_model()
 
     sess = tf.Session()
