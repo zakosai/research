@@ -98,7 +98,7 @@ class Translation:
         return neg_ll
         # return tf.losses.sigmoid_cross_entropy(x, x_recon)
         # print(x.shape, x_recon.shape, log_softmax_var.shape)
-        return losses.kullback_leibler_divergence(x, log_softmax_var)
+        # return losses.kullback_leibler_divergence(x, log_softmax_var)
 
         # return tf.reduce_mean(tf.abs(x - x_recon))
         # return -losses.binary_crossentropy(x, log_softmax_var)
@@ -298,11 +298,11 @@ def main():
     #     u_c = np.multiply(dataset['user_onehot'][i], content.T)
     #     u_c = u_c.T.flatten()
     #     user_item[i] = u_c
-    l = [107, 178, 571, 928, 1151, 1187, 1209, 1447, 1562, 1878]
-    l = list(set(range(num_u)) - set(l))
-    num_u_train = len(l)
-    y = dataset['user_onehot'][l, :]
-    x = user_item[l, :]
+    # l = [107, 178, 571, 928, 1151, 1187, 1209, 1447, 1562, 1878]
+    # l = list(set(range(num_u)) - set(l))
+    # num_u_train = len(l)
+    # y = dataset['user_onehot'][l, :]
+    # x = user_item[l, :]
 
 
 
@@ -318,13 +318,13 @@ def main():
     len_test = len(dataset['user_item_test'].keys())
 
     for i in range(1, iter):
-        shuffle_idx = np.random.permutation(num_u_train)
+        shuffle_idx = np.random.permutation(num_u)
         train_cost = 0
-        for j in range(int(num_u_train/batch_size)):
+        for j in range(int(num_u/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
-            y_b = y[list_idx]
-            x_b = x[list_idx]
-            re_x, re_y = re(x_b, y_b, 3, num_u)
+            y_b = dataset['user_onehot'][list_idx]
+            x_b = user_item[list_idx]
+            # re_x, re_y = re(x_b, y_b, 3, num_u)
 
             feed = {model.x: x_b, model.y:y_b, model.y_label:y_b}
 
