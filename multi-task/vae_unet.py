@@ -299,7 +299,7 @@ def main():
     #     user_item[i, :len(u_c)] = u_c
     user_item = np.zeros((num_u, max_item, num_u))
     for i in range(num_u):
-        idx = np.where(dataset['user_onehot'][i] == 1)
+        idx = np.where(dataset['user_onehot'][i] == 1)[0]
         u_c = dataset['item_onehot'][idx]
         user_item[i, :(len(idx)), :] = u_c
 
