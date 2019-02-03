@@ -46,7 +46,7 @@ class Translation:
         #     x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             filter = tf.zeros(([1, self.y_dim, 1]))
-            x_ = tf.nn.conv1d(x_, filter, stride=1)
+            x_ = tf.nn.conv1d(x_, filter, stride=1, padding="VALID")
             x_ = tf.nn.leaky_relu(x_, alpha=0.5)
             print(x_.shape)
             x_ = tf.concat([x_, self.y], axis=1)
