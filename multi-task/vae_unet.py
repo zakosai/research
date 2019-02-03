@@ -12,13 +12,14 @@ from keras import losses
 
 
 class Translation:
-    def __init__(self, batch_size, x_dim, y_dim, encode_dim, decode_dim, z_dim, eps=1e-10,
+    def __init__(self, batch_size, x_dim, y_dim, num_u,  encode_dim, decode_dim, z_dim, eps=1e-10,
                  lambda_0=10, lambda_1=0.1, lambda_2=100,
                  lambda_3=0.1,
                  lambda_4=100, learning_rate=1e-4):
         self.batch_size = batch_size
         self.x_dim = x_dim
         self.y_dim = y_dim
+        self.num_u = num_u
         self.encode_dim = encode_dim
         self.decode_dim = decode_dim
         self.z_dim = z_dim
@@ -45,7 +46,7 @@ class Translation:
         # if self.train:
         #     x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
-            filter = tf.zeros(([1, self.y_dim, 1]))
+            filter = tf.zeros(([1, self.num_u, 1]))
             x_ = tf.nn.conv1d(x_, filter, stride=1, padding="VALID")
             x_ = tf.nn.leaky_relu(x_, alpha=0.5)
             print(x_.shape)
@@ -110,7 +111,7 @@ class Translation:
         # return -losses.binary_crossentropy(x, log_softmax_var)
 
     def build_model(self):
-        self.x = tf.placeholder(tf.float32, [None, self.x_dim, self.y_dim], name='input')
+        self.x = tf.placeholder(tf.float32, [None, self.x_dim, self.num_u], name='input')
         self.y = tf.placeholder(tf.float32, [None, self.y_dim], name='label')
         self.y_label = tf.placeholder(tf.float32, [None, self.y_dim], name='real_label')
 
@@ -319,7 +320,7 @@ def main():
 
 
 
-    model = Translation(batch_size, max_item, num_p, encoding_dim, decoding_dim, z_dim)
+    model = Translation(batch_size, max_item, num_p, num_u, encoding_dim, decoding_dim, z_dim)
     model.build_model()
 
     sess = tf.Session()
