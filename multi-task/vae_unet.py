@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.contrib.layers import fully_connected, flatten, batch_norm, conv
+from tensorflow.contrib.layers import fully_connected, flatten, batch_norm
 import tensorflow.keras.backend as K
 from tensorflow.contrib.framework import argsort
 import numpy as np
