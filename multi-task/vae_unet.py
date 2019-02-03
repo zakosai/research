@@ -335,7 +335,7 @@ def main():
         for j in range(int(num_u/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             y_b = dataset['user_onehot'][list_idx]
-            x_b = user_item[list_idx]
+            # x_b = user_item[list_idx]
             # re_x, re_y = re(x_b, y_b, 3, num_u)
             user_item = np.zeros((batch_size, max_item, num_u))
             for i in range(batch_size):
