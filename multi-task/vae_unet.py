@@ -46,12 +46,12 @@ class Translation:
         # if self.train:
         #     x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
-            filter = tf.get_variable("v", [1, self.num_u, 50], regularizer=self.regularizer, trainable=True)
-            x_ = tf.nn.conv1d(x_, filter, stride=1, padding="VALID", use_cudnn_on_gpu=True)
-            x_ = tf.nn.leaky_relu(x_, alpha=0.5)
-            print(x_.shape)
-            x_ = tf.reshape(x_, [-1, self.x_dim*50])
-            x_ = tf.concat([x_, self.y], axis=1)
+            # filter = tf.get_variable("v", [1, self.num_u, 50], regularizer=self.regularizer, trainable=True)
+            # x_ = tf.nn.conv1d(x_, filter, stride=1, padding="VALID", use_cudnn_on_gpu=True)
+            # x_ = tf.nn.leaky_relu(x_, alpha=0.5)
+            # print(x_.shape)
+            # x_ = tf.reshape(x_, [-1, self.x_dim*50])
+            # x_ = tf.concat([x_, self.y], axis=1)
             for i in range(len(encode_dim)):
 
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
@@ -111,13 +111,13 @@ class Translation:
         # return -losses.binary_crossentropy(x, log_softmax_var)
 
     def build_model(self):
-        self.x = tf.placeholder(tf.float32, [None, self.x_dim, self.num_u], name='input')
+        self.x = tf.placeholder(tf.float32, [None, self.x_dim], name='input')
         self.y = tf.placeholder(tf.float32, [None, self.y_dim], name='label')
         self.y_label = tf.placeholder(tf.float32, [None, self.y_dim], name='real_label')
 
 
-        # x = tf.concat([self.x, self.y], axis=1)
-        x = self.x
+        x = tf.concat([self.x, self.y], axis=1)
+        # x = self.x
         # VAE for domain A
         x_recon, loss_kl = self.encode(x, self.encode_dim)
         self.x_recon = x_recon
@@ -281,7 +281,7 @@ def main():
     dataset = pickle.load(f)
     forder = args.data.split("/")[:-1]
     forder = "/".join(forder)
-    # content = np.load(os.path.join(args.ckpt, "text.npy"))
+    content = np.load(os.path.join(args.ckpt, "text.npy"))
     # content = content['z']
     # content = load_npz(os.path.join(forder, "mult_nor.npz"))
     # content = content.toarray()
@@ -293,13 +293,13 @@ def main():
 
     z_dim = 50
     max_item = max(np.sum(dataset['user_onehot'], axis=1))
-    # x_dim =  num_u * max_item
-    # user_item = np.zeros((num_u,x_dim))
-    # for i in range(num_u):
-    #     idx = np.where(dataset['user_onehot'][i] == 1)
-    #     u_c = dataset['item_onehot'][idx]
-    #     u_c = u_c.flatten()
-    #     user_item[i, :len(u_c)] = u_c
+    x_dim =  num_u * max_item
+    user_item = np.zeros((num_u,x_dim))
+    for i in range(num_u):
+        idx = np.where(dataset['user_onehot'][i] == 1)
+        u_c = dataset['item_onehot'][idx]
+        u_c = u_c.flatten()
+        user_item[i, :len(u_c)] = u_c
     # user_item = np.zeros((num_u, max_item, num_u))
     # for i in range(num_u):
     #     idx = np.where(dataset['user_onehot'][i] == 1)[0]
@@ -335,14 +335,14 @@ def main():
         for j in range(int(num_u/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             y_b = dataset['user_onehot'][list_idx]
-            # x_b = user_item[list_idx]
+            x_b = user_item[list_idx]
             # re_x, re_y = re(x_b, y_b, 3, num_u)
-            user_item = np.zeros((batch_size, max_item, num_u))
-            for i in range(batch_size):
-                idx = np.where(dataset['user_onehot'][list_idx[i]] == 1)[0]
-                u_c = dataset['item_onehot'][idx]
-                user_item[i, :(len(idx)), :] = u_c
-            x_b = user_item
+            # user_item = np.zeros((batch_size, max_item, num_u))
+            # for i in range(batch_size):
+            #     idx = np.where(dataset['user_onehot'][list_idx[i]] == 1)[0]
+            #     u_c = dataset['item_onehot'][idx]
+            #     user_item[i, :(len(idx)), :] = u_c
+            # x_b = user_item
             feed = {model.x: x_b, model.y:y_b, model.y_label:y_b}
 
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
@@ -357,14 +357,14 @@ def main():
             item_pred = []
             for j in range(int(len_test / batch_size)+1):
                 idx = min(batch_size*(j+1), len_test)
-                # x_test = user_item[dataset['user_item_test'].keys()][batch_size*j:idx]
+                x_test = user_item[dataset['user_item_test'].keys()][batch_size*j:idx]
                 y_test = dataset['user_onehot'][dataset['user_item_test'].keys()][batch_size*j:idx]
-                user_item = np.zeros((idx - batch_size*j, max_item, num_u))
-                for i in range(batch_size*j, idx):
-                    idx = np.where(dataset['user_onehot'][dataset['user_item_test'].keys()[i]] == 1)[0]
-                    u_c = dataset['item_onehot'][idx]
-                    user_item[i, :(len(idx)), :] = u_c
-                x_test = user_item
+                # user_item = np.zeros((idx - batch_size*j, max_item, num_u))
+                # for i in range(batch_size*j, idx):
+                #     idx = np.where(dataset['user_onehot'][dataset['user_item_test'].keys()[i]] == 1)[0]
+                #     u_c = dataset['item_onehot'][idx]
+                #     user_item[i, :(len(idx)), :] = u_c
+                # x_test = user_item
                 pred = sess.run(model.x_recon,
                                                   feed_dict={model.x:x_test, model.y:y_test})
                 if j == 0:
