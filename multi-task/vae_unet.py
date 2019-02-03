@@ -117,7 +117,7 @@ class Translation:
 
         # Loss VAE
         self.loss = self.lambda_2 * self.loss_reconstruct(self.y_label,x_recon) + \
-                    0.1 *tf.losses.get_regularization_loss()
+                    tf.losses.get_regularization_loss() + self.lambda_1*loss_kl
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
