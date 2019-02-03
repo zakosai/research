@@ -335,9 +335,14 @@ def main():
         for j in range(int(num_u/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             y_b = dataset['user_onehot'][list_idx]
-            x_b = user_item[list_idx]
+            # x_b = user_item[list_idx]
             # re_x, re_y = re(x_b, y_b, 3, num_u)
-
+            user_item = np.zeros((batch_size, max_item, num_u))
+            for i in range(batch_size):
+                idx = np.where(dataset['user_onehot'][list_idx[i]] == 1)[0]
+                u_c = dataset['item_onehot'][idx]
+                user_item[i, :(len(idx)), :] = u_c
+            x_b = user_item
             feed = {model.x: x_b, model.y:y_b, model.y_label:y_b}
 
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
