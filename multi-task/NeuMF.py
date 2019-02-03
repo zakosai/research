@@ -178,7 +178,7 @@ def calc_recall(pred, test, m=[100], type=None):
         result['ndcg@%d'%k] = np.mean(ndcg)
 
 
-    return np.mean(np.array(recall)), result
+    return np.mean(np.array(recall)), result, np.mean(ndcg)
 
 def dcg_score(y_true, y_score, k=50):
     """Discounted cumulative gain (DCG) at rank K.
@@ -263,6 +263,7 @@ if __name__ == '__main__':
     # if args.out > 0:
     #     model.save_weights(model_out_file, overwrite=True)
     max_recall = -1
+    max_ndcg = 0
     # Training model
     for epoch in range(1, num_epochs):
         t1 = time()
@@ -284,15 +285,13 @@ if __name__ == '__main__':
                 predict = model.predict([np.array(user), np.array(item)], batch_size=1000, verbose=0)
                 predict = [item for sublist in predict for item in sublist]
                 pred.append(predict)
-            recall, _ = calc_recall(np.array(pred), dataset['user_item_test'].values(), [50])
+            recall, _, ndcg = calc_recall(np.array(pred), dataset['user_item_test'].values(), [50])
             if recall > max_recall:
                 max_recall = recall
-                if max_recall < 0.1:
-                    _, result = calc_recall(np.array(pred), dataset['user_item_test'].values(), [50, 100, 150, 200,
+                max_ndcg = ndcg
+                _, result, _ = calc_recall(np.array(pred), dataset['user_item_test'].values(), [50, 100, 150, 200,
                                                                                                  250, 300])
-                else:
-                    _, result = calc_recall(np.array(pred), dataset['user_item_test'].values(), [10, 20, 30, 40, 50,
-                                                                                                 60])
+
                 if args.out > 0:
                     model.save_weights(model_out_file, overwrite=True)
 
@@ -301,8 +300,8 @@ if __name__ == '__main__':
         print("The best NeuMF model is saved to %s" %(model_out_file))
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
     if mf_pretrain != '':
-        f.write("Best recall NeuMF pretrained: %f\n" % max_recall)
+        f.write("Best recall NeuMF pretrained: %f, %f\n" % (max_recall, ndcg))
         np.save(os.path.join(args.ckpt, "result_NeuMF_pretrained.npy"), result)
     else:
-        f.write("Best recall NeuMF: %f\n" % max_recall)
+        f.write("Best recall NeuMF: %f, %f\n" % (max_recall, max_ndcg))
         np.save(os.path.join(args.ckpt, "result_NeuMF.npy"), result)

@@ -40,7 +40,7 @@ def calc_recall(pred, test, m=[100], type=None):
         result['ndcg@%d'%k] = np.mean(ndcg)
 
 
-    return np.mean(np.array(recall)), result
+    return np.mean(np.array(recall)), result, np.mean(ndcg)
 
 def dcg_score(y_true, y_score, k=50):
     """Discounted cumulative gain (DCG) at rank K.
@@ -100,15 +100,10 @@ def main():
         predict = fm.predict(X_test)
         y_pred.append(predict)
 
-    recall, _ = calc_recall(np.array(y_pred), dataset['user_item_test'].values(), [50])
-    print(recall)
-    if recall < 0.1:
-        _, result = calc_recall(np.array(y_pred), dataset['user_item_test'].values(), [50, 100, 150, 200, 250, 300])
-    else:
-        _, result = calc_recall(np.array(y_pred), dataset['user_item_test'].values(), [10, 20, 30, 40, 50, 60])
+    recall, result, ndcg = calc_recall(np.array(y_pred), dataset['user_item_test'].values(), [50])
 
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
-    f.write("Best recall FM: %f\n" % recall)
+    f.write("Best recall FM: %f, %f\n" % (recall, ndcg))
     np.save(os.path.join(args.ckpt, "result_FM.npy"), result)
 
 
