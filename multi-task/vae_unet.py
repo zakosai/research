@@ -194,14 +194,14 @@ def create_dataset_lastfm():
 def calc_recall(pred, test, train,m=[100], type=None):
     result = {}
     for k in m:
-        pred_ab = np.argsort(-pred)
+        pred_ab = np.argsort(-pred)[:,:]
         recall = []
         ndcg = []
         map = []
         precision = []
         for i in range(len(pred_ab)):
             train_item = np.where(train[i] == 1)[0]
-            p = list(set(pred[i]) - set(train_item))
+            p = list(set(pred_ab[i]) - set(train_item))
             p = np.array(p[:k])
             if len(test[i]) != 0:
                 hits = set(test[i]) & set(p)
