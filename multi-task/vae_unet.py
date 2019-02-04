@@ -282,7 +282,7 @@ def main():
     dataset = pickle.load(f)
     forder = args.data.split("/")[:-1]
     forder = "/".join(forder)
-    content = np.load(os.path.join(forder, "item-implicit.npy"))
+    # content = np.load(os.path.join(forder, "item-implicit.npy"))
     # content = content['z']
     # content = load_npz(os.path.join(forder, "mult_nor.npz"))
     # content = content.toarray()
