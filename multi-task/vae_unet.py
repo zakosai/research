@@ -298,7 +298,8 @@ def main():
     user_item = np.zeros((num_u,num_u))
     for i in range(num_u):
         idx = np.where(dataset['user_onehot'][i] == 1)[0]
-        u_c = np.sum(dataset['item_onehot'][idx], axis=0)
+        u_c = np.sum(dataset['item_onehot'][idx], axis=0).astype(np.float32)
+        u_c = u_c/len(idx)
         # u_c = u_c.flatten()
         user_item[i] = u_c
     # user_item = np.zeros((num_u, max_item, num_u))
