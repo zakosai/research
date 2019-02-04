@@ -197,6 +197,8 @@ def calc_recall(pred, test, m=[100], type=None):
         pred_ab = np.argsort(-pred)[:, :k]
         recall = []
         ndcg = []
+        map = []
+        precision = []
         for i in range(len(pred_ab)):
             p = pred_ab[i]
             if len(test[i]) != 0:
@@ -205,6 +207,16 @@ def calc_recall(pred, test, m=[100], type=None):
                 #recall
                 recall_val = float(len(hits)) / len(test[i])
                 recall.append(recall_val)
+                precision.append(float(len(hits)) / k)
+
+                # map
+                ap = 0
+                num_hit = 0
+                for j in range(0, k):
+                    if p[j] in test[i]:
+                        num_hit += 1
+                        ap += float(num_hit)/(k+1)
+                map.append(float(ap)/min(k, len(test[i])))
 
                 #ncdg
                 score = []
@@ -220,7 +232,8 @@ def calc_recall(pred, test, m=[100], type=None):
                 else:
                     ndcg.append(float(actual) / best)
 
-        print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
+        print("k= %d, recall %s: %f, ndcg: %f, precision: %f, mAp: %f"%(k, type, np.mean(recall), np.mean(ndcg),
+                                                                        np.mean(precision), np.mean(map)))
         result['recall@%d'%k] = np.mean(recall)
         result['ndcg@%d'%k] = np.mean(ndcg)
 
@@ -379,8 +392,9 @@ def main():
 
             if recall_item > max_recall:
                 max_recall = recall_item
-                _, result = calc_recall(item_pred, dataset['user_item_test'].values(),
-                                            [50, 100, 150, 200, 250, 300], "item")
+                print("max")
+                # _, result = calc_recall(item_pred, dataset['user_item_test'].values(),
+                #                             [50, 100, 150, 200, 250, 300], "item")
                 saver.save(sess, os.path.join(args.ckpt, 'conVAE-model-implicit'))
                 np.save(os.path.join(args.ckpt, "pred_implicit.npy"), item_pred)
 
@@ -395,7 +409,7 @@ def main():
     print(max_recall)
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
     f.write("Best recall ConVAE implicit: %f\n" % max_recall)
-    np.save(os.path.join(args.ckpt, "result_convae_implicit.npy"), result)
+    # np.save(os.path.join(args.ckpt, "result_convae_implicit.npy"), result)
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Tool",
