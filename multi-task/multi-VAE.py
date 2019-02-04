@@ -292,8 +292,7 @@ def main():
             if recall_item > max_recall:
                 max_recall = recall_item
                 max_ndcg = ndcg
-                _, result, _ = calc_recall(item_pred, dataset['user_item_test'].values(),
-                                        [50, 100, 150, 200, 250, 300], "item")
+                print("abc")
                 saver.save(sess, os.path.join(args.ckpt, 'multi-VAE'))
                 np.save(os.path.join(args.ckpt, "multi-pred.npy"), item_pred)
         model.train = True
@@ -305,7 +304,7 @@ def main():
     print(max_recall)
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
     f.write("Best recall Multi-VAE: %f, %f\n"%(max_recall, max_ndcg))
-    np.save(os.path.join(args.ckpt, "result_multi-vae.npy"), result)
+    # np.save(os.path.join(args.ckpt, "result_multi-vae.npy"), result)
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Tool",
