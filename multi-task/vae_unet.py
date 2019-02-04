@@ -202,7 +202,7 @@ def calc_recall(pred, test, train,m=[100], type=None):
         for i in range(len(pred_ab)):
             train_item = np.where(train[i] == 1)[0]
             p = list(set(pred[i]) - set(train_item))
-            p = p[:k]
+            p = np.array(p[:k])
             if len(test[i]) != 0:
                 hits = set(test[i]) & set(p)
                 #recall
