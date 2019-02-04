@@ -292,7 +292,7 @@ def main():
     encoding_dim = [600, 200]
     decoding_dim = [200, 600, num_p]
 
-    z_dim = 100
+    z_dim = 50
     max_item = max(np.sum(dataset['user_onehot'], axis=1))
     x_dim =  num_u
     user_item = np.zeros((num_u,num_u))
