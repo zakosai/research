@@ -290,8 +290,8 @@ def main():
             item_pred = sess.run(model.x_recon,
                                               feed_dict={model.x:x})
 
-            recall_item, _, ndcg = calc_recall(item_pred, dataset['user_item_test'].values(), dataset['user_onehot'][
-                dataset['user_item_test'].keys()][50], "item")
+            recall_item, _, ndcg = calc_recall(item_pred, dataset['user_item_test'].values(), dataset['user_onehot'][dataset[
+                'user_item_test'].keys()], [50], "item")
             if recall_item > max_recall:
                 max_recall = recall_item
                 max_ndcg = ndcg
