@@ -13,7 +13,7 @@ class Translation:
     def __init__(self, batch_size, dim, encode_dim, decode_dim, z_dim, eps=1e-10,
                  lambda_0=10, lambda_1=0.1, lambda_2=100,
                  lambda_3=0.1,
-                 lambda_4=100, learning_rate=1e-4):
+                 lambda_4=100, learning_rate=1e-3):
         self.batch_size = batch_size
         self.dim = dim
         self.encode_dim = encode_dim
@@ -165,11 +165,12 @@ def create_dataset_lastfm():
 
 def calc_recall(pred, test, m=[100], type=None):
     result = {}
-
     for k in m:
         pred_ab = np.argsort(-pred)[:, :k]
         recall = []
         ndcg = []
+        map = []
+        precision = []
         for i in range(len(pred_ab)):
             p = pred_ab[i]
             if len(test[i]) != 0:
@@ -178,6 +179,16 @@ def calc_recall(pred, test, m=[100], type=None):
                 #recall
                 recall_val = float(len(hits)) / len(test[i])
                 recall.append(recall_val)
+                precision.append(float(len(hits)) / k)
+
+                # map
+                ap = 0
+                num_hit = 0
+                for j in range(0, k):
+                    if p[j] in test[i]:
+                        num_hit += 1
+                        ap += float(num_hit)/(k+1)
+                map.append(float(ap)/min(k, len(test[i])))
 
                 #ncdg
                 score = []
@@ -192,10 +203,11 @@ def calc_recall(pred, test, m=[100], type=None):
                     ndcg.append(0)
                 else:
                     ndcg.append(float(actual) / best)
-        result['recall@%d'%k] = np.mean(recall)
-        result['ndcg@%d' % k] = np.mean(ndcg)
 
-        print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
+        print("k= %d, recall %s: %f, ndcg: %f, precision: %f, mAp: %f"%(k, type, np.mean(recall), np.mean(ndcg),
+                                                                        np.mean(precision), np.mean(map)))
+        result['recall@%d'%k] = np.mean(recall)
+        result['ndcg@%d'%k] = np.mean(ndcg)
 
 
     return np.mean(np.array(recall)), result
@@ -252,6 +264,7 @@ def main():
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(max_to_keep=20)
     max_recall = 0
+    max_ndcg = 0
 
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(num_u)
@@ -275,10 +288,11 @@ def main():
             item_pred = sess.run(model.x_recon,
                                               feed_dict={model.x:x})
 
-            recall_item , _= calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
+            recall_item, _, ndcg = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
             if recall_item > max_recall:
                 max_recall = recall_item
-                _, result = calc_recall(item_pred, dataset['user_item_test'].values(),
+                max_ndcg = ndcg
+                _, result, _ = calc_recall(item_pred, dataset['user_item_test'].values(),
                                         [50, 100, 150, 200, 250, 300], "item")
                 saver.save(sess, os.path.join(args.ckpt, 'multi-VAE'))
                 np.save(os.path.join(args.ckpt, "multi-pred.npy"), item_pred)
@@ -290,7 +304,7 @@ def main():
 
     print(max_recall)
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
-    f.write("Best recall Multi-VAE: %f"%max_recall)
+    f.write("Best recall Multi-VAE: %f, %f\n"%(max_recall, max_ndcg))
     np.save(os.path.join(args.ckpt, "result_multi-vae.npy"), result)
 
 parser = argparse.ArgumentParser(description='Process some integers.')
