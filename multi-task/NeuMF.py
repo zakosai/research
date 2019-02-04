@@ -144,20 +144,34 @@ def get_train_instances(train, num_negatives, dataset):
             labels.append(0)
     return user_input, item_input, labels
 
-def calc_recall(pred, test, m=[100], type=None):
+def calc_recall(pred, test, train,m=[100], type=None):
     result = {}
     for k in m:
-        pred_ab = np.argsort(-pred)[:, :k]
+        # pred_ab = np.argsort(-pred)
         recall = []
         ndcg = []
-        for i in range(len(pred_ab)):
-            p = list(pred_ab[i])
+        map = []
+        precision = []
+        for i in range(len(pred)):
+            p = pred[i]
+            train_item = np.where(train[i] == 1)[0]
+            p[train_item] = 0
+            p = np.argsort(p)[::-1][:k]
             if len(test[i]) != 0:
                 hits = set(test[i]) & set(p)
-
                 #recall
                 recall_val = float(len(hits)) / len(test[i])
                 recall.append(recall_val)
+                precision.append(float(len(hits)) / k)
+
+                # map
+                ap = 0
+                num_hit = 0
+                for j in range(0, k):
+                    if p[j] in test[i]:
+                        num_hit += 1
+                        ap += float(num_hit)/(k+1)
+                map.append(float(ap)/min(k, len(test[i])))
 
                 #ncdg
                 score = []
@@ -173,7 +187,8 @@ def calc_recall(pred, test, m=[100], type=None):
                 else:
                     ndcg.append(float(actual) / best)
 
-        print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
+        print("k= %d, recall %s: %f, ndcg: %f, precision: %f, mAp: %f"%(k, type, np.mean(recall), np.mean(ndcg),
+                                                                        np.mean(precision), np.mean(map)))
         result['recall@%d'%k] = np.mean(recall)
         result['ndcg@%d'%k] = np.mean(ndcg)
 
@@ -285,12 +300,15 @@ if __name__ == '__main__':
                 predict = model.predict([np.array(user), np.array(item)], batch_size=1000, verbose=0)
                 predict = [item for sublist in predict for item in sublist]
                 pred.append(predict)
-            recall, _, ndcg = calc_recall(np.array(pred), dataset['user_item_test'].values(), [50])
+            recall, _, ndcg = calc_recall(np.array(pred), dataset['user_item_test'].values(), \
+                                                     dataset['user_onehot'][
+                dataset[
+                'user_item_test'].keys()], [50], "item")
             if recall > max_recall:
                 max_recall = recall
                 max_ndcg = ndcg
-                _, result, _ = calc_recall(np.array(pred), dataset['user_item_test'].values(), [50, 100, 150, 200,
-                                                                                                 250, 300])
+                # _, result, _ = calc_recall(np.array(pred), dataset['user_item_test'].values(), [50, 100, 150, 200,
+                #                                                                                  250, 300])
 
                 if args.out > 0:
                     model.save_weights(model_out_file, overwrite=True)
@@ -301,7 +319,7 @@ if __name__ == '__main__':
     f = open(os.path.join(args.ckpt, "result_sum.txt"), "a")
     if mf_pretrain != '':
         f.write("Best recall NeuMF pretrained: %f, %f\n" % (max_recall, ndcg))
-        np.save(os.path.join(args.ckpt, "result_NeuMF_pretrained.npy"), result)
+        # np.save(os.path.join(args.ckpt, "result_NeuMF_pretrained.npy"), result)
     else:
         f.write("Best recall NeuMF: %f, %f\n" % (max_recall, max_ndcg))
-        np.save(os.path.join(args.ckpt, "result_NeuMF.npy"), result)
+        # np.save(os.path.join(args.ckpt, "result_NeuMF.npy"), result)
