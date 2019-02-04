@@ -15,7 +15,7 @@ class Translation:
     def __init__(self, batch_size, x_dim, y_dim, num_u,  encode_dim, decode_dim, z_dim, eps=1e-10,
                  lambda_0=10, lambda_1=0.1, lambda_2=100,
                  lambda_3=0.1,
-                 lambda_4=100, learning_rate=1e-5):
+                 lambda_4=100, learning_rate=1e-4):
         self.batch_size = batch_size
         self.x_dim = x_dim
         self.y_dim = y_dim
