@@ -289,8 +289,8 @@ def main():
 
     num_p = dataset['item_no']
     num_u = dataset['user_no']
-    encoding_dim = [600, 200]
-    decoding_dim = [200, 600, num_p]
+    encoding_dim = [200, 100]
+    decoding_dim = [100, 200, num_p]
 
     z_dim = 50
     max_item = max(np.sum(dataset['user_onehot'], axis=1))
