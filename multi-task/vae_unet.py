@@ -191,19 +191,20 @@ def create_dataset_lastfm():
 
     return dataset
 
-def calc_recall(pred, test, m=[100], type=None):
+def calc_recall(pred, test, train,m=[100], type=None):
     result = {}
     for k in m:
-        pred_ab = np.argsort(-pred)[:, :k]
+        pred_ab = np.argsort(-pred)
         recall = []
         ndcg = []
         map = []
         precision = []
         for i in range(len(pred_ab)):
-            p = pred_ab[i]
+            train_item = np.where(train[i] == 1)[0]
+            p = list(set(pred[i]) - set(train_item))
+            p = p[:k]
             if len(test[i]) != 0:
                 hits = set(test[i]) & set(p)
-
                 #recall
                 recall_val = float(len(hits)) / len(test[i])
                 recall.append(recall_val)
@@ -387,7 +388,8 @@ def main():
                 else:
                     item_pred = np.concatenate((item_pred, pred), axis=0)
 
-            recall_item, _ = calc_recall(item_pred, dataset['user_item_test'].values(), [50], "item")
+            recall_item, _ = calc_recall(item_pred, dataset['user_item_test'].values(), dataset['user_onehot'][dataset[
+                'user_item_test'].keys()], [50], "item")
             model.train = True
 
             if recall_item > max_recall:
