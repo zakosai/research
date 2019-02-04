@@ -210,7 +210,7 @@ def calc_recall(pred, test, m=[100], type=None):
         result['ndcg@%d'%k] = np.mean(ndcg)
 
 
-    return np.mean(np.array(recall)), result
+    return np.mean(np.array(recall)), result, np.mean(ndcg)
 
 def dcg_score(y_true, y_score, k=50):
     """Discounted cumulative gain (DCG) at rank K.
