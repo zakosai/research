@@ -90,7 +90,7 @@ class Translation:
         loss_kl = self.loss_kl(z_mu, z_sigma)
         # h = tf.concat([z, self.y], axis=1)
         h = z
-        y = self.dec(h, "decode", self.decode_dim)
+        y = self.dec(h, "decode", self.decode_dim, en_out)
         return y, loss_kl
 
     def decode(self, x, dim):
