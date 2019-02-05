@@ -101,7 +101,7 @@ def main():
 
 
     # Build and train a Factorization Machine
-    fm = pylibfm.FM(num_factors=50, num_iter=3000, verbose=True, task="classification", initial_learning_rate=0.01,
+    fm = pylibfm.FM(num_factors=50, num_iter=300, verbose=True, task="classification", initial_learning_rate=0.1,
                     learning_rate_schedule="optimal")
 
     fm.fit(X_train,y_train)
