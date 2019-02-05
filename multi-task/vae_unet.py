@@ -43,8 +43,8 @@ class Translation:
         #
         # noise = tf.random_normal(tf.shape(x_), stddev=0.1)
         # x_ = x_ + noise
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.5)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             # filter = tf.get_variable("v", [1, self.num_u, 50], regularizer=self.regularizer, trainable=True)
             # x_ = tf.nn.conv1d(x_, filter, stride=1, padding="VALID", use_cudnn_on_gpu=True)
@@ -62,8 +62,8 @@ class Translation:
 
     def dec(self, x, scope, decode_dim,reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.5)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
 
@@ -117,7 +117,7 @@ class Translation:
         self.y_label = tf.placeholder(tf.float32, [None, self.y_dim], name='real_label')
 
 
-        x = tf.concat([self.y, self.y], axis=1)
+        x = tf.concat([self.x, self.y], axis=1)
         # x = self.y
         # VAE for domain A
         x_recon, loss_kl = self.encode(x, self.encode_dim)
