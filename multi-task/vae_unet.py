@@ -83,12 +83,11 @@ class Translation:
         return z, z_mu, z_sigma
 
     def encode(self, x, dim):
-        # h, en_out = self.enc(x, "encode", dim)
-        # z, z_mu, z_sigma = self.gen_z(h, "VAE")
-        # loss_kl = self.loss_kl(z_mu, z_sigma)
+        h, en_out = self.enc(x, "encode", dim)
+        z, z_mu, z_sigma = self.gen_z(h, "VAE")
+        loss_kl = self.loss_kl(z_mu, z_sigma)
         # h = tf.concat([z, self.y], axis=1)
-        loss_kl = 0
-        h = self.y
+        h = z
         y = self.dec(h, "decode", self.decode_dim)
         return y, loss_kl
 
