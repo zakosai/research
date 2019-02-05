@@ -101,7 +101,7 @@ def main():
 
 
     # Build and train a Factorization Machine
-    fm = pylibfm.FM(num_factors=50, num_iter=300, verbose=True, task="classification", initial_learning_rate=0.1,
+    fm = pylibfm.FM(num_factors=50, num_iter=args.iter, verbose=True, task="classification", initial_learning_rate=0.1,
                     learning_rate_schedule="optimal")
 
     fm.fit(X_train,y_train)
@@ -130,7 +130,7 @@ parser.add_argument('--data',  type=str, default="Tool",
                    help='dataset name')
 parser.add_argument('--ckpt',  type=str, default="experiment/delicious",
                    help='1p or 8p')
-parser.add_argument('--num_p', type=int, default=7780, help='number of product')
+parser.add_argument('--iter', type=int, default=300, help='number of iter')
 
 
 if __name__ == '__main__':
