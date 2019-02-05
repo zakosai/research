@@ -60,7 +60,7 @@ class Translation:
                 en_out.append(x_)
         return x_, en_out
 
-    def dec(self, x, scope, decode_dim, enc, reuse=False):
+    def dec(self, x, scope, decode_dim,enc, reuse=False):
         x_ = x
         # if self.train:
         #     x_ = tf.nn.dropout(x_, 0.5)
@@ -70,10 +70,10 @@ class Translation:
                 x_ = fully_connected(x_, decode_dim[i],scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
                 x_ = tf.nn.leaky_relu(x_, alpha=0.5)
-                x_ = tf.concat([x_, enc[1-i]], axis=1)
+                x_ = tf.concat([x_, enc[1-i]])
+
             x_ = fully_connected(x_, decode_dim[-1], scope="last_dec",
                                  weights_regularizer=self.regularizer)
-            x_ = tf.nn.leaky_relu(x_, alpha=0.5)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
@@ -88,7 +88,7 @@ class Translation:
         h, en_out = self.enc(x, "encode", dim)
         z, z_mu, z_sigma = self.gen_z(h, "VAE")
         loss_kl = self.loss_kl(z_mu, z_sigma)
-        # h = tf.concat([z, self.y], axis=1)
+        # h = tf.concat([z, self.x], axis=1)
         h = z
         y = self.dec(h, "decode", self.decode_dim, en_out)
         return y, loss_kl
@@ -120,7 +120,8 @@ class Translation:
         self.y_label = tf.placeholder(tf.float32, [None, self.y_dim], name='real_label')
 
 
-        x = tf.concat([self.x, self.y], axis=1)
+        # x = tf.concat([self.x, self.y], axis=1)
+        x = self.y
         # x = self.y
         # VAE for domain A
         x_recon, loss_kl = self.encode(x, self.encode_dim)
