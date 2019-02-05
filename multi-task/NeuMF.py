@@ -58,7 +58,7 @@ def init_normal(shape, name=None):
     value = np.random.random(shape)
     return K.variable(value, name=name)
 
-def get_model(num_users, num_items, mf_dim=50, layers=[600,200], reg_layers=[0], reg_mf=0):
+def get_model(num_users, num_items, mf_dim=10, layers=[10], reg_layers=[0], reg_mf=0):
     assert len(layers) == len(reg_layers)
     num_layer = len(layers) #Number of layers in the MLP
     # Input variables
