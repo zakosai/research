@@ -43,8 +43,8 @@ class Translation:
         #
         # noise = tf.random_normal(tf.shape(x_), stddev=0.1)
         # x_ = x_ + noise
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             # filter = tf.get_variable("v", [1, self.num_u, 50], regularizer=self.regularizer, trainable=True)
             # x_ = tf.nn.conv1d(x_, filter, stride=1, padding="VALID", use_cudnn_on_gpu=True)
@@ -62,8 +62,8 @@ class Translation:
 
     def dec(self, x, scope, decode_dim,reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.5)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
 
@@ -83,10 +83,12 @@ class Translation:
         return z, z_mu, z_sigma
 
     def encode(self, x, dim):
-        h, en_out = self.enc(x, "encode", dim)
-        z, z_mu, z_sigma = self.gen_z(h, "VAE")
-        loss_kl = self.loss_kl(z_mu, z_sigma)
-        h = tf.concat([z, self.y], axis=1)
+        # h, en_out = self.enc(x, "encode", dim)
+        # z, z_mu, z_sigma = self.gen_z(h, "VAE")
+        # loss_kl = self.loss_kl(z_mu, z_sigma)
+        # h = tf.concat([z, self.y], axis=1)
+        loss_kl = 0
+        h = self.y
         y = self.dec(h, "decode", self.decode_dim)
         return y, loss_kl
 
@@ -125,7 +127,7 @@ class Translation:
 
         # Loss VAE
         self.loss = self.lambda_2 * self.loss_reconstruct(self.y_label,x_recon) + \
-                    tf.losses.get_regularization_loss() + self.lambda_1*loss_kl
+                    tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
