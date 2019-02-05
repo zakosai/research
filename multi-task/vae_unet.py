@@ -64,14 +64,13 @@ class Translation:
         x_ = x
         # if self.train:
         #     x_ = tf.nn.dropout(x_, 0.5)
-        enc = enc[::-1]
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
 
                 x_ = fully_connected(x_, decode_dim[i],scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
                 x_ = tf.nn.leaky_relu(x_, alpha=0.5)
-                x_ = tf.concat([x_, enc[i]], axis=1)
+                x_ = tf.concat([x_, enc[1-i]], axis=1)
             # x_ = fully_connected(x_, decode_dim[-1], scope="last_dec",
             #                      weights_regularizer=self.regularizer)
         return x_
