@@ -70,7 +70,7 @@ class Translation:
                 x_ = fully_connected(x_, decode_dim[i],scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
                 x_ = tf.nn.leaky_relu(x_, alpha=0.5)
-                x_ = tf.concat([x_, enc[1-i]])
+                x_ = tf.concat([x_, enc[1-i]], axis=1)
 
             x_ = fully_connected(x_, decode_dim[-1], scope="last_dec",
                                  weights_regularizer=self.regularizer)
