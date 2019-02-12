@@ -17,7 +17,7 @@ class Dataset(object):
         self.data = data
         self.max_sequence_length = max_sequence_length
         self.max_nb_words = max_nb_words
-        texts = [i[2] for i in self.data['train']] + [i[2] for i in self.data['test']]
+        texts = list(self.data['train'][2]) + list(self.data['test'][2])
         self.tokenizer = Tokenizer(num_words=self.max_nb_words)
         self.tokenizer.fit_on_texts(texts)
         self.embedding_dim = embedding_dim
