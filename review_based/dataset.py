@@ -13,13 +13,14 @@ import numpy as np
 
 
 class Dataset(object):
-    def __init__(self, data, max_sequence_length, max_nb_words, folder="data/"):
+    def __init__(self, data, max_sequence_length=1000, max_nb_words=20000, folder="data/", embedding_dim=100):
         self.data = data
         self.max_sequence_length = max_sequence_length
         self.max_nb_words = max_nb_words
         texts = [i[2] for i in self.data['train']] + [i[2] for i in self.data['test']]
         self.tokenizer = Tokenizer(num_words=self.max_nb_words)
         self.tokenizer.fit_on_texts(texts)
+        self.embedding_dim = embedding_dim
 
         self.embeddings_index = {}
         f = open(folder + 'glove.6B.100d.txt', encoding='utf8')
@@ -30,10 +31,19 @@ class Dataset(object):
             self.embeddings_index[word] = coefs
         f.close()
 
+        word_index = self.tokenizer.word_index
+        self.vocab_size = len(word_index) + 1
+        self.embedding_matrix = np.random.random((len(word_index) + 1, embedding_dim))
+        for word, i in word_index.items():
+            embedding_vector = self.embeddings_index.get(word)
+            if embedding_vector is not None:
+                # words not found in embedding index will be all-zeros.
+                self.embedding_matrix[i] = embedding_vector
+
 
     def create_batch(self, idx, k=2, type='train'):
         data_b = self.data[type].iloc[idx]
-        y_rating = list(data_b[3])
+        y_rating = list(data_b[3]) - 1
         y_review = self.tokenizer.texts_to_sequences(list(data_b[2]))
         y_review = pad_sequences(y_review, maxlen=self.max_sequence_length)
 
@@ -42,7 +52,7 @@ class Dataset(object):
         sequences_item = []
         for i, d in data_b.iterrows():
             user = self.data['train_user'][d[0]]
-            u_ids = list(np.random.randint(0, len(user[0]), k))
+            u_ids = list(np.random.randint(0, len(user[0]), min(k, len(user[0]))))
             seq = [user[1][j] for j in u_ids]
             sequences_user.append(' '.join(seq))
 
