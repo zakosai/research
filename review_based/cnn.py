@@ -124,7 +124,7 @@ def main():
         print("Loss last batch: %f"%loss)
 
         if i%1 == 0:
-            X_user, X_item, y_review, y_rating = dataset.create_batch(range(data['test']), k=2, type="test")
+            X_user, X_item, y_review, y_rating = dataset.create_batch(range(len(data['test'])), k=2, type="test")
             feed_dict = {model.embedding: embedding,
                          model.X_user_ids: X_user,
                          model.X_item_ids: X_item,
