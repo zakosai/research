@@ -110,11 +110,11 @@ def amz_to_pkl(args):
             drop.append(i)
     data.drop(data.index[drop], inplace=True)
     data = data.reset_index(drop=True)
-    if args.output == '':
+    if args.folder == '':
         folder = args.data.split("/")[:-1]
         folder = "/".join(folder)
     else:
-        folder = args.output
+        folder = args.folder
 
     # sort data
     data.sort_values(by='unixReviewTime', inplace=True, ascending=False)
