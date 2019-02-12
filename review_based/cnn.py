@@ -59,7 +59,7 @@ class Model(object):
 
         X = self.mlp(X, self.mlp_layers)
 
-        self.loss = tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=X)
+        self.loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=X))
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.X = X
 
