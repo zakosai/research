@@ -91,7 +91,7 @@ def parse_args():
 def main():
     args = parse_args()
     f = open(args.data, "rb")
-    data = pickle.load(f)
+    data = pickle.load(f, encoding='latin1')
     dataset = Dataset(data)
 
     filter = [32, 64, 128]
