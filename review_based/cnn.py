@@ -43,10 +43,10 @@ class Model(object):
         embedding_placeholder = tf.placeholder(tf.float32, [self.vocab_size, self.embedding_dim])
         embedding_init = self.embedding.assign(embedding_placeholder)
 
-        self.X_user_ids = tf.placeholder(tf.int8, [None, self.seq_dim], "X_user_ids")
-        self.X_item_ids = tf.placeholder(tf.int8, [None, self.seq_dim], "X_item_ids")
-        self.y_review_ids = tf.placeholder(tf.int8, [None, self.seq_dim], "y_review_ids")
-        self.y_rating = tf.placeholder(tf.int8, [None, 1], "y_rating")
+        self.X_user_ids = tf.placeholder(tf.int32, [None, self.seq_dim], "X_user_ids")
+        self.X_item_ids = tf.placeholder(tf.int32, [None, self.seq_dim], "X_item_ids")
+        self.y_review_ids = tf.placeholder(tf.int32, [None, self.seq_dim], "y_review_ids")
+        self.y_rating = tf.placeholder(tf.int32, [None, 1], "y_rating")
         y = tf.one_hot(self.y_rating, 5)
 
 
