@@ -44,7 +44,6 @@ class Dataset(object):
     def create_batch(self, idx, k=2, type='train'):
         data_b = self.data[type].iloc[idx]
         y_rating = data_b[3] - 1
-        y_rating = np.array(y_rating).reshape((len(idx), 1))
         y_review = self.tokenizer.texts_to_sequences(list(data_b[2]))
         y_review = pad_sequences(y_review, maxlen=self.max_sequence_length)
 
