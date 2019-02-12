@@ -105,7 +105,7 @@ def amz_to_pkl(args):
 
     # drop non review
     drop = []
-    for i, r in data['reviewText']:
+    for i, r in enumerate(data['reviewText']):
         if r == "":
             drop.append(i)
     data.drop(data.index[drop], inplace=True)
@@ -181,7 +181,6 @@ def amz_to_pkl(args):
 def main():
     args = parse_args()
     amz_to_pkl(args)
-
 
 if __name__ == '__main__':
     main()
