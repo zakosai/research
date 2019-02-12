@@ -58,8 +58,8 @@ class Model(object):
         X = tf.concat([X_user_z, X_item_z], axis=1)
 
         X = self.mlp(X, self.mlp_layers)
-
-        self.loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=y, logits=X))
+        print(y.shape, X.shape)
+        self.loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.y_rating, logits=X))
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.X = X
 
