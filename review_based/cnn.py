@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.contrib.layers import conv1d, fully_connected, max_pooling1d, flatten
+from tensorflow.layers import conv1d, dense, max_pooling1d, flatten
 import pickle
 import argparse
 import sys
@@ -31,7 +31,7 @@ class Model(object):
         x_ = x
         with tf.variable_scope(scope):
             for i in range(len(layers)):
-                x_ = fully_connected(x_, layers[i], weights_regularizer=self.regularizer, activation_fn=self.activation)
+                x_ = dense(x_, layers[i], kernel_regularizer=self.regularizer, activation=self.activation)
         return x_
 
 
