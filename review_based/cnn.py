@@ -256,7 +256,6 @@ def main():
                              model.y_review_ids: y_review,
                              model.y_rating: y_rating}
                 p = sess.run(model.X, feed_dict=feed_dict)
-                print(p, y_rating)
                 if j == 0:
                     error = p - y_rating
                 else:
