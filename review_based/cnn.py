@@ -42,9 +42,10 @@ class Model(object):
                 x_ = max_pooling2d(x_, (2, 1), (2, 1))
             x_ = max_pooling2d(x_, (8, 1), (8, 1))
             if self.attention:
-                att = MultiHeadsAttModel(8*1, 512, 64, 32)
+                x_ = tf.reshape(x_, (-1, 8, 512))
+                att = MultiHeadsAttModel(8, 512, 64, 32)
                 x_ = att([x_, x_, x_])
-                x_ = tf.reshape(x_, (-1, 8, 8, 32))
+                x_ = tf.reshape(x_, (-1, 8, 1, 32))
                 # x_ = NormL()(x_)
             print(x_.get_shape())
             x_ = flatten(x_)
