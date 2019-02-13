@@ -13,7 +13,7 @@ import numpy as np
 
 
 class Dataset(object):
-    def __init__(self, data, max_sequence_length=1000, max_nb_words=20000, folder="data/", embedding_dim=100):
+    def __init__(self, data, max_sequence_length=1000, max_nb_words=20000, folder="data/", embedding_dim=300):
         self.data = data
         self.max_sequence_length = max_sequence_length
         self.max_nb_words = max_nb_words
@@ -23,7 +23,7 @@ class Dataset(object):
         self.embedding_dim = embedding_dim
 
         self.embeddings_index = {}
-        f = open(folder + 'glove.6B.100d.txt', encoding='utf8')
+        f = open(folder + 'glove.6B.300d.txt', encoding='utf8')
         for line in f:
             values = line.split()
             word = values[0]
