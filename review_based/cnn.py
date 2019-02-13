@@ -109,8 +109,8 @@ class Model(object):
         x_rec = flatten(x_rec)
         loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=x, logits=x_rec)
         print(loss.get_shape())
-        loss = tf.reduce_mean(loss)
-        print(loss.get_shape)
+        loss = tf.reduce_mean(loss, axis=0)
+        print(loss.get_shape())
         return -loss
 
 
