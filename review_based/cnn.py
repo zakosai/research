@@ -1,5 +1,6 @@
 import tensorflow as tf
 from tensorflow.layers import conv2d, dense, max_pooling2d, flatten
+import tensorflow.contrib.slim as slim
 import pickle
 import argparse
 import sys
@@ -17,12 +18,28 @@ class Model(object):
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.learning_rate = learning_rate
 
+    def denseBlock(self, x, i, num_filters_per_size_i, cnn_filter_size_i=3, num_rep_block_i=4):
+        with tf.variable_scope("dense_unit_%s" % i):
+            nodes = []
+            x_ = x
+            x_ = conv2d(x_, num_filters_per_size_i, (cnn_filter_size_i, 1))
+            nodes.append(x_)
+            print(x_.get_shape())
+            for z in range(num_rep_block_i - 1):
+                x_ = conv2d(tf.concat(nodes, 3), num_filters_per_size_i, (cnn_filter_size_i, 1))
+                nodes.append(x_)
+                print(x_.get_shape())
+
+            return x_
+
     def encode(self, x, filters, scope="user"):
         x_ = x
         with tf.variable_scope(scope):
+            x_ = conv2d(x_, filters[0], (3, 1))
             for i in range(len(filters)):
-                x_ = conv2d(x_, filters[i], (5, 1) )
-                x_ = max_pooling2d(x_, (5, 1), (5, 1))
+                x_ = self.denseBlock(x_, i, filters[i])
+                x_ = max_pooling2d(x_, (2, 1), (2, 1))
+            x_ = max_pooling2d(x_, (8, 1), (8, 1))
             x_ = flatten(x_)
 
         return x_
@@ -31,8 +48,8 @@ class Model(object):
     #     x_ = x
     #     with tf.variable_scope(scope):
     #         for i in range(len(filters)):
-    #             x_ = conv1d(x_, filters[i], 5)
-    #             x_ = max_pooling1d(x_, 5, 5)
+    #             x_ = conv2d(x_, filters[i], (5, 1) )
+    #             x_ = max_pooling2d(x_, (5, 1), (5, 1))
     #         x_ = flatten(x_)
     #
     #     return x_
@@ -106,14 +123,14 @@ def main():
     args = parse_args()
     f = open(args.data, "rb")
     data = pickle.load(f)
-    dataset = Dataset(data)
+    dataset = Dataset(data, max_sequence_length=1024)
 
-    filter = [32, 64, 128]
+    filter = [64, 128, 256, 512]
     mlp_layers = [20, 1]
     batch_size = 500
     iter = 20
 
-    model = Model(filter, mlp_layers, dataset.vocab_size, dataset.embedding_dim)
+    model = Model(filter, mlp_layers, dataset.vocab_size, dataset.embedding_dim, seq_dim=dataset.max_sequence_length)
     model.build_model()
 
     sess = tf.Session()
