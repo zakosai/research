@@ -35,7 +35,7 @@ class Model(object):
     def encode(self, x, filters, scope="user"):
         x_ = x
         with tf.variable_scope(scope):
-            x_ = conv2d(x_, filters[0], (3, 1))
+            x_ = conv2d(x_, filters[0], (3, 1), padding='same')
             for i in range(len(filters)):
                 x_ = self.denseBlock(x_, i, filters[i])
                 x_ = max_pooling2d(x_, (2, 1), (2, 1))
@@ -127,7 +127,7 @@ def main():
 
     filter = [64, 128, 256, 512]
     mlp_layers = [20, 1]
-    batch_size = 500
+    batch_size = 128
     iter = 20
 
     model = Model(filter, mlp_layers, dataset.vocab_size, dataset.embedding_dim, seq_dim=dataset.max_sequence_length)
