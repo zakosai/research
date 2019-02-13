@@ -107,6 +107,7 @@ def main():
     saver = tf.train.Saver(max_to_keep=3)
     embedding = dataset.embedding_matrix
     train_no = len(data['train'])
+    test_no = len(data['test'])
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(train_no)
         train_cost = 0
@@ -124,14 +125,20 @@ def main():
         print("Loss last batch: %f"%loss)
 
         if i%1 == 0:
-            X_user, X_item, y_review, y_rating = dataset.create_batch(range(len(data['test'])), k=2, type="test")
-            feed_dict = {model.embedding: embedding,
-                         model.X_user_ids: X_user,
-                         model.X_item_ids: X_item,
-                         model.y_review_ids: y_review,
-                         model.y_rating: y_rating}
-            pred = sess.run(model.X, feed_dict=feed_dict)
-            pred = np.argmax(pred, axis=1)
+            for j in range(int(test_no / batch_size)+1):
+                idx = list(range(j*batch_size, min(test_no, (j+1)*batch_size)))
+                X_user, X_item, y_review, y_rating = dataset.create_batch(idx, k=2, type="test")
+                feed_dict = {model.embedding: embedding,
+                             model.X_user_ids: X_user,
+                             model.X_item_ids: X_item,
+                             model.y_review_ids: y_review,
+                             model.y_rating: y_rating}
+                p = sess.run(model.X, feed_dict=feed_dict)
+                p = np.argmax(p, axis=1)
+                if j == 0:
+                    pred = p
+                else:
+                    pred = np.concatenate([pred, p], axis=0)
             mse = np.mean((pred - y_rating) ** 2)
             print("rmse = %f"%mse)
 
