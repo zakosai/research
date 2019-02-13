@@ -105,8 +105,8 @@ class Model(object):
         return x_
 
     def rec_loss(self, x, x_rec):
-        return tf.reduce_sum(-x * tf.log(x_rec + 1e-10) -  (1.0 - x) * tf.log(1.0 - x_rec + 1e-10))
-
+        return tf.reduce_mean(tf.reduce_sum(-x * tf.log(x_rec + 1e-10) - (1.0 - x) * tf.log(1.0 - x_rec + 1e-10),
+                                            axis=1))
 
 
     def build_model(self):
