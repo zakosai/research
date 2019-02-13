@@ -32,7 +32,7 @@ class Model(object):
         with tf.variable_scope(scope):
             for i in range(len(layers)-1):
                 x_ = dense(x_, layers[i], kernel_regularizer=self.regularizer, activation=self.activation)
-            x_ = dense(x_, layers[i], kernel_regularizer=self.regularizer)
+            x_ = dense(x_, layers[-1], kernel_regularizer=self.regularizer)
         return x_
 
 
