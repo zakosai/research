@@ -63,8 +63,8 @@ class Model(object):
 
         X_user = tf.nn.embedding_lookup(self.embedding, self.X_user_ids)
         X_item = tf.nn.embedding_lookup(self.embedding, self.X_item_ids)
-        X_user = tf.reshape(X_user, (-1, -1, 1, self.embedding_dim))
-        X_item = tf.reshape(X_item, (-1, -1, 1, self.embedding_dim))
+        X_user = tf.reshape(X_user, (-1, self.seq_dim, 1, self.embedding_dim))
+        X_item = tf.reshape(X_item, (-1, self.seq_dim, 1, self.embedding_dim))
 
         X_user_z = self.encode(X_user, self.filters, "user")
         X_item_z = self.encode(X_item, self.filters, "item")
