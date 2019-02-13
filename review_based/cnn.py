@@ -257,7 +257,6 @@ def main():
                              model.y_rating: y_rating}
                 p = sess.run(model.X, feed_dict=feed_dict)
                 if j == 0:
-                    print(p, y_rating)
                     error = p - y_rating
                 else:
                     error = np.concatenate([error, p-y_rating], axis=0)
