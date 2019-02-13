@@ -45,9 +45,9 @@ class Model(object):
                 att = MultiHeadsAttModel(8*1, 512, 64, 32)
                 x_ = att([x_, x_, x_])
                 x_ = tf.reshape(x_, (-1, 8, 8, 32))
-                x_ = NormL()(x_)
+                # x_ = NormL()(x_)
             print(x_.get_shape())
-            x_ = Flatten()(x_)
+            x_ = flatten(x_)
         return x_
 
     # def _dec(self, x, filters, scope="user"):
