@@ -107,7 +107,11 @@ class Model(object):
     def rec_loss(self, x, x_rec):
         x = flatten(x)
         x_rec = flatten(x_rec)
-        return -tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=x, logits=x_rec))
+        loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=x, logits=x_rec)
+        print(loss.get_shape())
+        loss = tf.reduce_mean(loss)
+        print(loss.get_shape)
+        return -loss
 
 
     def build_model(self):
