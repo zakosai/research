@@ -1,14 +1,15 @@
 import tensorflow as tf
-from tensorflow.layers import conv2d, dense, max_pooling2d, flatten
+from tensorflow.layers import conv2d, dense, max_pooling2d, flatten, conv2d_transpose
 import tensorflow.contrib.slim as slim
 import pickle
 import argparse
 import sys
 from dataset import Dataset
 import numpy as np
+from attention import MultiHeadsAttModel, NormL
 
 class Model(object):
-    def __init__(self, filters, mlp_layers, vocab_size, embedding_dim, seq_dim=1000, learning_rate=1e-3):
+    def __init__(self, filters, mlp_layers, vocab_size, embedding_dim, seq_dim=1000, learning_rate=1e-3, attention=True):
         self.vocab_size = vocab_size
         self.embedding_dim = embedding_dim
         self.seq_dim = seq_dim
@@ -17,6 +18,7 @@ class Model(object):
         self.activation = tf.nn.relu
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.learning_rate = learning_rate
+        self.attention = attention
 
     def denseBlock(self, x, i, num_filters_per_size_i, cnn_filter_size_i=3, num_rep_block_i=4):
         with tf.variable_scope("dense_unit_%s" % i):
@@ -36,11 +38,26 @@ class Model(object):
         x_ = x
         with tf.variable_scope(scope):
             for i in range(len(filters)):
-                x_ = conv2d(x_, filters[i], (2,1))
+                x_ = conv2d(x_, filters[i], (2,1), padding='same')
                 x_ = max_pooling2d(x_, (2, 1), (2, 1))
             x_ = max_pooling2d(x_, (8, 1), (8, 1))
+            if self.attention:
+                att = MultiHeadsAttModel(8*1, 512, 8*3, 32)
+                x_ = att([x_, x_, x_])
+                x_ = tf.reshape(x_, (-1, 8, 8, 32))
+                x_ = NormL()(x_)
             x_ = flatten(x_)
         return x_
+
+    # def _dec(self, x, filters, scope="user"):
+    #     x_ = x
+    #     with tf.variable_scope(scope):
+    #         for i in range(len(filters)):
+    #             x_ = conv2d_tr(x_, filters[i], (2, 1))
+    #             x_ = max_pooling2d(x_, (2, 1), (2, 1))
+    #         x_ = max_pooling2d(x_, (8, 1), (8, 1))
+    #         x_ = flatten(x_)
+    #     return x_
 
     def encode(self, x, filters, scope="user"):
         x_ = x
@@ -136,7 +153,7 @@ def main():
     dataset = Dataset(data, max_sequence_length=1024)
 
     filter = [64, 128, 256, 512]
-    mlp_layers = [20, 1]
+    mlp_layers = [256, 1]
     batch_size = 128
     iter = 20
 
