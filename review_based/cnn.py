@@ -148,7 +148,7 @@ class Model(object):
         X = self.mlp(X, self.mlp_layers)
         X = tf.reshape(X, [-1])
         print(y.shape, X.shape)
-        X = tf.clip_by_value(X, 1, 5)
+        # X = tf.clip_by_value(X, 1, 5)
         self.loss = tf.losses.mean_squared_error(self.y_rating, X) + tf.losses.get_regularization_loss()
         if self.vae:
             loss_rec = self.rec_loss(X_user, X_user_rec) + self.rec_loss(X_item, X_item_rec)
