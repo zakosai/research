@@ -43,7 +43,7 @@ class Dataset(object):
 
     def create_batch(self, idx, k=2, type='train'):
         data_b = self.data[type].iloc[idx]
-        y_rating = data_b[3] - 1
+        y_rating = data_b[3]
         y_review = self.tokenizer.texts_to_sequences(list(data_b[2]))
         y_review = pad_sequences(y_review, maxlen=self.max_sequence_length)
 
@@ -52,13 +52,17 @@ class Dataset(object):
         sequences_item = []
         for i, d in data_b.iterrows():
             user = self.data['train_user'][d[0]]
-            u_ids = list(np.random.randint(0, len(user[0]), min(k, len(user[0]))))
+            ids = list(set(range(len(user[0]))) - set([user[0].index(d[0])]))
+            ids = np.random.permutation(ids)
+            u_ids = ids[:min(len(user[0]), k)]
             seq = [user[1][j] for j in u_ids]
             sequences_user.append(' '.join(seq))
 
             try:
                 item = self.data['train_item'][d[1]]
-                i_ids = list(np.random.randint(0, len(item[0]), k))
+                ids = list(set(range(len(item[0]))) - set([item[0].index(d[1])]))
+                ids = np.random.permutation(ids)
+                i_ids = ids[:min(len(user[0]), k)]
                 seq = [item[1][j] for j in i_ids]
                 sequences_item.append(' '.join(seq))
             except:
@@ -69,6 +73,27 @@ class Dataset(object):
         X_item = pad_sequences(X_item, maxlen=self.max_sequence_length)
 
         return X_user, X_item, y_review, y_rating
+
+    def create_implicit_batch(self, idx, type="train"):
+        data_b = self.data[type].iloc[idx]
+        y_rating = data_b[3]
+
+        sequences_user = []
+        sequences_item = []
+        for i, d in data_b.iterrows():
+            user = self.data['train_user'][d[0]][0].copy()
+            user.remove(d[1])
+            seq = np.zeros()
+            sequences_user.append(' '.join(seq))
+
+            try:
+                item = self.data['train_item'][d[1]]
+                i_ids = list(np.random.randint(0, len(item[0]), k))
+                seq = [item[1][j] for j in i_ids]
+                sequences_item.append(' '.join(seq))
+            except:
+                sequences_item.append(' ')
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -157,7 +182,7 @@ def amz_to_pkl(args):
             test.append([uid, iid, clean_str(d.reviewText), int(d.overall)])
         else:
             train.append([uid, iid, clean_str(d.reviewText), int(d.overall)])
-            if uid in train:
+            if uid in train_user:
                 train_user[uid][0].append(iid)
                 train_user[uid][1].append(clean_str(d.reviewText))
                 train_user[uid][2].append(int(d.overall))
