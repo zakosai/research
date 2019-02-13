@@ -30,8 +30,9 @@ class Model(object):
     def mlp(self, x, layers, scope="mlp"):
         x_ = x
         with tf.variable_scope(scope):
-            for i in range(len(layers)):
+            for i in range(len(layers)-1):
                 x_ = dense(x_, layers[i], kernel_regularizer=self.regularizer, activation=self.activation)
+            x_ = dense(x_, layers[i], kernel_regularizer=self.regularizer)
         return x_
 
 
@@ -59,7 +60,7 @@ class Model(object):
 
         X = self.mlp(X, self.mlp_layers)
         print(y.shape, X.shape)
-        self.loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=X))
+        self.loss = tf.losses.mean_squared_error(self.y_rating, X) + 0.1* tf.losses.get_regularization_loss()
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.X = X
 
@@ -95,7 +96,7 @@ def main():
     dataset = Dataset(data)
 
     filter = [32, 64, 128]
-    mlp_layers = [20, 5]
+    mlp_layers = [20, 1]
     batch_size = 500
     iter = 100
 
