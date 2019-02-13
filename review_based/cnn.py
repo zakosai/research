@@ -149,7 +149,7 @@ class Model(object):
         X = tf.reshape(X, [-1])
         print(y.shape, X.shape)
         X = tf.clip_by_value(X, 1, 5)
-        self.loss = tf.losses.mean_squared_error(self.y_rating, X) + 0.1* tf.losses.get_regularization_loss()
+        self.loss = tf.losses.mean_squared_error(self.y_rating, X) + tf.losses.get_regularization_loss()
         if self.vae:
             loss_rec = self.rec_loss(X_user, X_user_rec) + self.rec_loss(X_item, X_item_rec)
             self.loss += 0.1 * loss_rec
@@ -257,6 +257,7 @@ def main():
                              model.y_rating: y_rating}
                 p = sess.run(model.X, feed_dict=feed_dict)
                 if j == 0:
+                    print(p, y_rating)
                     error = p - y_rating
                 else:
                     error = np.concatenate([error, p-y_rating], axis=0)
