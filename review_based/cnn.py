@@ -136,10 +136,10 @@ def main():
                 p = sess.run(model.X, feed_dict=feed_dict)
                 p = np.argmax(p, axis=1)
                 if j == 0:
-                    pred = p
+                    error = p - y_rating
                 else:
-                    pred = np.concatenate([pred, p], axis=0)
-            mse = np.mean((pred - y_rating) ** 2)
+                    error = np.concatenate([error, p-y_rating], axis=0)
+            mse = np.mean(error ** 2)
             print("rmse = %f"%mse)
 
 
