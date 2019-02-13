@@ -195,6 +195,13 @@ def parse_args():
         help='using vae model or not',
         type=bool
     )
+    parser.add_argument(
+        '--k',
+        default=2,
+        dest='k',
+        help='using k review',
+        type=int
+    )
 
     if len(sys.argv) == 1:
         parser.print_help()
@@ -227,7 +234,7 @@ def main():
         train_cost = 0
         for j in range(int(train_no/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
-            X_user, X_item, y_review, y_rating = dataset.create_batch(list_idx)
+            X_user, X_item, y_review, y_rating = dataset.create_batch(list_idx, k=args.k)
             feed_dict ={model.embedding: embedding,
                         model.X_user_ids: X_user,
                         model.X_item_ids: X_item,
@@ -241,7 +248,7 @@ def main():
         if i%1 == 0:
             for j in range(int(test_no / batch_size)+1):
                 idx = list(range(j*batch_size, min(test_no, (j+1)*batch_size)))
-                X_user, X_item, y_review, y_rating = dataset.create_batch(idx, k=2, type="test")
+                X_user, X_item, y_review, y_rating = dataset.create_batch(idx, k=args.k, type="test")
                 feed_dict = {model.embedding: embedding,
                              model.X_user_ids: X_user,
                              model.X_item_ids: X_item,
