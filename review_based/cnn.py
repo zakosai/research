@@ -46,9 +46,9 @@ class Model(object):
             x_ = max_pooling2d(x_, (8, 1), (8, 1))
             if self.attention:
                 x_ = tf.reshape(x_, (-1, 8, 512))
-                att = MultiHeadsAttModel(8, 512, 64, 32)
+                att = MultiHeadsAttModel(8, 512, 64, 512)
                 x_ = att([x_, x_, x_])
-                x_ = tf.reshape(x_, (-1, 8, 1, 32))
+                x_ = tf.reshape(x_, (-1, 8, 1, 512))
                 # x_ = NormL()(x_)
             print(x_.get_shape())
             x_ = flatten(x_)
@@ -57,7 +57,7 @@ class Model(object):
     def _dec(self, x, filters, scope="user"):
         x_ = x
         with tf.variable_scope(scope):
-            x_ = tf.reshape(x_, (-1, 8, 1, -1))
+            x_ = tf.reshape(x_, (-1, 8, 1, filters[0]))
             x_ = tf.image.resize_nearest_neighbor(x_, (64, 1))
             for i in range(1, len(filters)):
                 x_ = conv2d_transpose(x_, filters[i], (2, 1))
