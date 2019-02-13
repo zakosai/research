@@ -10,7 +10,7 @@ from attention import MultiHeadsAttModel, NormL
 
 class Model(object):
     def __init__(self, filters, mlp_layers, vocab_size, embedding_dim, seq_dim=1000, learning_rate=1e-4,
-                 attention=True):
+                 attention=True, deep_model=True, vae=True):
         self.vocab_size = vocab_size
         self.embedding_dim = embedding_dim
         self.seq_dim = seq_dim
@@ -20,6 +20,8 @@ class Model(object):
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.learning_rate = learning_rate
         self.attention = attention
+        self.deep_model = deep_model
+        self.vae = vae
 
     def denseBlock(self, x, i, num_filters_per_size_i, cnn_filter_size_i=3, num_rep_block_i=4):
         with tf.variable_scope("dense_unit_%s" % i):
@@ -55,10 +57,11 @@ class Model(object):
     def _dec(self, x, filters, scope="user"):
         x_ = x
         with tf.variable_scope(scope):
-            for i in range(len(filters)):
-                x_ = conv2d_transpose(x_, filters[i], (2, 1), )
-            x_ = max_pooling2d(x_, (8, 1), (8, 1))
-            x_ = flatten(x_)
+            x_ = tf.reshape(x_, (-1, 8, 1, -1))
+            x_ = tf.image.resize_nearest_neighbor(x_, (64, 1))
+            for i in range(1, len(filters)):
+                x_ = conv2d_transpose(x_, filters[i], (2, 1))
+            x_ = conv2d_transpose(x_, self.embedding_dim, (2,1))
         return x_
 
     def encode(self, x, filters, scope="user"):
@@ -98,6 +101,8 @@ class Model(object):
             x_ = dense(x_, layers[-1], kernel_regularizer=self.regularizer)
         return x_
 
+    def rec_loss(self, x, x_rec):
+        return tf.reduce_sum(-x * tf.log(x_rec + 1e-10) -  (1.0 - x) * tf.log(1.0 - x_rec + 1e-10))
 
 
 
@@ -119,14 +124,26 @@ class Model(object):
         X_user = tf.reshape(X_user, (-1, self.seq_dim, 1, self.embedding_dim))
         X_item = tf.reshape(X_item, (-1, self.seq_dim, 1, self.embedding_dim))
 
-        X_user_z = self.encode(X_user, self.filters, "user")
-        X_item_z = self.encode(X_item, self.filters, "item")
+        if self.deep_model:
+            X_user_z = self.encode(X_user, self.filters, "user")
+            X_item_z = self.encode(X_item, self.filters, "item")
+        else:
+            X_user_z = self._enc(X_user, self.filters, "user")
+            X_item_z = self._enc(X_item, self.filters, "item")
+
+        if self.vae:
+            X_user_rec = self._dec(X_user_z, self.filters[::-1], "dec_user")
+            X_item_rec = self._dec(X_item_z, self.filters[::-1], "dec_item")
+
         X = tf.concat([X_user_z, X_item_z], axis=1)
 
         X = self.mlp(X, self.mlp_layers)
         X = tf.reshape(X, [-1])
         print(y.shape, X.shape)
         self.loss = tf.losses.mean_squared_error(self.y_rating, X) + 0.1* tf.losses.get_regularization_loss()
+        if self.vae:
+            loss_rec = self.rec_loss(X_user, X_user_rec) + self.rec_loss(X_item, X_item_rec)
+            self.loss += 0.1 * loss_rec
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.X = X
 
@@ -156,6 +173,20 @@ def parse_args():
         help='using attention or not',
         type=bool
     )
+    parser.add_argument(
+        '--deep',
+        default=False,
+        dest='deep',
+        help='using deep model or not',
+        type=bool
+    )
+    parser.add_argument(
+        '--vae',
+        default=False,
+        dest='vae',
+        help='using vae model or not',
+        type=bool
+    )
 
     if len(sys.argv) == 1:
         parser.print_help()
@@ -170,11 +201,11 @@ def main():
 
     filter = [64, 128, 256, 512]
     mlp_layers = [256, 1]
-    batch_size = 128
+    batch_size = 256
     iter = 50
 
     model = Model(filter, mlp_layers, dataset.vocab_size, dataset.embedding_dim, seq_dim=dataset.max_sequence_length,
-                  attention=args.attention)
+                  attention=args.attention, deep_model=args.deep, vae=args.vae)
     model.build_model()
 
     sess = tf.Session()
