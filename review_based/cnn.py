@@ -39,7 +39,6 @@ class Model(object):
 
     def _enc(self, x, filters, scope="user"):
         x_ = x
-        x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope):
             for i in range(len(filters)):
                 x_ = conv2d(x_, filters[i], (2,1), padding='same')
@@ -217,7 +216,7 @@ def main():
     dataset = Dataset(data, max_sequence_length=1024)
 
     filter = [64, 128, 256, 512]
-    mlp_layers = [256, 1]
+    mlp_layers = [256, 50, 1]
     batch_size = 256
     iter = 50
 
