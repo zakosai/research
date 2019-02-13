@@ -22,11 +22,11 @@ class Model(object):
         with tf.variable_scope("dense_unit_%s" % i):
             nodes = []
             x_ = x
-            x_ = conv2d(x_, num_filters_per_size_i, (cnn_filter_size_i, 1))
+            x_ = conv2d(x_, num_filters_per_size_i, (cnn_filter_size_i, 1), padding='same')
             nodes.append(x_)
             print(x_.get_shape())
             for z in range(num_rep_block_i - 1):
-                x_ = conv2d(tf.concat(nodes, 3), num_filters_per_size_i, (cnn_filter_size_i, 1))
+                x_ = conv2d(tf.concat(nodes, 3), num_filters_per_size_i, (cnn_filter_size_i, 1), padding='same')
                 nodes.append(x_)
                 print(x_.get_shape())
 
