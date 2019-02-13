@@ -56,10 +56,13 @@ class Dataset(object):
             seq = [user[1][j] for j in u_ids]
             sequences_user.append(' '.join(seq))
 
-            item = self.data['train_item'][d[1]]
-            i_ids = list(np.random.randint(0, len(item[0]), k))
-            seq = [item[1][j] for j in i_ids]
-            sequences_item.append(' '.join(seq))
+            try:
+                item = self.data['train_item'][d[1]]
+                i_ids = list(np.random.randint(0, len(item[0]), k))
+                seq = [item[1][j] for j in i_ids]
+                sequences_item.append(' '.join(seq))
+            except:
+                sequences_item.append(' ')
         X_user = self.tokenizer.texts_to_sequences(sequences_user)
         X_user = pad_sequences(X_user, maxlen=self.max_sequence_length)
         X_item = self.tokenizer.texts_to_sequences(sequences_item)
