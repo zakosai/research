@@ -60,8 +60,8 @@ class Model(object):
             x_ = tf.reshape(x_, (-1, 8, 1, filters[0]))
             x_ = tf.image.resize_nearest_neighbor(x_, (64, 1))
             for i in range(1, len(filters)):
-                x_ = conv2d_transpose(x_, filters[i], (2, 1))
-            x_ = conv2d_transpose(x_, self.embedding_dim, (2,1))
+                x_ = conv2d_transpose(x_, filters[i], (3, 1), (2, 1))
+            x_ = conv2d_transpose(x_, self.embedding_dim, (3,1), (2, 1))
         return x_
 
     def encode(self, x, filters, scope="user"):
