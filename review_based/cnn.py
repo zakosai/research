@@ -69,6 +69,13 @@ class Model(object):
                 x_ = self.denseBlock(x_, i, filters[i])
                 x_ = max_pooling2d(x_, (2, 1), (2, 1))
             x_ = max_pooling2d(x_, (8, 1), (8, 1))
+            if self.attention:
+                x_ = tf.reshape(x_, (-1, 8, 512))
+                att = MultiHeadsAttModel(8, 512, 64, 32)
+                x_ = att([x_, x_, x_])
+                x_ = tf.reshape(x_, (-1, 8, 1, 32))
+                # x_ = NormL()(x_)
+            print(x_.get_shape())
             x_ = flatten(x_)
 
         return x_
@@ -112,8 +119,8 @@ class Model(object):
         X_user = tf.reshape(X_user, (-1, self.seq_dim, 1, self.embedding_dim))
         X_item = tf.reshape(X_item, (-1, self.seq_dim, 1, self.embedding_dim))
 
-        X_user_z = self._enc(X_user, self.filters, "user")
-        X_item_z = self._enc(X_item, self.filters, "item")
+        X_user_z = self.encode(X_user, self.filters, "user")
+        X_item_z = self.encode(X_item, self.filters, "item")
         X = tf.concat([X_user_z, X_item_z], axis=1)
 
         X = self.mlp(X, self.mlp_layers)
@@ -157,7 +164,7 @@ def main():
     filter = [64, 128, 256, 512]
     mlp_layers = [256, 1]
     batch_size = 128
-    iter = 20
+    iter = 50
 
     model = Model(filter, mlp_layers, dataset.vocab_size, dataset.embedding_dim, seq_dim=dataset.max_sequence_length)
     model.build_model()
