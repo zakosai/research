@@ -51,7 +51,7 @@ class Dataset(object):
         sequences_user = []
         sequences_item = []
         for i, d in data_b.iterrows():
-            user = self.data['train_user'][d[0]]
+            user = self.data['train_user'][d[0]].copy()
             ids = list(set(range(len(user[0]))) - set([user[0].index(d[0])]))
             ids = np.random.permutation(ids)
             u_ids = ids[:min(len(user[0]), k)]
@@ -59,7 +59,7 @@ class Dataset(object):
             sequences_user.append(' '.join(seq))
 
             try:
-                item = self.data['train_item'][d[1]]
+                item = self.data['train_item'][d[1]].copy()
                 ids = list(set(range(len(item[0]))) - set([item[0].index(d[1])]))
                 ids = np.random.permutation(ids)
                 i_ids = ids[:min(len(user[0]), k)]
