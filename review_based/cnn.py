@@ -216,7 +216,7 @@ def main():
     dataset = Dataset(data, max_sequence_length=1024)
 
     filter = [64, 128, 256, 512]
-    mlp_layers = [256, 50, 1]
+    mlp_layers = [256, 1]
     batch_size = 256
     iter = 50
 
