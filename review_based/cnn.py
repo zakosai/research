@@ -59,6 +59,7 @@ class Model(object):
         X = tf.concat([X_user_z, X_item_z], axis=1)
 
         X = self.mlp(X, self.mlp_layers)
+        X = tf.reshape(X, [-1])
         print(y.shape, X.shape)
         self.loss = tf.losses.mean_squared_error(self.y_rating, X) + 0.1* tf.losses.get_regularization_loss()
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
