@@ -46,6 +46,8 @@ class Model(object):
                 x_ = att([x_, x_, x_])
                 x_ = tf.reshape(x_, (-1, 8, 8, 32))
                 x_ = NormL()(x_)
+            print(x_.get_shape())
+            x_ = tf.Tensor(x_)
             x_ = flatten(x_)
         return x_
 
