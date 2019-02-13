@@ -39,6 +39,7 @@ class Model(object):
 
     def _enc(self, x, filters, scope="user"):
         x_ = x
+        x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope):
             for i in range(len(filters)):
                 x_ = conv2d(x_, filters[i], (2,1), padding='same')
