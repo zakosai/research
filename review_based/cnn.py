@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.layers import conv2d, dense, max_pooling2d, flatten, conv2d_transpose
-import tensorflow.contrib.slim as slim
+from keras.layers import Flatten
 import pickle
 import argparse
 import sys
@@ -47,8 +47,7 @@ class Model(object):
                 x_ = tf.reshape(x_, (-1, 8, 8, 32))
                 x_ = NormL()(x_)
             print(x_.get_shape())
-            x_ = tf.Tensor(x_)
-            x_ = flatten(x_)
+            x_ = Flatten()(x_)
         return x_
 
     # def _dec(self, x, filters, scope="user"):
