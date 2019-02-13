@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.layers import conv1d, dense, max_pooling1d, flatten
+from tensorflow.layers import conv2d, dense, max_pooling2d, flatten
 import pickle
 import argparse
 import sys
@@ -21,11 +21,21 @@ class Model(object):
         x_ = x
         with tf.variable_scope(scope):
             for i in range(len(filters)):
-                x_ = conv1d(x_, filters[i], 5)
-                x_ = max_pooling1d(x_, 5, 5)
+                x_ = conv2d(x_, filters[i], (5, 1) )
+                x_ = max_pooling2d(x_, (5, 1), (5, 1))
             x_ = flatten(x_)
 
         return x_
+
+    # def decode(self, x, filters, scope="user"):
+    #     x_ = x
+    #     with tf.variable_scope(scope):
+    #         for i in range(len(filters)):
+    #             x_ = conv1d(x_, filters[i], 5)
+    #             x_ = max_pooling1d(x_, 5, 5)
+    #         x_ = flatten(x_)
+    #
+    #     return x_
 
     def mlp(self, x, layers, scope="mlp"):
         x_ = x
@@ -53,6 +63,8 @@ class Model(object):
 
         X_user = tf.nn.embedding_lookup(self.embedding, self.X_user_ids)
         X_item = tf.nn.embedding_lookup(self.embedding, self.X_item_ids)
+        X_user = tf.reshape(X_user, (-1, -1, 1, self.embedding_dim))
+        X_item = tf.reshape(X_item, (-1, -1, 1, self.embedding_dim))
 
         X_user_z = self.encode(X_user, self.filters, "user")
         X_item_z = self.encode(X_item, self.filters, "item")
@@ -93,13 +105,13 @@ def parse_args():
 def main():
     args = parse_args()
     f = open(args.data, "rb")
-    data = pickle.load(f, encoding='latin1')
+    data = pickle.load(f)
     dataset = Dataset(data)
 
     filter = [32, 64, 128]
     mlp_layers = [20, 1]
     batch_size = 500
-    iter = 100
+    iter = 20
 
     model = Model(filter, mlp_layers, dataset.vocab_size, dataset.embedding_dim)
     model.build_model()
