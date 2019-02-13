@@ -9,7 +9,8 @@ import numpy as np
 from attention import MultiHeadsAttModel, NormL
 
 class Model(object):
-    def __init__(self, filters, mlp_layers, vocab_size, embedding_dim, seq_dim=1000, learning_rate=1e-3, attention=True):
+    def __init__(self, filters, mlp_layers, vocab_size, embedding_dim, seq_dim=1000, learning_rate=1e-4,
+                 attention=True):
         self.vocab_size = vocab_size
         self.embedding_dim = embedding_dim
         self.seq_dim = seq_dim
