@@ -118,8 +118,8 @@ class Model(object):
         X_user = tf.reshape(X_user, (-1, self.seq_dim, 1, self.embedding_dim))
         X_item = tf.reshape(X_item, (-1, self.seq_dim, 1, self.embedding_dim))
 
-        X_user_z = self._enc(X_user, self.filters, "user")
-        X_item_z = self._enc(X_item, self.filters, "item")
+        X_user_z = self.encode(X_user, self.filters, "user")
+        X_item_z = self.encode(X_item, self.filters, "item")
         X = tf.concat([X_user_z, X_item_z], axis=1)
 
         X = self.mlp(X, self.mlp_layers)
@@ -148,6 +148,13 @@ def parse_args():
         help='where to experiment',
         type=str
     )
+    parser.add_argument(
+        '--attention',
+        default=False,
+        dest='attention',
+        help='using attention or not',
+        type=bool
+    )
 
     if len(sys.argv) == 1:
         parser.print_help()
@@ -165,7 +172,8 @@ def main():
     batch_size = 128
     iter = 50
 
-    model = Model(filter, mlp_layers, dataset.vocab_size, dataset.embedding_dim, seq_dim=dataset.max_sequence_length)
+    model = Model(filter, mlp_layers, dataset.vocab_size, dataset.embedding_dim, seq_dim=dataset.max_sequence_length,
+                  attention=args.attention)
     model.build_model()
 
     sess = tf.Session()
