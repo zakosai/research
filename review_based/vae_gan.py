@@ -358,6 +358,8 @@ def main():
                     error = np.concatenate([error, p-rating], axis=0)
             mse = np.mean(error ** 2)
             print("rmse = %f"%mse)
+        if i%100 == 0:
+            model.learning_rate /= 10
 
 if __name__ == '__main__':
     main()
