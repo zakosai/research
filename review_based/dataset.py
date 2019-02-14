@@ -82,23 +82,26 @@ class Dataset(object):
 
     def create_implicit_batch(self, idx, type="train"):
         data_b = self.data[type].iloc[idx]
-        y_rating = data_b[3]
+        y_rating = np.array(data_b[3])
 
         sequences_user = []
         sequences_item = []
         for i, d in data_b.iterrows():
-            user = self.data['train_user'][d[0]][0].copy()
-            user.remove(d[1])
-            seq = np.zeros()
-            sequences_user.append(' '.join(seq))
+            user = self.data['train_user'][d[0]]
+            seq = np.zeros(self.data['item_no'])
+            for i, j in enumerate(user[0]):
+                if j != d[1]:
+                    seq[j] = user[2][i]
+            sequences_user.append(seq)
 
-            try:
-                item = self.data['train_item'][d[1]]
-                i_ids = list(np.random.randint(0, len(item[0]), k))
-                seq = [item[1][j] for j in i_ids]
-                sequences_item.append(' '.join(seq))
-            except:
-                sequences_item.append(' ')
+        item = self.data['train_item'][d[0]]
+        seq = np.zeros(self.data['user_no'])
+        for i, j in enumerate(item[0]):
+            if j != d[0]:
+                seq[j] = item[2][i]
+        sequences_item.append(seq)
+
+        return sequences_user, sequences_item, y_rating
 
 
 def parse_args():

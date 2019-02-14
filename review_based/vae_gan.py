@@ -182,6 +182,7 @@ class Translation:
         # predict rating
         z = tf.concat([z_A, z_B], axis=1)
         rating_pred = self.mlp(z, self.rating_layers)
+        rating_pred = tf.reshape(rating_pred, [-1])
 
 
         # Loss VAE
