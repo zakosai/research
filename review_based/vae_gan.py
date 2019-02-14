@@ -301,7 +301,7 @@ def main():
     data = pickle.load(f)
     dataset = Dataset(data, max_sequence_length=1024)
 
-    iter = 100
+    iter = 500
     batch_size = 500
     z_dim = 50
     adv_dim_A = adv_dim_B = rating_layers = [100, 1]
