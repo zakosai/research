@@ -340,9 +340,9 @@ def main():
                                                         model.loss_CC, model.loss_rating], feed_dict=feed)
 
 
-                print("Loss last batch: %f"%loss_rating)
 
         if i%10 == 0 and i > 20:
+            print("Loss last batch: %f" % loss_rating)
             for j in range(int(test_no / batch_size)+1):
                 idx = list(range(j*batch_size, min(test_no, (j+1)*batch_size)))
                 user, item, rating = dataset.create_implicit_batch(idx, "test")
