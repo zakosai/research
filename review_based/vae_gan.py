@@ -214,6 +214,7 @@ class Translation:
         self.y_AB = y_AB
 
         # loss rating
+        print(self.y.get_shape, rating_pred.get_shape)
         self.loss_rating = tf.losses.mean_squared_error(self.y, rating_pred)
 
         self.loss_gen = self.loss_CC + 0.1 * tf.losses.get_regularization_loss() +\
