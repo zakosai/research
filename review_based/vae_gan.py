@@ -318,7 +318,6 @@ def main():
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(max_to_keep=3)
-    embedding = dataset.embedding_matrix
     train_no = len(data['train'])
     test_no = len(data['test'])
     for i in range(1, iter):
@@ -326,8 +325,8 @@ def main():
         train_cost = 0
         for j in range(int(train_no/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
-            user, item, rating = Dataset.create_implicit_batch(list_idx, "train")
-            feed_dict ={model.x_A: user,
+            user, item, rating = dataset.create_implicit_batch(list_idx, "train")
+            feed ={model.x_A: user,
                         model.x_B: item,
                         model.y: rating}
             if i < 20:
@@ -346,7 +345,7 @@ def main():
         if i%10 == 0 and i > 20:
             for j in range(int(test_no / batch_size)+1):
                 idx = list(range(j*batch_size, min(test_no, (j+1)*batch_size)))
-                user, item, rating = Dataset.create_implicit_batch(idx, "test")
+                user, item, rating = dataset.create_implicit_batch(idx, "test")
                 feed_dict = {model.x_A: user,
                              model.x_B: item,
                              model.y: rating}
