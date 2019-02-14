@@ -89,17 +89,21 @@ class Dataset(object):
         for i, d in data_b.iterrows():
             user = self.data['train_user'][d[0]]
             seq = np.zeros(self.data['item_no'])
-            for i, j in enumerate(user[0]):
+            for k, j in enumerate(user[0]):
                 if j != d[1]:
-                    seq[j] = user[2][i]
+                    seq[j] = user[2][k]
             sequences_user.append(seq)
 
-        item = self.data['train_item'][d[0]]
-        seq = np.zeros(self.data['user_no'])
-        for i, j in enumerate(item[0]):
-            if j != d[0]:
-                seq[j] = item[2][i]
-        sequences_item.append(seq)
+
+            seq = np.zeros(self.data['user_no'])
+            try:
+                item = self.data['train_item'][d[0]]
+                for k, j in enumerate(item[0]):
+                    if j != d[0]:
+                        seq[j] = item[2][k]
+            except:
+                pass
+            sequences_item.append(seq)
 
         return sequences_user, sequences_item, y_rating
 
