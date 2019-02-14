@@ -1,8 +1,5 @@
 import tensorflow as tf
 from tensorflow.contrib.layers import fully_connected, flatten, batch_norm, maxout
-from tensorflow import sigmoid
-import tensorflow.keras.backend as K
-from tensorflow.contrib.framework import argsort
 import numpy as np
 import os
 import argparse
@@ -138,8 +135,8 @@ class Translation:
         return neg_ll
 
 
-    def loss_recsys(self, pred, label):
-        return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(label, pred), axis=1))
+    # def loss_recsys(self, pred, label):
+    #     return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(label, pred), axis=1))
 
     def loss_discriminator(self, x, x_fake):
         loss_real = tf.reduce_mean(tf.squared_difference(x, 1))
