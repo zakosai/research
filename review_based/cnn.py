@@ -174,7 +174,8 @@ class Model(object):
         self.loss = tf.losses.mean_squared_error(self.y_rating, X) + tf.losses.get_regularization_loss()
         if self.vae:
             loss_rec = self.rec_loss(X_user, X_user_rec) + self.rec_loss(X_item, X_item_rec)
-            self.loss += loss_rec + 0.1*self.loss_kl(X_user_mu, X_user_sigma) + 0.1 * self.loss_kl(X_item_mu, X_item_sigma)
+            self.loss = 100* self.loss + loss_rec + 0.1*self.loss_kl(X_user_mu, X_user_sigma) + 0.1 * self.loss_kl(
+                X_item_mu, X_item_sigma)
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.X = X
 
