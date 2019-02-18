@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.layers import conv2d, dense, max_pooling2d, flatten, conv2d_transpose
-from keras.layers import Flatten
+from keras import metrics
 import pickle
 import argparse
 import sys
@@ -107,11 +107,13 @@ class Model(object):
     def rec_loss(self, x, x_rec):
         x = flatten(x)
         x_rec = flatten(x_rec)
-        loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=x, logits=x_rec)
-        print(loss.get_shape())
-        loss = tf.reduce_mean(loss, axis=0)
-        print(loss.get_shape())
-        return -loss
+        # loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=x, logits=x_rec)
+        # print(loss.get_shape())
+        # loss = tf.reduce_mean(loss, axis=0)
+        # print(loss.get_shape())
+        # return -loss
+        loss = self.embedding_dim * self.seq_dim * metrics.binary_crossentropy(x, x_rec)
+        return loss
 
 
     def build_model(self):
