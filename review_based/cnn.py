@@ -157,8 +157,8 @@ class Model(object):
         if self.vae:
             h_user, X_user_mu, X_user_sigma = self.gen_z(X_user_z, "user")
             h_item, X_item_mu, X_item_sigma = self.gen_z(X_item_z, "item")
-            h_user = dense(h_user, 4092,kernel_regularizer=self.regularizer, activation=self.activation)
-            h_item = dense(h_item, 4092,kernel_regularizer=self.regularizer, activation=self.activation)
+            h_user = dense(h_user, 4096,kernel_regularizer=self.regularizer, activation=self.activation)
+            h_item = dense(h_item, 4096,kernel_regularizer=self.regularizer, activation=self.activation)
             X_user_rec = self._dec(h_user, self.filters[::-1], "dec_user")
             X_item_rec = self._dec(h_item, self.filters[::-1], "dec_item")
 
