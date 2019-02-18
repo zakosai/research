@@ -22,6 +22,7 @@ class Model(object):
         self.attention = attention
         self.deep_model = deep_model
         self.vae = vae
+        self.z_dim = 50
 
     def denseBlock(self, x, i, num_filters_per_size_i, cnn_filter_size_i=3, num_rep_block_i=4):
         with tf.variable_scope("dense_unit_%s" % i):
@@ -67,6 +68,14 @@ class Model(object):
             print(x_.get_shape())
         return x_
 
+    def gen_z(self, h, scope, reuse=False):
+        with tf.variable_scope(scope, reuse=reuse):
+            z_mu = dense(h, self.z_dim, kernel_regularizer=self.regularizer, activation=self.activation)
+            z_sigma = dense(h, self.z_dim, kernel_regularizer=self.regularizer, activation=self.activation)
+            e = tf.random_normal(tf.shape(z_mu))
+            z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
+        return z, z_mu, z_sigma
+
     def encode(self, x, filters, scope="user"):
         x_ = x
         with tf.variable_scope(scope):
@@ -85,6 +94,7 @@ class Model(object):
             x_ = flatten(x_)
 
         return x_
+
 
     # def decode(self, x, filters, scope="user"):
     #     x_ = x
@@ -115,6 +125,9 @@ class Model(object):
         loss = tf.reduce_mean(self.embedding_dim * self.seq_dim * metrics.binary_crossentropy(x, x_rec))
         return loss
 
+    def loss_kl(self, mu, sigma):
+        return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
+
 
     def build_model(self):
         self.embedding = tf.Variable(tf.constant(0.0, shape=[self.vocab_size, self.embedding_dim]),
@@ -142,10 +155,17 @@ class Model(object):
             X_item_z = self._enc(X_item, self.filters, "item")
 
         if self.vae:
-            X_user_rec = self._dec(X_user_z, self.filters[::-1], "dec_user")
-            X_item_rec = self._dec(X_item_z, self.filters[::-1], "dec_item")
+            h_user, X_user_mu, X_user_sigma = self.gen_z(X_user_z, "user")
+            h_item, X_item_mu, X_item_sigma = self.gen_z(X_item_z, "item")
+            h_user = dense(h_user, 4092,kernel_regularizer=self.regularizer, activation=self.activation)
+            h_item = dense(h_item, 4092,kernel_regularizer=self.regularizer, activation=self.activation)
+            X_user_rec = self._dec(h_user, self.filters[::-1], "dec_user")
+            X_item_rec = self._dec(h_item, self.filters[::-1], "dec_item")
 
-        X = tf.concat([X_user_z, X_item_z], axis=1)
+        if self.vae:
+            X = tf.concat([X_user_mu, X_item_mu], axis=1)
+        else:
+            X = tf.concat([X_user_z, X_item_z], axis=1)
 
         X = self.mlp(X, self.mlp_layers)
         X = tf.reshape(X, [-1])
