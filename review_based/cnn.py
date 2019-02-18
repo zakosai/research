@@ -22,7 +22,7 @@ class Model(object):
         self.attention = attention
         self.deep_model = deep_model
         self.vae = vae
-        self.z_dim = 200
+        self.z_dim = 1024
 
     def denseBlock(self, x, i, num_filters_per_size_i, cnn_filter_size_i=3, num_rep_block_i=4):
         with tf.variable_scope("dense_unit_%s" % i):
