@@ -73,7 +73,7 @@ class Model(object):
             z_mu = dense(h, self.z_dim, kernel_regularizer=self.regularizer, activation=self.activation)
             z_sigma = dense(h, self.z_dim, kernel_regularizer=self.regularizer, activation=self.activation)
             e = tf.random_normal(tf.shape(z_mu))
-            z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
+            z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), 1e-10)) * e
         return z, z_mu, z_sigma
 
     def encode(self, x, filters, scope="user"):
