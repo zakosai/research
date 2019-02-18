@@ -112,7 +112,7 @@ class Model(object):
         # loss = tf.reduce_mean(loss, axis=0)
         # print(loss.get_shape())
         # return -loss
-        loss = self.embedding_dim * self.seq_dim * metrics.binary_crossentropy(x, x_rec)
+        loss = tf.reduce_mean(self.embedding_dim * self.seq_dim * metrics.binary_crossentropy(x, x_rec))
         return loss
 
 
