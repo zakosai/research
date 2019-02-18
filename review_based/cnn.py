@@ -245,7 +245,7 @@ def main():
                         model.y_rating: y_rating}
 
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed_dict)
-
+        print(len(loss))
         print("Loss last batch: %f"%loss)
 
         if i%1 == 0:
