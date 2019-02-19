@@ -12,7 +12,7 @@ from dataset import Dataset
 class Model(object):
     def __init__(self, tf_dim=8000, vae=False):
         self.tfdim = tf_dim
-        self.layers = [600, 200]
+        self.layers = [1000, 500, 100]
         self.z_dim = [50]
         self.activation = tf.nn.tanh
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
@@ -25,7 +25,7 @@ class Model(object):
             for i in range(len(layers)):
                 x_ = fully_connected(x_, layers[i], activation_fn=self.activation, weights_regularizer=self.regularizer,
                                      scope="encode_%d"%i)
-                # x_ = tf.nn.leaky_relu(x_, 0.5)
+                x_ = tf.nn.leaky_relu(x_, 0.5)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
@@ -43,7 +43,7 @@ class Model(object):
             for i in range(len(layers)-1):
                 x_ = fully_connected(x_, layers[i], activation_fn=self.activation, weights_regularizer=self.regularizer,
                                      scope="encode_%d" % i)
-                # x_ = tf.nn.leaky_relu(x_, 0.5)
+                x_ = tf.nn.leaky_relu(x_, 0.5)
             x_ = fully_connected(x_, layers[-1],  weights_regularizer=self.regularizer)
         return x_
 
