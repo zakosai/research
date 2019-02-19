@@ -144,8 +144,8 @@ class Dataset(object):
                 sequences_item.append(' '.join(seq))
             except:
                 sequences_item.append(' ')
-        X_user = self.tfidf.transform(sequences_user)
-        X_item = self.tfidf.transform(sequences_item)
+        X_user = self.tfidf.transform(sequences_user).toarray()
+        X_item = self.tfidf.transform(sequences_item).toarray()
 
         return X_user, X_item, y_rating
 
