@@ -172,8 +172,8 @@ def main():
     batch_size = 500
     iter = 50
 
-    model = Model()
-    model.build_model(vae=args.vae, deep=args.deep)
+    model = Model(vae=args.vae, deep=args.deep)
+    model.build_model()
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
