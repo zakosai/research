@@ -173,7 +173,7 @@ def main():
     iter = 50
 
     model = Model()
-    model.build_model()
+    model.build_model(vae=args.vae, deep=args.deep)
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
