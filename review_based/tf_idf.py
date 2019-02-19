@@ -14,7 +14,7 @@ class Model(object):
         self.tfdim = tf_dim
         self.layers = [600, 200]
         self.z_dim = [50]
-        self.activation = None
+        self.activation = tf.nn.tanh
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.learning_rate = 1e-4
         self.vae = vae
@@ -25,7 +25,7 @@ class Model(object):
             for i in range(len(layers)):
                 x_ = fully_connected(x_, layers[i], activation_fn=self.activation, weights_regularizer=self.regularizer,
                                      scope="encode_%d"%i)
-                x_ = tf.nn.leaky_relu(x_, 0.5)
+                # x_ = tf.nn.leaky_relu(x_, 0.5)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
@@ -43,7 +43,7 @@ class Model(object):
             for i in range(len(layers)-1):
                 x_ = fully_connected(x_, layers[i], activation_fn=self.activation, weights_regularizer=self.regularizer,
                                      scope="encode_%d" % i)
-                x_ = tf.nn.leaky_relu(x_, 0.5)
+                # x_ = tf.nn.leaky_relu(x_, 0.5)
             x_ = fully_connected(x_, layers[-1],  weights_regularizer=self.regularizer)
         return x_
 
@@ -174,7 +174,7 @@ def main():
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed_dict)
         print("Loss last batch: %f"%loss)
 
-        if i%10 == 0:
+        if i%1 == 0:
             for j in range(int(test_no / batch_size)+1):
                 idx = list(range(j*batch_size, min(test_no, (j+1)*batch_size)))
                 x_user, x_item, y_rating = dataset.create_tfidf(idx, k=args.k, type="test")
@@ -188,6 +188,9 @@ def main():
                     error = np.concatenate([error, p-y_rating], axis=0)
             mse = np.mean(error ** 2)
             print("rmse = %f"%mse)
+
+        if i%30 == 0:
+            model.learning_rate /= 10
 
 if __name__ == '__main__':
     main()
