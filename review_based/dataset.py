@@ -6,6 +6,7 @@ import os
 import pickle
 import re
 from keras.preprocessing.text import Tokenizer, text_to_word_sequence
+from sklearn.feature_extraction.text import TfidfVectorizer
 from keras.preprocessing.sequence import pad_sequences
 import numpy as np
 
@@ -39,6 +40,12 @@ class Dataset(object):
             if embedding_vector is not None:
                 # words not found in embedding index will be all-zeros.
                 self.embedding_matrix[i] = embedding_vector
+
+        # tf-idf
+
+        text = self.data['train'][2]
+        self.tfidf = TfidfVectorizer(stop_words='english', max_features=8000)
+        self.tfidf.fit(text.astype('U'), self.data['train'][3])
 
 
     def create_batch(self, idx, k=2, type='train'):
@@ -106,6 +113,43 @@ class Dataset(object):
             sequences_item.append(seq)
 
         return sequences_user, sequences_item, y_rating
+
+    def create_tfidf(self, idx, k=2, type='train'):
+        data_b = self.data[type].iloc[idx]
+        y_rating = np.array(data_b[3])
+        y_review = self.tokenizer.texts_to_sequences(list(data_b[2]))
+        y_review = pad_sequences(y_review, maxlen=self.max_sequence_length)
+
+        # Create X
+        sequences_user = []
+        sequences_item = []
+        for i, d in data_b.iterrows():
+            user = self.data['train_user'][d[0]]
+            if type == "train":
+                ids = list(set(range(len(user[0]))) - set([user[0].index(d[1])]))
+            else:
+                ids = list(range(len(user[0])))
+            ids = np.random.permutation(ids)
+            u_ids = ids[:min(len(user[0]), k)]
+            seq = [user[1][j] for j in u_ids]
+            sequences_user.append(' '.join(seq))
+
+            try:
+                item = self.data['train_item'][d[1]]
+                if type == "train":
+                    ids = list(set(range(len(item[0]))) - set([item[0].index(d[0])]))
+                else:
+                    ids = list(range(len(item[0])))
+                ids = np.random.permutation(ids)
+                i_ids = ids[:min(len(user[0]), k)]
+                seq = [item[1][j] for j in i_ids]
+                sequences_item.append(' '.join(seq))
+            except:
+                sequences_item.append(' ')
+        X_user = self.tfidf.transform(sequences_user)
+        X_item = self.tfidf.transform(sequences_item)
+
+        return X_user, X_item, y_review, y_rating
 
 
 def parse_args():
