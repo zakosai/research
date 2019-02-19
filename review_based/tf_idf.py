@@ -45,7 +45,7 @@ class Model(object):
         with tf.variable_scope(scope):
             for i in range(len(layers)-1):
                 x_ = fully_connected(x_, layers[i], activation_fn=self.activation, weights_regularizer=self.regularizer,
-                                     scope="encode_%d" % i)
+                                     scope="decode_%d" % i)
                 x_ = tf.nn.leaky_relu(x_, 0.5)
             x_ = fully_connected(x_, layers[-1],  weights_regularizer=self.regularizer)
         return x_
