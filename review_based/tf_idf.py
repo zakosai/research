@@ -177,6 +177,7 @@ def main():
     f = open(args.data, "rb")
     data = pickle.load(f)
     dataset = Dataset(data, max_sequence_length=1024)
+    f.close()
 
     batch_size = 1000
     iter = 50
@@ -189,6 +190,7 @@ def main():
     saver = tf.train.Saver(max_to_keep=3)
     train_no = len(data['train'])
     test_no = len(data['test'])
+    min_error = 100000
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(train_no)
         train_cost = 0
@@ -215,9 +217,15 @@ def main():
                     error = np.concatenate([error, p-y_rating], axis=0)
             mse = np.mean(error ** 2)
             print("rmse = %f"%mse)
+            if mse < min_error:
+                min_error = mse
 
         if i%30 == 0:
             model.learning_rate /= 10
+    f = open("data/result.txt", "a")
+    f.write("%s: %f"%(args.data, min_error))
+    f.close()
+
 
 if __name__ == '__main__':
     main()
