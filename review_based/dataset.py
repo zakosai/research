@@ -117,8 +117,6 @@ class Dataset(object):
     def create_tfidf(self, idx, k=2, type='train'):
         data_b = self.data[type].iloc[idx]
         y_rating = np.array(data_b[3])
-        y_review = self.tokenizer.texts_to_sequences(list(data_b[2]))
-        y_review = pad_sequences(y_review, maxlen=self.max_sequence_length)
 
         # Create X
         sequences_user = []
@@ -149,7 +147,7 @@ class Dataset(object):
         X_user = self.tfidf.transform(sequences_user)
         X_item = self.tfidf.transform(sequences_item)
 
-        return X_user, X_item, y_review, y_rating
+        return X_user, X_item, y_rating
 
 
 def parse_args():
