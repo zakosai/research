@@ -10,14 +10,15 @@ from dataset import Dataset
 
 
 class Model(object):
-    def __init__(self, tf_dim=8000, vae=False):
+    def __init__(self, tf_dim=8000, vae=False, deep=False):
         self.tfdim = tf_dim
-        self.layers = [1000, 500, 100]
+        self.layers = [600, 200]
         self.z_dim = [50]
-        self.activation = tf.nn.tanh
+        self.activation = tf.nn.relu
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.learning_rate = 1e-4
         self.vae = vae
+        self.deep = deep
 
     def _enc(self, x, layers, scope="user"):
         x_ = x
@@ -47,6 +48,19 @@ class Model(object):
             x_ = fully_connected(x_, layers[-1],  weights_regularizer=self.regularizer)
         return x_
 
+    def resnet(self, x, layers, scope="user"):
+        x_ = x
+        with tf.variable_scope(scope):
+            for i in range(len(layers)):
+                x_ = fully_connected(x_, layers[i], activation_fn=self.activation, weights_regularizer=self.regularizer,
+                                     scope="encode_%d" % i)
+                net = fully_connected(x_, layers[i], activation_fn=self.activation, weights_regularizer=self.regularizer,
+                                     scope="deeper_%d" % i)
+                x_ = tf.math.add(x_, net)
+                if i != (len(layers) -1):
+                    x_ = tf.nn.leaky_relu(x_, 0.5)
+            return x_
+
     def mlp(self, x, layers, scope="rating"):
         x_ = x
         with tf.variable_scope(scope):
@@ -73,8 +87,12 @@ class Model(object):
         self.x_item = tf.placeholder(tf.float32, [None, self.tfdim])
         self.y = tf.placeholder(tf.float32, [None])
 
-        z_user = self._enc(self.x_user, self.layers, "user")
-        z_item = self._enc(self.x_item, self.layers, "item")
+        if self.deep:
+            z_user = self.resnet(self.x_user, self.layers, "user")
+            z_item = self.resnet(self.x_item, self.layers, "item")
+        else:
+            z_user = self._enc(self.x_user, self.layers, "user")
+            z_item = self._enc(self.x_item, self.layers, "item")
 
         if self.vae:
             user_h, user_mu, user_sigma = self.gen_z(z_user, "user")
