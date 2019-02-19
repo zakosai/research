@@ -44,7 +44,7 @@ class Dataset(object):
         # tf-idf
 
         text = self.data['train'][2]
-        self.tfidf = TfidfVectorizer(stop_words='english', max_features=20000)
+        self.tfidf = TfidfVectorizer(stop_words='english', max_features=8000)
         self.tfidf.fit(text.astype('U'), self.data['train'][3])
 
 
