@@ -37,6 +37,7 @@ class Model(object):
         z = tf.concat([z_user, z_item], axis=1)
 
         self.pred = self._enc(z, [10, 1], scope="rating")
+        self.pred = tf.reshape(self.pred, [-1])
         self.loss = tf.losses.mean_squared_error(self.y, self.pred) + tf.losses.get_regularization_loss()
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
