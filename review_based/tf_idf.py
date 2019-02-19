@@ -58,9 +58,9 @@ class Model(object):
                                      scope="encode_%d" % i)
                 net = fully_connected(x_, layers[i], activation_fn=self.activation, weights_regularizer=self.regularizer,
                                      scope="deeper_%d" % i)
-                net = fully_connected(net, layers[i], activation_fn=self.activation,
-                                      weights_regularizer=self.regularizer,
-                                      scope="deeper2_%d" % i)
+                # net = fully_connected(net, layers[i], activation_fn=self.activation,
+                #                       weights_regularizer=self.regularizer,
+                #                       scope="deeper2_%d" % i)
                 x_ = tf.math.add(x_, net)
                 if i != (len(layers) -1):
                     x_ = tf.nn.leaky_relu(x_, 0.5)
