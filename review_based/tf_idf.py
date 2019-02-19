@@ -13,12 +13,14 @@ class Model(object):
     def __init__(self, tf_dim=8000, vae=False, deep=False):
         self.tfdim = tf_dim
         self.layers = [600, 200]
-        self.z_dim = [50]
+        self.z_dim = 50
         self.activation = None
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.learning_rate = 1e-4
         self.vae = vae
         self.deep = deep
+        if not self.vae:
+            self.layers.append(self.z_dim)
 
     def _enc(self, x, layers, scope="user"):
         x_ = x
@@ -87,6 +89,7 @@ class Model(object):
         self.x_user = tf.placeholder(tf.float32, [None, self.tfdim])
         self.x_item = tf.placeholder(tf.float32, [None, self.tfdim])
         self.y = tf.placeholder(tf.float32, [None])
+
 
         if self.deep:
             z_user = self.resnet(self.x_user, self.layers, "user")
