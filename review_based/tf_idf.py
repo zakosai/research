@@ -178,7 +178,7 @@ def main():
     data = pickle.load(f)
     dataset = Dataset(data, max_sequence_length=1024)
 
-    batch_size = 500
+    batch_size = 1000
     iter = 50
 
     model = Model(vae=args.vae, deep=args.deep)
