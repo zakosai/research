@@ -44,7 +44,7 @@ class Dataset(object):
         # tf-idf
 
         text = self.data['train'][2]
-        self.tfidf = TfidfVectorizer(stop_words='english', max_features=8000)
+        self.tfidf = TfidfVectorizer(stop_words='english', max_features=20000)
         self.tfidf.fit(text.astype('U'), self.data['train'][3])
 
 
@@ -142,6 +142,27 @@ class Dataset(object):
                 i_ids = ids[:min(len(user[0]), k)]
                 seq = [item[1][j] for j in i_ids]
                 sequences_item.append(' '.join(seq))
+            except:
+                sequences_item.append(' ')
+        X_user = self.tfidf.transform(sequences_user).toarray()
+        X_item = self.tfidf.transform(sequences_item).toarray()
+
+        return X_user, X_item, y_rating
+
+    def create_tfidf_full(self, idx, k=2, type='train'):
+        data_b = self.data[type].iloc[idx]
+        y_rating = np.array(data_b[3])
+
+        # Create X
+        sequences_user = []
+        sequences_item = []
+        for i, d in data_b.iterrows():
+            user = self.data['train_user'][d[0]]
+            sequences_user.append(' '.join(user[1]))
+
+            try:
+                item = self.data['train_item'][d[1]]
+                sequences_item.append(' '.join(item[1]))
             except:
                 sequences_item.append(' ')
         X_user = self.tfidf.transform(sequences_user).toarray()

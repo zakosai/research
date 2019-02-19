@@ -204,7 +204,7 @@ def main():
         if i%1 == 0:
             for j in range(int(test_no / batch_size)+1):
                 idx = list(range(j*batch_size, min(test_no, (j+1)*batch_size)))
-                x_user, x_item, y_rating = dataset.create_tfidf(idx, k=args.k, type="test")
+                x_user, x_item, y_rating = dataset.create_tfidf_full(idx, k=args.k, type="test")
                 feed_dict = {model.x_user: x_user,
                              model.x_item: x_item,
                              model.y: y_rating}
