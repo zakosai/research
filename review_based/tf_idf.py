@@ -13,7 +13,7 @@ class Model(object):
     def __init__(self, tf_dim=8000):
         self.tfdim = tf_dim
         self.layers = [600, 200, 50]
-        self.activation = tf.nn.sigmoid
+        self.activation = tf.nn.relu
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.learning_rate = 1e-4
 
@@ -44,7 +44,7 @@ class Model(object):
         z_item = self._enc(self.x_item, self.layers, "item")
         z = tf.concat([z_user, z_item], axis=1)
 
-        self.pred = self.mlp(z, [10, 1], scope="rating")
+        self.pred = self.mlp(z, [20, 1], scope="rating")
         self.pred = tf.reshape(self.pred, [-1])
         self.loss = tf.losses.mean_squared_error(self.y, self.pred) + tf.losses.get_regularization_loss()
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
