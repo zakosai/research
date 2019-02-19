@@ -14,7 +14,7 @@ class Model(object):
         self.tfdim = tf_dim
         self.layers = [600, 200]
         self.z_dim = [50]
-        self.activation = tf.nn.relu
+        self.activation = None
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.learning_rate = 1e-4
         self.vae = vae
@@ -67,6 +67,7 @@ class Model(object):
             for i in range(len(layers)-1):
                 x_ = fully_connected(x_, layers[i], activation_fn=self.activation, weights_regularizer=self.regularizer,
                                      scope="encode_%d" % i)
+                x_ = tf.nn.leaky_relu(x_, 0.5)
             x_ = fully_connected(x_, layers[-1], weights_regularizer=self.regularizer)
         return x_
 
