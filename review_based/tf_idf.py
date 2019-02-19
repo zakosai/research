@@ -99,10 +99,12 @@ class Model(object):
             z_item = self._enc(self.x_item, self.layers, "item")
 
         if self.vae:
+            layers = self.layers[::-1]
+            layers.append(self.tfdim)
             user_h, user_mu, user_sigma = self.gen_z(z_user, "user")
             item_h, item_mu, item_sigma = self.gen_z(z_item, "item")
-            user_gen = self._dec(user_h, self.layers[::-1], "user")
-            item_gen = self._dec(item_h, self.layers[::-1], "item")
+            user_gen = self._dec(user_h, layers, "user")
+            item_gen = self._dec(item_h, layers, "item")
             z = tf.concat([user_mu, item_mu], axis=1)
         else:
             z = tf.concat([z_user, z_item], axis=1)
