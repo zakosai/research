@@ -10,7 +10,7 @@ from dataset import Dataset
 
 
 class Model(object):
-    def __init__(self, tf_dim=8000, vae=False, deep=False):
+    def __init__(self, tf_dim=20000, vae=False, deep=False):
         self.tfdim = tf_dim
         self.layers = [600, 200]
         self.z_dim = 50
