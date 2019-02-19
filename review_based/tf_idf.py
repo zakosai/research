@@ -119,7 +119,7 @@ def main():
             feed_dict ={model.x_user: x_user,
                         model.x_item: x_item,
                         model.y: y_rating}
-
+            print(x_user.shape, x_item.shape, y_rating.shape)
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed_dict)
         print("Loss last batch: %f"%loss)
 
@@ -130,7 +130,7 @@ def main():
                 feed_dict = {model.x_user: x_user,
                              model.x_item: x_item,
                              model.y: y_rating}
-                p = sess.run(model.X, feed_dict=feed_dict)
+                p = sess.run(model.pred, feed_dict=feed_dict)
                 if j == 0:
                     error = p - y_rating
                 else:
