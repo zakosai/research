@@ -182,7 +182,7 @@ def main():
     dataset = Dataset(args.data, max_sequence_length=1024)
 
     batch_size = 1000
-    iter = 20
+    iter = 50
 
     model = Model(vae=args.vae, deep=args.deep)
     model.build_model()
