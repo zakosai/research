@@ -11,41 +11,56 @@ from keras.preprocessing.sequence import pad_sequences
 import numpy as np
 
 
-
-
 class Dataset(object):
-    def __init__(self, data, max_sequence_length=1000, max_nb_words=20000, folder="data/", embedding_dim=300):
-        self.data = data
-        self.max_sequence_length = max_sequence_length
-        self.max_nb_words = max_nb_words
-        texts = list(self.data['train'][2]) + list(self.data['test'][2])
-        self.tokenizer = Tokenizer(num_words=self.max_nb_words)
-        self.tokenizer.fit_on_texts(texts)
-        self.embedding_dim = embedding_dim
-
-        self.embeddings_index = {}
-        f = open(folder + 'glove.6B.300d.txt', encoding='utf8')
-        for line in f:
-            values = line.split()
-            word = values[0]
-            coefs = np.asarray(values[1:], dtype='float32')
-            self.embeddings_index[word] = coefs
+    def __init__(self, data, cnn=False, max_sequence_length=1000, max_nb_words=20000, folder="data/",
+                 embedding_dim=300):
+        f = open(data, "rb")
+        self.data = pickle.load(f)
         f.close()
+        if cnn:
+            self.max_sequence_length = max_sequence_length
+            self.max_nb_words = max_nb_words
+            texts = list(self.data['train'][2]) + list(self.data['test'][2])
+            self.tokenizer = Tokenizer(num_words=self.max_nb_words)
+            self.tokenizer.fit_on_texts(texts)
+            self.embedding_dim = embedding_dim
 
-        word_index = self.tokenizer.word_index
-        self.vocab_size = len(word_index) + 1
-        self.embedding_matrix = np.random.random((len(word_index) + 1, embedding_dim))
-        for word, i in word_index.items():
-            embedding_vector = self.embeddings_index.get(word)
-            if embedding_vector is not None:
-                # words not found in embedding index will be all-zeros.
-                self.embedding_matrix[i] = embedding_vector
+            self.embeddings_index = {}
+            f = open(folder + 'glove.6B.300d.txt', encoding='utf8')
+            for line in f:
+                values = line.split()
+                word = values[0]
+                coefs = np.asarray(values[1:], dtype='float32')
+                self.embeddings_index[word] = coefs
+            f.close()
+
+            word_index = self.tokenizer.word_index
+            self.vocab_size = len(word_index) + 1
+            self.embedding_matrix = np.random.random((len(word_index) + 1, embedding_dim))
+            for word, i in word_index.items():
+                embedding_vector = self.embeddings_index.get(word)
+                if embedding_vector is not None:
+                    # words not found in embedding index will be all-zeros.
+                    self.embedding_matrix[i] = embedding_vector
 
         # tf-idf
-
-        text = self.data['train'][2]
-        self.tfidf = TfidfVectorizer(stop_words='english', max_features=20000)
-        self.tfidf.fit(text.astype('U'), self.data['train'][3])
+        else:
+            text = self.data['train'][2]
+            tfidf = TfidfVectorizer(stop_words='english', max_features=20000)
+            tfidf.fit(text.astype('U'), self.data['train'][3])
+            text = []
+            for u in range(self.data['user_no']):
+                user = self.data['train_user'][u]
+                text.append(' '.join(user[1]))
+            self.X_user = tfidf.transform(text).toarray()
+            text = []
+            for i in range(self.data['item_no']):
+                try:
+                    item = self.data['train_item'][i]
+                    text.append(' '.join(item[1]))
+                except:
+                    text.append(' ')
+            self.X_item = tfidf.transform(text).toarray()
 
 
     def create_batch(self, idx, k=2, type='train'):
@@ -118,6 +133,7 @@ class Dataset(object):
         data_b = self.data[type].iloc[idx]
         y_rating = np.array(data_b[3])
 
+
         # Create X
         sequences_user = []
         sequences_item = []
@@ -152,21 +168,23 @@ class Dataset(object):
     def create_tfidf_full(self, idx, k=2, type='train'):
         data_b = self.data[type].iloc[idx]
         y_rating = np.array(data_b[3])
+        X_user = self.X_user[data_b[0]]
+        X_item = self.X_item[data_b[1]]
 
         # Create X
-        sequences_user = []
-        sequences_item = []
-        for i, d in data_b.iterrows():
-            user = self.data['train_user'][d[0]]
-            sequences_user.append(' '.join(user[1]))
-
-            try:
-                item = self.data['train_item'][d[1]]
-                sequences_item.append(' '.join(item[1]))
-            except:
-                sequences_item.append(' ')
-        X_user = self.tfidf.transform(sequences_user).toarray()
-        X_item = self.tfidf.transform(sequences_item).toarray()
+        # sequences_user = []
+        # sequences_item = []
+        # for i, d in data_b.iterrows():
+        #     user = self.data['train_user'][d[0]]
+        #     sequences_user.append(' '.join(user[1]))
+        #
+        #     try:
+        #         item = self.data['train_item'][d[1]]
+        #         sequences_item.append(' '.join(item[1]))
+        #     except:
+        #         sequences_item.append(' ')
+        # X_user = self.tfidf.transform(sequences_user).toarray()
+        # X_item = self.tfidf.transform(sequences_item).toarray()
 
         return X_user, X_item, y_rating
 
@@ -295,6 +313,7 @@ def amz_to_pkl(args):
 def main():
     args = parse_args()
     amz_to_pkl(args)
+
 
 if __name__ == '__main__':
     main()

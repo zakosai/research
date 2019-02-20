@@ -3,9 +3,9 @@ from tensorflow.contrib.layers import fully_connected
 import numpy as np
 import argparse
 import sys
-import pickle
-from dataset import Dataset
+import os
 
+from dataset import Dataset
 
 
 
@@ -15,6 +15,7 @@ class Model(object):
         self.layers = [1000, 500, 100]
         self.z_dim = 50
         self.activation = None
+        self.act_mlp = None
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.learning_rate = 1e-4
         self.vae = vae
@@ -52,6 +53,7 @@ class Model(object):
 
     def resnet(self, x, layers, scope="user"):
         x_ = x
+        # x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope):
             for i in range(len(layers)):
                 x_ = fully_connected(x_, layers[i], activation_fn=self.activation, weights_regularizer=self.regularizer,
@@ -62,16 +64,19 @@ class Model(object):
                 #                       weights_regularizer=self.regularizer,
                 #                       scope="deeper2_%d" % i)
                 x_ = tf.math.add(x_, net)
-                if i != (len(layers) -1):
-                    x_ = tf.nn.leaky_relu(x_, 0.5)
+                # if i != (len(layers) -1):
+                x_ = tf.nn.leaky_relu(x_, 0.5)
             return x_
 
     def mlp(self, x, layers, scope="rating"):
         x_ = x
         with tf.variable_scope(scope):
             for i in range(len(layers)-1):
-                x_ = fully_connected(x_, layers[i], activation_fn=self.activation, weights_regularizer=self.regularizer,
+                x_ = fully_connected(x_, layers[i], activation_fn=self.act_mlp, weights_regularizer=self.regularizer,
                                      scope="encode_%d" % i)
+                net = fully_connected(x_, layers[i], activation_fn=self.act_mlp, weights_regularizer=self.regularizer,
+                                      scope="deeper_%d" % i)
+                x_ = tf.math.add(x_, net)
                 x_ = tf.nn.leaky_relu(x_, 0.5)
             x_ = fully_connected(x_, layers[-1], weights_regularizer=self.regularizer)
         return x_
@@ -114,7 +119,7 @@ class Model(object):
 
         self.pred = self.mlp(z, [20, 1], scope="rating")
         self.pred = tf.reshape(self.pred, [-1])
-        self.loss = tf.losses.mean_squared_error(self.y, self.pred) + tf.losses.get_regularization_loss()
+        self.loss = tf.losses.mean_squared_error(self.y, self.pred) + 0.1*tf.losses.get_regularization_loss()
         if self.vae:
             self.loss += self.loss_reconstruct(self.x_user, user_gen) + self.loss_reconstruct(self.x_item, item_gen) +\
                             0.1 * self.loss_kl(user_mu, user_sigma) + 0.1 * self.loss_kl(item_mu, item_sigma)
@@ -134,7 +139,7 @@ def parse_args():
     parser.add_argument(
         '--output',
         default='experiment',
-        dest='folder',
+        dest='output',
         help='where to experiment',
         type=str
     )
@@ -174,13 +179,10 @@ def parse_args():
 
 def main():
     args = parse_args()
-    f = open(args.data, "rb")
-    data = pickle.load(f)
-    dataset = Dataset(data, max_sequence_length=1024)
-    f.close()
+    dataset = Dataset(args.data, max_sequence_length=1024)
 
     batch_size = 1000
-    iter = 50
+    iter = 20
 
     model = Model(vae=args.vae, deep=args.deep)
     model.build_model()
@@ -188,8 +190,8 @@ def main():
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(max_to_keep=3)
-    train_no = len(data['train'])
-    test_no = len(data['test'])
+    train_no = len(dataset.data['train'])
+    test_no = len(dataset.data['test'])
     min_error = 100000
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(train_no)
@@ -219,12 +221,14 @@ def main():
             print("rmse = %f"%mse)
             if mse < min_error:
                 min_error = mse
+                saver.save(sess, os.path.join(args.output, "model"))
 
         if i%30 == 0:
             model.learning_rate /= 10
     f = open("data/result.txt", "a")
-    f.write("%s: %f"%(args.data, min_error))
+    f.write("%s: %f\n"%(args.data, min_error))
     f.close()
+
 
 
 if __name__ == '__main__':
