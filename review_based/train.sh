@@ -13,7 +13,8 @@ Video Clothing Baby Office Electronics"
 i=0
 for f in $folder;
 do
-     i=$((i+1))
+
     python tf_idf.py --data=data/$f/dataset.pkl --deep=True --output=data/$f/ --multi=${multi[($i)]}
+    i=$((i+1))
 done
 
