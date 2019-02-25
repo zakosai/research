@@ -172,6 +172,13 @@ def parse_args():
         help='using k review',
         type=int
     )
+    parser.add_argument(
+        '--multi',
+        default=2.0,
+        dest='multi',
+        help='using k review',
+        type=float
+    )
 
     if len(sys.argv) == 1:
         parser.print_help()
@@ -228,7 +235,8 @@ def main():
         if i%30 == 0:
             model.learning_rate /= 10
     f = open("data/result.txt", "a")
-    f.write("%s: %f\n"%(args.data, min_error))
+    f.write("%s: %f, multi-point: %f, compare with multi-point: %.1f\n"%(args.data, min_error, args.multi,
+                                                              float(args.multi/min_error)*100-100))
     f.close()
 
 
