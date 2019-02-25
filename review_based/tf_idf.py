@@ -121,7 +121,8 @@ class Model(object):
         self.pred = tf.reshape(self.pred, [-1])
         self.loss = tf.losses.mean_squared_error(self.y, self.pred) + 0.1*tf.losses.get_regularization_loss()
         if self.vae:
-            self.loss += self.loss_reconstruct(self.x_user, user_gen) + self.loss_reconstruct(self.x_item, item_gen) +\
+            self.loss += 0.1*self.loss_reconstruct(self.x_user, user_gen) + 0.1*self.loss_reconstruct(self.x_item,
+                                                                                                item_gen) +\
                             0.1 * self.loss_kl(user_mu, user_sigma) + 0.1 * self.loss_kl(item_mu, item_sigma)
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
@@ -213,6 +214,7 @@ def main():
                              model.x_item: x_item,
                              model.y: y_rating}
                 p = sess.run(model.pred, feed_dict=feed_dict)
+                p = np.clip(p, 1, 5)
                 if j == 0:
                     error = p - y_rating
                 else:
