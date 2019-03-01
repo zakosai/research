@@ -375,6 +375,10 @@ def description(args):
         except:
             continue
 
+    for i in range(len(item)):
+        if text[i] == 0:
+            text[i] = " "
+
     tfidf = TfidfVectorizer(stop_words='english', max_features=8000)
     description = tfidf.fit_transform(text).toarray()
     np.save(os.path.join("data", args.data, "description"), description)
