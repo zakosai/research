@@ -377,7 +377,7 @@ def description(args):
 
     for i in range(len(item)):
         if text[i] == 0:
-            text[i] = " "
+            text[i] = ""
 
     tfidf = TfidfVectorizer(stop_words='english', max_features=8000)
     description = tfidf.fit_transform(text).toarray()
