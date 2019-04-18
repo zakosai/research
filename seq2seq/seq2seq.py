@@ -130,7 +130,7 @@ def main():
             model.learning_rate /= 2
             print("decrease lr to %f" % model.learning_rate)
 
-        print(max_recall)
+    print(max_recall)
 
 
 
