@@ -85,10 +85,11 @@ def main():
     num_p = args.num_p
     checkpoint_dir = "experiment/%s/%s/" % (dataset, type)
 
-    data = Dataset(num_p, "data/%s/%s"%(dataset, type))
+    data = Dataset(num_p, "../data/%s/%s"%(dataset, type))
 
     model = Seq2seq()
     model.p_dim = data.n_user
+    model.w_size = data.w_size = args.w_size
     model.build_model()
 
     sess = tf.Session()
@@ -101,6 +102,7 @@ def main():
         shuffle_idx = np.random.permutation(data.n_user)
         train_cost = 0
         data.create_train_iter()
+
         for j in range(int(data.n_user / batch_size)):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
             X, y = data.create_batch(list_idx, data.X_iter, data.y_iter)
@@ -141,7 +143,7 @@ parser.add_argument('--data', type=str, default="Tool",
 parser.add_argument('--type', type=str, default="implicit",
                     help='1p or 8p')
 parser.add_argument('--num_p', type=int, default=7780, help='number of product')
-
+parser.add_argument('--w_size', type=int, default=10, help='window size')
 
 if __name__ == '__main__':
     main()
