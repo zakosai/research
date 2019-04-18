@@ -17,7 +17,7 @@ class Seq2seq(object):
 
     def prediction(self, x, y, reuse=False):
         with tf.variable_scope("last_layer", reuse=reuse):
-            out = layers.fully_connected(x, self.n_products, tf.nn.relu)
+            out = layers.fully_connected(x, self.n_products, None)
             loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(y, out, 100))
 
         return loss, out
@@ -46,8 +46,8 @@ class Seq2seq(object):
             cell = tf.contrib.rnn.DropoutWrapper(cell=cell, output_keep_prob=0.8)
 
         cell1 = tf.contrib.rnn.LSTMCell(self.n_hidden, state_is_tuple=True)
-        # cell1 = tf.contrib.rnn.AttentionCellWrapper(
-        #     cell1, attn_length=16, state_is_tuple=True)
+        cell1 = tf.contrib.rnn.AttentionCellWrapper(
+            cell1, attn_length=16, state_is_tuple=True)
         if self.train:
             cell1 = tf.contrib.rnn.DropoutWrapper(cell=cell1, output_keep_prob=0.8)
 
@@ -78,7 +78,7 @@ class Seq2seq(object):
 
 def main():
     iter = 3000
-    batch_size = 500
+    batch_size = 1000
     args = parser.parse_args()
     dataset = args.data
     type = args.type
