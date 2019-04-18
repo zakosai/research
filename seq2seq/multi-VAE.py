@@ -101,25 +101,46 @@ class Translation:
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
 
-def create_dataset(dataset="Tool", type=1, num_p = 7780):
-    dense_train = read_data("data2/%s/cf-train-%dp-users.dat"%(dataset, type))
+def create_dataset(dataset="ml-1m", type=1, num_p=7780):
+    dense_train, dense_infer1 = read_data("data/%s/%s/train.txt"%(dataset, type))
     train = one_hot_vector(dense_train, num_p)
+    val = train[:400]
+    dense_val = dense_train[:400]
+    dense_infer_val = dense_infer1[:400]
 
-    dense_test = read_data("data2/%s/cf-test-%dp-users.dat"%(dataset, type))
+    train = train[400:]
+    dense_train = dense_train[400:]
+    dense_infer1 = dense_infer1[400:]
 
+    dense_test, dense_infer2 = read_data("data/%s/%s/test.txt"%(dataset, type))
+    test = one_hot_vector(dense_test, num_p)
 
-    return train, dense_train, dense_test
+    data = {'train': train,
+            'dense_train': dense_train,
+            'dense_infer1': dense_infer1,
+            'val': val,
+            'dense_val': dense_val,
+            'dense_infer_val': dense_infer_val,
+            'test': test,
+            'dense_test': dense_test,
+            'dense_infer2': dense_infer2}
+
+    print("Summary: \n# num train: %d\n# num val: %d\n# num test: %d"%(len(train), len(val), len(test)))
+
+    return data
 
 def read_data(filename):
     arr = []
+    out = []
     for line in open(filename):
         a = line.strip().split()
         if a == []:
             l = []
         else:
-            l = [int(x) for x in a[1:]]
+            l = [int(x) for x in a[1:-1]]
         arr.append(l)
-    return arr
+        out.append([a[-1]])
+    return arr, out
 
 def read_data2(filename):
     data = list(open(filename).readlines())
@@ -226,9 +247,12 @@ def main():
     dataset = args.data
     type = args.type
     num_p = args.num_p
-    checkpoint_dir = "experiment/" % (dataset, type)
-    train, dense_train, dense_test = create_dataset(dataset, type, num_p)
-    num_u = len(dense_train)
+    checkpoint_dir = "experiment/%s/%s/" % (dataset, type)
+    data = create_dataset(dataset, type, num_p)
+    num_u = len(data['dense_train'])
+    train = data['train']
+
+
 
     encoding_dim = [600, 200]
     decoding_dim = [200, 600, num_p]
@@ -243,14 +267,15 @@ def main():
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(max_to_keep=20)
     max_recall = 0
-    dense_val = dense_test[:100]
-    user_val = train[:100]
+
 
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(num_u)
         train_cost = 0
         for j in range(int(num_u/batch_size)):
-            list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
+            list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
+            if j == int(num_u/batch_size) -1:
+                list_idx = shuffle_idx[j * batch_size:]
             x = train[list_idx]
 
             feed = {model.x: x}
@@ -265,19 +290,20 @@ def main():
         if i%10 == 0:
             model.train = False
             loss_val, y_val = sess.run([model.loss, model.x_recon],
-                                              feed_dict={model.x:user_val})
+                                              feed_dict={model.x:data['val']})
 
-            recall, _, _ = calc_recall(y_val, dense_train[:100], dense_val)
+            recall, _, _ = calc_recall(y_val, data['dense_val'], data['dense_infer_val'])
             print("Loss val: %f, recall %f" % (loss_val, recall))
             if recall > max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'multi-VAE-model'), i)
-                loss_test, y= sess.run([model.loss, model.x_recon], feed_dict={model.x: train})
 
 
                 # y_ab = y_ab[test_B]
                 # y_ba = y_ba[test_A]
-                recall, hit, ndcg = calc_recall(y, dense_train, dense_test)
+                loss_test, y = sess.run([model.loss, model.x_recon],
+                                           feed_dict={model.x: data['test']})
+                recall, hit, ndcg = calc_recall(y, data['dense_test'], data['dense_infer2'])
                 print("Loss test: %f, recall: %f, hit: %f, ndcg: %f" % (loss_test, recall, hit, ndcg))
             model.train = True
         if i%100 == 0 and model.learning_rate > 1e-6:
@@ -290,7 +316,7 @@ def main():
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Tool",
                    help='dataset name')
-parser.add_argument('--type',  type=int, default=1,
+parser.add_argument('--type',  type=str, default="implicit",
                    help='1p or 8p')
 parser.add_argument('--num_p', type=int, default=7780, help='number of product')
 
