@@ -17,7 +17,7 @@ class Seq2seq(object):
 
     def prediction(self, x, y, reuse=False):
         with tf.variable_scope("last_layer", reuse=reuse):
-            out = layers.fully_connected(x, self.n_products, None)
+            out = layers.fully_connected(x, self.n_products, tf.nn.relu)
             loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(y, out, 100))
 
         return loss, out
