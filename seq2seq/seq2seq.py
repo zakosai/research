@@ -38,7 +38,7 @@ class Seq2seq(object):
 
         outputs = tf.concat(outputs1, 2)
         # print(outputs.shape)
-        # last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden*2))
+        last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden*2))
         # cell = tf.contrib.rnn.LSTMCell(self.n_hidden, state_is_tuple=True)
         # # cell = tf.contrib.rnn.AttentionCellWrapper(
         # #     cell, attn_length=24, state_is_tuple=True)
@@ -57,7 +57,7 @@ class Seq2seq(object):
         # # The second output is the last state and we will not use that
         # outputs, _ = tf.nn.dynamic_rnn(stack, self.X, self.seq_len, dtype=tf.float32)
         # attention_output, alphas = self.attention(outputs, 256, return_alphas=True)
-        last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden))
+        # last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden))
         # # last_state = attention_output
         # self.predict =layers.fully_connected(last_state, 24)
 
