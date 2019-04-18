@@ -60,6 +60,8 @@ class Seq2seq(object):
         last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden))
         # # last_state = attention_output
         # self.predict =layers.fully_connected(last_state, 24)
+        if not self.train:
+            self.predict = layers.fully_connected(outputs, self.n_products, tf.nn.relu)
 
         self.loss, self.predict = self.prediction(last_state, self.y)
         # self.loss *=10
