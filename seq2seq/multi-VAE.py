@@ -252,11 +252,11 @@ def main():
 
 
 
-    encoding_dim = [600, 200]
-    decoding_dim = [200, 600, num_p]
+    encoding_dim = [600]
+    decoding_dim = [600, num_p]
 
 
-    z_dim = 50
+    z_dim = 200
 
     model = Translation(batch_size, num_p, encoding_dim, decoding_dim, z_dim)
     model.build_model()
