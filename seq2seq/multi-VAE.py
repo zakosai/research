@@ -240,7 +240,7 @@ def calc_rmse(pred, test):
 
 def main():
     iter = 3000
-    batch_size= 50
+    batch_size= 500
     args = parser.parse_args()
     dataset = args.data
     type = args.type
