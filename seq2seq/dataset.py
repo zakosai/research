@@ -64,6 +64,9 @@ class Dataset(object):
             self.val_infer.append(tr[n+self.w_size])
             self.test.append(tr[-self.w_size:])
 
+        self.val = np.reshape(self.val, (len(self.val), self.w_size))
+        self.test = np.reshape(self.test, (len(self.test), self.w_size))
+
 
 
 
