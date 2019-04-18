@@ -24,7 +24,7 @@ class Dataset(object):
             else:
                 l = [int(x) for x in a[1:-1]]
             train.append(l)
-            infer.append([a[-1]])
+            infer.append([int(a[-1])])
         return train, infer
 
 
