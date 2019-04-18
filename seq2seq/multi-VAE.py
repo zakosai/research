@@ -163,7 +163,7 @@ def one_hot_vector2(A, num_product):
         one_hot[i[0], i[1]] = i[2]
     return one_hot
 
-def calc_recall(pred, train, test, k=10, type=None):
+def calc_recall(pred, train, test, k=20, type=None):
     pred_ab = np.argsort(-pred)
     recall = []
     ndcg = []
