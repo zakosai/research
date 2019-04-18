@@ -61,7 +61,7 @@ class Dataset(object):
         for i, tr in enumerate(tmp_test):
             n = np.random.randint((len(tr)-self.w_size-1))
             self.val.append(tr[n:n+self.w_size])
-            self.val_infer.append(tr[n+self.w_size])
+            self.val_infer.append([tr[n+self.w_size]])
             self.test.append(tr[-self.w_size:])
 
         self.val = np.reshape(self.val, (len(self.val), self.w_size))
