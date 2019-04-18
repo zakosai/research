@@ -60,8 +60,6 @@ class Seq2seq(object):
         last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden))
         # # last_state = attention_output
         # self.predict =layers.fully_connected(last_state, 24)
-        if not self.train:
-            self.predict = layers.fully_connected(outputs, self.n_products, tf.nn.relu)
 
         self.loss, self.predict = self.prediction(last_state, self.y)
         # self.loss *=10
@@ -112,9 +110,9 @@ def main():
 
         if i % 10 == 0:
             model.train = False
-            X_val, _ = data.create_batch(range(len(data.val)), data.val, data.val_infer)
+            X_val, y_val = data.create_batch(range(len(data.val)), data.val, data.val_infer)
             loss_val, y_val = sess.run([model.loss, model.predict],
-                                       feed_dict={model.X: X_val})
+                                       feed_dict={model.X: X_val, model.y:y_val})
 
             recall, _, _ = calc_recall(y_val, data.val, data.val_infer)
             print("Loss val: %f, recall %f" % (loss_val, recall))
@@ -122,9 +120,9 @@ def main():
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'multi-VAE-model'), i)
 
-                X_test, _ = data.create_batch(range(len(data.test)), data.test, data.infer2)
+                X_test, y_test = data.create_batch(range(len(data.test)), data.test, data.infer2)
                 loss_test, y = sess.run([model.loss, model.predict],
-                                        feed_dict={model.X: X_test})
+                                        feed_dict={model.X: X_test, model.y:y_test})
                 recall, hit, ndcg = calc_recall(y, data.test, data.infer2)
                 print("Loss test: %f, recall: %f, hit: %f, ndcg: %f" % (loss_test, recall, hit, ndcg))
             model.train = True
