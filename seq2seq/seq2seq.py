@@ -18,9 +18,19 @@ class Seq2seq(object):
     def prediction(self, x, y, reuse=False):
         with tf.variable_scope("last_layer", reuse=reuse):
             out = layers.fully_connected(x, self.n_products, tf.nn.tanh)
-            loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(y, out, 100))
+            # loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(y, out, 100))
+            loss = self.loss_reconstruct(y, out)
 
         return loss, out
+
+    def loss_reconstruct(self, x, x_recon):
+        log_softmax_var = tf.nn.log_softmax(x_recon)
+
+        neg_ll = -tf.reduce_mean(tf.reduce_sum(
+            log_softmax_var * x,
+            axis=-1))
+        # return tf.reduce_mean(tf.abs(x - x_recon))
+        return neg_ll
 
     def build_model(self):
         self.X = tf.placeholder(tf.float32, [None, self.w_size, self.p_dim])
@@ -129,7 +139,7 @@ def main():
                 print("Loss test: %f, recall: %f, hit: %f, ndcg: %f" % (loss_test, recall, hit, ndcg))
             model.train = True
         if i % 100 == 0 and model.learning_rate > 1e-6:
-            model.learning_rate /= 2
+            model.learning_rate /= 10
             print("decrease lr to %f" % model.learning_rate)
 
     print(max_recall)
