@@ -136,7 +136,7 @@ def read_data(filename):
         else:
             l = [int(x) for x in a[1:-1]]
         arr.append(l)
-        out.append([a[-1]])
+        out.append([int(a[-1])])
     return arr, out
 
 def read_data2(filename):
@@ -178,6 +178,7 @@ def calc_recall(pred, train, test, k=10, type=None):
                 p.remove(u)
         p = p[:k]
         hits = set(test[i]) & set(p)
+        # print(test[i], p, hits)
 
         #recall
         recall_val = float(len(hits)) / len(test[i])
@@ -239,7 +240,7 @@ def calc_rmse(pred, test):
 
 def main():
     iter = 3000
-    batch_size= 500
+    batch_size= 50
     args = parser.parse_args()
     dataset = args.data
     type = args.type
