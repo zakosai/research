@@ -23,6 +23,27 @@ class Seq2seq(object):
 
         return loss, out
 
+    def attention(self, inputs):
+        # Trainable parameters
+        hidden_size = inputs.shape[2].value
+        u_omega = tf.get_variable("u_omega", [hidden_size], initializer=tf.keras.initializers.glorot_normal())
+
+        with tf.name_scope('v'):
+            v = tf.tanh(inputs)
+
+        # For each of the timestamps its vector of size A from `v` is reduced with `u` vector
+        vu = tf.tensordot(v, u_omega, axes=1, name='vu')  # (B,T) shape
+        alphas = tf.nn.softmax(vu, name='alphas')  # (B,T) shape
+
+        # Output of (Bi-)RNN is reduced with attention vector; the result has (B,D) shape
+        output = tf.reduce_sum(inputs * tf.expand_dims(alphas, -1), 1)
+
+        # Final output with tanh
+        output = tf.tanh(output)
+
+        return output, alphas
+
+
     def loss_reconstruct(self, x, x_recon):
         log_softmax_var = tf.nn.log_softmax(x_recon)
 
@@ -32,23 +53,31 @@ class Seq2seq(object):
         # return tf.reduce_mean(tf.abs(x - x_recon))
         return neg_ll
 
+
     def build_model(self):
         self.X = tf.placeholder(tf.float32, [None, self.w_size, self.p_dim])
         self.y = tf.placeholder(tf.float32, [None, self.n_products])
 
         self.seq_len = tf.fill([tf.shape(self.X)[0]], self.w_size)
 
-        # with tf.variable_scope("cell_def_1"):
-        #     f_cell = tf.nn.rnn_cell.LSTMCell(self.n_hidden, state_is_tuple=True)
-        #     f_cell = tf.contrib.rnn.AttentionCellWrapper(
-        #         f_cell, attn_length=24, state_is_tuple=True)
-        #     b_cell = tf.nn.rnn_cell.LSTMCell(self.n_hidden, state_is_tuple=True)
-        #     b_cell = tf.contrib.rnn.AttentionCellWrapper(
-        #         b_cell, attn_length=24, state_is_tuple=True)
-        # with tf.variable_scope("cell_op_1"):
-        #     outputs1, _ = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, self.X, sequence_length=self.seq_len,dtype=tf.float32)
-        #
-        # outputs = tf.concat(outputs1, 2)
+        with tf.variable_scope("cell_def_1"):
+            f_cell = tf.nn.rnn_cell.LSTMCell(self.n_hidden, state_is_tuple=True)
+            f_cell = tf.contrib.rnn.DropoutWrapper(cell=f_cell, output_keep_prob=0.8)
+            b_cell = tf.nn.rnn_cell.LSTMCell(self.n_hidden, state_is_tuple=True)
+            b_cell = tf.contrib.rnn.DropoutWrapper(cell=b_cell, output_keep_prob=0.8)
+        with tf.variable_scope("cell_op_1"):
+            outputs1, _ = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, self.X, sequence_length=self.seq_len,dtype=tf.float32)
+
+        outputs = tf.concat(outputs1, 2)
+
+        with tf.variable_scope('attention'):
+            self.attn, self.alphas = self.attention(outputs)
+
+        # Dropout
+        with tf.variable_scope('dropout'):
+            self.h_drop = tf.nn.dropout(self.attn, 0.8)
+
+        last_state = self.h_drop
 
         # merge = outputs
         # shape = merge.shape
@@ -67,25 +96,25 @@ class Seq2seq(object):
         # outputs = tf.concat(outputs2, 2)
         # print(outputs.shape)
         # last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden*2))
-        cell = tf.contrib.rnn.LSTMCell(self.n_hidden, state_is_tuple=True)
-        # cell = tf.contrib.rnn.AttentionCellWrapper(
-        #     cell, attn_length=24, state_is_tuple=True)
-        if self.train:
-            cell = tf.contrib.rnn.DropoutWrapper(cell=cell, output_keep_prob=0.8)
-
-        cell1 = tf.contrib.rnn.LSTMCell(self.n_hidden, state_is_tuple=True)
-        cell1 = tf.contrib.rnn.AttentionCellWrapper(
-            cell1, attn_length=24, state_is_tuple=True)
-        if self.train:
-            cell1 = tf.contrib.rnn.DropoutWrapper(cell=cell1, output_keep_prob=0.8)
-
-        # Stacking rnn cells
-        stack = tf.contrib.rnn.MultiRNNCell([cell, cell1], state_is_tuple=True)
-
-        # The second output is the last state and we will not use that
-        outputs, _ = tf.nn.dynamic_rnn(stack, self.X, self.seq_len, dtype=tf.float32)
-        # attention_output, alphas = self.attention(outputs, 256, return_alphas=True)
-        last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden))
+        # cell = tf.contrib.rnn.LSTMCell(self.n_hidden, state_is_tuple=True)
+        # # cell = tf.contrib.rnn.AttentionCellWrapper(
+        # #     cell, attn_length=24, state_is_tuple=True)
+        # if self.train:
+        #     cell = tf.contrib.rnn.DropoutWrapper(cell=cell, output_keep_prob=0.8)
+        #
+        # cell1 = tf.contrib.rnn.LSTMCell(self.n_hidden, state_is_tuple=True)
+        # cell1 = tf.contrib.rnn.AttentionCellWrapper(
+        #     cell1, attn_length=24, state_is_tuple=True)
+        # if self.train:
+        #     cell1 = tf.contrib.rnn.DropoutWrapper(cell=cell1, output_keep_prob=0.8)
+        #
+        # # Stacking rnn cells
+        # stack = tf.contrib.rnn.MultiRNNCell([cell, cell1], state_is_tuple=True)
+        #
+        # # The second output is the last state and we will not use that
+        # outputs, _ = tf.nn.dynamic_rnn(stack, self.X, self.seq_len, dtype=tf.float32)
+        # # attention_output, alphas = self.attention(outputs, 256, return_alphas=True)
+        # last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden))
         # # last_state = attention_output
         # self.predict =layers.fully_connected(last_state, 24)
 
