@@ -40,30 +40,33 @@ class Seq2seq(object):
 
         with tf.variable_scope("cell_def_1"):
             f_cell = tf.nn.rnn_cell.LSTMCell(self.n_hidden, state_is_tuple=True)
+            f_cell = tf.contrib.rnn.AttentionCellWrapper(
+                f_cell, attn_length=24, state_is_tuple=True)
             b_cell = tf.nn.rnn_cell.LSTMCell(self.n_hidden, state_is_tuple=True)
-
+            b_cell = tf.contrib.rnn.AttentionCellWrapper(
+                b_cell, attn_length=24, state_is_tuple=True)
         with tf.variable_scope("cell_op_1"):
             outputs1, _ = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, self.X, sequence_length=self.seq_len,dtype=tf.float32)
 
         outputs = tf.concat(outputs1, 2)
 
-        merge = outputs
-        shape = merge.shape
-        print("First BLSTM = ", shape)
-
-        nb_hidden_2 = self.n_hidden * 2
-
-        with tf.variable_scope("cell_def_2"):
-            f1_cell = tf.nn.rnn_cell.LSTMCell(nb_hidden_2, state_is_tuple=True)
-            b1_cell = tf.nn.rnn_cell.LSTMCell(nb_hidden_2, state_is_tuple=True)
-
-        with tf.variable_scope("cell_op_2"):
-            outputs2, _ = tf.nn.bidirectional_dynamic_rnn(f1_cell, b1_cell, merge, sequence_length=self.seq_len,
-                                                          dtype=tf.float32)
-
-        outputs = tf.concat(outputs2, 2)
-        print(outputs.shape)
-        last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden*4))
+        # merge = outputs
+        # shape = merge.shape
+        # print("First BLSTM = ", shape)
+        #
+        # nb_hidden_2 = self.n_hidden * 2
+        #
+        # with tf.variable_scope("cell_def_2"):
+        #     f1_cell = tf.nn.rnn_cell.LSTMCell(nb_hidden_2, state_is_tuple=True)
+        #     b1_cell = tf.nn.rnn_cell.LSTMCell(nb_hidden_2, state_is_tuple=True)
+        #
+        # with tf.variable_scope("cell_op_2"):
+        #     outputs2, _ = tf.nn.bidirectional_dynamic_rnn(f1_cell, b1_cell, merge, sequence_length=self.seq_len,
+        #                                                   dtype=tf.float32)
+        #
+        # outputs = tf.concat(outputs2, 2)
+        # print(outputs.shape)
+        last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden*2))
         # cell = tf.contrib.rnn.LSTMCell(self.n_hidden, state_is_tuple=True)
         # # cell = tf.contrib.rnn.AttentionCellWrapper(
         # #     cell, attn_length=24, state_is_tuple=True)
