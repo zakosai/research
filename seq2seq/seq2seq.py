@@ -43,8 +43,7 @@ class Seq2seq(object):
             b_cell = tf.nn.rnn_cell.LSTMCell(self.n_hidden, state_is_tuple=True)
 
         with tf.variable_scope("cell_op_1"):
-            outputs1, _ = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, self.X, sequence_length=self.seq_len,
-                                                          dtype=tf.float32)
+            outputs1, _ = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, self.X, sequence_length=self.seq_len,dtype=tf.float32)
 
         outputs = tf.concat(outputs1, 2)
 
@@ -63,8 +62,8 @@ class Seq2seq(object):
                                                           dtype=tf.float32)
 
         outputs = tf.concat(outputs2, 2)
-        # print(outputs.shape)
-        last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden*2))
+        print(outputs.shape)
+        last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden*4))
         # cell = tf.contrib.rnn.LSTMCell(self.n_hidden, state_is_tuple=True)
         # # cell = tf.contrib.rnn.AttentionCellWrapper(
         # #     cell, attn_length=24, state_is_tuple=True)
