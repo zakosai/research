@@ -39,8 +39,8 @@ class Seq2seq(object):
         self.seq_len = tf.fill([tf.shape(self.X)[0]], self.w_size)
 
         with tf.variable_scope("cell_def_1"):
-            f_cell = tf.nn.rnn_cell.LSTMCell(self.n_hidden, state_is_tuple=True)
-            b_cell = tf.nn.rnn_cell.LSTMCell(self.n_hidden, state_is_tuple=True)
+            f_cell = tf.nn.rnn_cell.GRUCell(self.n_hidden)
+            b_cell = tf.nn.rnn_cell.GRUCell(self.n_hidden)
 
         with tf.variable_scope("cell_op_1"):
             outputs1, _ = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, self.X, sequence_length=self.seq_len,
