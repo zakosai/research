@@ -570,7 +570,7 @@ class cf_vae_extend:
             ndcg = []
             hit = 0
             for i in range(len(user_all)):
-                p = pred_all[i, :k + len(train_users[i])]
+                p = pred_all[i, :m + len(train_users[i])]
                 p = p.tolist()
                 for u in train_users[i]:
                     if u in p:
