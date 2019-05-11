@@ -490,12 +490,12 @@ class cf_vae_extend:
 
     def save_model(self, save_path_pmf):
         # self.saver.save(self.sess, save_path_weights)
-        sio.savemat(save_path_pmf, {"U":self.U, "V":self.V, "Z":self.exp_z, "Z_im":self.exp_z_im})
+        scipy.io.savemat(save_path_pmf, {"U":self.U, "V":self.V, "Z":self.exp_z, "Z_im":self.exp_z_im})
         print "all parameters saved"
 
     def load_model(self, load_path_pmf):
         # self.saver.restore(self.sess, load_path_weights)
-        data = sio.loadmat(load_path_pmf)
+        data = scipy.io.loadmat(load_path_pmf)
         try:
             self.U = data["U"]
             self.V = data["V"]
