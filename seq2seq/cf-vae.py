@@ -718,8 +718,10 @@ def read_file(dir, item_no):
 
     for i in range(len(item)):
         if item[i] == 0:
-            item[i] == []
+            item[i] = []
 
+
+    print(train, item, infer, train_no)
 
     return train, item, infer, train_no
 
