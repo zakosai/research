@@ -716,6 +716,11 @@ def read_file(dir, item_no):
         infer.append([int(a[-1])])
         idx += 1
 
+    for i in len(item):
+        if item[i] == 0:
+            item[i] == []
+
+
     return train, item, infer, train_no
 
 def load_rating(path):
@@ -769,7 +774,7 @@ if gs == 1:
             for r in [0.1, 1, 10]:
                 params.lambda_r = r
                 if i > -1:
-                    model = cf_vae_extend(num_users=data['user_no'], num_items=data['item_no'],
+                    model = cf_vae_extend(num_users=len(data['train_users']), num_items=len(data["train_items"]),
                                           num_factors=num_factors,
                                           params=params,
                                           input_dim=dim, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200,
