@@ -50,8 +50,6 @@ class vanilla_vae:
 
             # noisy_level = 1
             # x = x + noisy_level*tf.random_normal(tf.shape(x))
-            attention = dense(x, self.input_dim, scope='att_layer', activation=tf.nn.sigmoid)
-            x = merge([x, attention], output_shape=self.input_dim, name='attention_mul', mode='mul')
             for i in range(depth_inf):
                 x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
