@@ -105,7 +105,7 @@ class Seq2seq(object):
 
         # Dropout
         with tf.variable_scope('dropout'):
-            outputs = tf.nn.dropout(self.attn, 0.8)
+            outputs = tf.nn.dropout(outputs, 0.8)
 
         last_state = outputs
 
