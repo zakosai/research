@@ -582,19 +582,19 @@ class cf_vae_extend:
                 except:
                     recall_val = 1
                 recall_vals.append(recall_val)
-                pred = np.array(pred_all[i])
-                score = []
-                for k in range(m):
-                    if top_M[k] in hits:
-                        score.append(1)
-                    else:
-                        score.append(0)
-                actual = self.dcg_score(score, pred[top_M], m)
-                best = self.dcg_score(score, score, m)
-                if best ==0:
-                    ndcg.append(0)
-                else:
-                    ndcg.append(float(actual)/best)
+                # pred = np.array(pred_all[i])
+                # score = []
+                # for k in range(m):
+                #     if top_M[k] in hits:
+                #         score.append(1)
+                #     else:
+                #         score.append(0)
+                # actual = self.dcg_score(score, pred[top_M], m)
+                # best = self.dcg_score(score, score, m)
+                # if best ==0:
+                #     ndcg.append(0)
+                # else:
+                #     ndcg.append(float(actual)/best)
                 # precision = float(hits_num) / float(m)
                 # precision_vals.append(precision)
 
@@ -603,7 +603,7 @@ class cf_vae_extend:
             # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
             #                        [u for u in user_all if len(u)!=0], m)
 
-            print("recall %f, hit: %f, NDCG: %f"%(recall_avg, float(hit)/len(user_all), np.mean(ndcg)))
+            print("recall %f, hit: %f, NDCG:"%(recall_avg, float(hit)/len(user_all),))
             #print recall_avg
             if file != None:
                 file.write("m = %d, recall = %f\t"%(m, recall_avg))
@@ -718,7 +718,6 @@ def read_file(dir, item_no):
             item[i] = []
 
 
-    print(train, item, infer, train_no)
 
     return train, item, infer, train_no
 
