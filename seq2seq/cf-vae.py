@@ -716,7 +716,7 @@ def read_file(dir, item_no):
         infer.append([int(a[-1])])
         idx += 1
 
-    for i in len(item):
+    for i in range(len(item)):
         if item[i] == 0:
             item[i] == []
 
