@@ -564,14 +564,19 @@ class cf_vae_extend:
         recall_avgs = []
         precision_avgs = []
         mapk_avgs = []
-        for m in [50]:
+        for m in [10]:
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
             ndcg = []
             hit = 0
             for i in range(len(user_all)):
-                top_M = list(np.argsort(-pred_all[i])[0:m])
-                hits = set(top_M) & set(user_all[i])   # item idex from 0
+                p = pred_all[i, :k + len(train_users[i])]
+                p = p.tolist()
+                for u in train_users[i]:
+                    if u in p:
+                        p.remove(u)
+                top_M = p[:k]
+                hits = set(test_users[i]) & set(top_M)
                 hits_num = len(hits)
                 if hits_num > 0:
                     hit += 1
@@ -665,21 +670,53 @@ zdim = args.zdim
 gs = args.gridsearch
 print(model_type)
 
-def load_cvae_data(data_dir):
+def load_cvae_data(data_dir, item_no):
   variables = load_npz(os.path.join(data_dir,"mult_nor.npz"))
-
-  f = open(os.path.join(data_dir,"dataset.pkl"), 'rb')
-  dataset = pickle.load(f)
+  dataset = {}
   dataset["content"] = variables.toarray()
 
 
 
-  dataset["train_users"] = load_rating(dataset['user_onehot'])
-  dataset["train_items"] = load_rating(dataset['item_onehot'])
-  dataset["test_users"] = dataset['user_item_test']
+  dataset["train_users"], dataset["train_items"], dataset["test_users"], dataset["train_no"] = read_file(data_dir, item_no)
 
   return dataset
 
+def read_file(dir, item_no):
+    train = []
+    infer = []
+    item = [0] * item_no
+    idx = 0
+    for line in open(os.path.join(dir, "train.txt")):
+        a = line.strip().split()
+        if a == []:
+            l = []
+        else:
+            l = [int(x) for x in a[1:-1]]
+            for i in a[1:-1]:
+                if item[i] == 0:
+                    item[i] = [idx]
+                else:
+                    item[i].append(idx)
+        train.append(l)
+        infer.append([int(a[-1])])
+        idx += 1
+    train_no = idx
+    for line in open(os.path.join(dir, "test.txt")):
+        a = line.strip().split()
+        if a == []:
+            l = []
+        else:
+            l = [int(x) for x in a[1:-1]]
+            for i in a[1:-1]:
+                if item[i] == 0:
+                    item[i] = [idx]
+                else:
+                    item[i].append(idx)
+        train.append(l)
+        infer.append([int(a[-1])])
+        idx += 1
+
+    return train, item, infer, train_no
 
 def load_rating(path):
     arr = []
