@@ -671,7 +671,7 @@ gs = args.gridsearch
 print(model_type)
 
 def load_cvae_data(data_dir, item_no):
-  variables = load_npz(os.path.join(data_dir,"mult_nor.npz"))
+  variables = load_npz(os.path.join(data_dir,"item.npz"))
   dataset = {}
   dataset["content"] = variables.toarray()
 
@@ -686,7 +686,7 @@ def read_file(dir, item_no):
     infer = []
     item = [0] * item_no
     idx = 0
-    for line in open(os.path.join(dir, "train.txt")):
+    for line in open(os.path.join(dir, "implicit/train.txt")):
         a = line.strip().split()
         if a == []:
             l = []
@@ -701,7 +701,7 @@ def read_file(dir, item_no):
         infer.append([int(a[-1])])
         idx += 1
     train_no = idx
-    for line in open(os.path.join(dir, "test.txt")):
+    for line in open(os.path.join(dir, "implicit/test.txt")):
         a = line.strip().split()
         if a == []:
             l = []
