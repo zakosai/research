@@ -757,9 +757,7 @@ best_recall = 0
 best_hyper = []
 
 dim = data['content'].shape[1]
-train_user = []
-for i in data['test_users'].keys():
-    train_user.append(data['train_users'][i])
+
 
 if gs == 1:
     i = 0
@@ -785,7 +783,11 @@ if gs == 1:
                     f.write("%d-----------%f----------%f----------%f\n"%(i,u,v,r))
                     pred_all = model.predict_all()
                     pred_all = pred_all[data['test_users'].keys()]
-                    recall = model.predict_val(pred_all, train_user, data["test_users"].values(), f)
+                    f.write("val: ")
+                    recall = model.predict_val(pred_all[:data['train_no']], data["train_users"][:data['train_no']],data["test_users"][:data['train_no']], f)
+                    f.write("\n")
+                    f.write("test: ")
+                    recall = model.predict_val(pred_all[data['train_no']:], data["train_users"][data['train_no']:],data["test_users"][data['train_no']:], f)
                     f.write("\n")
                     f.close()
                     if recall > best_recall:
