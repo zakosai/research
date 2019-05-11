@@ -789,7 +789,6 @@ if gs == 1:
                     f = open(os.path.join(ckpt, "result_cvae_%d.txt"%model_type), 'a')
                     f.write("%d-----------%f----------%f----------%f\n"%(i,u,v,r))
                     pred_all = model.predict_all()
-                    pred_all = pred_all[data['test_users'].keys()]
                     f.write("val: ")
                     recall = model.predict_val(pred_all[:data['train_no']], data["train_users"][:data['train_no']],data["test_users"][:data['train_no']], f)
                     f.write("\n")
