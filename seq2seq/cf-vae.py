@@ -692,7 +692,7 @@ def read_file(dir, item_no):
             l = []
         else:
             l = [int(x) for x in a[1:-1]]
-            for i in a[1:-1]:
+            for i in l:
                 if item[i] == 0:
                     item[i] = [idx]
                 else:
@@ -707,7 +707,7 @@ def read_file(dir, item_no):
             l = []
         else:
             l = [int(x) for x in a[1:-1]]
-            for i in a[1:-1]:
+            for i in l:
                 if item[i] == 0:
                     item[i] = [idx]
                 else:
