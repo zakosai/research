@@ -745,7 +745,7 @@ C = [0.1, 1, 10]
 # self.num_iter = 3000
 # self.EM_iter = 100
 
-data = load_cvae_data(data_dir)
+data = load_cvae_data(data_dir, 3706)
 np.random.seed(0)
 tf.set_random_seed(0)
 
