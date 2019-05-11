@@ -558,9 +558,6 @@ class cf_vae_extend:
         user_all = test_users
         ground_tr_num = [len(user) for user in user_all]
 
-
-        pred_all = list(pred_all)
-
         recall_avgs = []
         precision_avgs = []
         mapk_avgs = []
@@ -570,12 +567,12 @@ class cf_vae_extend:
             ndcg = []
             hit = 0
             for i in range(len(user_all)):
-                p = pred_all[i, :m + len(train_users[i])]
+                p = pred_all[i, :(m + len(train_users[i]))]
                 p = p.tolist()
                 for u in train_users[i]:
                     if u in p:
                         p.remove(u)
-                top_M = p[:k]
+                top_M = p[:m]
                 hits = set(test_users[i]) & set(top_M)
                 hits_num = len(hits)
                 if hits_num > 0:
