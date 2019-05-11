@@ -16,13 +16,13 @@ class Seq2seq(object):
         self.train = True
 
 
-    def encoder_BiLSTM(self, X):
-        with tf.variable_scope("cell_def_1"):
-            f_cell = tf.nn.rnn_cell.LSTMCell(self.n_hidden, state_is_tuple=True)
+    def encoder_BiLSTM(self, X, scope, n_hidden):
+        with tf.variable_scope("cell_def_%s"%scope):
+            f_cell = tf.nn.rnn_cell.LSTMCell(n_hidden, state_is_tuple=True)
             f_cell = tf.contrib.rnn.DropoutWrapper(cell=f_cell, output_keep_prob=0.8)
-            b_cell = tf.nn.rnn_cell.LSTMCell(self.n_hidden, state_is_tuple=True)
+            b_cell = tf.nn.rnn_cell.LSTMCell(n_hidden, state_is_tuple=True)
             b_cell = tf.contrib.rnn.DropoutWrapper(cell=b_cell, output_keep_prob=0.8)
-        with tf.variable_scope("cell_op_1"):
+        with tf.variable_scope("cell_op_%s"%scope):
             outputs1, last_state = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, X, sequence_length=self.seq_len,
                                                           dtype=tf.float32)
 
@@ -97,15 +97,17 @@ class Seq2seq(object):
         self.seq_len = tf.fill([tf.shape(self.X)[0]], self.w_size)
 
 
-        outputs, _ = self.encoder_BiLSTM(self.X)
-        with tf.variable_scope('attention'):
-            self.attn, self.alphas = self.attention(outputs)
+        outputs, _ = self.encoder_BiLSTM(self.X, "1", self.n_hidden)
+        # with tf.variable_scope('attention'):
+        #     outputs, self.alphas = self.attention(outputs)
+        #
+        # outputs, _ = self.encoder_BiLSTM(outputs, "2", self.n_hidden*2)
 
         # Dropout
-        # with tf.variable_scope('dropout'):
-        #     self.h_drop = tf.nn.dropout(self.attn, 0.8)
+        with tf.variable_scope('dropout'):
+            outputs = tf.nn.dropout(self.attn, 0.8)
 
-        last_state = self.attn
+        last_state = outputs
 
         self.loss, self.predict = self.prediction(last_state, self.y)
         # self.loss *=10
