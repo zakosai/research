@@ -101,13 +101,13 @@ class Seq2seq(object):
         # with tf.variable_scope('attention'):
         #     outputs, self.alphas = self.attention(outputs)
         #
-        outputs, _ = self.encoder_BiLSTM(outputs, "2", self.n_hidden*2)
+        # outputs, _ = self.encoder_BiLSTM(outputs, "2", self.n_hidden*2)
 
         # Dropout
-        # with tf.variable_scope('dropout'):
-        #     outputs = tf.nn.dropout(outputs, 0.8)
+        with tf.variable_scope('dropout'):
+            outputs = tf.nn.dropout(outputs, 0.8)
 
-        last_state = outputs
+        last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden*2))
 
         self.loss, self.predict = self.prediction(last_state, self.y)
         # self.loss *=10
