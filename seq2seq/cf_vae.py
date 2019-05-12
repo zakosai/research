@@ -555,6 +555,7 @@ class cf_vae_extend:
         return recall_avgs, mapk_avgs
 
     def predict_val(self, pred_all, train_users, test_users, file=None):
+        pred_all = np.argsort(-pred_all)
         user_all = test_users
         ground_tr_num = [len(user) for user in user_all]
 
