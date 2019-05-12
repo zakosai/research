@@ -90,7 +90,9 @@ class Seq2seq(object):
 
             if cat !=None:
                 out_cat = layers.fully_connected(cat, self.cat_dim, tf.nn.tanh)
-                out_cat = tf.linalg.matmul(self.item_cat, out_cat)
+                out_cat = tf.reshape(out_cat, [-1, self.cat_dim, 1])
+                out_cat = tf.matmul(self.item_cat, out_cat)
+                out_cat = tf.reshape(out_cat, [-1, self.n_products])
                 out = out_cat * out
 
             loss = self.loss_reconstruct(y, out)
