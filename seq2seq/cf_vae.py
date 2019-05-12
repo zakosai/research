@@ -761,7 +761,7 @@ def main():
                 params.lambda_v = v
                 for r in [0.1, 1, 10]:
                     params.lambda_r = r
-                    if i > -1:
+                    if i > 12:
                         model = cf_vae_extend(num_users=len(data['train_users']), num_items=len(data["train_items"]),
                                               num_factors=num_factors,
                                               params=params,
