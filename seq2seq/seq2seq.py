@@ -179,7 +179,6 @@ def main():
         shuffle_idx = np.random.permutation(data.n_user)
         train_cost = 0
         data.create_train_iter()
-        data.item_emb = np.array(text)
         print(data.item_emb.shape)
 
         for j in range(int(data.n_user / batch_size)):
