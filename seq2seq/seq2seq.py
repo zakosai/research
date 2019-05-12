@@ -97,19 +97,19 @@ class Seq2seq(object):
         self.seq_len = tf.fill([tf.shape(self.X)[0]], self.w_size)
 
 
-        outputs, _ = self.encoder_LSTM(self.X, 2)
 
-        # outputs, _ = self.encoder_BiLSTM(self.X, "1", self.n_hidden)
-        # with tf.variable_scope('attention'):
-        #     outputs, self.alphas = self.attention(outputs)
-        #
-        # outputs, _ = self.encoder_BiLSTM(outputs, "2", self.n_hidden*2)
+        outputs, _ = self.encoder_BiLSTM(self.X, "1", self.n_hidden)
+
+        outputs, _ = self.encoder_BiLSTM(outputs, "2", self.n_hidden*2)
+        with tf.variable_scope('attention'):
+            outputs, self.alphas = self.attention(outputs)
 
         # Dropout
-        # with tf.variable_scope('dropout'):
-        #     outputs = tf.nn.dropout(outputs, 0.8)
+        with tf.variable_scope('dropout'):
+            outputs = tf.nn.dropout(outputs, 0.8)
 
-        last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden))
+        # last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden))
+        last_state = outputs
 
         self.loss, self.predict = self.prediction(last_state, self.y)
         # self.loss *=10
@@ -170,12 +170,13 @@ def main():
             print("Loss val: %f, recall %f" % (loss_val, recall))
             if recall > max_recall:
                 max_recall = recall
-                saver.save(sess, os.path.join(checkpoint_dir, 'multi-VAE-model'), i)
+                saver.save(sess, os.path.join(checkpoint_dir, 'bilstm-model'), i)
 
                 X_test, y_test = data.create_batch(range(len(data.test)), data.test, data.infer2)
                 loss_test, y = sess.run([model.loss, model.predict],
                                         feed_dict={model.X: X_test, model.y:y_test})
                 recall, hit, ndcg = calc_recall(y, data.test, data.infer2)
+                np.savez(os.path.join(checkpoint_dir, "pred"), p_val=y_val, p_test=y)
                 print("Loss test: %f, recall: %f, hit: %f, ndcg: %f" % (loss_test, recall, hit, ndcg))
             model.train = True
         if i % 100 == 0 and model.learning_rate > 1e-6:
