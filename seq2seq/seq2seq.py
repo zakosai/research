@@ -96,9 +96,9 @@ class Seq2seq(object):
                 out_cat = tf.reshape(out_cat, [tf.shape(cat)[0], self.n_products])
                 print(cat.shape, out_cat.shape)
                 out = tf.reshape(out, [tf.shape(cat)[0], self.n_products])
-                out = out_cat * out
+                pred = out_cat * out
 
-            loss = self.loss_reconstruct(y, out)
+            loss = self.loss_reconstruct(y, pred)
 
         return loss, out
 
