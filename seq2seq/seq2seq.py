@@ -91,7 +91,8 @@ class Seq2seq(object):
             if cat !=None:
                 out_cat = layers.fully_connected(cat, self.cat_dim, tf.nn.tanh)
                 out_cat = tf.reshape(out_cat, [-1, self.cat_dim, 1])
-                out_cat = tf.matmul(self.item_cat, out_cat)
+                out_cat = tf.matmul(tf.broadcast_to(self.item_cat, [tf.shape(out_cat)[0], self.item_cat.shape[0],
+                                                                    self.item_cat.shape[1]]),  out_cat)
                 out_cat = tf.reshape(out_cat, [-1, self.n_products])
                 out = out_cat * out
 
