@@ -9,7 +9,7 @@ from scipy.sparse import load_npz
 
 
 class Seq2seq(object):
-    def __init__(self, item_cat):
+    def __init__(self):
         self.w_size = 10
         self.p_dim = 100
         self.n_products = 3706
