@@ -177,7 +177,6 @@ def main():
         for j in range(int(data.n_user / batch_size)):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
             X, y, cat = data.create_batch(list_idx, data.X_iter, data.y_iter)
-            print(X.shape, cat.shape)
 
             feed = {model.X: X, model.y:y, model.X_cat:cat}
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
