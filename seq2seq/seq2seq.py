@@ -15,7 +15,7 @@ class Seq2seq(object):
         self.learning_rate = 1e-4
         self.train = True
         self.cat_dim = 18
-        self.item_cat = item_cat
+        self.item_cat = item_cat.astype(np.float32)
 
 
     def encoder_BiLSTM(self, X, scope, n_hidden):
