@@ -89,11 +89,12 @@ class Seq2seq(object):
             # loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(y, out, 100))
 
             if cat !=None:
-                out_cat = layers.fully_connected(cat, self.cat_dim, tf.nn.tanh)
-                out_cat = tf.reshape(out_cat, [-1, self.cat_dim, 1])
-                out_cat = tf.matmul(tf.broadcast_to(self.item_cat, [tf.shape(out_cat)[0], self.item_cat.shape[0],
-                                                                    self.item_cat.shape[1]]),  out_cat)
+                cat = layers.fully_connected(cat, self.cat_dim, tf.nn.tanh)
+                cat = tf.reshape(cat, [-1, self.cat_dim, 1])
+                out_cat = tf.matmul(tf.broadcast_to(self.item_cat, [tf.shape(cat)[0], self.item_cat.shape[0],
+                                                                    self.item_cat.shape[1]]),  cat)
                 out_cat = tf.reshape(out_cat, [-1, self.n_products])
+                print(tf.shape(cat), tf.shape(out_cat))
                 out = out_cat * out
 
             loss = self.loss_reconstruct(y, out)
