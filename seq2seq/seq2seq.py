@@ -181,15 +181,15 @@ def main():
 
         for j in range(int(data.n_user / batch_size)):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
-            X, y, cat, y_cat = data.create_batch(list_idx, data.X_iter, data.y_iter)
+            X, y = data.create_batch(list_idx, data.X_iter, data.y_iter)
 
-            feed = {model.X: X, model.y:y, model.X_cat:cat, model.y_cat:y_cat}
+            feed = {model.X: X, model.y:y}
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
         if i % 10 == 0:
             model.train = False
-            X_val, y_val, cat_val, y_cat = data.create_batch(range(len(data.val)), data.val, data.val_infer)
-            feed = {model.X: X_val, model.y: y_val, model.X_cat: cat_val, model.y_cat: y_cat}
+            X_val, y_val = data.create_batch(range(len(data.val)), data.val, data.val_infer)
+            feed = {model.X: X_val, model.y: y_val}
             loss_val, y_val = sess.run([model.loss, model.predict],
                                        feed_dict=feed)
 
@@ -199,8 +199,8 @@ def main():
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'bilstm-model'), i)
 
-                X_test, y_test, cat_test, y_cat = data.create_batch(range(len(data.test)), data.test, data.infer2)
-                feed = {model.X: X_test, model.y: y_test, model.X_cat: cat_test, model.y_cat: y_cat}
+                X_test, y_test = data.create_batch(range(len(data.test)), data.test, data.infer2)
+                feed = {model.X: X_test, model.y: y_test}
                 loss_test, y = sess.run([model.loss, model.predict],
                                         feed_dict=feed)
                 recall, hit, ndcg = calc_recall(y, data.test, data.infer2)
