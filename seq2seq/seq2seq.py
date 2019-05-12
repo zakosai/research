@@ -97,17 +97,19 @@ class Seq2seq(object):
         self.seq_len = tf.fill([tf.shape(self.X)[0]], self.w_size)
 
 
-        outputs, _ = self.encoder_BiLSTM(self.X, "1", self.n_hidden)
+        outputs, _ = self.encoder_LSTM(self.X, 2)
+
+        # outputs, _ = self.encoder_BiLSTM(self.X, "1", self.n_hidden)
         # with tf.variable_scope('attention'):
         #     outputs, self.alphas = self.attention(outputs)
         #
-        outputs, _ = self.encoder_BiLSTM(outputs, "2", self.n_hidden*2)
+        # outputs, _ = self.encoder_BiLSTM(outputs, "2", self.n_hidden*2)
 
         # Dropout
         # with tf.variable_scope('dropout'):
         #     outputs = tf.nn.dropout(outputs, 0.8)
 
-        last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden*4))
+        last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden))
 
         self.loss, self.predict = self.prediction(last_state, self.y)
         # self.loss *=10
