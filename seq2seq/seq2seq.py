@@ -129,7 +129,7 @@ class Seq2seq(object):
         # Categories
         out_cat, _ = self.encoder_BiLSTM(self.X_cat, "cat", self.n_hidden)
         print(out_cat.shape)
-        last_state_cat = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden*2))
+        last_state_cat = tf.reshape(out_cat[:, -1, :], (-1, self.n_hidden*2))
 
         self.loss, self.predict = self.prediction(last_state, self.y, last_state_cat)
         # self.loss *=10
