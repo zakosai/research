@@ -89,10 +89,10 @@ class Seq2seq(object):
             # loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(y, out, 100))
 
             if cat !=None:
-                cat = layers.fully_connected(cat, self.cat_dim, tf.nn.tanh)
-                cat = tf.reshape(cat, [-1, self.cat_dim, 1])
+                pred_cat = layers.fully_connected(cat, self.cat_dim, tf.nn.tanh)
+                pred_cat = tf.reshape(pred_cat, [-1, self.cat_dim, 1])
                 out_cat = tf.matmul(tf.broadcast_to(self.item_cat, [tf.shape(cat)[0], self.item_cat.shape[0],
-                                                                    self.item_cat.shape[1]]),  cat)
+                                                                    self.item_cat.shape[1]]),  pred_cat)
                 out_cat = tf.reshape(out_cat, [tf.shape(out)[0], self.n_products])
                 print(cat.shape, out_cat.shape)
                 out = tf.reshape(out, [tf.shape(out)[0], self.n_products])
@@ -110,6 +110,7 @@ class Seq2seq(object):
 
         self.seq_len = tf.fill([tf.shape(self.X)[0]], self.w_size)
 
+        assert tf.shape(self.X)[0] == tf.shape(self.X_cat)[0]
 
 
         outputs, _ = self.encoder_BiLSTM(self.X, "1", self.n_hidden)
