@@ -110,7 +110,7 @@ class Seq2seq(object):
 
         self.seq_len = tf.fill([tf.shape(self.X)[0]], self.w_size)
 
-        assert tf.shape(self.X)[0] == tf.shape(self.X_cat)[0]
+        # assert tf.shape(self.X)[0] == tf.shape(self.X_cat)[0]
 
 
         outputs, _ = self.encoder_BiLSTM(self.X, "1", self.n_hidden)
