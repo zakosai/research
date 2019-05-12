@@ -12,6 +12,7 @@ class Dataset(object):
 
         self.n_user = len(self.train)
         self.n_item = n_item
+        self.cat_dim = 18
 
 
     def read_file(self, filename):
@@ -46,12 +47,13 @@ class Dataset(object):
         n_batch = len(idx)
         X_batch = np.zeros((n_batch, self.w_size, self.item_emb.shape[1]))
         y_batch = np.zeros((n_batch, self.n_item))
+        cat_batch = np.zeros((n_batch, self.w_size, self.cat_dim))
         for i in range(n_batch):
             X_batch[i, :, :] = self.item_emb[X_iter[idx[i]]]
             y_batch[i, y_iter[idx[i]]] = 1
+            cat_batch[i, :, :] = self.item_cat[X_iter[idx[i]]]
 
-        return X_batch, y_batch
-
+        return X_batch, y_batch, cat_batch
 
 
     def create_val_test(self, tmp_test):
@@ -66,6 +68,13 @@ class Dataset(object):
 
         self.val = np.reshape(self.val, (len(self.val), self.w_size))
         self.test = np.reshape(self.test, (len(self.test), self.w_size))
+
+
+    def create_item_cat(self, folder):
+        item_cat  = list(open("%s/categories.txt"%folder))
+        item_cat = [i.strip() for i in item_cat]
+        item_cat = [i.split(",") for i in item_cat]
+        self.item_cat = np.array(item_cat).astype(np.uint8)
 
 
 

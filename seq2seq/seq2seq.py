@@ -7,13 +7,15 @@ import os
 
 
 class Seq2seq(object):
-    def __init__(self):
+    def __init__(self, item_cat):
         self.w_size = 10
         self.p_dim = 100
         self.n_products = 3706
         self.n_hidden = 256
         self.learning_rate = 1e-4
         self.train = True
+        self.cat_dim = 18
+        self.item_cat = item_cat
 
 
     def encoder_BiLSTM(self, X, scope, n_hidden):
@@ -81,10 +83,16 @@ class Seq2seq(object):
         return neg_ll
 
 
-    def prediction(self, x, y, reuse=False):
+    def prediction(self, x, y, cat=None, reuse=False):
         with tf.variable_scope("last_layer", reuse=reuse):
             out = layers.fully_connected(x, self.n_products, tf.nn.tanh)
             # loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(y, out, 100))
+
+            if cat !=None:
+                out_cat = layers.fully_connected(cat, self.cat_dim, tf.nn.tanh)
+                out_cat = tf.linalg.matmul(self.item_cat, out_cat)
+                out = out_cat * out
+
             loss = self.loss_reconstruct(y, out)
 
         return loss, out
@@ -92,6 +100,7 @@ class Seq2seq(object):
 
     def build_model(self):
         self.X = tf.placeholder(tf.float32, [None, self.w_size, self.p_dim])
+        self.X_cat = tf.placeholder(tf.float32, [None, self.w_size, self.cat_dim])
         self.y = tf.placeholder(tf.float32, [None, self.n_products])
 
         self.seq_len = tf.fill([tf.shape(self.X)[0]], self.w_size)
@@ -101,17 +110,21 @@ class Seq2seq(object):
         outputs, _ = self.encoder_BiLSTM(self.X, "1", self.n_hidden)
 
         outputs, _ = self.encoder_BiLSTM(outputs, "2", self.n_hidden*2)
-        with tf.variable_scope('attention'):
-            outputs, self.alphas = self.attention(outputs)
+        # with tf.variable_scope('attention'):
+        #     outputs, self.alphas = self.attention(outputs)
+        #
+        # # Dropout
+        # with tf.variable_scope('dropout'):
+        #     outputs = tf.nn.dropout(outputs, 0.8)
 
-        # Dropout
-        with tf.variable_scope('dropout'):
-            outputs = tf.nn.dropout(outputs, 0.8)
+        last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden*4))
+        # last_state = outputs
 
-        # last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden))
-        last_state = outputs
+        # Categories
+        out_cat, _ = self.encoder_BiLSTM(self.X_cat, "cat", self.n_hidden)
+        last_state_cat = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden*2))
 
-        self.loss, self.predict = self.prediction(last_state, self.y)
+        self.loss, self.predict = self.prediction(last_state, self.y, last_state_cat)
         # self.loss *=10
         # for i in range(self.w_size-1):
         #     x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden))
@@ -135,9 +148,10 @@ def main():
     num_p = args.num_p
     checkpoint_dir = "experiment/%s/%s/" % (dataset, type)
 
-    data = Dataset(num_p, "../data/%s/%s"%(dataset, type))
+    data = Dataset(num_p, "data/%s/%s"%(dataset, type))
+    data.create_item_cat( "data/%s/%s"%(dataset, type))
 
-    model = Seq2seq()
+    model = Seq2seq(data.item_cat)
     model.p_dim = data.n_user
     model.w_size = data.w_size = args.w_size
     model.build_model()
@@ -155,16 +169,16 @@ def main():
 
         for j in range(int(data.n_user / batch_size)):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
-            X, y = data.create_batch(list_idx, data.X_iter, data.y_iter)
+            X, y, cat = data.create_batch(list_idx, data.X_iter, data.y_iter)
 
-            feed = {model.X: X, model.y:y}
+            feed = {model.X: X, model.y:y, model.X_cat:cat}
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
         if i % 10 == 0:
             model.train = False
-            X_val, y_val = data.create_batch(range(len(data.val)), data.val, data.val_infer)
+            X_val, y_val, cat_val = data.create_batch(range(len(data.val)), data.val, data.val_infer)
             loss_val, y_val = sess.run([model.loss, model.predict],
-                                       feed_dict={model.X: X_val, model.y:y_val})
+                                       feed_dict={model.X: X_val, model.y:y_val, model.X_cat: cat_val})
 
             recall, _, _ = calc_recall(y_val, data.val, data.val_infer)
             print("Loss val: %f, recall %f" % (loss_val, recall))
@@ -172,9 +186,9 @@ def main():
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'bilstm-model'), i)
 
-                X_test, y_test = data.create_batch(range(len(data.test)), data.test, data.infer2)
+                X_test, y_test, cat_test = data.create_batch(range(len(data.test)), data.test, data.infer2)
                 loss_test, y = sess.run([model.loss, model.predict],
-                                        feed_dict={model.X: X_test, model.y:y_test})
+                                        feed_dict={model.X: X_test, model.y:y_test, model.X_cat:cat_test})
                 recall, hit, ndcg = calc_recall(y, data.test, data.infer2)
                 np.savez(os.path.join(checkpoint_dir, "pred"), p_val=y_val, p_test=y)
                 print("Loss test: %f, recall: %f, hit: %f, ndcg: %f" % (loss_test, recall, hit, ndcg))
