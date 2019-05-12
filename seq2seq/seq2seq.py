@@ -133,7 +133,7 @@ class Seq2seq(object):
         # print(out_cat.shape)
         # last_state_cat = tf.reshape(out_cat[:, -1, :], (-1, self.n_hidden*2))
 
-        self.loss, self.predict = self.prediction(last_state)
+        self.loss, self.predict = self.prediction(last_state, self.y)
         # self.loss *=10
         # for i in range(self.w_size-1):
         #     x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden))
