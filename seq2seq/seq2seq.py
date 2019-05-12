@@ -161,7 +161,7 @@ def main():
     # data.create_item_cat("data/%s/%s"%(dataset, type))
     text = load_npz("data/%s/item.npz"%dataset)
     print(text.shape)
-    data.item_emb = text
+    data.item_emb = text.toarray()
 
     model = Seq2seq()
     # model.p_dim = data.n_user
