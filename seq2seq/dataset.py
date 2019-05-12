@@ -48,12 +48,14 @@ class Dataset(object):
         X_batch = np.zeros((n_batch, self.w_size, self.item_emb.shape[1]))
         y_batch = np.zeros((n_batch, self.n_item))
         cat_batch = np.zeros((n_batch, self.w_size, self.cat_dim))
+        y_cat_batch = np.zeros((n_batch, self.cat_dim))
         for i in range(n_batch):
             X_batch[i, :, :] = self.item_emb[X_iter[idx[i]]]
             y_batch[i, y_iter[idx[i]]] = 1
             cat_batch[i, :, :] = self.item_cat[X_iter[idx[i]]]
+            y_cat_batch[i, :] = self.item_cat[y_iter[idx[i]]]
 
-        return X_batch, y_batch, cat_batch
+        return X_batch, y_batch, cat_batch, y_cat_batch
 
 
     def create_val_test(self, tmp_test):

@@ -83,7 +83,7 @@ class Seq2seq(object):
         return neg_ll
 
 
-    def prediction(self, x, y, cat=None, reuse=False):
+    def prediction(self, x, y, cat=None, y_cat=None, reuse=False):
         with tf.variable_scope("last_layer", reuse=reuse):
             out = layers.fully_connected(x, self.n_products, tf.nn.tanh)
             # loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(y, out, 100))
@@ -93,12 +93,9 @@ class Seq2seq(object):
                 pred_cat = tf.reshape(pred_cat, [-1, self.cat_dim, 1])
                 out_cat = tf.matmul(tf.broadcast_to(self.item_cat, [tf.shape(cat)[0], self.item_cat.shape[0],
                                                                     self.item_cat.shape[1]]),  pred_cat)
-                out_cat = tf.reshape(out_cat, [tf.shape(out)[0], self.n_products])
-                print(cat.shape, out_cat.shape)
-                out = tf.reshape(out, [tf.shape(out)[0], self.n_products])
                 pred = out_cat * out
 
-            loss = self.loss_reconstruct(y, pred)
+            loss = 10*self.loss_reconstruct(y, pred) + self.loss_reconstruct(y_cat, out_cat)
 
         return loss, out
 
@@ -107,6 +104,7 @@ class Seq2seq(object):
         self.X = tf.placeholder(tf.float32, [None, self.w_size, self.p_dim])
         self.X_cat = tf.placeholder(tf.float32, [None, self.w_size, self.cat_dim])
         self.y = tf.placeholder(tf.float32, [None, self.n_products])
+        self.y_cat = tf.placeholder(tf.float32, [None, self.cat_dim])
 
         self.seq_len = tf.fill([tf.shape(self.X)[0]], self.w_size)
 
@@ -131,7 +129,7 @@ class Seq2seq(object):
         print(out_cat.shape)
         last_state_cat = tf.reshape(out_cat[:, -1, :], (-1, self.n_hidden*2))
 
-        self.loss, self.predict = self.prediction(last_state, self.y, last_state_cat)
+        self.loss, self.predict = self.prediction(last_state, self.y, last_state_cat, self.y_cat)
         # self.loss *=10
         # for i in range(self.w_size-1):
         #     x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden))
@@ -176,16 +174,17 @@ def main():
 
         for j in range(int(data.n_user / batch_size)):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
-            X, y, cat = data.create_batch(list_idx, data.X_iter, data.y_iter)
+            X, y, cat, y_cat = data.create_batch(list_idx, data.X_iter, data.y_iter)
 
-            feed = {model.X: X, model.y:y, model.X_cat:cat}
+            feed = {model.X: X, model.y:y, model.X_cat:cat, model.y_cat:y_cat}
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
         if i % 10 == 0:
             model.train = False
-            X_val, y_val, cat_val = data.create_batch(range(len(data.val)), data.val, data.val_infer)
+            X_val, y_val, cat_val, y_cat = data.create_batch(range(len(data.val)), data.val, data.val_infer)
+            feed = {model.X: X_val, model.y: y_val, model.X_cat: cat_val, model.y_cat: y_cat}
             loss_val, y_val = sess.run([model.loss, model.predict],
-                                       feed_dict={model.X: X_val, model.y:y_val, model.X_cat: cat_val})
+                                       feed_dict=feed)
 
             recall, _, _ = calc_recall(y_val, data.val, data.val_infer)
             print("Loss val: %f, recall %f" % (loss_val, recall))
@@ -193,9 +192,10 @@ def main():
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'bilstm-model'), i)
 
-                X_test, y_test, cat_test = data.create_batch(range(len(data.test)), data.test, data.infer2)
+                X_test, y_test, cat_test, y_cat = data.create_batch(range(len(data.test)), data.test, data.infer2)
+                feed = {model.X: X_test, model.y: y_test, model.X_cat: cat_test, model.y_cat: y_cat}
                 loss_test, y = sess.run([model.loss, model.predict],
-                                        feed_dict={model.X: X_test, model.y:y_test, model.X_cat:cat_test})
+                                        feed_dict=feed)
                 recall, hit, ndcg = calc_recall(y, data.test, data.infer2)
                 np.savez(os.path.join(checkpoint_dir, "pred"), p_val=y_val, p_test=y)
                 print("Loss test: %f, recall: %f, hit: %f, ndcg: %f" % (loss_test, recall, hit, ndcg))
