@@ -4,6 +4,8 @@ import numpy as np
 import argparse
 from dataset import Dataset, calc_recall
 import os
+from scipy.sparse import load_npz
+
 
 
 class Seq2seq(object):
@@ -15,7 +17,7 @@ class Seq2seq(object):
         self.learning_rate = 1e-4
         self.train = True
         self.cat_dim = 18
-        self.item_cat = item_cat.astype(np.float32)
+        # self.item_cat = item_cat.astype(np.float32)
 
 
     def encoder_BiLSTM(self, X, scope, n_hidden):
@@ -95,16 +97,18 @@ class Seq2seq(object):
                                                                     self.item_cat.shape[1]]),  pred_cat)
                 pred = out_cat * out
 
-            loss = 10*self.loss_reconstruct(y, pred) + self.loss_reconstruct(y_cat, out_cat)
+                loss = 10*self.loss_reconstruct(y, pred) + self.loss_reconstruct(y_cat, out_cat)
+            else:
+                loss = self.loss_reconstruct(y, out)
 
         return loss, out
 
 
     def build_model(self):
         self.X = tf.placeholder(tf.float32, [None, self.w_size, self.p_dim])
-        self.X_cat = tf.placeholder(tf.float32, [None, self.w_size, self.cat_dim])
+        # self.X_cat = tf.placeholder(tf.float32, [None, self.w_size, self.cat_dim])
         self.y = tf.placeholder(tf.float32, [None, self.n_products])
-        self.y_cat = tf.placeholder(tf.float32, [None, self.cat_dim])
+        # self.y_cat = tf.placeholder(tf.float32, [None, self.cat_dim])
 
         self.seq_len = tf.fill([tf.shape(self.X)[0]], self.w_size)
 
@@ -125,11 +129,11 @@ class Seq2seq(object):
         # last_state = outputs
 
         # Categories
-        out_cat, _ = self.encoder_BiLSTM(self.X_cat, "cat", self.n_hidden)
-        print(out_cat.shape)
-        last_state_cat = tf.reshape(out_cat[:, -1, :], (-1, self.n_hidden*2))
+        # out_cat, _ = self.encoder_BiLSTM(self.X_cat, "cat", self.n_hidden)
+        # print(out_cat.shape)
+        # last_state_cat = tf.reshape(out_cat[:, -1, :], (-1, self.n_hidden*2))
 
-        self.loss, self.predict = self.prediction(last_state, self.y, last_state_cat, self.y_cat)
+        self.loss, self.predict = self.prediction(last_state)
         # self.loss *=10
         # for i in range(self.w_size-1):
         #     x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden))
@@ -154,11 +158,14 @@ def main():
     checkpoint_dir = "experiment/%s/%s/" % (dataset, type)
 
     data = Dataset(num_p, "data/%s/%s"%(dataset, type))
-    data.create_item_cat( "data/%s/%s"%(dataset, type))
+    # data.create_item_cat("data/%s/%s"%(dataset, type))
+    text = load_npz("data/%s/item.npz"%dataset)
+    data.item_emb = text
 
     model = Seq2seq(data.item_cat)
-    model.p_dim = data.n_user
+    # model.p_dim = data.n_user
     model.w_size = data.w_size = args.w_size
+    model.p_dim = text.shape[1]
     model.build_model()
 
     sess = tf.Session()
