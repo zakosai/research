@@ -162,7 +162,7 @@ def main():
     text = load_npz("data/%s/item.npz"%dataset)
     data.item_emb = text
 
-    model = Seq2seq(data.item_cat)
+    model = Seq2seq()
     # model.p_dim = data.n_user
     model.w_size = data.w_size = args.w_size
     model.p_dim = text.shape[1]
