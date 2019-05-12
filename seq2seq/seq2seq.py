@@ -180,6 +180,7 @@ def main():
         train_cost = 0
         data.create_train_iter()
         data.item_emb = np.array(text)
+        print(data.item_emb.shape)
 
         for j in range(int(data.n_user / batch_size)):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
