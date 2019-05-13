@@ -32,26 +32,27 @@ def model(clf, resistance, test, X=None, LOF=False):
     acc = resistance + pred
     tp = acc[acc == -2].size
     tn = acc[acc == 2].size
+    acc = round(float(tp + tn) / len(pred), 2) * 100
 
     try:
-        precision = round(tp / outlier, 2) * 100
+        precision = round(float(tp) / outlier, 2) * 100
     except:
         precision = np.nan
 
 
     try:
-        recall = round(tp / re, 2) * 100
+        recall = round(float(tp) / re, 2) * 100
     except:
         recall = np.nan
 
     try:
-        fscore = round(2 * tp / (outlier + re), 2)
+        fscore = round(2 * float(tp) / (outlier + re), 2)
     except:
         fscore = np.nan
 
     acc = acc[acc != 0].size
 
-    return outlier, round(outlier*100/len(pred),2), recall, precision, acc, fscore
+    return outlier, round(float(outlier*100)/len(pred),2), recall, precision, acc, fscore
 
 
 def IsolationForrest(ftest_file, ftrain_file):
