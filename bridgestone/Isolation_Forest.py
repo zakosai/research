@@ -212,12 +212,12 @@ def IsolationForrest(ftest_file, ftrain_file):
         l = list(model(clfsvm, resistance, test))
         tmp_result += l[:-1]
         if s == "D14":
-            draw(l[-1], test, x1, y1, "SVM-poly")
+            draw(l[-1], test, x1, y1, "SVM-rbf")
 
         l = list(model(clfsvm2, resistance, test))
         tmp_result += l[:-1]
         if s == "D14":
-            draw(l[-1], test, x1, y1, "SVM-rbf")
+            draw(l[-1], test, x1, y1, "SVM-poly")
         l = list(model(clfLOF, resistance, test, X, True))
         pred = l[-1]
         tmp_result += l[:-1]
