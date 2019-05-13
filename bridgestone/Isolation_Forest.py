@@ -64,7 +64,7 @@ def IsolationForrest(ftest_file, ftrain_file):
         if line[67]!= "" and line[40] != "" and int(line[67])!= 0:
             y1.append((float(line[14])-float(line[40])))
             x1.append(int(line[67]))
-    sort = np.argsort(x1)
+    sort = np.argsort(np.array(x1))
     print(sort)
     y1 = np.array(y1)[sort].tolist()
     x1 = np.array(x1)[sort].tolist()
