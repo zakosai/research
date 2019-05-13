@@ -19,7 +19,7 @@ def main():
 
 def model(clf, resistance, test):
     start = timeit.default_timer()
-    pred = clf.pred(test)
+    pred = clf.predict(test)
     outlier = pred[pred == -1].size
     re = resistance[resistance == -1].size
 
@@ -48,20 +48,16 @@ def model(clf, resistance, test):
 
 def IsolationForrest(ftest_file, ftrain_file):
     dataTest = list(open(ftest_file, "rt"))
-    dataTest = [d.strip() for d in dataTest]
+    dataTest = dataTest[0].split("\r")
     dataTest = [d.split(",") for d in dataTest]
     dataTest = dataTest[1:]
     # f = open("36 categories/2･2-D･D_R195_Mix.csv", "rt", encoding="utf-8")
     dataTrain = list(open(ftrain_file, "rt"))
-    print(len(dataTrain))
     dataTrain = dataTrain[0].split("\r")
-    print(len(dataTrain))
     dataTrain =[d.split(",") for d in dataTrain]
     dataTrain = dataTrain[1:]
-    print(len(dataTrain), len(dataTrain[0]))
     y1 = []
     x1 = []
-    print(dataTrain[:10])
 
     ######## read training data#######################
     for line in dataTrain:
