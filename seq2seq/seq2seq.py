@@ -161,7 +161,7 @@ def main():
     # data.create_item_cat("data/%s/%s"%(dataset, type))
     text = load_npz("data/%s/item.npz"%dataset)
     print(text.shape)
-    data.item_emb = text.toarray()
+    # data.item_emb = text.toarray()
 
     model = Seq2seq()
     # model.p_dim = data.n_user
@@ -178,7 +178,7 @@ def main():
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(data.n_user)
         train_cost = 0
-        data.create_train_iter()
+        data.create_train_iter(text.toarray())
 
         for j in range(int(data.n_user / batch_size)):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
