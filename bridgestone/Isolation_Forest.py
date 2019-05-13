@@ -50,6 +50,8 @@ def model(clf, resistance, test, X=None, LOF=False):
     except:
         fscore = np.nan
 
+    if LOF:
+        return outlier, round(float(outlier*100)/len(pred),2), recall, precision, acc, fscore, pred
     return outlier, round(float(outlier*100)/len(pred),2), recall, precision, acc, fscore
 
 
@@ -96,14 +98,14 @@ def IsolationForrest(ftest_file, ftrain_file):
 
                     d = int(line[67])
                     a = float(line[14]) - float(line[40])
-                    l = [np.log(int(line[67])), (float(line[14])- float(line[40]))]
+                    l = [int(line[67]), (float(line[14])- float(line[40]))]
 
             elif line[28] == "RT1":
                 if line[15] != '' and float(line[15]) != 0 and line[40] != '' and line[68] != '' and int(line[68]) > 0:
-                    l = [np.log(int(line[68])), (float(line[15])- float(line[40]))]
+                    l = [int(line[68]), (float(line[15])- float(line[40]))]
             elif line[28] == "RT2":
                 if line[15] != '' and float(line[15]) != 0 and line[40] != '' and line[69] != ''and int(line[69]) > 0:
-                    l = [np.log(int(line[69])), (float(line[15])- float(line[40])) ]
+                    l = [int(line[69]), (float(line[15])- float(line[40])) ]
             if len(l)!= 0:
                 #for number of vehicle
                 #---------------------
@@ -175,7 +177,9 @@ def IsolationForrest(ftest_file, ftrain_file):
         tmp_result += list(model(clf, resistance, test))
         tmp_result += list(model(clfsvm, resistance, test))
         tmp_result += list(model(clfsvm2, resistance, test))
-        tmp_result += list(model(clfLOF, resistance, test, X, True))
+        l = list(model(clfLOF, resistance, test, X, True))
+        pred = l[-1]
+        tmp_result += l[:-1]
         result.append(tmp_result)
 
 
@@ -185,35 +189,35 @@ def IsolationForrest(ftest_file, ftrain_file):
         #                outliersvm, round(outliersvm*100/len(pred),2), recallsvm, precisionsvm,accsvm,fscoresvm,
         #                outliersvm2, round(outliersvm2*100/len(pred),2),recallsvm2, precisionsvm2,accsvm2,fscoresvm2])
 
-        # if s == "D14":
-        #     outlier = test[predsvm==-1]
-        #     normal = test[predsvm!=-1]
-        #     b1 = plt.scatter(x1, y1, c='blue', s=40)
-        #     b2 = plt.scatter(outlier[:,0], outlier[:,1], c='blueviolet', s=40)
-        #     c = plt.scatter(normal[:,0], normal[:,1], c='gold', s=40)
-        #     yl = np.linspace(0, 16, 10)
-        #     xl1 = np.array(np.log(yl) + np.log(2151))
-        #     xl2 = np.array(np.log(yl) + np.log(27727))
-        #     # xl1 = np.array(2151*yl)
-        #     # xl2 = np.array(27727*yl)
-        #     c2, = plt.plot(xl1, yl, c='red')
-        #     c3, = plt.plot(xl2, yl, c='red')
-        #     plt.axis('tight')
-        #     plt.xlim((0, np.log(500000)))
-        #     # plt.xlim((0,500000))
-        #     plt.ylim((0, 16))
-        #     plt.xlabel("Distance")
-        #     plt.ylabel("Erosion")
-        #     plt.legend([ b1, b2, c, c2],
-        #                ["Train data",
-        #                 "shop anomalies", "shop normal data", "separation line between outlier and normal area"],
-        #                loc="upper left",
-        #                prop=matplotlib.font_manager.FontProperties(size=11))
-        #     plt.title(
-        #         "Shop %s ; errors novel regular: %d/%d ; "
-        #         % (s, len(outlier), len(test)))
-        #     plt.savefig("mail/SVMrbfD14", dpi = 220)
-        #     plt.close()
+        if s == "D14":
+            outlier = test[pred==-1]
+            normal = test[pred!=-1]
+            b1 = plt.scatter(x1, y1, c='blue', s=40)
+            b2 = plt.scatter(outlier[:,0], outlier[:,1], c='blueviolet', s=40)
+            c = plt.scatter(normal[:,0], normal[:,1], c='gold', s=40)
+            yl = np.linspace(0, 16, 10)
+            xl1 = np.array(np.log(yl) + np.log(2151))
+            xl2 = np.array(np.log(yl) + np.log(27727))
+            # xl1 = np.array(2151*yl)
+            # xl2 = np.array(27727*yl)
+            c2, = plt.plot(xl1, yl, c='red')
+            c3, = plt.plot(xl2, yl, c='red')
+            plt.axis('tight')
+            plt.xlim((0, np.log(500000)))
+            # plt.xlim((0,500000))
+            plt.ylim((0, 16))
+            plt.xlabel("Distance")
+            plt.ylabel("Erosion")
+            plt.legend([ b1, b2, c, c2],
+                       ["Train data",
+                        "shop anomalies", "shop normal data", "separation line between outlier and normal area"],
+                       loc="upper left",
+                       prop=matplotlib.font_manager.FontProperties(size=11))
+            plt.title(
+                "Shop %s ; errors novel regular: %d/%d ; "
+                % (s, len(outlier), len(test)))
+            plt.savefig("LOFD14", dpi = 220)
+            plt.close()
         #
         #     outlier = test[predsvm2==-1]
         #     normal = test[predsvm2!=-1]
