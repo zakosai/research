@@ -47,15 +47,21 @@ def model(clf, resistance, test):
 
 
 def IsolationForrest(ftest_file, ftrain_file):
-    dataTest = list(open(ftest_file, "rt"))
-    dataTest = dataTest[0].split("\r")
+    dataTest = list(open(ftest_file))
+    dataTest = [d.replace("\r\n", "") for d in dataTest]
     dataTest = [d.split(",") for d in dataTest]
     dataTest = dataTest[1:]
+    for i in range(len(dataTest)):
+        if len(dataTest[i]) != 92:
+            dataTest[i] = dataTest[i][:92]
+    dataTest = np.array(dataTest)
     # f = open("36 categories/2･2-D･D_R195_Mix.csv", "rt", encoding="utf-8")
     dataTrain = list(open(ftrain_file, "rt"))
     dataTrain = dataTrain[0].split("\r")
     dataTrain =[d.split(",") for d in dataTrain]
     dataTrain = dataTrain[1:]
+    dataTrain = np.array(dataTrain)
+    print(dataTrain.shape)
     y1 = []
     x1 = []
 
@@ -64,12 +70,9 @@ def IsolationForrest(ftest_file, ftrain_file):
         if line[67]!= "" and line[40] != "" and int(line[67])!= 0:
             y1.append((float(line[14])-float(line[40])))
             x1.append(int(line[67]))
-    print(len(x1))
     sort = np.argsort(np.array(x1))
-    print(sort)
     y1 = np.array(y1)[sort].tolist()
     x1 = np.array(x1)[sort].tolist()
-    print(x1)
     # x1, y1 = zip(*sorted(zip(x1, y1)))
 
 
