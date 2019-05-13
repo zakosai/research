@@ -17,13 +17,11 @@ def main():
     # plot()
 
 
-def model(clf, resistance, test, X=None, LOF=False):
+def model(clf, resistance, test):
     start = timeit.default_timer()
 
-    if LOF:
-        pred = clf.fit_predict(test)
-    else:
-        pred = clf.predict(test)
+
+    pred = clf.predict(test)
     outlier = pred[pred == -1].size
     re = resistance[resistance == -1].size
 
@@ -135,7 +133,7 @@ def IsolationForrest(ftest_file, ftrain_file):
 
     # start = timeit.default_timer()
     clfLOF = KNeighborsClassifier(n_neighbors=2)
-    clfLOF.fit(X)
+    clfLOF.fit(x1, y1)
     # train_IF = timeit.default_timer() - start
 
     print(len(shop))
