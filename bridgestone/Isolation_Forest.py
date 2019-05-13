@@ -7,7 +7,7 @@ import numpy as np
 from sklearn import svm
 import matplotlib.font_manager
 from sklearn.ensemble import IsolationForest
-from sklearn.neighbors import LocalOutlierFactor
+from sklearn.neighbors import LocalOutlierFactor, KNeighborsClassifier
 import timeit
 
 def main():
@@ -17,7 +17,7 @@ def main():
     # plot()
 
 
-def model(clf, resistance, test, LOF=False):
+def model(clf, resistance, test, X=None, LOF=False):
     start = timeit.default_timer()
 
     if LOF:
@@ -134,7 +134,7 @@ def IsolationForrest(ftest_file, ftrain_file):
     # train_IF = timeit.default_timer()-start
 
     # start = timeit.default_timer()
-    clfLOF = LocalOutlierFactor(n_neighbors=20, contamination=0.1)
+    clfLOF = KNeighborsClassifier(n_neighbors=2)
     clfLOF.fit(X)
     # train_IF = timeit.default_timer() - start
 
@@ -174,7 +174,7 @@ def IsolationForrest(ftest_file, ftrain_file):
         tmp_result += list(model(clf, resistance, test))
         tmp_result += list(model(clfsvm, resistance, test))
         tmp_result += list(model(clfsvm2, resistance, test))
-        tmp_result += list(model(clfLOF, resistance, test, True))
+        tmp_result += list(model(clfLOF, resistance, test))
         result.append(tmp_result)
 
 
