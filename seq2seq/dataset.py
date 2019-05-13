@@ -29,18 +29,19 @@ class Dataset(object):
         return train, infer
 
 
-    def create_train_iter(self):
+    def create_train_iter(self, text):
         self.X_iter = []
         self.y_iter = []
-        # self.item_emb = np.zeros((self.n_item, self.n_user))
+        self.item_emb = np.zeros((self.n_item, self.n_user))
         for i, tr in enumerate(self.train):
             n = np.random.randint(len(tr)-self.w_size-1)
             self.X_iter.append(tr[n:n+self.w_size])
             self.y_iter.append(tr[n+self.w_size])
-            # self.item_emb[tr, [i]*len(tr)] = 1
+            self.item_emb[tr, [i]*len(tr)] = 1
 
         self.X_iter = np.reshape(self.X_iter, (self.n_user, self.w_size))
         self.y_iter = np.array(self.y_iter)
+        self.item_emb = np.concatenate((self.item_emb, text), axis=1)
 
 
     def create_batch(self, idx, X_iter, y_iter):
