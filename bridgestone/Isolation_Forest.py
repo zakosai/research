@@ -118,7 +118,7 @@ def IsolationForrest(ftest_file, ftrain_file):
 
     ################# train process ############################
     rng = np.random.RandomState(42)
-    x1 = np.log(x1)
+    # x1 = np.log(x1)
     X = np.column_stack((x1, y1))
 
     # start = timeit.default_timer()
@@ -160,10 +160,10 @@ def IsolationForrest(ftest_file, ftrain_file):
         score = 0
 
         test = np.array(shop[s])
-        test[:,0] = np.log(test[:,0])
+        # test[:,0] = np.log(test[:,0])
 
-        resistance = np.array(np.power(np.e, test[:, 0]) / (test[:, 1] + np.e - 12))
-        # resistance = np.array(test[:,0]/test[:,1])
+        # resistance = np.array(np.power(np.e, test[:, 0]) / (test[:, 1] + np.e - 12))
+        resistance = np.array(test[:,0]/test[:,1])
         for i in range(0, len(resistance)):
             if resistance[i] > 27727:
                 score += np.abs(test[i, 0] - 27727 * test[i, 1]) / np.sqrt(1 + 27727 ** 2)
@@ -190,21 +190,22 @@ def IsolationForrest(ftest_file, ftrain_file):
         #                outliersvm2, round(outliersvm2*100/len(pred),2),recallsvm2, precisionsvm2,accsvm2,fscoresvm2])
 
         if s == "D14":
+            np.savez("pred", pred=pred)
             outlier = test[pred==-1]
             normal = test[pred!=-1]
             b1 = plt.scatter(x1, y1, c='blue', s=40)
             b2 = plt.scatter(outlier[:,0], outlier[:,1], c='blueviolet', s=40)
             c = plt.scatter(normal[:,0], normal[:,1], c='gold', s=40)
             yl = np.linspace(0, 16, 10)
-            xl1 = np.array(np.log(yl) + np.log(2151))
-            xl2 = np.array(np.log(yl) + np.log(27727))
-            # xl1 = np.array(2151*yl)
-            # xl2 = np.array(27727*yl)
+            # xl1 = np.array(np.log(yl) + np.log(2151))
+            # xl2 = np.array(np.log(yl) + np.log(27727))
+            xl1 = np.array(2151*yl)
+            xl2 = np.array(27727*yl)
             c2, = plt.plot(xl1, yl, c='red')
             c3, = plt.plot(xl2, yl, c='red')
             plt.axis('tight')
-            plt.xlim((0, np.log(500000)))
-            # plt.xlim((0,500000))
+            # plt.xlim((0, np.log(500000)))
+            plt.xlim((0,500000))
             plt.ylim((0, 16))
             plt.xlabel("Distance")
             plt.ylabel("Erosion")
