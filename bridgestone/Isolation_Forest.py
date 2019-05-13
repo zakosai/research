@@ -53,6 +53,7 @@ def IsolationForrest(ftest_file, ftrain_file):
     dataTest = [d.split(",") for d in dataTest]
     # f = open("36 categories/2･2-D･D_R195_Mix.csv", "rt", encoding="utf-8")
     dataTrain = list(open(ftrain_file))
+    print(dataTrain[:10])
     dataTrain = dataTrain[1:]
     dataTrain = [d.strip() for d in dataTrain]
     dataTrain =[d.split(",") for d in dataTrain]
