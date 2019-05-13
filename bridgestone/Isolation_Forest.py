@@ -50,8 +50,6 @@ def model(clf, resistance, test, X=None, LOF=False):
     except:
         fscore = np.nan
 
-    acc = acc[acc != 0].size
-
     return outlier, round(float(outlier*100)/len(pred),2), recall, precision, acc, fscore
 
 
