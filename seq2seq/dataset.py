@@ -1,8 +1,8 @@
 import numpy as np
 
 class Dataset(object):
-    def __init__(self, n_item, folder):
-        self.w_size = 10
+    def __init__(self, n_item, folder, w_size=10):
+        self.w_size = w_size
 
         train_file = "%s/train.txt"%folder
         self.train, self.infer1 = self.read_file(train_file)
@@ -74,7 +74,7 @@ class Dataset(object):
 
 
     def create_item_cat(self, folder):
-        item_cat  = list(open("%s/categories.txt"%folder))
+        item_cat = list(open("%s/categories.txt"%folder))
         item_cat = [i.strip() for i in item_cat]
         item_cat = [i.split(",") for i in item_cat]
         self.item_cat = np.array(item_cat).astype(np.uint8)

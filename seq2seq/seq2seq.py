@@ -157,7 +157,7 @@ def main():
     num_p = args.num_p
     checkpoint_dir = "experiment/%s/%s/" % (dataset, type)
 
-    data = Dataset(num_p, "data/%s/%s"%(dataset, type))
+    data = Dataset(num_p, "data/%s/%s"%(dataset, type), args.w_size)
     # data.create_item_cat("data/%s/%s"%(dataset, type))
     text = load_npz("data/%s/item.npz"%dataset)
     print(text.shape)
@@ -165,8 +165,7 @@ def main():
 
     model = Seq2seq()
     # model.p_dim = data.n_user
-    model.w_size = data.w_size = args.w_size
-    print(model.w_size, data.w_size, args.w_size)
+    model.w_size = args.w_size
     model.p_dim = text.shape[1]+ data.n_user
     model.build_model()
 
