@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 __author__ = 'linh'
 
 import csv
@@ -6,22 +7,55 @@ import numpy as np
 from sklearn import svm
 import matplotlib.font_manager
 from sklearn.ensemble import IsolationForest
+from sklearn.neighbors import LocalOutlierFactor
 import timeit
 
 def main():
-    ftest_file = "Bridgestone raw data_20161101/タイヤ情報一覧_renamed.csv"
-    ftrain_file = "data 2-8/Supervised data 2 (20170301).csv"
+    ftest_file = "data/test.csv"
+    ftrain_file = "data/train.csv"
     IsolationForrest(ftest_file, ftrain_file)
     # plot()
 
 
+def model(clf, resistance, test):
+    start = timeit.default_timer()
+    pred = clf.pred(test)
+    outlier = pred[pred == -1].size
+    re = resistance[resistance == -1].size
+
+    acc = resistance + pred
+    tp = acc[acc == -2].size
+    tn = acc[acc == 2].size
+
+    try:
+        precision = round(tp / outlier, 2) * 100
+    except:
+        precision = np.nan
+
+
+    try:
+        recall = round(tp / re, 2) * 100
+    except:
+        recall = np.nan
+
+    try:
+        fscore = round(2 * tp / (outlier + re), 2)
+    except:
+        fscore = np.nan
+
+    return outlier, round(outlier*100/len(pred),2), precision, recall, acc, fscore
+
+
 def IsolationForrest(ftest_file, ftrain_file):
-    f = open(ftest_file, "rt", encoding="utf-8")
-    dataTest = csv.reader(f, delimiter=",")
+    dataTest = list(open(ftest_file))
+    dataTest = dataTest[1:]
+    dataTest = [d.strip() for d in dataTest]
+    dataTest = [d.split(",") for d in dataTest]
     # f = open("36 categories/2･2-D･D_R195_Mix.csv", "rt", encoding="utf-8")
-    ftrain = open(ftrain_file, "rt", encoding="utf-8")
-    dataTrain = csv.reader(ftrain, delimiter=",")
-    next(dataTrain)
+    dataTrain = list(open(ftrain_file))
+    dataTrain = dataTrain[1:]
+    dataTrain = [d.strip() for d in dataTrain]
+    dataTrain =[d.split(",") for d in dataTrain]
     y1 = []
     x1 = []
 
@@ -30,8 +64,10 @@ def IsolationForrest(ftest_file, ftrain_file):
         if line[67]!= "" and line[40] != "" and int(line[67])!= 0:
             y1.append((float(line[14])-float(line[40])))
             x1.append(int(line[67]))
-    ftrain.close()
-    x1, y1 = zip(*sorted(zip(x1, y1)))
+    sort = np.argsort(x1)
+    y1 = np.array(y1)[sort].tolist()
+    x1 = np.array(x1)[sort].tolist()
+    # x1, y1 = zip(*sorted(zip(x1, y1)))
 
 
 
@@ -39,7 +75,6 @@ def IsolationForrest(ftest_file, ftrain_file):
 
     ##################divide test data into shop################
     shop = {}
-    next(dataTest)
     for line in dataTest:
         if line[3]!= "" and line[66]!= '' and int(line[66])> 0:
             l = []
@@ -85,6 +120,12 @@ def IsolationForrest(ftest_file, ftrain_file):
     clf = IsolationForest(max_samples=500, random_state=rng )
     clf.fit(X)
     train_IF = timeit.default_timer()-start
+
+    start = timeit.default_timer()
+    clfLOF = LocalOutlierFactor(n_neighbors=20, contamination=0.1)
+    clfLOF.fit(X)
+    train_IF = timeit.default_timer() - start
+
     print(len(shop))
 
 
@@ -102,96 +143,34 @@ def IsolationForrest(ftest_file, ftrain_file):
 
     for s in shop:
         score = 0
+
         test = np.array(shop[s])
-
-
         test[:,0] = np.log(test[:,0])
 
-        start = timeit.default_timer()
-        pred = clf.predict(test)
-        test_IF += timeit.default_timer()-start
-        outlier = pred[pred==-1].size
-
-        start = timeit.default_timer()
-        predsvm = clfsvm.predict(test)
-        test_svm_rbf += timeit.default_timer()-start
-        outliersvm = predsvm[predsvm==-1].size
-
-        start = timeit.default_timer()
-        predsvm2 = clfsvm2.predict(test)
-        test_svm_poly += timeit.default_timer()-start
-        outliersvm2 = predsvm2[predsvm2==-1].size
-
-
-        ################### calculate algorithm accuracy ##################
-        resistance = np.array(np.power(np.e,test[:,0])/(test[:,1]+np.e-12))
+        resistance = np.array(np.power(np.e, test[:, 0]) / (test[:, 1] + np.e - 12))
         # resistance = np.array(test[:,0]/test[:,1])
         for i in range(0, len(resistance)):
-            if resistance[i] >27727:
-                score += np.abs(test[i,0]-27727*test[i,1])/np.sqrt(1+27727**2)
+            if resistance[i] > 27727:
+                score += np.abs(test[i, 0] - 27727 * test[i, 1]) / np.sqrt(1 + 27727 ** 2)
             elif resistance[i] < 2151:
-                score += np.abs(test[i,0]-2151*test[i,1])/np.sqrt(1+2151**2)
-        resistance[resistance>27727] = -1
-        resistance[resistance<2151] = -1
-        resistance[resistance!=-1] = 1
-        re = resistance[resistance==-1].size
+                score += np.abs(test[i, 0] - 2151 * test[i, 1]) / np.sqrt(1 + 2151 ** 2)
+        resistance[resistance > 27727] = -1
+        resistance[resistance < 2151] = -1
+        resistance[resistance != -1] = 1
+        re = resistance[resistance == -1].size
+        tmp_result = [s, len(test), re]
+        tmp_result += list(model(clf, resistance, test))
+        tmp_result += list(model(clfsvm, resistance, test))
+        tmp_result += list(model(clfsvm2, resistance, test))
+        tmp_result += list(model(clfLOF, resistance, test))
+        result.append(tmp_result)
 
 
 
-        acc = resistance + pred
-        tp = acc[acc==-2].size
-        tn = acc[acc==2].size
-        accsvm = resistance + predsvm
-        tpsvm = accsvm[accsvm==-2].size
-        tnsvm = accsvm[accsvm==2].size
-        accsvm2 = resistance + predsvm2
-        tpsvm2 = accsvm2[accsvm2==-2].size
-        tnsvm2 = accsvm2[accsvm2 == 2].size
-
-        acc = round((tp+tn)/len(pred),2)*100
-        accsvm = round((tpsvm+tnsvm)/len(pred),2)*100
-        accsvm2 = round((tpsvm2+tnsvm2)/len(pred),2)*100
-
-
-
-
-        try:
-            precision = round(tp/outlier, 2)*100
-        except:
-            precision = np.nan
-        try:
-            precisionsvm = round(tpsvm/outliersvm,2)*100
-        except:
-            precisionsvm = np.nan
-        try:
-            precisionsvm2 = round(tpsvm2/outliersvm2,2)*100
-        except:
-            precisionsvm2 = np.nan
-
-        try:
-            recall = round(tp/re,2)*100
-            recallsvm = round(tpsvm/re,2)*100
-            recallsvm2 = round(tpsvm2/re,2)*100
-        except:
-            recall = np.nan
-            recallsvm = np.nan
-            recallsvm2 = np.nan
-
-        try:
-            fscore = round(2*tp/(outlier+re),2)
-            fscoresvm = round(2*tpsvm/(outliersvm+re), 2)
-            fscoresvm2 = round(2*tpsvm2/(outliersvm2+re), 2)
-        except:
-            fscore = np.nan
-            fscoresvm = np.nan
-            fscoresvm2 = np.nan
-
-        # print(score/len(pred), len(pred), outlier)
-
-        result.append([s,len(pred), re,#score/len(pred),
-                       outlier, round(outlier*100/len(pred),2),recall, precision, acc, fscore,
-                       outliersvm, round(outliersvm*100/len(pred),2), recallsvm, precisionsvm,accsvm,fscoresvm,
-                       outliersvm2, round(outliersvm2*100/len(pred),2),recallsvm2, precisionsvm2,accsvm2,fscoresvm2])
+        # result.append([s,len(pred), re,#score/len(pred),
+        #                outlier, round(outlier*100/len(pred),2),recall, precision, acc, fscore,
+        #                outliersvm, round(outliersvm*100/len(pred),2), recallsvm, precisionsvm,accsvm,fscoresvm,
+        #                outliersvm2, round(outliersvm2*100/len(pred),2),recallsvm2, precisionsvm2,accsvm2,fscoresvm2])
 
         # if s == "D14":
         #     outlier = test[predsvm==-1]
@@ -310,7 +289,7 @@ def IsolationForrest(ftest_file, ftrain_file):
 
 
     ################ Write outlier result of all algorithms ##################
-    fwrite = open("outliernew.csv", "wt", encoding="utf-8")
+    fwrite = open("outliernew.csv", "wt")
     datawrite = csv.writer(fwrite, delimiter=",")
     datawrite.writerow(["shop", "total amount","obvious outlier",
                         "IForest outlier predict", "IForest outlier percentage", "IForest recall", "IForest precision", "Iforest accuracy","IF F-score",
@@ -318,17 +297,18 @@ def IsolationForrest(ftest_file, ftrain_file):
                         "SVM poly outlier amount", "SVM poly outlier percentage", "SVM poly recall", "SVM poly precision", "SVM poly accuracy", "SVM poly F-score"])
     for line in result:
         datawrite.writerow(line)
+    fwrite.close()
 
-    print(train_IF, train_svm_rbf, train_svm_poly)
-    print(test_IF, test_svm_rbf, test_svm_poly)
+    # print(train_IF, train_svm_rbf, train_svm_poly)
+    # print(test_IF, test_svm_rbf, test_svm_poly)
 
 
 
 def plot():
-    f = open("Bridgestone raw data_20161101/タイヤ情報一覧_renamed.csv", "rt", encoding="utf-8")
+    f = open("data/タイヤ情報一覧_renamed.csv", "rt")
     dataTest = csv.reader(f, delimiter=",")
     # f = open("36 categories/2･2-D･D_R195_Mix.csv", "rt", encoding="utf-8")
-    ftrain = open("data 2-8/Supervised data 2 (20170301).csv", "rt", encoding="utf-8")
+    ftrain = open("data/Supervised data 2 (20170301).csv", "rt", encoding="utf-8")
     dataTrain = csv.reader(ftrain, delimiter=",")
     next(dataTrain)
     y1 = []
