@@ -160,8 +160,8 @@ def IsolationForrest(ftest_file, ftrain_file):
         test = np.array(shop[s])
         test[:,0] = np.log(test[:,0])
 
-        resistance = np.array(np.power(np.e, test[:, 0]) / (test[:, 1] + np.e - 12))
-        # resistance = np.array(test[:,0]/test[:,1])
+        # resistance = np.array(np.power(np.e, test[:, 0]) / (test[:, 1] + np.e - 12))
+        resistance = np.array(test[:,0]/test[:,1])
         for i in range(0, len(resistance)):
             if resistance[i] > 27727:
                 score += np.abs(test[i, 0] - 27727 * test[i, 1]) / np.sqrt(1 + 27727 ** 2)
