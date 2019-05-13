@@ -96,7 +96,7 @@ def IsolationForrest(ftest_file, ftrain_file):
 
                     d = int(line[67])
                     a = float(line[14]) - float(line[40])
-                    l = [int(line[67]), (float(line[14])- float(line[40])) ]
+                    l = [int(line[67]), (float(line[14])- float(line[40]))]
 
             elif line[28] == "RT1":
                 if line[15] != '' and float(line[15]) != 0 and line[40] != '' and line[68] != '' and int(line[68]) > 0:
