@@ -55,7 +55,7 @@ def IsolationForrest(ftest_file, ftrain_file):
     dataTrain = list(open(ftrain_file, "rt"))
     print(len(dataTrain))
     dataTrain = [d.split("\r") for d in dataTrain]
-    print(len(dataTrain))
+    print(dataTrain)
     dataTrain =[d.split(",") for d in dataTrain]
     dataTrain = dataTrain[1:]
     print(len(dataTrain), len(dataTrain[0]))
