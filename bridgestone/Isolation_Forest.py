@@ -100,10 +100,10 @@ def IsolationForrest(ftest_file, ftrain_file):
 
             elif line[28] == "RT1":
                 if line[15] != '' and float(line[15]) != 0 and line[40] != '' and line[68] != '' and int(line[68]) > 0:
-                    l = [int(line[68]), (float(line[15])- float(line[40])) ]
+                    l = [int(line[68]), (float(line[14])- float(line[40]))]
             elif line[28] == "RT2":
                 if line[15] != '' and float(line[15]) != 0 and line[40] != '' and line[69] != ''and int(line[69]) > 0:
-                    l = [int(line[69]), (float(line[15])- float(line[40])) ]
+                    l = [int(line[69]), (float(line[14])- float(line[40])) ]
             if len(l)!= 0:
                 #for number of vehicle
                 #---------------------
@@ -160,8 +160,8 @@ def IsolationForrest(ftest_file, ftrain_file):
         test = np.array(shop[s])
         test[:,0] = np.log(test[:,0])
 
-        # resistance = np.array(np.power(np.e, test[:, 0]) / (test[:, 1] + np.e - 12))
-        resistance = np.array(test[:,0]/test[:,1])
+        resistance = np.array(np.power(np.e, test[:, 0]) / (test[:, 1] + np.e - 12))
+        # resistance = np.array(test[:,0]/test[:,1])
         for i in range(0, len(resistance)):
             if resistance[i] > 27727:
                 score += np.abs(test[i, 0] - 27727 * test[i, 1]) / np.sqrt(1 + 27727 ** 2)
