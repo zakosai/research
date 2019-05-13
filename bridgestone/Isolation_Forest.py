@@ -65,8 +65,10 @@ def IsolationForrest(ftest_file, ftrain_file):
             y1.append((float(line[14])-float(line[40])))
             x1.append(int(line[67]))
     sort = np.argsort(x1)
+    print(sort)
     y1 = np.array(y1)[sort].tolist()
     x1 = np.array(x1)[sort].tolist()
+    print(x1)
     # x1, y1 = zip(*sorted(zip(x1, y1)))
 
 
