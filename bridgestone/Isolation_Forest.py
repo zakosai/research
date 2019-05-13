@@ -47,7 +47,9 @@ def model(clf, resistance, test, LOF=False):
     except:
         fscore = np.nan
 
-    return outlier, round(outlier*100/len(pred),2), precision, recall, acc, fscore
+    acc = acc[acc != 0].size
+
+    return outlier, round(outlier*100/len(pred),2), recall, precision, acc, fscore
 
 
 def IsolationForrest(ftest_file, ftrain_file):
