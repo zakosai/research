@@ -17,9 +17,13 @@ def main():
     # plot()
 
 
-def model(clf, resistance, test):
+def model(clf, resistance, test, LOF=False):
     start = timeit.default_timer()
-    pred = clf.predict(test)
+
+    if LOF:
+        pred = clf.fit_predict(test)
+    else:
+        pred = clf.predict(test)
     outlier = pred[pred == -1].size
     re = resistance[resistance == -1].size
 
@@ -112,25 +116,25 @@ def IsolationForrest(ftest_file, ftrain_file):
     x1 = np.log(x1)
     X = np.column_stack((x1, y1))
 
-    start = timeit.default_timer()
+    # start = timeit.default_timer()
     clfsvm = svm.OneClassSVM(nu=0.5, kernel='rbf', gamma='auto')
     clfsvm.fit(X)
-    train_svm_rbf = timeit.default_timer()-start
+    # train_svm_rbf = timeit.default_timer()-start
 
-    start = timeit.default_timer()
+    # start = timeit.default_timer()
     clfsvm2 = svm.OneClassSVM(nu=0.5, kernel='poly', gamma='auto')
     clfsvm2.fit(X)
-    train_svm_poly = timeit.default_timer()-start
+    # train_svm_poly = timeit.default_timer()-start
 
-    start = timeit.default_timer()
+    # start = timeit.default_timer()
     clf = IsolationForest(max_samples=500, random_state=rng )
     clf.fit(X)
-    train_IF = timeit.default_timer()-start
+    # train_IF = timeit.default_timer()-start
 
-    start = timeit.default_timer()
+    # start = timeit.default_timer()
     clfLOF = LocalOutlierFactor(n_neighbors=20, contamination=0.1)
     clfLOF.fit(X)
-    train_IF = timeit.default_timer() - start
+    # train_IF = timeit.default_timer() - start
 
     print(len(shop))
 
@@ -168,7 +172,7 @@ def IsolationForrest(ftest_file, ftrain_file):
         tmp_result += list(model(clf, resistance, test))
         tmp_result += list(model(clfsvm, resistance, test))
         tmp_result += list(model(clfsvm2, resistance, test))
-        tmp_result += list(model(clfLOF, resistance, test))
+        tmp_result += list(model(clfLOF, resistance, test, True))
         result.append(tmp_result)
 
 
