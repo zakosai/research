@@ -190,7 +190,7 @@ def IsolationForrest(ftest_file, ftrain_file):
         #                outliersvm2, round(outliersvm2*100/len(pred),2),recallsvm2, precisionsvm2,accsvm2,fscoresvm2])
 
         if s == "D14":
-            np.savez("pred", pred=pred)
+            np.savez("pred", pred=pred, test=test)
             outlier = test[pred==-1]
             normal = test[pred!=-1]
             b1 = plt.scatter(x1, y1, c='blue', s=40)
