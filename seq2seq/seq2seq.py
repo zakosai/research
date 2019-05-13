@@ -166,6 +166,7 @@ def main():
     model = Seq2seq()
     # model.p_dim = data.n_user
     model.w_size = data.w_size = args.w_size
+    print(model.w_size, data.w_size, args.w_size)
     model.p_dim = text.shape[1]+ data.n_user
     model.build_model()
 
