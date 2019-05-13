@@ -47,12 +47,12 @@ def model(clf, resistance, test):
 
 
 def IsolationForrest(ftest_file, ftrain_file):
-    dataTest = list(open(ftest_file))
+    dataTest = list(open(ftest_file, "rt"))
     dataTest = dataTest[1:]
     dataTest = [d.strip() for d in dataTest]
     dataTest = [d.split(",") for d in dataTest]
     # f = open("36 categories/2･2-D･D_R195_Mix.csv", "rt", encoding="utf-8")
-    dataTrain = list(open(ftrain_file))
+    dataTrain = list(open(ftrain_file, "rt"))
     print(len(dataTrain))
     dataTrain = dataTrain[1:]
     print(len(dataTrain))
