@@ -58,12 +58,14 @@ def IsolationForrest(ftest_file, ftrain_file):
     dataTrain =[d.split(",") for d in dataTrain]
     y1 = []
     x1 = []
+    print(dataTrain[:10])
 
     ######## read training data#######################
     for line in dataTrain:
         if line[67]!= "" and line[40] != "" and int(line[67])!= 0:
             y1.append((float(line[14])-float(line[40])))
             x1.append(int(line[67]))
+    print(len(x1))
     sort = np.argsort(np.array(x1))
     print(sort)
     y1 = np.array(y1)[sort].tolist()
