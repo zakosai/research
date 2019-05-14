@@ -162,8 +162,10 @@ def main():
     data = Dataset(num_p, "data/%s/%s"%(dataset, type), args.w_size)
     data.hybrid = True
     # data.create_item_cat("data/%s/%s"%(dataset, type))
-    text = load_npz("data/%s/item.npz"%dataset)
-    print(text.shape)
+    # text = load_npz("data/%s/item.npz"%dataset)
+    # print(text.shape)
+    text = np.load("data/%s/text_doc2vec.npz")
+    text = text["v"]
     # data.item_emb = text.toarray()
 
     model = Seq2seq()
@@ -182,7 +184,7 @@ def main():
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(data.n_user)
         train_cost = 0
-        data.create_train_iter(text.toarray())
+        data.create_train_iter(text)
 
         for j in range(int(data.n_user / batch_size)):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
@@ -213,7 +215,7 @@ def main():
                 print("Loss test: %f, recall: %f, hit: %f, ndcg: %f" % (loss_test, recall, hit, ndcg))
             model.train = True
         if i % 100 == 0 and model.learning_rate > 1e-6:
-            model.learning_rate /= 10
+            model.learning_rate /= 2
             print("decrease lr to %f" % model.learning_rate)
 
     print(max_recall)
