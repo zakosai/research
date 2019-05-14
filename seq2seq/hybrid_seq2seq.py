@@ -160,6 +160,7 @@ def main():
     checkpoint_dir = "experiment/%s/%s/" % (dataset, type)
 
     data = Dataset(num_p, "data/%s/%s"%(dataset, type), args.w_size)
+    data.hybrid = True
     # data.create_item_cat("data/%s/%s"%(dataset, type))
     text = load_npz("data/%s/item.npz"%dataset)
     print(text.shape)

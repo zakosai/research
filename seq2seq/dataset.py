@@ -13,7 +13,7 @@ class Dataset(object):
         self.n_user = len(self.train)
         self.n_item = n_item
         self.cat_dim = 18
-        self.text = []
+        self.hybrid = False
 
 
     def read_file(self, filename):
@@ -44,7 +44,7 @@ class Dataset(object):
         self.y_iter = np.array(self.y_iter)
         # if text == "input":
         #     self.item_emb = np.concatenate((self.item_emb, text), axis=1)
-        if text != []:
+        if self.hybrid:
             self.text = text
 
 
@@ -57,12 +57,12 @@ class Dataset(object):
         for i in range(n_batch):
             X_batch[i, :, :] = self.item_emb[X_iter[idx[i]]]
             y_batch[i, y_iter[idx[i]]] = 1
-            if self.text != []:
+            if self.hybrid:
                 t_batch = self.text[X_iter[idx[i]]]
             # cat_batch[i, :, :] = self.item_cat[X_iter[idx[i]]]
             # y_cat_batch[i, :] = self.item_cat[y_iter[idx[i]]]
 
-        if self.text != []:
+        if self.hybrid:
             return X_batch, y_batch, t_batch
         return X_batch, y_batch
 
