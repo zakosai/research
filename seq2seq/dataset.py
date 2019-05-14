@@ -13,7 +13,7 @@ class Dataset(object):
         self.n_user = len(self.train)
         self.n_item = n_item
         self.cat_dim = 18
-        self.text = None
+        self.text = []
 
 
     def read_file(self, filename):
@@ -57,12 +57,12 @@ class Dataset(object):
         for i in range(n_batch):
             X_batch[i, :, :] = self.item_emb[X_iter[idx[i]]]
             y_batch[i, y_iter[idx[i]]] = 1
-            if self.text != None:
+            if self.text != []:
                 t_batch = self.text[X_iter[idx[i]]]
             # cat_batch[i, :, :] = self.item_cat[X_iter[idx[i]]]
             # y_cat_batch[i, :] = self.item_cat[y_iter[idx[i]]]
 
-        if self.text != None:
+        if self.text != []:
             return X_batch, y_batch, t_batch
         return X_batch, y_batch
 
