@@ -58,9 +58,9 @@ def model(clf, resistance, test, X=None, LOF=False):
 def draw(pred, test, x1, y1, type):
     outlier = test[pred == -1]
     normal = test[pred != -1]
-    b1 = plt.scatter(x1, y1, c='blue', s=15, marker='o')
-    b2 = plt.scatter(outlier[:, 0], outlier[:, 1], c='blueviolet', s=15, marker='o')
-    c = plt.scatter(normal[:, 0], normal[:, 1], c='gold', s=15, marker='o')
+    b1 = plt.scatter(x1, y1, c='blue', s=15, marker='o', linewidth=0.5, edgecolor=(0, 0, 0, 0.5))
+    b2 = plt.scatter(outlier[:, 0], outlier[:, 1], c='blueviolet', s=15, marker='o', linewidth=0.5, edgecolor=(0, 0, 0, 0.5))
+    c = plt.scatter(normal[:, 0], normal[:, 1], c='gold', s=15, marker='o', linewidth=0.5, edgecolor=(0, 0, 0, 0.5))
     yl = np.linspace(0, 16, 10)
     # xl1 = np.array(np.log(yl) + np.log(2151))
     # xl2 = np.array(np.log(yl) + np.log(27727))
@@ -70,7 +70,7 @@ def draw(pred, test, x1, y1, type):
     c3, = plt.plot(xl2, yl, c='red', linewidth=0.7)
     plt.axis('tight')
     # plt.xlim((0, np.log(500000)))
-    plt.xlim((0, 500000))
+    plt.xlim((0, 450000))
     plt.ylim((0, 16))
     plt.xlabel("Distance")
     plt.ylabel("Erosion")
@@ -78,10 +78,11 @@ def draw(pred, test, x1, y1, type):
                ["Train data",
                 "shop anomalies", "shop normal data", "separation line between outlier and normal area"],
                loc="upper left",
-               prop=matplotlib.font_manager.FontProperties(size=12))
+               prop=matplotlib.font_manager.FontProperties(size=12),
+               framealpha=1, edgecolor=(0, 0, 0, 0.5), scatterpoints=3)
     plt.title(
-        "Shop D14 - errors novel regular: %d/%d - %s "
-        % (len(outlier), len(test), type))
+        "Shop D14 - errors novel regular: %d/%d "
+        % (len(outlier), len(test)))
     plt.savefig("%s"%type, dpi=440)
     plt.close()
 
@@ -234,18 +235,19 @@ def IsolationForrest(ftest_file, ftrain_file):
         if s in ["D100", "D160", "D223"]:
             outlier = test[resistance == -1]
             normal = test[resistance == 1]
-            b2 = plt.scatter(outlier[:, 0], outlier[:, 1], c='blueviolet', s=15, marker='o')
-            c = plt.scatter(normal[:, 0], normal[:, 1], c='gold', s=15, marker='o')
+            b2 = plt.scatter(outlier[:, 0], outlier[:, 1], c='blueviolet', s=15, marker='o', linewidth=0.5, edgecolor=(0, 0, 0, 0.5))
+            c = plt.scatter(normal[:, 0], normal[:, 1], c='gold', s=15, marker='o', linewidth=0.5, edgecolor=(0, 0, 0, 0.5))
             plt.axis('tight')
             # plt.xlim((0, np.log(500000)))
-            plt.xlim((0, 500000))
+            plt.xlim((0, 450000))
             plt.ylim((0, 16))
             plt.xlabel("Distance")
             plt.ylabel("Erosion")
             plt.legend([b2, c],
                        ["shop anomalies", "shop normal data"],
                        loc="upper left",
-                       prop=matplotlib.font_manager.FontProperties(size=12))
+                       prop=matplotlib.font_manager.FontProperties(size=12),
+                       framealpha=1, edgecolor=(0, 0, 0, 0.5), scatterpoints=3)
             plt.title(
                 "Shop %s - errors novel regular: %d/%d - %s "
                 % (s, len(outlier), len(test), type))
