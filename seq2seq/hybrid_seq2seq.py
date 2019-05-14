@@ -169,7 +169,8 @@ def main():
     model = Seq2seq()
     # model.p_dim = data.n_user
     model.w_size = args.w_size
-    model.p_dim = text.shape[1]+ data.n_user
+    model.p_dim = data.n_user
+    model.cat_dim = text.shape[1]
     model.build_model()
 
     sess = tf.Session()
