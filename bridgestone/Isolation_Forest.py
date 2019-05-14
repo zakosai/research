@@ -171,7 +171,7 @@ def IsolationForrest(ftest_file, ftrain_file):
     # clfLOF.fit(X)
     # train_IF = timeit.default_timer() - start
     clf = KNeighborsClassifier(n_neighbors=2)
-    gen_x = []
+    gen_X = []
     gen_y = []
     for i in range(300):
         x = np.random.randint(0, 16)
@@ -179,10 +179,10 @@ def IsolationForrest(ftest_file, ftrain_file):
             y = np.random.randint(x*27727, 450000)
         else:
             y = np.random.randint(0, x*2151)
-        gen_x.append(x)
-        gen_y.append(y)
-    gen_X = np.column_stack((gen_x, gen_y))
-    clf.fit(np.concatenate((X, gen_X)), np.concatenate(np.ones(X.shape[0]), -np.ones(gen_X.shape[0])))
+        gen_X.append([x, y])
+        gen_y.append(-1)
+
+    clf.fit(np.concatenate((X, np.array(gen_X))), np.concatenate(np.ones(X.shape[0]), np.array(gen_y)))
 
     print(len(shop))
 
