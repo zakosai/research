@@ -18,7 +18,7 @@ np.random.seed(0)
 tf.set_random_seed(0)
 
 
-class params:
+class params_class:
     def __init__(self):
         self.C_a = 1.0
         self.C_b = 0.01
@@ -717,6 +717,7 @@ def main():
     zdim = args.zdim
     gs = args.gridsearch
     print(model_type)
+    params = params_class()
     params.lambda_u = 10
     params.lambda_v = 1
     params.lambda_r = 0.1
