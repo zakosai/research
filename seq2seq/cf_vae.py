@@ -7,9 +7,7 @@ import  argparse
 import os
 import pickle
 from tensorbayes.layers import dense, placeholder, conv2d, conv2d_transpose, max_pool
-
 from keras.backend import binary_crossentropy
-
 import time
 import scipy
 
@@ -18,7 +16,6 @@ import tensorflow.contrib.layers as slim
 
 np.random.seed(0)
 tf.set_random_seed(0)
-
 
 
 class params:
@@ -720,7 +717,6 @@ def main():
     zdim = args.zdim
     gs = args.gridsearch
     print(model_type)
-    params = params()
     params.lambda_u = 10
     params.lambda_v = 1
     params.lambda_r = 0.1
