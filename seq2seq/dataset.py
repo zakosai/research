@@ -54,11 +54,13 @@ class Dataset(object):
         y_batch = np.zeros((n_batch, self.n_item))
         # cat_batch = np.zeros((n_batch, self.w_size, self.cat_dim))
         # y_cat_batch = np.zeros((n_batch, self.cat_dim))
+        if self.hybrid:
+            t_batch = np.zeros((n_batch, self.w_size, self.text.shape[1]))
         for i in range(n_batch):
             X_batch[i, :, :] = self.item_emb[X_iter[idx[i]]]
             y_batch[i, y_iter[idx[i]]] = 1
             if self.hybrid:
-                t_batch = self.text[X_iter[idx[i]]]
+                t_batch[i, :, :] = self.text[X_iter[idx[i]]]
             # cat_batch[i, :, :] = self.item_cat[X_iter[idx[i]]]
             # y_cat_batch[i, :] = self.item_cat[y_iter[idx[i]]]
 
