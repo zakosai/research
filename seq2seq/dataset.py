@@ -30,7 +30,7 @@ class Dataset(object):
         return train, infer
 
 
-    def create_train_iter(self, text=None):
+    def create_train_iter(self, text=[]):
         self.X_iter = []
         self.y_iter = []
         self.item_emb = np.zeros((self.n_item, self.n_user))
@@ -44,7 +44,7 @@ class Dataset(object):
         self.y_iter = np.array(self.y_iter)
         # if text == "input":
         #     self.item_emb = np.concatenate((self.item_emb, text), axis=1)
-        if text != None:
+        if text != []:
             self.text = text
 
 
