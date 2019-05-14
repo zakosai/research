@@ -182,7 +182,7 @@ def IsolationForrest(ftest_file, ftrain_file):
         gen_X.append([x, y])
         gen_y.append(-1)
 
-    clf.fit(np.concatenate((X, np.array(gen_X))), np.concatenate(np.ones(X.shape[0]), np.array(gen_y)))
+    clf.fit(np.concatenate((X, np.array(gen_X))), np.concatenate((np.ones(X.shape[0]), np.array(gen_y))))
 
     print(len(shop))
 
