@@ -249,8 +249,8 @@ def IsolationForrest(ftest_file, ftrain_file):
                        prop=matplotlib.font_manager.FontProperties(size=12),
                        framealpha=1, edgecolor=(0, 0, 0, 0.5), scatterpoints=3)
             plt.title(
-                "Shop %s - errors novel regular: %d/%d - %s "
-                % (s, len(outlier), len(test), type))
+                "Shop %s - errors novel regular: %d/%d"
+                % (s, len(outlier), len(test)))
             plt.savefig("%s" % s, dpi=440)
             plt.close()
 
