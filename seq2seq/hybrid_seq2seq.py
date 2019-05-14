@@ -164,7 +164,7 @@ def main():
     # data.create_item_cat("data/%s/%s"%(dataset, type))
     # text = load_npz("data/%s/item.npz"%dataset)
     # print(text.shape)
-    text = np.load("data/%s/text_doc2vec.npz")
+    text = np.load("data/%s/text_doc2vec.npz"%dataset)
     text = text["v"]
     # data.item_emb = text.toarray()
 
