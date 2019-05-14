@@ -174,11 +174,11 @@ def IsolationForrest(ftest_file, ftrain_file):
     gen_X = []
     gen_y = []
     for i in range(300):
-        x = np.random.randint(1, 16)
+        y = np.random.randint(1, 16)
         if i < 250:
-            y = np.random.randint(x*27727, 450000)
+            x = np.random.randint(y*27727, 450000)
         else:
-            y = np.random.randint(1, x*2151)
+            x = np.random.randint(1, y*2151)
         gen_X.append([x, y])
         gen_y.append(-1)
 
