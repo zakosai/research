@@ -13,6 +13,7 @@ class Dataset(object):
         self.n_user = len(self.train)
         self.n_item = n_item
         self.cat_dim = 18
+        self.text = None
 
 
     def read_file(self, filename):
@@ -29,7 +30,7 @@ class Dataset(object):
         return train, infer
 
 
-    def create_train_iter(self, text):
+    def create_train_iter(self, text=None):
         self.X_iter = []
         self.y_iter = []
         self.item_emb = np.zeros((self.n_item, self.n_user))
@@ -41,7 +42,10 @@ class Dataset(object):
 
         self.X_iter = np.reshape(self.X_iter, (self.n_user, self.w_size))
         self.y_iter = np.array(self.y_iter)
-        self.item_emb = np.concatenate((self.item_emb, text), axis=1)
+        # if text == "input":
+        #     self.item_emb = np.concatenate((self.item_emb, text), axis=1)
+        if text != None:
+            self.text = text
 
 
     def create_batch(self, idx, X_iter, y_iter):
@@ -53,9 +57,13 @@ class Dataset(object):
         for i in range(n_batch):
             X_batch[i, :, :] = self.item_emb[X_iter[idx[i]]]
             y_batch[i, y_iter[idx[i]]] = 1
+            if self.text != None:
+                t_batch = self.text[X_iter[idx[i]]]
             # cat_batch[i, :, :] = self.item_cat[X_iter[idx[i]]]
             # y_cat_batch[i, :] = self.item_cat[y_iter[idx[i]]]
 
+        if self.text != None:
+            return X_batch, y_batch, t_batch
         return X_batch, y_batch
 
 

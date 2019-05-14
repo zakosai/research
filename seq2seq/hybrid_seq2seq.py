@@ -106,6 +106,7 @@ class Seq2seq(object):
 
     def build_model(self):
         self.X = tf.placeholder(tf.float32, [None, self.w_size, self.p_dim])
+        self.X_cat = tf.placeholder(tf.float32, [None, self.w_size, self.cat_dim])
         self.y = tf.placeholder(tf.float32, [None, self.n_products])
         # self.y_cat = tf.placeholder(tf.float32, [None, self.cat_dim])
 
@@ -126,6 +127,13 @@ class Seq2seq(object):
 
         last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden*4))
         # last_state = outputs
+
+        # Categories
+        out_cat, _ = self.encoder_BiLSTM(self.X_cat, "cat", self.n_hidden)
+        out_cat, _ = self.encoder_BiLSTM(self.X_cat, "cat2", self.n_hidden*2)
+        print(out_cat.shape)
+        last_state_cat = tf.reshape(out_cat[:, -1, :], (-1, self.n_hidden*4))
+        last_state = tf.concat([last_state, last_state_cat], axis=1)
 
         self.loss, self.predict = self.prediction(last_state, self.y)
         # self.loss *=10
@@ -153,13 +161,14 @@ def main():
 
     data = Dataset(num_p, "data/%s/%s"%(dataset, type), args.w_size)
     # data.create_item_cat("data/%s/%s"%(dataset, type))
-
+    text = load_npz("data/%s/item.npz"%dataset)
+    print(text.shape)
     # data.item_emb = text.toarray()
 
     model = Seq2seq()
     # model.p_dim = data.n_user
     model.w_size = args.w_size
-    model.p_dim = data.n_user
+    model.p_dim = text.shape[1]+ data.n_user
     model.build_model()
 
     sess = tf.Session()
@@ -171,19 +180,19 @@ def main():
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(data.n_user)
         train_cost = 0
-        data.create_train_iter()
+        data.create_train_iter(text.toarray())
 
         for j in range(int(data.n_user / batch_size)):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
-            X, y = data.create_batch(list_idx, data.X_iter, data.y_iter)
+            X, y, t = data.create_batch(list_idx, data.X_iter, data.y_iter)
 
-            feed = {model.X: X, model.y:y}
+            feed = {model.X: X, model.y:y, model.X_cat:t}
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
         if i % 10 == 0:
             model.train = False
-            X_val, y_val = data.create_batch(range(len(data.val)), data.val, data.val_infer)
-            feed = {model.X: X_val, model.y: y_val}
+            X_val, y_val, t = data.create_batch(range(len(data.val)), data.val, data.val_infer)
+            feed = {model.X: X_val, model.y: y_val, model.X_cat:t}
             loss_val, y_val = sess.run([model.loss, model.predict],
                                        feed_dict=feed)
 
@@ -193,8 +202,8 @@ def main():
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'bilstm-model'), i)
 
-                X_test, y_test = data.create_batch(range(len(data.test)), data.test, data.infer2)
-                feed = {model.X: X_test, model.y: y_test}
+                X_test, y_test, t = data.create_batch(range(len(data.test)), data.test, data.infer2)
+                feed = {model.X: X_test, model.y: y_test, model.X_cat:t}
                 loss_test, y = sess.run([model.loss, model.predict],
                                         feed_dict=feed)
                 recall, hit, ndcg = calc_recall(y, data.test, data.infer2)
