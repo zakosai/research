@@ -78,7 +78,7 @@ def draw(pred, test, x1, y1, type):
                ["Train data",
                 "shop anomalies", "shop normal data", "separation line between outlier and normal area"],
                loc="upper left",
-               prop=matplotlib.font_manager.FontProperties(size=7))
+               prop=matplotlib.font_manager.FontProperties(size=12))
     plt.title(
         "Shop D14 - errors novel regular: %d/%d - %s "
         % (len(outlier), len(test), type))
@@ -152,26 +152,26 @@ def IsolationForrest(ftest_file, ftrain_file):
     X = np.column_stack((x1, y1))
 
     # start = timeit.default_timer()
-    # clfsvm = svm.OneClassSVM(nu=0.5, kernel='rbf', gamma='auto')
-    # clfsvm.fit(X)
-    # # train_svm_rbf = timeit.default_timer()-start
-    #
-    # # start = timeit.default_timer()
-    # clfsvm2 = svm.OneClassSVM(nu=0.5, kernel='poly', gamma='auto')
-    # clfsvm2.fit(X)
-    # # train_svm_poly = timeit.default_timer()-start
-    #
-    # # start = timeit.default_timer()
-    # clf = IsolationForest(max_samples=500, random_state=rng )
-    # clf.fit(X)
-    # # train_IF = timeit.default_timer()-start
-    #
-    # # start = timeit.default_timer()
-    # clfLOF = LocalOutlierFactor(n_neighbors=20, contamination=0.1)
-    # clfLOF.fit(X)
+    clfsvm = svm.OneClassSVM(nu=0.5, kernel='rbf', gamma='auto')
+    clfsvm.fit(X)
+    # train_svm_rbf = timeit.default_timer()-start
+
+    # start = timeit.default_timer()
+    clfsvm2 = svm.OneClassSVM(nu=0.5, kernel='poly', gamma='auto')
+    clfsvm2.fit(X)
+    # train_svm_poly = timeit.default_timer()-start
+
+    # start = timeit.default_timer()
+    clf = IsolationForest(max_samples=500, random_state=rng )
+    clf.fit(X)
+    # train_IF = timeit.default_timer()-start
+
+    # start = timeit.default_timer()
+    clfLOF = LocalOutlierFactor(n_neighbors=20, contamination=0.1)
+    clfLOF.fit(X)
     # train_IF = timeit.default_timer() - start
-    clf = KNeighborsClassifier(n_neighbors=1)
-    clf.fit(np.concatenate(X, np.zeros(X.shape[1])))
+    # clf = KNeighborsClassifier(n_neighbors=1)
+    # clf.fit(np.concatenate(X, np.zeros(X.shape[1])))
 
     print(len(shop))
 
@@ -206,30 +206,51 @@ def IsolationForrest(ftest_file, ftrain_file):
         resistance[resistance != -1] = 1
         re = resistance[resistance == -1].size
         tmp_result = [s, len(test), re]
-        # l = list(model(clf, resistance, test))
-        # tmp_result += l[:-1]
-        # if s == "D14":
-        #     draw(l[-1], test, x1, y1, "IForest")
-        #
-        # l = list(model(clfsvm, resistance, test))
-        # tmp_result += l[:-1]
-        # if s == "D14":
-        #     draw(l[-1], test, x1, y1, "SVM-rbf")
-        #
-        # l = list(model(clfsvm2, resistance, test))
-        # tmp_result += l[:-1]
-        # if s == "D14":
-        #     draw(l[-1], test, x1, y1, "SVM-poly")
-        # l = list(model(clfLOF, resistance, test, X, True))
-        # pred = l[-1]
-        # tmp_result += l[:-1]
-        # if s == "D14":
-        #     draw(l[-1], test, x1, y1, "LOF")
         l = list(model(clf, resistance, test))
         tmp_result += l[:-1]
         if s == "D14":
-            draw(l[-1], test, x1, y1, "kNN")
+            draw(l[-1], test, x1, y1, "IForest")
+
+        l = list(model(clfsvm, resistance, test))
+        tmp_result += l[:-1]
+        if s == "D14":
+            draw(l[-1], test, x1, y1, "SVM-rbf")
+
+        l = list(model(clfsvm2, resistance, test))
+        tmp_result += l[:-1]
+        if s == "D14":
+            draw(l[-1], test, x1, y1, "SVM-poly")
+        l = list(model(clfLOF, resistance, test, X, True))
+        pred = l[-1]
+        tmp_result += l[:-1]
+        if s == "D14":
+            draw(l[-1], test, x1, y1, "LOF")
+        # l = list(model(clf, resistance, test))
+        # tmp_result += l[:-1]
+        # if s == "D14":
+        #     draw(l[-1], test, x1, y1, "kNN")
         result.append(tmp_result)
+
+        if s in ["D100", "D160", "D223"]:
+            outlier = test[resistance == -1]
+            normal = test[resistance == 1]
+            b2 = plt.scatter(outlier[:, 0], outlier[:, 1], c='blueviolet', s=15, marker='o')
+            c = plt.scatter(normal[:, 0], normal[:, 1], c='gold', s=15, marker='o')
+            plt.axis('tight')
+            # plt.xlim((0, np.log(500000)))
+            plt.xlim((0, 500000))
+            plt.ylim((0, 16))
+            plt.xlabel("Distance")
+            plt.ylabel("Erosion")
+            plt.legend([b2, c],
+                       ["shop anomalies", "shop normal data"],
+                       loc="upper left",
+                       prop=matplotlib.font_manager.FontProperties(size=12))
+            plt.title(
+                "Shop %s - errors novel regular: %d/%d - %s "
+                % (s, len(outlier), len(test), type))
+            plt.savefig("%s" % s, dpi=440)
+            plt.close()
 
 
 
