@@ -162,10 +162,10 @@ def main():
     data = Dataset(num_p, "data/%s/%s"%(dataset, type), args.w_size)
     data.hybrid = True
     # data.create_item_cat("data/%s/%s"%(dataset, type))
-    # text = load_npz("data/%s/item.npz"%dataset)
+    text = load_npz("data/%s/item.npz"%dataset).toarray()
     # print(text.shape)
-    text = np.load("data/%s/text_doc2vec.npz"%dataset)
-    text = text["v"]
+    # text = np.load("data/%s/text_doc2vec.npz"%dataset)
+    # text = text["v"]
     # data.item_emb = text.toarray()
 
     model = Seq2seq()
