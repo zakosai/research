@@ -170,19 +170,8 @@ def IsolationForrest(ftest_file, ftrain_file):
     # clfLOF = LocalOutlierFactor(n_neighbors=20, contamination=0.1)
     # clfLOF.fit(X)
     # train_IF = timeit.default_timer() - start
-    clf = KNeighborsClassifier(n_neighbors=2)
-    gen_X = []
-    gen_y = []
-    for i in range(300):
-        y = np.random.randint(1, 16)
-        if i < 250:
-            x = np.random.randint(y*27727, 450000)
-        else:
-            x = np.random.randint(1, y*2151)
-        gen_X.append([x, y])
-        gen_y.append(-1)
-
-    clf.fit(np.concatenate((X, np.array(gen_X))), np.concatenate((np.ones(X.shape[0]), np.array(gen_y))))
+    clf = KNeighborsClassifier(n_neighbors=1)
+    clf.fit(np.concatenate(X, np.zeros(X.shape[1])))
 
     print(len(shop))
 
