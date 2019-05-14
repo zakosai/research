@@ -14,6 +14,7 @@ class Dataset(object):
         self.n_item = n_item
         self.cat_dim = 18
         self.hybrid = False
+        self.item_cat = []
 
 
     def read_file(self, filename):
@@ -42,8 +43,8 @@ class Dataset(object):
 
         self.X_iter = np.reshape(self.X_iter, (self.n_user, self.w_size))
         self.y_iter = np.array(self.y_iter)
-        # if text == "input":
-        #     self.item_emb = np.concatenate((self.item_emb, text), axis=1)
+        if self.item_cat != []:
+            self.item_emb = np.concatenate((self.item_emb, self.item_cat), axis=1)
         if self.hybrid:
             self.text = text
 

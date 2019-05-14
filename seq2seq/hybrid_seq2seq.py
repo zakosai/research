@@ -161,7 +161,7 @@ def main():
 
     data = Dataset(num_p, "data/%s/%s"%(dataset, type), args.w_size)
     data.hybrid = True
-    # data.create_item_cat("data/%s/%s"%(dataset, type))
+    data.create_item_cat("data/%s/%s"%(dataset, type))
     text = load_npz("data/%s/item.npz"%dataset).toarray()
     # print(text.shape)
     # text = np.load("data/%s/text_doc2vec.npz"%dataset)
@@ -171,7 +171,7 @@ def main():
     model = Seq2seq()
     # model.p_dim = data.n_user
     model.w_size = args.w_size
-    model.p_dim = data.n_user
+    model.p_dim = data.n_user + 18
     model.cat_dim = text.shape[1]
     model.build_model()
 
