@@ -117,11 +117,11 @@ class Seq2seq(object):
         # assert tf.shape(self.X)[0] == tf.shape(self.X_cat)[0]
 
         if self.bilstm:
-            for i in self.n_layer:
+            for i in range(self.n_layer):
                 outputs, _ = self.encoder_BiLSTM(self.X, str(i+1), self.n_hidden*2**i)
             last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden * 2**(i+1)))
         else:
-            for i in self.n_layer:
+            for i in range(self.n_layer):
                 outputs, _ = self.encoder_LSTM(self.X, str(i+1), self.n_hidden)
             last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden))
 
@@ -155,7 +155,7 @@ def main():
     args = parser.parse_args()
     dataset = args.data
     type = args.type
-    num_p = len(list(open("data/%s/%s/item_id.txt")))
+    num_p = len(list(open("data/%s/item_id.txt"%(dataset))))
     checkpoint_dir = "experiment/%s/%s/" % (dataset, type)
 
     data = Dataset(num_p, "data/%s/%s"%(dataset, type), args.w_size)
@@ -163,11 +163,12 @@ def main():
 
     # data.item_emb = text.toarray()
 
-    model = Seq2seq()
+    model = Seq2seq(args.n_layers, args.bilstm)
     # model.p_dim = data.n_user
+    model.n_products = data.n_item
     model.w_size = args.w_size
     model.p_dim = data.n_user
-    model.build_model(args.n_layers, args.bilstm)
+    model.build_model()
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
@@ -176,7 +177,7 @@ def main():
 
     f = open("experiment/result.txt", "a")
     f.write("-------------------------\n")
-    f.write("Data: %s - num_p: %d - seq2se1\nbilstm: %s - n_layers: %d - w_size:%d\n"%(data, data.n_item, model.bilstm, model.n_layer, model.w_size))
+    f.write("Data: %s - num_p: %d - seq2se1\nbilstm: %s - n_layers: %d - w_size:%d\n"%(dataset, data.n_item, model.bilstm, model.n_layer, model.w_size))
     result = []
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(data.n_user)

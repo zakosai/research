@@ -36,9 +36,13 @@ class Dataset(object):
         self.y_iter = []
         self.item_emb = np.zeros((self.n_item, self.n_user))
         for i, tr in enumerate(self.train):
-            n = np.random.randint(len(tr)-self.w_size-1)
-            self.X_iter.append(tr[n:n+self.w_size])
-            self.y_iter.append(tr[n+self.w_size])
+            if len(tr) > self.w_size:
+                n = np.random.randint(len(tr)-self.w_size)
+                self.X_iter.append(tr[n:n+self.w_size])
+                self.y_iter.append(tr[n+self.w_size])
+            else:
+                self.X_iter.append(tr)
+                self.y_iter.append(self.infer1[i])
             self.item_emb[tr, [i]*len(tr)] = 1
 
         self.X_iter = np.reshape(self.X_iter, (self.n_user, self.w_size))
@@ -75,9 +79,10 @@ class Dataset(object):
         self.val_infer = []
         self.test = []
         for i, tr in enumerate(tmp_test):
-            n = np.random.randint((len(tr)-self.w_size-1))
-            self.val.append(tr[n:n+self.w_size])
-            self.val_infer.append([tr[n+self.w_size]])
+            if len(tr) > self.w_size:
+                n = np.random.randint((len(tr)-self.w_size))
+                self.val.append(tr[n:n + self.w_size])
+                self.val_infer.append([tr[n + self.w_size]])
             self.test.append(tr[-self.w_size:])
 
         self.val = np.reshape(self.val, (len(self.val), self.w_size))

@@ -156,8 +156,8 @@ def main():
     args = parser.parse_args()
     dataset = args.data
     type = args.type
-    num_p = len(list(open("data/%s/%s/item_id.txt")))
-    checkpoint_dir = "experiment/%s/%s/" % (dataset, type)
+    num_p = len(list(open("data/%s/item_id.txt"%dataset)))
+    checkpoint_dir = "experiment/%s/" % (dataset, type)
 
     data = Dataset(num_p, "data/%s/%s"%(dataset, type), args.w_size)
     data.hybrid = True
@@ -173,6 +173,7 @@ def main():
     model.w_size = args.w_size
     model.p_dim = data.n_user + data.item_cat.shape[1]
     model.cat_dim = text.shape[1]
+    model.n_products = data.n_item
     model.build_model()
 
     sess = tf.Session()
