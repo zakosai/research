@@ -201,9 +201,20 @@ def main():
         if i % 10 == 0:
             model.train = False
             X_val, y_val, t = data.create_batch(range(len(data.val)), data.val, data.val_infer)
-            feed = {model.X: X_val, model.y: y_val, model.X_cat:t}
-            loss_val, y_val = sess.run([model.loss, model.predict],
-                                       feed_dict=feed)
+            for j in range(int(len(X_val) / batch_size)+1):
+                if (j + 1) * batch_size > len(X_val):
+                    X_b_val = X_val[j * batch_size:]
+                    t_b = t[j * batch_size:]
+                else:
+                    X_b_val = X_val[j * batch_size:(j + 1) * batch_size]
+                    t_b = t[j * batch_size:(j + 1) * batch_size]
+                feed = {model.X: X_b_val, model.X_cat:t_b}
+                loss_val, y_b_val = sess.run([model.loss, model.predict],
+                                           feed_dict=feed)
+                if j == 0:
+                    y_val = y_b_val
+                else:
+                    y_val = np.concatenate((y_val, y_b_val), axis=0)
 
             recall, _, _ = calc_recall(y_val, data.val, data.val_infer)
             print("Loss val: %f, recall %f" % (loss_val, recall))
@@ -212,12 +223,23 @@ def main():
                 saver.save(sess, os.path.join(checkpoint_dir, 'bilstm-model'), i)
 
                 X_test, y_test, t = data.create_batch(range(len(data.test)), data.test, data.infer2)
-                feed = {model.X: X_test, model.y: y_test, model.X_cat:t}
-                loss_test, y = sess.run([model.loss, model.predict],
-                                        feed_dict=feed)
+                for j in range(int(len(X_test) / batch_size) + 1):
+                    if (j + 1) * batch_size > len(X_test):
+                        X_b_val = X_test[j * batch_size:]
+                        t_b = t[j * batch_size:]
+                    else:
+                        X_b_val = X_test[j * batch_size:(j + 1) * batch_size]
+                        t_b = t[j * batch_size:(j + 1) * batch_size]
+                    feed = {model.X: X_b_val, model.X_cat: t_b}
+                    loss_val, y_b_val = sess.run([model.loss, model.predict],
+                                                 feed_dict=feed)
+                    if j == 0:
+                        y = y_b_val
+                    else:
+                        y = np.concatenate((y, y_b_val), axis=0)
                 recall, hit, ndcg = calc_recall(y, data.test, data.infer2)
                 np.savez(os.path.join(checkpoint_dir, "pred"), p_val=y_val, p_test=y)
-                print("Loss test: %f, recall: %f, hit: %f, ndcg: %f" % (loss_test, recall, hit, ndcg))
+                print("recall: %f, hit: %f, ndcg: %f" % (recall, hit, ndcg))
                 if recall > result[1]:
                     result = [i, recall, hit, ndcg]
             model.train = True
