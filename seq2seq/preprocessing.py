@@ -130,7 +130,7 @@ def create_amazon(dir_r, type, fsum):
 
 if __name__ == '__main__':
     dataset = ["CD", "Grocery", "Kitchen", "Office", "Outdoor"]
-    fsum = open("data/amazon/summary.txt", "w")
+    fsum = open("data/summary.txt", "w")
     for type in dataset:
         dir_r = "../cf-vae/data/%s/"%type
         create_amazon(dir_r, type, fsum)
