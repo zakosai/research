@@ -5,6 +5,6 @@
 type="CD Grocery Kitchen Office Outdoor"
 for t in $type; do
     mkdir experiment/$t
-    python hybrid_seq2seq.py --data=$t
-    python seq2seq.py --data=$t
+#    python hybrid_seq2seq.py --data=$t --w_size=4
+    python seq2seq.py --data=$t --w_size=4
 done
