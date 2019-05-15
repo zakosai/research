@@ -151,12 +151,12 @@ class Seq2seq(object):
 
 
 def main():
-    iter = 3000
+    iter = 1000
     batch_size = 1000
     args = parser.parse_args()
     dataset = args.data
     type = args.type
-    num_p = args.num_p
+    num_p = len(list(open("data/%s/%s/item_id.txt")))
     checkpoint_dir = "experiment/%s/%s/" % (dataset, type)
 
     data = Dataset(num_p, "data/%s/%s"%(dataset, type), args.w_size)
@@ -171,7 +171,7 @@ def main():
     model = Seq2seq()
     # model.p_dim = data.n_user
     model.w_size = args.w_size
-    model.p_dim = data.n_user + 18
+    model.p_dim = data.n_user + data.item_cat.shape[1]
     model.cat_dim = text.shape[1]
     model.build_model()
 
@@ -180,6 +180,10 @@ def main():
     saver = tf.train.Saver(max_to_keep=20)
     max_recall = 0
 
+    f = open("experiment/result.txt", "a")
+    f.write("-------------------------\n")
+    f.write("Data: %s - num_p: %d - hybrid\nbilstm: True - n_layers: 2 - w_size:%d\n"%(data, data.n_item))
+    result = []
 
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(data.n_user)
@@ -213,13 +217,14 @@ def main():
                 recall, hit, ndcg = calc_recall(y, data.test, data.infer2)
                 np.savez(os.path.join(checkpoint_dir, "pred"), p_val=y_val, p_test=y)
                 print("Loss test: %f, recall: %f, hit: %f, ndcg: %f" % (loss_test, recall, hit, ndcg))
+                if recall > result[1]:
+                    result = [i, recall, hit, ndcg]
             model.train = True
         if i % 100 == 0 and model.learning_rate > 1e-6:
             model.learning_rate /= 10
             print("decrease lr to %f" % model.learning_rate)
-
+    f.write("iter: %d - recall: %f - hit: %f - ndcg: %f\n" % (result[0], result[1], result[2], result[3]))
     print(max_recall)
-
 
 
 

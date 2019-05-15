@@ -4,12 +4,13 @@ import numpy as np
 import argparse
 from dataset import Dataset, calc_recall
 import os
+import time
 from scipy.sparse import load_npz
 
 
 
 class Seq2seq(object):
-    def __init__(self):
+    def __init__(self, n_layer=2, bilstm=True):
         self.w_size = 10
         self.p_dim = 100
         self.n_products = 3706
@@ -17,6 +18,8 @@ class Seq2seq(object):
         self.learning_rate = 1e-3
         self.train = True
         self.cat_dim = 18
+        self.n_layer = n_layer
+        self.bilstm = bilstm
         # self.item_cat = item_cat.astype(np.float32)
 
 
@@ -113,10 +116,15 @@ class Seq2seq(object):
 
         # assert tf.shape(self.X)[0] == tf.shape(self.X_cat)[0]
 
+        if self.bilstm:
+            for i in self.n_layer:
+                outputs, _ = self.encoder_BiLSTM(self.X, str(i+1), self.n_hidden*2**i)
+            last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden * 2**(i+1)))
+        else:
+            for i in self.n_layer:
+                outputs, _ = self.encoder_LSTM(self.X, str(i+1), self.n_hidden)
+            last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden))
 
-        outputs, _ = self.encoder_BiLSTM(self.X, "1", self.n_hidden)
-
-        outputs, _ = self.encoder_BiLSTM(outputs, "2", self.n_hidden*2)
         # with tf.variable_scope('attention'):
         #     outputs, self.alphas = self.attention(outputs)
         #
@@ -124,7 +132,6 @@ class Seq2seq(object):
         # with tf.variable_scope('dropout'):
         #     outputs = tf.nn.dropout(outputs, 0.8)
 
-        last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden*4))
         # last_state = outputs
 
         self.loss, self.predict = self.prediction(last_state, self.y)
@@ -143,12 +150,12 @@ class Seq2seq(object):
 
 
 def main():
-    iter = 3000
+    iter = 1000
     batch_size = 1000
     args = parser.parse_args()
     dataset = args.data
     type = args.type
-    num_p = args.num_p
+    num_p = len(list(open("data/%s/%s/item_id.txt")))
     checkpoint_dir = "experiment/%s/%s/" % (dataset, type)
 
     data = Dataset(num_p, "data/%s/%s"%(dataset, type), args.w_size)
@@ -160,14 +167,17 @@ def main():
     # model.p_dim = data.n_user
     model.w_size = args.w_size
     model.p_dim = data.n_user
-    model.build_model()
+    model.build_model(args.n_layers, args.bilstm)
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(max_to_keep=20)
     max_recall = 0
 
-
+    f = open("experiment/result.txt", "a")
+    f.write("-------------------------\n")
+    f.write("Data: %s - num_p: %d - seq2se1\nbilstm: %s - n_layers: %d - w_size:%d\n"%(data, data.n_item, model.bilstm, model.n_layer, model.w_size))
+    result = []
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(data.n_user)
         train_cost = 0
@@ -200,10 +210,13 @@ def main():
                 recall, hit, ndcg = calc_recall(y, data.test, data.infer2)
                 np.savez(os.path.join(checkpoint_dir, "pred"), p_val=y_val, p_test=y)
                 print("Loss test: %f, recall: %f, hit: %f, ndcg: %f" % (loss_test, recall, hit, ndcg))
+                if recall > result[1]:
+                    result = [i, recall, hit, ndcg]
             model.train = True
         if i % 100 == 0 and model.learning_rate > 1e-6:
             model.learning_rate /= 2
             print("decrease lr to %f" % model.learning_rate)
+    f.write("iter: %d - recall: %f - hit: %f - ndcg: %f\n"%(result[0], result[1], result[2], result[3]))
 
     print(max_recall)
 
@@ -217,6 +230,11 @@ parser.add_argument('--type', type=str, default="implicit",
                     help='1p or 8p')
 parser.add_argument('--num_p', type=int, default=7780, help='number of product')
 parser.add_argument('--w_size', type=int, default=10, help='window size')
+parser.add_argument('--bilstm', type=bool, default=True, help='window size')
+parser.add_argument('--n_layers', type=int, default=2, help='window size')
+
+
+
 
 if __name__ == '__main__':
     main()
