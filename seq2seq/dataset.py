@@ -42,7 +42,7 @@ class Dataset(object):
                 self.y_iter.append(tr[n+self.w_size])
             else:
                 self.X_iter.append(tr)
-                self.y_iter.append(self.infer1[i])
+                self.y_iter.append(self.infer1[i][0])
             self.item_emb[tr, [i]*len(tr)] = 1
 
         self.X_iter = np.reshape(self.X_iter, (self.n_user, self.w_size))
