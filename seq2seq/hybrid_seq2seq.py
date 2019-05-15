@@ -152,7 +152,7 @@ class Seq2seq(object):
 
 def main():
     iter = 1000
-    batch_size = 500
+    batch_size = 300
     args = parser.parse_args()
     dataset = args.data
     type = args.type
