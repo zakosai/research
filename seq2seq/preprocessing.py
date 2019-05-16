@@ -72,7 +72,7 @@ def create_amazon(dir_r, type, fsum):
     train_id = shuffle_id[:train_len]
     test_id = shuffle_id[train_len:]
 
-    os.mkdir("data/%s/implicit"%type)
+    # os.mkdir("data/%s/implicit"%type)
     ftrain = open("data/%s/implicit/train.txt" % type, "w")
     for idx in train_id:
         user = np.array(ratings[idx]).reshape((len(ratings[idx]), 3))
