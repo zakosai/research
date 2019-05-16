@@ -183,7 +183,7 @@ def main():
 
     f = open("experiment/result.txt", "a")
     f.write("-------------------------\n")
-    f.write("Data: %s - num_p: %d - hybrid\nbilstm: True - n_layers: 2 - w_size:%d\n"%(data, data.n_item))
+    f.write("Data: %s - num_p: %d - hybrid\nbilstm: True - n_layers: 2 - w_size:%d\n"%(data, data.n_item, data.w_size))
     result = [0,0,0,0]
 
     for i in range(1, iter):
