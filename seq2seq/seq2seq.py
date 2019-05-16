@@ -169,6 +169,7 @@ def main():
     model.w_size = args.w_size
     if args.cat:
         data.create_item_cat("data/%s" % (dataset))
+        print(data.item_cat.shape[1])
         model.p_dim = data.n_user + data.item_cat.shape[1]
     else:
         model.p_dim = data.n_user
