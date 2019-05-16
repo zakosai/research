@@ -179,6 +179,7 @@ def main():
     f.write("-------------------------\n")
     f.write("Data: %s - num_p: %d - seq2se1\nbilstm: %s - n_layers: %d - w_size:%d\n"%(dataset, data.n_item, model.bilstm, model.n_layer, model.w_size))
     result = [0,0,0,0]
+    print(len(data.val))
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(data.n_user)
         train_cost = 0
