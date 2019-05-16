@@ -91,6 +91,8 @@ def create_amazon(dir_r, type, fsum):
         ftest.write("%d %s\n" % (idx, " ".join(item)))
     ftest.close()
 
+    fsum.write("Train num: %d, test num: %d\n"%(len(train_id, len(test_id))))
+
 
     # Hybrid
     data_item = getDF("%s/meta.json.gz" % dir_r)
@@ -118,7 +120,6 @@ def create_amazon(dir_r, type, fsum):
     categories = data_item.categories.tolist()
     categories = [i for cat in categories for c in cat for i in c]
     categories = list(set(categories))
-    len(categories)
 
     f = open("data/%s/categories.txt" % type, "w")
     for c in list_cat:
@@ -126,7 +127,10 @@ def create_amazon(dir_r, type, fsum):
         for i in c[0][0]:
             arr[categories.index(i)] = '1'
         f.write(",".join(arr))
+        f.write("\n")
     f.close()
+
+    fsum.write("text length: %d - cat length: %d\n"%(X.shape[1], len(categories)))
 
 if __name__ == '__main__':
     dataset = ["CD", "Grocery", "Kitchen", "Office", "Outdoor"]
