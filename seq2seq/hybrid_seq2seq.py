@@ -184,7 +184,7 @@ def main():
     f = open("experiment/result.txt", "a")
     f.write("-------------------------\n")
     f.write("Data: %s - num_p: %d - hybrid\nbilstm: True - n_layers: 2 - w_size:%d\n"%(data, data.n_item))
-    result = []
+    result = [0,0,0,0]
 
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(data.n_user)
