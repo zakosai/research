@@ -189,7 +189,7 @@ if __name__ == '__main__':
     dataset = ["ml-1m", "Office", "CD", "Grocery", "Kitchen",  "Outdoor"]
     # fsum = open("data/summary.txt", "w")
     for type in dataset:
-        dir_r = "data/%s/"%type
+        dir_r = "data/%s"%type
         create_user_info(dir_r)
 
 
