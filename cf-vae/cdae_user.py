@@ -153,8 +153,8 @@ class cf_vae_extend:
 
                 x_im_recons = y_im
         with tf.variable_scope("user"):
-            encoding_dims = [100]
-            decoding_dims = [100, self.user_dim]
+            encoding_dims = []
+            decoding_dims = [self.user_dim]
 
             x_u = self.x_u_
             x_u = tf.layers.dropout(x_u, rate=0.3)
