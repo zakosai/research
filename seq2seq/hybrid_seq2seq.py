@@ -178,7 +178,7 @@ def main():
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
-    saver = tf.train.Saver(max_to_keep=20)
+    saver = tf.train.Saver(max_to_keep=5)
     max_recall = 0
 
     f = open("experiment/result.txt", "a")
@@ -222,7 +222,7 @@ def main():
             print("Loss val: %f, recall %f" % (loss_val, recall))
             if recall > max_recall:
                 max_recall = recall
-                saver.save(sess, os.path.join(checkpoint_dir, 'bilstm-model'), i)
+                saver.save(sess, os.path.join(checkpoint_dir, 'bilstm-model'))
 
                 X_test, y_test, t = data.create_batch(range(len(data.test)), data.test, data.infer2)
                 for j in range(int(len(X_test) / batch_size) + 1):
