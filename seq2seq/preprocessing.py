@@ -130,6 +130,10 @@ def create_amazon(dir_r, type, fsum):
         f.write("\n")
     f.close()
 
+    f = open("data/%s/list_categories.txt"%type, "w")
+    f.write("\n".join(categories))
+    f.close()
+
     fsum.write("text length: %d - cat length: %d\n"%(X.shape[1], len(categories)))
 
 if __name__ == '__main__':
