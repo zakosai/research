@@ -167,7 +167,11 @@ def main():
     # model.p_dim = data.n_user
     model.n_products = data.n_item
     model.w_size = args.w_size
-    model.p_dim = data.n_user
+    if args.cat:
+        data.create_item_cat("data/%s" % (dataset))
+        model.p_dim = data.n_user + data.item_cat.shape[1]
+    else:
+        model.p_dim = data.n_user
     model.build_model()
 
     sess = tf.Session()
@@ -256,6 +260,8 @@ parser.add_argument('--num_p', type=int, default=7780, help='number of product')
 parser.add_argument('--w_size', type=int, default=10, help='window size')
 parser.add_argument('--bilstm', type=bool, default=True, help='window size')
 parser.add_argument('--n_layers', type=int, default=2, help='window size')
+parser.add_argument('--cat', type=bool, default=False, help='window size')
+
 
 
 
