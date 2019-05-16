@@ -197,15 +197,17 @@ def main():
             for j in range(int(len(X_val) / batch_size)+1):
                 if (j + 1) * batch_size > len(X_val):
                     X_b_val = X_val[j * batch_size:]
+                    y_b = y_val[j*batch_size:]
                 else:
                     X_b_val = X_val[j * batch_size:(j + 1) * batch_size]
-                feed = {model.X: X_b_val}
+                    y_b = y_val[j*batch_size : (j+1) * batch_size]
+                feed = {model.X: X_b_val, model.y:y_b}
                 loss_val, y_b_val = sess.run([model.loss, model.predict],
                                            feed_dict=feed)
                 if j == 0:
-                    y_val = y_b_val
+                    p_val = y_b_val
                 else:
-                    y_val = np.concatenate((y_val, y_b_val), axis=0)
+                    p_val = np.concatenate((p_val, y_b_val), axis=0)
 
             recall, _, _ = calc_recall(y_val, data.val, data.val_infer)
             print("Loss val: %f, recall %f" % (loss_val, recall))
@@ -217,9 +219,11 @@ def main():
                 for j in range(int(len(X_test) / batch_size) + 1):
                     if (j + 1) * batch_size > len(X_test):
                         X_b_val = X_test[j * batch_size:]
+                        y_b = y_test[j * batch_size:]
                     else:
                         X_b_val = X_test[j * batch_size:(j + 1) * batch_size]
-                    feed = {model.X: X_b_val}
+                        y_b = y_test[j * batch_size:(j + 1) * batch_size]
+                    feed = {model.X: X_b_val, model.y:y_b}
                     loss_val, y_b_val = sess.run([model.loss, model.predict],
                                                  feed_dict=feed)
                     if j == 0:
