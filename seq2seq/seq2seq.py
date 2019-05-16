@@ -211,8 +211,9 @@ def main():
                     p_val = np.concatenate((p_val, y_b_val), axis=0)
 
             recall, _, _ = calc_recall(y_val, data.val, data.val_infer)
+            print(data.val_infer)
             print("Loss val: %f, recall %f" % (loss_val, recall))
-            if recall > max_recall:
+            if recall >= max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'bilstm-model'), i)
 
