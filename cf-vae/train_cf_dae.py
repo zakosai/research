@@ -129,13 +129,14 @@ if gs == 1:
                     f.close()
                     if recall > best_recall:
                         best_recall = recall
-                        best_hyper = [u,v, r]
+                        best_hyper = [u,v, r, i]
 
                     print(u, v, r)
                 i += 1
 
     f = open(os.path.join(ckpt, "result_sum.txt"), "a")
-    f.write("Best recall CDAE: %f at (%f, %f, %f)\n" % (best_recall, best_hyper[0], best_hyper[1], best_hyper[2]))
+    f.write("Best recall CDAE: %f at %d (%f, %f, %f)\n" % (best_recall, best_hyper[3], best_hyper[0], best_hyper[1],
+                                                                                   best_hyper[2]))
     f.close()
 else:
     model = cf_vae_extend(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,

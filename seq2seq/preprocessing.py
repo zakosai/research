@@ -91,7 +91,7 @@ def create_amazon(dir_r, type, fsum):
         ftest.write("%d %s\n" % (idx, " ".join(item)))
     ftest.close()
 
-    fsum.write("Train num: %d, test num: %d\n"%(len(train_id, len(test_id))))
+    fsum.write("Train num: %d, test num: %d\n"%(len(train_id), len(test_id)))
 
 
     # Hybrid
@@ -133,7 +133,7 @@ def create_amazon(dir_r, type, fsum):
     fsum.write("text length: %d - cat length: %d\n"%(X.shape[1], len(categories)))
 
 if __name__ == '__main__':
-    dataset = ["CD", "Grocery", "Kitchen", "Office", "Outdoor"]
+    dataset = ["Office", "CD", "Grocery", "Kitchen",  "Outdoor"]
     fsum = open("data/summary.txt", "w")
     for type in dataset:
         dir_r = "../cf-vae/data/%s/"%type

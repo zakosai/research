@@ -90,8 +90,6 @@ class cf_vae:
         self.saver = tf.train.Saver()
         # if init == True:
         self.saver.restore(self.sess, ckpt_file)
-        for v in tf.get_collection(tf.GraphKeys.VARIABLES):
-            print(v)
         start = time.time()
         for i in range(self.params.num_iter):
             idx = np.random.choice(self.num_items, self.params.batch_size, replace=False)
@@ -146,8 +144,9 @@ class cf_vae:
         return self.exp_z
 
 
-    def fit(self, users, items, x_data, params):
-
+    def fit(self, users, items, x_data, params, test_users):
+        start = time.time()
+        file = open(os.path.join(self.ckpt_model, "result_%d.txt"%self.model), "w")
         self.e_step(x_data)
         self.exp_z = self.get_exp_hidden(x_data)
         for i in range(params.EM_iter):
@@ -157,6 +156,14 @@ class cf_vae:
             self.e_step(x_data)
             self.exp_z = self.get_exp_hidden(x_data)
 
+            if i%5 ==4:
+                file.write("---------iter %d--------\n"%i)
+                pred_all = self.predict_all(self.U)
+                self.predict_val(pred_all, users, test_users, file)
+                self.save_model(save_path_pmf=os.path.join(self.ckpt_model, "cf_vae_%d_%d.mat"%(self.model, i)))
+                print(time.time() - start)
+        file.close()
+        print("time: %d"%(time.time()-start))
         return None
 
     def save_model(self, save_path_pmf):
@@ -194,6 +201,46 @@ class cf_vae:
             print recall_avg
             recall_avgs.append(recall_avg)
         return recall_avgs
+
+    def predict_val(self, pred_all, train_users, test_users, file):
+        user_all = test_users
+        ground_tr_num = [len(user) for user in user_all]
+
+
+        pred_all = list(pred_all)
+
+        recall_avgs = []
+        precision_avgs = []
+        mapk_avgs = []
+        for m in [5, 35]:
+            print "m = " + "{:>10d}".format(m) + "done"
+            recall_vals = []
+            for i in range(len(user_all)):
+                top_M = list(np.argsort(-pred_all[i])[0:(m +1)])
+                if train_users[i] in top_M:
+                    top_M.remove(train_users[i])
+                else:
+                    top_M = top_M[:-1]
+                if len(top_M) != m:
+                    print(top_M, train_users[i])
+                if len(train_users[i]) != 1:
+                    print(i)
+                hits = set(top_M) & set(user_all[i])   # item idex from 0
+                hits_num = len(hits)
+                try:
+                    recall_val = float(hits_num) / float(ground_tr_num[i])
+                except:
+                    recall_val = 1
+                recall_vals.append(recall_val)
+                # precision = float(hits_num) / float(m)
+                # precision_vals.append(precision)
+
+            recall_avg = np.mean(np.array(recall_vals))
+            # precision_avg = np.mean(np.array(precision_vals))
+            # # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
+            # #                        [u for u in user_all if len(u)!=0], m)
+            print recall_avg
+            file.write("m = %d, recall = %f"%(m, recall_avg))
 
     def predict_all(self):
         return np.dot(self.U, (self.V.T))

@@ -79,8 +79,8 @@ class neuVAE:
         # inference process
         with tf.variable_scope("text"):
             x = self.x_
-            # if train:
-            #     x = tf.layers.dropout(x, rate=0.7)
+            if train:
+                x = tf.layers.dropout(x, rate=0.7)
             depth_inf = len(self.encoding_dims)
             for i in range(depth_inf):
                 x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
@@ -98,11 +98,12 @@ class neuVAE:
             x_recons = y
 
         with tf.variable_scope("user"):
+
             encoding_dims = [200]
             decoding_dims = [200,self.user_dim]
             x_u = self.x_u_
-            # if train:
-            #     x_u = tf.layers.dropout(x_u, rate=0.7)
+            if train:
+                x_u = tf.layers.dropout(x_u, rate=0.7)
             depth_inf = len(encoding_dims)
             for i in range(depth_inf):
                 x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.relu)
@@ -120,7 +121,7 @@ class neuVAE:
             x_u_recons = y_u
 
         with tf.variable_scope("neuCF"):
-            em = tf.concat([z_mu, z_u_mu], 1)
+            em = tf.concat([self.z, self.z_u], 1)
             if train == True:
                 em = tf.nn.dropout(em, 0.5)
             layers = [100, 50]

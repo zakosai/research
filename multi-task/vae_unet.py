@@ -315,7 +315,7 @@ def main():
 
     z_dim = 50
     max_item = max(np.sum(dataset['user_onehot'], axis=1))
-    x_dim =  num_u
+    x_dim = num_u
     user_item = np.zeros((num_u,num_u))
     for i in range(num_u):
         idx = np.where(dataset['user_onehot'][i] == 1)[0]

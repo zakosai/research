@@ -28,8 +28,6 @@ data = data.astype(np.float32)/255
 idx = np.random.rand(data.shape[0]) < 0.8
 train_X = data[idx]
 test_X = data[~idx]
-print(len(train_X), len(train_X[0]))
-print(len(test_X), len(test_X[0]))
 #
 
 

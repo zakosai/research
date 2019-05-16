@@ -238,8 +238,8 @@ if __name__ == '__main__':
     t1 = time()
     train = dataset['train']
     num_users, num_items = dataset['user_no'], dataset['item_no']
-    print("Load data done [%.1f s]. #user=%d, #item=%d, #train=%d, #test=%d" 
-          %(time()-t1, num_users, num_items, train.nnz, len(dataset['test'])))
+    print("Load data done [%.1f s]. #user=%d, #item=%d, #train=%d, #test=%d"
+          % (time() - t1, num_users, num_items, len(train), len(testRatings)))
     
     # Build model
     model = get_model(num_users, num_items, mf_dim, layers, reg_layers, reg_mf)

@@ -10,9 +10,9 @@ from dataset import Dataset
 
 
 class Model(object):
-    def __init__(self, tf_dim=20000, vae=False, deep=False):
+    def __init__(self, tf_dim=8000, vae=False, deep=False):
         self.tfdim = tf_dim
-        self.layers = [1000, 500, 100]
+        self.layers = [600, 200]
         self.z_dim = 50
         self.activation = None
         self.act_mlp = None
@@ -51,11 +51,11 @@ class Model(object):
             x_ = fully_connected(x_, layers[-1],  weights_regularizer=self.regularizer)
         return x_
 
-    def resnet(self, x, layers, scope="user"):
+    def resnet(self, x, layers, scope="user", reuse=False):
         x_ = x
         # x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope):
-            for i in range(len(layers)):
+            for i in range(len(layers)-1):
                 x_ = fully_connected(x_, layers[i], activation_fn=self.activation, weights_regularizer=self.regularizer,
                                      scope="encode_%d" % i)
                 net = fully_connected(x_, layers[i], activation_fn=self.activation, weights_regularizer=self.regularizer,
@@ -66,6 +66,17 @@ class Model(object):
                 x_ = tf.math.add(x_, net)
                 # if i != (len(layers) -1):
                 x_ = tf.nn.leaky_relu(x_, 0.5)
+        with tf.variable_scope("share", reuse=reuse):
+            x_ = fully_connected(x_, layers[-1], activation_fn=self.activation, weights_regularizer=self.regularizer,
+                                 scope="encode_share")
+            net = fully_connected(x_, layers[-1], activation_fn=self.activation, weights_regularizer=self.regularizer,
+                                  scope="deeper_share" )
+            # net = fully_connected(net, layers[i], activation_fn=self.activation,
+            #                       weights_regularizer=self.regularizer,
+            #                       scope="deeper2_%d" % i)
+            x_ = tf.math.add(x_, net)
+            # if i != (len(layers) -1):
+            x_ = tf.nn.leaky_relu(x_, 0.5)
             return x_
 
     def mlp(self, x, layers, scope="rating"):
@@ -101,7 +112,7 @@ class Model(object):
 
         if self.deep:
             z_user = self.resnet(self.x_user, self.layers, "user")
-            z_item = self.resnet(self.x_item, self.layers, "item")
+            z_item = self.resnet(self.x_item, self.layers, "item", True)
         else:
             z_user = self._enc(self.x_user, self.layers, "user")
             z_item = self._enc(self.x_item, self.layers, "item")
@@ -238,7 +249,6 @@ def main():
     f.write("%s: %f, multi-point: %f, compare with multi-point: %.1f\n"%(args.data, min_error, args.multi,
                                                               float(args.multi/min_error)*100-100))
     f.close()
-
 
 
 if __name__ == '__main__':

@@ -8,6 +8,11 @@ import re
 from keras.preprocessing.text import Tokenizer, text_to_word_sequence
 from sklearn.feature_extraction.text import TfidfVectorizer
 from keras.preprocessing.sequence import pad_sequences
+from gensim.test.utils import get_tmpfile
+from gensim.models.doc2vec import Doc2Vec, TaggedDocument
+from gensim.parsing.preprocessing import strip_non_alphanum, strip_punctuation, strip_short, strip_numeric
+from gensim.parsing.preprocessing import remove_stopwords
+
 import numpy as np
 
 class Dataset(object):
@@ -45,8 +50,10 @@ class Dataset(object):
         # tf-idf
         else:
             text = self.data['train'][2]
-            tfidf = TfidfVectorizer(stop_words='english', max_features=20000)
-            self.y_review = tfidf.fit_transform(text.astype('U'), self.data['train'][3])
+            text = [strip_short(strip_numeric(strip_punctuation(remove_stopwords(strip_non_alphanum(t))))) for t in
+                    text]
+            tfidf = TfidfVectorizer(stop_words='english', max_features=8000)
+            self.y_review = tfidf.fit_transform(text, self.data['train'][3])
             text = []
             for u in range(self.data['user_no']):
                 user = self.data['train_user'][u]
@@ -68,6 +75,32 @@ class Dataset(object):
                     self.user_onehot[user, j] = d[2][i]
             self.description = np.load(os.path.join(data, "description.npy"))
             print(self.description.shape)
+            # _, items = np.unique(self.data['train'][0], return_counts=True)
+            # _, users = np.unique(self.data['train'][1], return_counts=True)
+            # doc_len = 50
+            # self.seq_len_user = max(items) * doc_len
+            # self.seq_len_item = max(users) * doc_len
+            # print(self.seq_len_user, self.seq_len_item)
+            #
+            # fname = get_tmpfile(os.path.join("/home/ubuntu/kaggle",data, "doc2vec"))
+            # model = Doc2Vec.load(fname)
+            # self.X_user = np.zeros((self.data['user_no'], self.seq_len_user))
+            # self.X_item = np.zeros((self.data['item_no'], self.seq_len_item))
+            # for _, d in self.data['train'].iterrows():
+            #     j = 0
+            #     while self.X_user[d[0], j*doc_len] != 0:
+            #         j+= 1
+            #     text = strip_short(strip_numeric(strip_punctuation(remove_stopwords(strip_non_alphanum(d[2])))))
+            #     text_arr = model.infer_vector(text.split())
+            #     self.X_user[d[0], j * doc_len:(j + 1) * doc_len] = text_arr
+            #
+            #     j = 0
+            #     while self.X_item[d[1], j * doc_len] != 0:
+            #         j += 1
+            #     self.X_item[d[1], j * doc_len:(j + 1) * doc_len] = text_arr
+            #
+            # print("Finish")
+
 
 
     def create_batch(self, idx, k=2, type='train'):
@@ -176,16 +209,27 @@ class Dataset(object):
         data_b = self.data[type].iloc[idx]
         y_rating = np.array(data_b[3])
         X_user = self.X_user[data_b[0]]
-        X_item = self.X_item[data_b[1]]
-        user_onehot = self.user_onehot[data_b[0]]
-        item_onehot = self.user_onehot.T[data_b[1]]
-        description = self.description[data_b[1], :]
-        # user_onehot = np.concatenate((X_user, user_onehot), axis=1)
-        # item_onehot = np.concatenate((X_item, item_onehot), axis=1)
-        if type=='train':
-            y_review = self.y_review[idx].toarray()
-        else:
-            y_review = data_b[2]
+        X_item = self.description[data_b[1]]
+        # user_onehot = self.user_onehot[data_b[0]]
+        # item_onehot = self.user_onehot.T[data_b[1]]
+        # description = self.description[data_b[1], :]
+        # # user_onehot = np.concatenate((X_user, user_onehot), axis=1)
+        # # item_onehot = np.concatenate((X_item, item_onehot), axis=1)
+        # if type=='train':
+        #     y_review = self.y_review[idx].toarray()
+        # else:
+        #     y_review = data_b[2]
+        #
+        # neg_items = []
+        # for i, d in data_b.iterrows():
+        #     user = self.data['train_user'][d[0]]
+        #     r = np.random.randint(self.data['item_no'])
+        #     while r in user[0]:
+        #         r = np.random.randint(self.data['item_no'])
+        #     neg_items.append(r)
+        #
+        # X_neg = self.X_item[neg_items]
+
         # X_user = np.concatenate((X_user, user_onehot), axis=1)
         # X_item = np.concatenate((X_item, item_onehot), axis=1)
 
@@ -204,7 +248,7 @@ class Dataset(object):
         # X_user = self.tfidf.transform(sequences_user).toarray()
         # X_item = self.tfidf.transform(sequences_item).toarray()
 
-        return X_user, X_item, user_onehot, item_onehot, y_rating, y_review, description
+        return X_user, X_item, y_rating
 
     def create_tfidf_neg(self, idx, k=2, type='train'):
         data_b = self.data[type].iloc[idx]
@@ -237,6 +281,48 @@ class Dataset(object):
         # X_item = self.tfidf.transform(sequences_item).toarray()
 
         return X_user, X_item, y_rating
+
+    def create_lstm_train(self, idx, seq_len):
+        X = []
+        y = []
+        for u in idx:
+            user = self.data['train_user'][u]
+            rdx = 0
+            if len(user[0]) > seq_len:
+                rdx = np.random.randint(1, len(user[0])-seq_len+1)
+                item = user[0][rdx:(rdx+seq_len)]
+                item = item[::-1]
+                X.append(self.user_onehot.T[item])
+            else:
+                item = []
+                for i in range(1, len(user[0])):
+                    item.append(self.user_onehot.T[i])
+                while len(item != seq_len):
+                    item.append([0]*self.data['user_no'])
+                X.append(item[::-1])
+            y.append(user[0][rdx-1])
+
+        return X, y
+
+    def create_lstm_test(self, idx, seq_len):
+        X = []
+        y = []
+        for u in idx:
+            data = self.data['test'].iloc[u]
+            rdx = 0
+            item = self.data['train_user'][data[0]][0][rdx:(rdx + seq_len)]
+            item = item[::-1]
+            X.append(self.user_onehot.T[item])
+            y.append(data[1])
+
+        return X, y
+
+
+
+
+
+
+
 
 
 def parse_args():

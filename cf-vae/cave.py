@@ -418,8 +418,7 @@ class cf_vae_extend:
                     top_M = top_M[:-1]
                 if len(top_M) != m:
                     print(top_M, train_users[i])
-                if len(train_users[i]) != 1:
-                    print(i)
+
                 hits = set(top_M) & set(user_all[i])   # item idex from 0
                 hits_num = len(hits)
                 try:
@@ -464,8 +463,7 @@ class cf_vae_extend:
                     top_M = top_M[:-1]
                 if len(top_M) != m:
                     print(top_M, train_users[i])
-                if len(train_users[i]) != 1:
-                    print(i)
+
                 hits = set(top_M) & set(user_all[i])   # item idex from 0
                 hits_num = len(hits)
                 try:

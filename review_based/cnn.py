@@ -162,15 +162,14 @@ class Model(object):
             X_user_rec = self._dec(h_user, self.filters[::-1], "dec_user")
             X_item_rec = self._dec(h_item, self.filters[::-1], "dec_item")
 
-        # if self.vae:
-        #     X = tf.concat([X_user_mu, X_item_mu], axis=1)
-        # else:
-        #     X = tf.concat([X_user_z, X_item_z], axis=1)
-        #
-        # X = self.mlp(X, self.mlp_layers)
-        # X = tf.reshape(X, [-1])
-        # print(y.shape, X.shape)
-        X = tf.reduce_sum(tf.multiply(X_user_z, X_item_z), axis=1)
+        if self.vae:
+            X = tf.concat([X_user_mu, X_item_mu], axis=1)
+        else:
+            X = tf.concat([X_user_z, X_item_z], axis=1)
+
+        X = self.mlp(X, self.mlp_layers)
+        X = tf.reshape(X, [-1])
+        print(y.shape, X.shape)
         # X = tf.clip_by_value(X, 1, 5)
         self.loss = tf.losses.mean_squared_error(self.y_rating, X) + tf.losses.get_regularization_loss()
         if self.vae:
