@@ -6,6 +6,7 @@ import gensim
 import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.sparse import save_npz
+from datetime import datetime
 
 def parse(path):
     g = gzip.open(path, "rb")
@@ -136,12 +137,59 @@ def create_amazon(dir_r, type, fsum):
 
     fsum.write("text length: %d - cat length: %d\n"%(X.shape[1], len(categories)))
 
-if __name__ == '__main__':
-    dataset = ["Office", "CD", "Grocery", "Kitchen",  "Outdoor"]
-    fsum = open("data/summary.txt", "w")
-    for type in dataset:
-        dir_r = "../cf-vae/data/%s/"%type
-        create_amazon(dir_r, type, fsum)
 
+def create_user_info(data_dir):
+    train = []
+    categories = np.genfromtxt("%s/categories.txt" % data_dir, np.int8, delimiter=",")
+    ratings = np.genfromtxt("%s/ratings.txt" % data_dir, np.int32, delimiter=" ", )
+    user_info = []
+    time_info = []
+    fuser = open("%s/user_info_train.txt" % data_dir, "w")
+    ftime = open("%s/time_train.txt" % data_dir, "w")
+    for line in open("%s/implicit/train.txt" % data_dir):
+        # read line
+        list_p = line.strip().split()
+        list_p = [int(p) for p in list_p]
+        u = list_p[0]
+        list_p = list_p[1:]
+
+        # create arr
+        no_item = len(list_p)
+        r = [0] * 5
+        weekdays = [0] * 7
+        cat = np.zeros(categories.shape[1])
+        time = []
+        tmp_rating = ratings[np.where(ratings[:, 0] == u)]
+        line_no = 0
+
+        for p in list_p:
+            # rating
+            rat = tmp_rating[line_no]
+            if p == rat[1] or u == rat[0]:
+                r[rat[2] - 1] += 1
+                cat += categories[rat[1]]
+                t = datetime.fromtimestamp(r[3])
+                weekdays[t.weekday()] += 1
+                time.append(r[3])
+                line_no += 1
+            else:
+                print(rat, line_no)
+        #     r = np.array(r)/sum(r)
+        #     weekdays = np.array(weekdays)/sum(weekdays)
+        #     cat = cat/sum(cat)
+
+        user_info.append([no_item] + r + weekdays + cat.tolist())
+        fuser.write("%d,%s\n" % (u, ",".join([str(i) for i in user_info[-1]])))
+        ftime.write("%d,%s\n" % (u, ",".join([str(i) for i in time])))
+        time_info.append(time)
+    fuser.close()
+    ftime.close()
+
+if __name__ == '__main__':
+    dataset = ["ml-1m", "Office", "CD", "Grocery", "Kitchen",  "Outdoor"]
+    # fsum = open("data/summary.txt", "w")
+    for type in dataset:
+        dir_r = "data/%s/"%type
+        create_user_info(dir_r)
 
 
