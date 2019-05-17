@@ -208,18 +208,19 @@ def main():
         train_cost = 0
         data.create_train_iter()
 
-        for j in range(int(data.n_user / batch_size)):
+        for j in range(0, int(data.n_user / batch_size)):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
             X, y= data.create_batch(list_idx, data.X_iter, data.y_iter)
             t = data.user_info_train[list_idx]
 
             feed = {model.X: X, model.y:y, model.X_cat:t}
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
+
         if i % 10 == 0:
             model.train = False
             X_val, y_val = data.create_batch(range(len(data.val2)), data.val2, data.infer1)
             print(X_val.shape, y_val.shape, data.user_info_train.shape)
-            for j in range(int(len(X_val) / batch_size)+1):
+            for j in range(0, int(len(X_val) / batch_size)+1):
                 if (j + 1) * batch_size > len(data.val):
                     X_b_val = X_val[j * batch_size:]
                     y_b = y_val[j * batch_size:]
