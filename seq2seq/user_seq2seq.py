@@ -215,7 +215,6 @@ def main():
 
             feed = {model.X: X, model.y:y, model.X_cat:t}
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
-        print("Loss: %f"%loss)
         if i % 10 == 0:
             model.train = False
             X_val, y_val = data.create_batch(range(len(data.val)), data.val, data.val_infer)
@@ -243,7 +242,7 @@ def main():
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'bilstm-model'))
 
-                X_test, y_test, t = data.create_batch(range(len(data.test)), data.test, data.infer2)
+                X_test, y_test= data.create_batch(range(len(data.test)), data.test, data.infer2)
                 for j in range(int(len(X_test) / batch_size) + 1):
                     if (j + 1) * batch_size > len(X_test):
                         X_b_val = X_test[j * batch_size:]
