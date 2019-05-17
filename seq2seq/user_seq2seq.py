@@ -222,11 +222,11 @@ def main():
                 if (j + 1) * batch_size > len(data.val):
                     X_b_val = X_val[j * batch_size:]
                     y_b = y_val[j * batch_size:]
-                    t_b = data.user_info_val[j * batch_size:]
+                    t_b = data.user_info_train[j * batch_size:]
                 else:
                     X_b_val = X_val[j * batch_size:(j + 1) * batch_size]
                     y_b = y_val[j * batch_size:(j + 1) * batch_size]
-                    t_b = data.user_info_val[j * batch_size:(j + 1) * batch_size]
+                    t_b = data.user_info_train[j * batch_size:(j + 1) * batch_size]
 
                 feed = {model.X: X_b_val, model.X_cat:t_b, model.y:y_b}
                 loss_val, y_b_val = sess.run([model.loss, model.predict],
