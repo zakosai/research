@@ -98,13 +98,13 @@ class Dataset(object):
     def create_user_info(self, folder):
         user_info = list(open("%s/user_info_train.txt"%folder))
         user_info = [u.strip() for u in user_info]
-        user_info = [u.split(",")[1:] for u in user_info ]
-        self.user_info_train = np.array(user_info).astype(np.int32)
+        user_info = [u.split(",")[1:] for u in user_info]
+        self.user_info_train = np.array(user_info).astype(np.float32)
 
         user_info = list(open("%s/user_info_test.txt" % folder))
         user_info = [u.strip() for u in user_info]
         user_info = [u.split(",")[1:] for u in user_info]
-        self.user_info_test = np.array(user_info).astype(np.int32)
+        self.user_info_test = np.array(user_info).astype(np.float32)
 
 
 
