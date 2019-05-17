@@ -98,12 +98,9 @@ class Seq2seq(object):
 
 
     def prediction(self, x, y, cat=None, y_cat=None, reuse=False):
-        x_ = x
-        layer = [600, self.n_products]
         with tf.variable_scope("last_layer", reuse=reuse):
-            for i in range(len(layer)):
-                x_ = layers.fully_connected(x_, layer[i], self.active_function, scope="mlp_%d" % i,weights_regularizer=self.regularizer)
-            out = x_
+            out = layers.fully_connected(x, self.n_products, tf.nn.tanh)
+            # loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(y, out, 100))
 
             if cat !=None:
                 pred_cat = layers.fully_connected(cat, self.cat_dim, tf.nn.tanh)
@@ -199,8 +196,9 @@ def main():
 
     f = open("experiment/result.txt", "a")
     f.write("-------------------------\n")
-    f.write("Data: %s - num_p: %d - hybrid\nbilstm: True - n_layers: 2 - w_size:%d\n"
+    f.write("Data: %s - num_p: %d - user info\nbilstm: True - n_layers: 2 - w_size:%d\n"
             %(dataset, data.n_item, data.w_size))
+    f.write("cat: %s - time: %s\n" % (args.cat, args.time))
     result = [0,0,0,0]
 
     for i in range(1, iter):

@@ -158,7 +158,7 @@ def main():
     num_p = len(list(open("data/%s/item_id.txt"%(dataset))))
     checkpoint_dir = "experiment/%s/%s/" % (dataset, type)
 
-    data = Dataset(num_p, "data/%s"%(dataset), args.w_size)
+    data = Dataset(num_p, "data/%s"%(dataset), args.w_size, cat=args.cat, time=args.time)
     # data.create_item_cat("data/%s/%s"%(dataset, type))
 
     # data.item_emb = text.toarray()
@@ -169,12 +169,10 @@ def main():
     model.w_size = args.w_size
     model.p_dim = data.n_user
     if args.cat:
-        data.create_item_cat("data/%s" % (dataset))
         print(data.item_cat.shape[1])
         model.p_dim += data.item_cat.shape[1]
-
-
-
+    if args.time:
+        model.p_dim += dataset.time_dim
 
     model.build_model()
 
@@ -185,7 +183,9 @@ def main():
 
     f = open("experiment/result.txt", "a")
     f.write("-------------------------\n")
-    f.write("Data: %s - num_p: %d - seq2se1\nbilstm: %s - n_layers: %d - w_size:%d\n"%(dataset, data.n_item, model.bilstm, model.n_layer, model.w_size))
+    f.write("Data: %s - num_p: %d - seq2seq\nbilstm: %s - n_layers: %d - w_size:%d\n"
+            %(dataset, data.n_item, model.bilstm, model.n_layer, model.w_size))
+    f.write("cat: %s - time: %s\n"%(args.cat, args.time))
     result = [0,0,0,0]
     print(len(data.val))
     for i in range(1, iter):
@@ -195,14 +195,20 @@ def main():
 
         for j in range(int(data.n_user / batch_size)):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
-            X, y = data.create_batch(list_idx, data.X_iter, data.y_iter)
+            if args.time:
+                X, y = data.create_batch(list_idx, data.X_iter, data.y_iter, data.time_emb)
+            else:
+                X, y = data.create_batch(list_idx, data.X_iter, data.y_iter)
 
             feed = {model.X: X, model.y:y}
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
         if i % 10 == 0:
             model.train = False
-            X_val, y_val = data.create_batch(range(len(data.val)), data.val, data.val_infer)
+            if args.time:
+                X_val, y_val = data.create_batch(range(len(data.val)), data.val, data.val_infer, data.time_emb_val)
+            else:
+                X_val, y_val = data.create_batch(range(len(data.val)), data.val, data.val_infer)
             for j in range(int(len(X_val) / batch_size)+1):
                 if (j + 1) * batch_size > len(X_val):
                     X_b_val = X_val[j * batch_size:]
@@ -224,7 +230,10 @@ def main():
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'bilstm-model'))
 
-                X_test, y_test = data.create_batch(range(len(data.test)), data.test, data.infer2)
+                if args.time:
+                    X_test, y_test = data.create_batch(range(len(data.test)), data.test, data.infer2, data.time_emb_test)
+                else:
+                    X_test, y_test = data.create_batch(range(len(data.test)), data.test, data.infer2)
                 for j in range(int(len(X_test) / batch_size) + 1):
                     if (j + 1) * batch_size > len(X_test):
                         X_b_val = X_test[j * batch_size:]
