@@ -99,8 +99,10 @@ class Seq2seq(object):
 
     def prediction(self, x, y, cat=None, y_cat=None, reuse=False):
         with tf.variable_scope("last_layer", reuse=reuse):
-            out = layers.fully_connected(x, self.n_products, tf.nn.tanh)
-            # loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(y, out, 100))
+            for i in range(len(self.layers)):
+                x_ = layers.fully_connected(x_, self.layers[i], self.active_function, scope="mlp_%d" % i,
+                                            weights_regularizer=self.regularizer)
+            out = x_
 
             if cat !=None:
                 pred_cat = layers.fully_connected(cat, self.cat_dim, tf.nn.tanh)
