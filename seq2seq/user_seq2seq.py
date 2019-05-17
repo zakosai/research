@@ -236,7 +236,7 @@ def main():
                     p_val = y_b_val
                 else:
                     p_val = np.concatenate((p_val, y_b_val), axis=0)
-            print(p_val.shape)
+                print(p_val.shape)
 
             recall, _, _ = calc_recall(p_val, data.val2, data.infer1)
             print("Loss val: %f, recall %f" % (loss_val, recall))
