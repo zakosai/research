@@ -144,6 +144,50 @@ def create_user_info(data_dir):
     ratings = np.genfromtxt("%s/ratings.txt" % data_dir, np.int32, delimiter="::", )
     user_info = []
     time_info = []
+    fuser = open("%s/user_info_train.txt" % data_dir, "w")
+    ftime = open("%s/time_train.txt" % data_dir, "w")
+    for line in open("%s/implicit/train.txt" % data_dir):
+        # read line
+        list_p = line.strip().split()
+        list_p = [int(p) for p in list_p]
+        u = list_p[0]
+        list_p = list_p[1:]
+
+        # create arr
+        no_item = len(list_p)
+        r = [0] * 5
+        weekdays = [0] * 7
+        cat = np.zeros(categories.shape[1])
+        time = []
+        tmp_rating = ratings[np.where(ratings[:, 0] == u)]
+        line_no = 0
+
+        for p in list_p:
+            # rating
+            rat = tmp_rating[line_no]
+            if p == rat[1] or u == rat[0]:
+                r[rat[2] - 1] += 1
+                cat += categories[rat[1]]
+                t = datetime.fromtimestamp(r[3])
+                weekdays[t.weekday()] += 1
+                time.append(r[3])
+                line_no += 1
+            else:
+                print(rat, line_no)
+        #     r = np.array(r)/sum(r)
+        #     weekdays = np.array(weekdays)/sum(weekdays)
+        #     cat = cat/sum(cat)
+
+        user_info.append([no_item] + r + weekdays + cat.tolist())
+        fuser.write("%d,%s\n" % (u, ",".join([str(i) for i in user_info[-1]])))
+        ftime.write("%d,%s\n" % (u, ",".join([str(i) for i in time])))
+        time_info.append(time)
+    fuser.close()
+    ftime.close()
+
+    # for test
+    user_info = []
+    time_info = []
     fuser = open("%s/user_info_test.txt" % data_dir, "w")
     ftime = open("%s/time_test.txt" % data_dir, "w")
     for line in open("%s/implicit/test.txt" % data_dir):
