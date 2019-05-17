@@ -158,7 +158,7 @@ def main():
     num_p = len(list(open("data/%s/item_id.txt"%(dataset))))
     checkpoint_dir = "experiment/%s/%s/" % (dataset, type)
 
-    data = Dataset(num_p, "data/%s/%s"%(dataset, type), args.w_size)
+    data = Dataset(num_p, "data/%s"%(dataset), args.w_size)
     # data.create_item_cat("data/%s/%s"%(dataset, type))
 
     # data.item_emb = text.toarray()
@@ -167,12 +167,15 @@ def main():
     # model.p_dim = data.n_user
     model.n_products = data.n_item
     model.w_size = args.w_size
+    model.p_dim = data.n_user
     if args.cat:
         data.create_item_cat("data/%s" % (dataset))
         print(data.item_cat.shape[1])
-        model.p_dim = data.n_user + data.item_cat.shape[1]
-    else:
-        model.p_dim = data.n_user
+        model.p_dim += data.item_cat.shape[1]
+
+
+
+
     model.build_model()
 
     sess = tf.Session()
@@ -262,6 +265,8 @@ parser.add_argument('--w_size', type=int, default=10, help='window size')
 parser.add_argument('--bilstm', type=bool, default=True, help='window size')
 parser.add_argument('--n_layers', type=int, default=2, help='window size')
 parser.add_argument('--cat', type=bool, default=False, help='window size')
+parser.add_argument('--time', type=bool, default=False, help='window size')
+
 
 
 

@@ -159,7 +159,7 @@ def main():
     num_p = len(list(open("data/%s/item_id.txt"%dataset)))
     checkpoint_dir = "experiment/%s/" % (dataset)
 
-    data = Dataset(num_p, "data/%s/%s"%(dataset, type), args.w_size)
+    data = Dataset(num_p, "data/%s"%(dataset), args.w_size)
     data.hybrid = True
     data.create_item_cat("data/%s"%(dataset))
     text = load_npz("data/%s/item.npz"%dataset).toarray()
@@ -183,7 +183,8 @@ def main():
 
     f = open("experiment/result.txt", "a")
     f.write("-------------------------\n")
-    f.write("Data: %s - num_p: %d - hybrid\nbilstm: True - n_layers: 2 - w_size:%d\n"%(data, data.n_item, data.w_size))
+    f.write("Data: %s - num_p: %d - hybrid\nbilstm: True - n_layers: 2 - w_size:%d\n"%(dataset, data.n_item,
+                                                                                       data.w_size))
     result = [0,0,0,0]
 
     for i in range(1, iter):

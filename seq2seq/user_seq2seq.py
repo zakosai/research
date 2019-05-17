@@ -173,7 +173,7 @@ def main():
     num_p = len(list(open("data/%s/item_id.txt"%dataset)))
     checkpoint_dir = "experiment/%s/" % (dataset)
 
-    data = Dataset(num_p, "data/%s/%s"%(dataset, type), args.w_size, args.cat, args.time)
+    data = Dataset(num_p, "data/%s"%(dataset), args.w_size, args.cat, args.time)
 
 
     model = Seq2seq()
