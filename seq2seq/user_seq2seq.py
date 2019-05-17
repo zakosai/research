@@ -137,7 +137,7 @@ class Seq2seq(object):
         # with tf.variable_scope('dropout'):
         #     outputs = tf.nn.dropout(outputs, 0.8)
 
-        last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden*4))
+        last_state = tf.reshape(outputs[:, -1, :], (tf.shape(self.X)[0], self.n_hidden*4))
         # last_state = outputs
 
         # Categories
@@ -146,6 +146,7 @@ class Seq2seq(object):
         # print(out_cat.shape)
         # last_state_cat = tf.reshape(out_cat[:, -1, :], (-1, self.n_hidden*4))
         last_state_cat = self.mlp(self.X_cat)
+        last_state_cat = tf.reshape(last_state_cat, (tf.shape(self.X)[0], self.layers[-1]))
         last_state = tf.concat([last_state, last_state_cat], axis=1)
 
         self.loss, self.predict = self.prediction(last_state, self.y)
@@ -215,7 +216,7 @@ def main():
 
             feed = {model.X: X, model.y:y, model.X_cat:t}
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
-
+        print("Loss: %f"%loss)
         if i % 10 == 0:
             model.train = False
             X_val, y_val = data.create_batch(range(len(data.val)), data.val, data.val_infer)
