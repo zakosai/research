@@ -50,7 +50,7 @@ class Dataset(object):
 
         self.X_iter = np.reshape(self.X_iter, (self.n_user, self.w_size))
         self.y_iter = np.array(self.y_iter)
-        self.val2 = np.array(self.val2, (len(self.val2), self.w_size))
+        self.val2 = np.array(self.val2)
         if self.item_cat != []:
             self.item_emb = np.concatenate((self.item_emb, self.item_cat), axis=1)
         if self.hybrid:
