@@ -89,7 +89,7 @@ class Dataset(object):
 
         self.val = np.reshape(self.val, (len(self.val), self.w_size))
         self.test = np.reshape(self.test, (len(self.test), self.w_size))
-        self.user_info_val = self.user_info_test[list_u]
+        self.list_u = list_u
 
 
     def create_item_cat(self, folder):
@@ -108,6 +108,7 @@ class Dataset(object):
         user_info = [u.strip() for u in user_info]
         user_info = [u.split(",")[1:] for u in user_info]
         self.user_info_test = np.array(user_info).astype(np.float32)
+        self.user_info_val = self.user_info_test[self.list_u]
 
 
 
