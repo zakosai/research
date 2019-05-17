@@ -229,7 +229,7 @@ def create_user_info(data_dir):
     ftime.close()
 
 if __name__ == '__main__':
-    dataset = ["Office", "Garden"]
+    dataset = ["Outdoor"]
     fsum = open("data/summary.txt", "w")
     for type in dataset:
         # dir_r = "../cf-vae/data/%s"%type

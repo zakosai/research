@@ -183,8 +183,7 @@ def main():
 
     f = open("experiment/result.txt", "a")
     f.write("-------------------------\n")
-    f.write("Data: %s - num_p: %d - hybrid\nbilstm: True - n_layers: 2 - w_size:%d\n"%(dataset, data.n_item,
-                                                                                       data.w_size))
+    f.write("Data: %s - num_p: %d - hybrid\nbilstm: True - n_layers: 2 - w_size:%d\n"%(dataset, data.n_item,data.w_size))
     result = [0,0,0,0]
 
     for i in range(1, iter):
@@ -263,6 +262,8 @@ parser.add_argument('--type', type=str, default="implicit",
                     help='1p or 8p')
 parser.add_argument('--num_p', type=int, default=7780, help='number of product')
 parser.add_argument('--w_size', type=int, default=10, help='window size')
-
+parser.add_argument('--batch_size', type=int, default=1000)
+parser.add_argument('--cat', type=bool, default=False)
+parser.add_argument('--time', type=bool, default=False)
 if __name__ == '__main__':
     main()
