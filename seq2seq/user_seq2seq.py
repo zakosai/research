@@ -212,7 +212,6 @@ def main():
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
             X, y= data.create_batch(list_idx, data.X_iter, data.y_iter)
             t = data.user_info_train[list_idx]
-            print(X.shape, y.shape, t.shape)
 
             feed = {model.X: X, model.y:y, model.X_cat:t}
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
@@ -221,7 +220,7 @@ def main():
             model.train = False
             X_val, y_val = data.create_batch(range(len(data.val)), data.val, data.val_infer)
             for j in range(int(len(X_val) / batch_size)+1):
-                if (j + 1) * batch_size > len(X_val):
+                if (j + 1) * batch_size > len(data.val):
                     X_b_val = X_val[j * batch_size:]
                     y_b = y_val[j * batch_size:]
                     t_b = data.user_info_test[j * batch_size:]
@@ -229,6 +228,8 @@ def main():
                     X_b_val = X_val[j * batch_size:(j + 1) * batch_size]
                     y_b = y_val[j * batch_size:(j + 1) * batch_size]
                     t_b = data.user_info_test[j * batch_size:(j + 1) * batch_size]
+
+                print(X_b_val.shape, y_b.shape, t_b.shape)
                 feed = {model.X: X_b_val, model.X_cat:t_b, model.y:y_b}
                 loss_val, y_b_val = sess.run([model.loss, model.predict],
                                            feed_dict=feed)
