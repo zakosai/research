@@ -175,7 +175,7 @@ def main():
 
     data = Dataset(num_p, "data/%s/%s"%(dataset, type), args.w_size)
     # data.hybrid = True
-    # data.create_item_cat("data/%s"%(dataset))
+    data.create_item_cat("data/%s"%(dataset))
     data.create_user_info("data/%s"%dataset)
     # text = load_npz("data/%s/item.npz"%dataset).toarray()
     # print(text.shape)
@@ -186,8 +186,8 @@ def main():
     model = Seq2seq()
     # model.p_dim = data.n_user
     model.w_size = args.w_size
-    # model.p_dim = data.n_user + data.item_cat.shape[1]
-    model.p_dim = data.n_user
+    model.p_dim = data.n_user + data.item_cat.shape[1]
+    # model.p_dim = data.n_user
     # model.cat_dim = text.shape[1]
     model.cat_dim = data.user_info_train.shape[1]
     model.n_products = data.n_item
@@ -217,7 +217,7 @@ def main():
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
         if i % 10 == 0:
             model.train = False
-            X_val, y_val = data.create_batch(range(len(data.val)), data.val, data.val_infer)
+            X_val, y_val = data.create_batch(range(len(data.val2)), data.val2, data.val_infer1)
             for j in range(int(len(X_val) / batch_size)+1):
                 if (j + 1) * batch_size > len(data.val):
                     X_b_val = X_val[j * batch_size:]

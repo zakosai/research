@@ -34,6 +34,7 @@ class Dataset(object):
     def create_train_iter(self, text=[]):
         self.X_iter = []
         self.y_iter = []
+        self.val2 = []
         self.item_emb = np.zeros((self.n_item, self.n_user))
         for i, tr in enumerate(self.train):
             if len(tr) > self.w_size:
@@ -44,9 +45,12 @@ class Dataset(object):
                 self.X_iter.append(tr)
                 self.y_iter.append(self.infer1[i][0])
             self.item_emb[tr, [i]*len(tr)] = 1
+        self.val2.append(tr[-self.w_size:])
+
 
         self.X_iter = np.reshape(self.X_iter, (self.n_user, self.w_size))
         self.y_iter = np.array(self.y_iter)
+        self.val2 = np.array(self.val2, (len(self.val2), self.w_size))
         if self.item_cat != []:
             self.item_emb = np.concatenate((self.item_emb, self.item_cat), axis=1)
         if self.hybrid:
