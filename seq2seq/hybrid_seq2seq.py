@@ -176,7 +176,7 @@ def main():
         print(data.item_cat.shape[1])
         model.p_dim += data.item_cat.shape[1]
     if args.time:
-        model.p_dim += dataset.time_dim
+        model.p_dim += data.time_dim
     model.cat_dim = text.shape[1]
     model.n_products = data.n_item
     model.build_model()

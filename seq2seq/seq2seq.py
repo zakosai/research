@@ -172,7 +172,7 @@ def main():
         print(data.item_cat.shape[1])
         model.p_dim += data.item_cat.shape[1]
     if args.time:
-        model.p_dim += dataset.time_dim
+        model.p_dim += data.time_dim
 
     model.build_model()
 
