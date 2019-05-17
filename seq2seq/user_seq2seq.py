@@ -105,8 +105,7 @@ class Seq2seq(object):
             if cat !=None:
                 pred_cat = layers.fully_connected(cat, self.cat_dim, tf.nn.tanh)
                 pred_cat = tf.reshape(pred_cat, [-1, self.cat_dim, 1])
-                out_cat = tf.matmul(tf.broadcast_to(self.item_cat, [tf.shape(cat)[0], self.item_cat.shape[0],
-                                                                    self.item_cat.shape[1]]),  pred_cat)
+                out_cat = tf.matmul(tf.broadcast_to(self.item_cat, [tf.shape(cat)[0], self.item_cat.shape[0],self.item_cat.shape[1]]),  pred_cat)
                 pred = out_cat * out
 
                 loss = 10*self.loss_reconstruct(y, pred) + self.loss_reconstruct(y_cat, out_cat)
@@ -172,8 +171,8 @@ def main():
     type = args.type
     num_p = len(list(open("data/%s/item_id.txt"%dataset)))
     checkpoint_dir = "experiment/%s/" % (dataset)
-
-    data = Dataset(num_p, "data/%s"%(dataset), args.w_size, args.cat, args.time)
+    data = Dataset(num_p, "data/%s"%(dataset), args.w_size, cat=args.cat, time=args.time)
+    data.create_user_info("data/%s"%dataset)
 
 
     model = Seq2seq()
@@ -197,7 +196,8 @@ def main():
 
     f = open("experiment/result.txt", "a")
     f.write("-------------------------\n")
-    f.write("Data: %s - num_p: %d - hybrid\nbilstm: True - n_layers: 2 - w_size:%d\n"%(dataset, data.n_item, data.w_size))
+    f.write("Data: %s - num_p: %d - hybrid\nbilstm: True - n_layers: 2 - w_size:%d\n"
+            %(dataset, data.n_item, data.w_size))
     result = [0,0,0,0]
 
     for i in range(1, iter):
@@ -219,9 +219,11 @@ def main():
         if i % 10 == 0:
             model.train = False
             if args.time:
-                X_val, y_val = data.create_batch(range(len(data.val)), data.val, data.val_infer, data.time_val)
+                X_val, y_val = data.create_batch(range(len(data.val)),
+                                                 data.val, data.val_infer, data.time_emb_val)
             else:
-                X_val, y_val = data.create_batch(range(len(data.val)), data.val, data.val_infer)
+                X_val, y_val = data.create_batch(range(len(data.val)),
+                                                 data.val, data.val_infer)
             for j in range(0, int(len(X_val) / batch_size)+1):
                 if (j + 1) * batch_size > len(data.val):
                     X_b_val = X_val[j * batch_size:]
@@ -246,9 +248,11 @@ def main():
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'bilstm-model'))
                 if args.time:
-                    X_test, y_test = data.create_batch(range(len(data.test)), data.test, data.infer2, data.time_test)
+                    X_test, y_test = data.create_batch(range(len(data.test)), data.test,
+                                                       data.infer2, data.time_emb_test)
                 else:
-                    X_test, y_test= data.create_batch(range(len(data.test)), data.test, data.infer2)
+                    X_test, y_test= data.create_batch(range(len(data.test)), data.test,
+                                                      data.infer2)
                 for j in range(int(len(X_test) / batch_size) + 1):
                     if (j + 1) * batch_size > len(X_test):
                         X_b_val = X_test[j * batch_size:]
@@ -274,7 +278,8 @@ def main():
         if i % 100 == 0 and model.learning_rate > 1e-6:
             model.learning_rate /= 10
             print("decrease lr to %f" % model.learning_rate)
-    f.write("iter: %d - recall: %f - hit: %f - ndcg: %f\n" % (result[0], result[1], result[2], result[3]))
+    f.write("iter: %d - recall: %f - hit: %f - ndcg: %f\n"
+            % (result[0], result[1], result[2], result[3]))
     print(max_recall)
 
 

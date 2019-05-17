@@ -16,12 +16,13 @@ class Dataset(object):
         self.hybrid = False
         self.time_dim = 23
         self.time = time
+        time_test = None
         if self.time:
-            self.create_time(folder)
+            time_test = self.create_time(folder)
         self.cat = cat
         if self.cat:
             self.create_item_cat(folder)
-        self.create_val_test(tmp_test)
+        self.create_val_test(tmp_test, time_test)
 
 
 
@@ -58,7 +59,7 @@ class Dataset(object):
 
             if self.time:
                 for j in range(n+1, n+self.w_size+1):
-                    self.time_emb[i, self.train[i][j], :] = self.convert_time(self.time_train[i][j])
+                    self.time_emb[i, j-n-1, :] = self.convert_time(self.time_train[i][j])
             self.item_emb[tr, [i]*len(tr)] = 1
             self.val2.append(tr[-self.w_size:])
 
@@ -91,13 +92,13 @@ class Dataset(object):
         return X_batch, y_batch
 
 
-    def create_val_test(self, tmp_test):
+    def create_val_test(self, tmp_test, time_test):
         self.val = []
         self.val_infer = []
         self.test = []
         list_u = []
-        self.time_val = []
-        self.time_test = []
+        self.time_emb_val = []
+        self.time_emb_test = []
         for i, tr in enumerate(tmp_test):
             if len(tr) > self.w_size+1:
                 n = np.random.randint((len(tr)-self.w_size-1))
@@ -107,24 +108,26 @@ class Dataset(object):
                 if self.time:
                     time = []
                     for j in range(n+1, n+self.w_size+1):
-                        time.append(self.convert_time(self.time_test[i][j]))
+                        time.append(self.convert_time(time_test[i][j]))
 
-                    self.time_val.append(time)
+                    self.time_emb_val.append(time)
             self.test.append(tr[-self.w_size:])
             if self.time:
                 time = []
                 for j in range(len(tr)-self.w_size, len(tr)):
-                    time.append(self.convert_time(self.time_test[i][j]))
+                    time.append(self.convert_time(time_test[i][j]))
 
-                self.time_test.append(time)
+                self.time_emb_test.append(time)
 
         self.val = np.reshape(self.val, (len(self.val), self.w_size))
         self.test = np.reshape(self.test, (len(self.test), self.w_size))
         self.list_u = list_u
 
         if self.time:
-            self.time_val = np.reshape(self.time_val, (len(self.time_val), self.w_size, self.time_dim))
-            self.time_test = np.reshape(self.time_test, (len(self.time_test), self.w_size, self.time_dim))
+            self.time_emb_val = np.reshape(self.time_emb_val,
+                                           (len(self.time_emb_val), self.w_size, self.time_dim))
+            self.time_emb_test = np.reshape(self.time_emb_test,
+                                        (len(self.time_emb_test), self.w_size, self.time_dim))
 
 
     def create_item_cat(self, folder):
@@ -158,7 +161,7 @@ class Dataset(object):
         # hour
         hour[int(time.hour/6)] = 1
         weekday[time.weekday()] = 1
-        month[time.month] = 1
+        month[time.month-1] = 1
 
         time = hour + weekday + month
         return time
@@ -167,7 +170,7 @@ class Dataset(object):
         filename = "%s/time_train.txt"%folder
         self.time_train = []
         for line in open(filename):
-            a = line.strip().split()
+            a = line.strip().split(",")
             if a == []:
                 l = []
             else:
@@ -175,20 +178,15 @@ class Dataset(object):
             self.time_train.append(l)
 
         filename = "%s/time_test.txt" % folder
-        self.time_test = []
+        time_test = []
         for line in open(filename):
-            a = line.strip().split()
+            a = line.strip().split(",")
             if a == []:
                 l = []
             else:
                 l = [x for x in a[1:]]
-            self.time_test.append(l)
-
-
-
-
-
-
+            time_test.append(l)
+        return time_test
 
 
 

@@ -167,9 +167,9 @@ def create_user_info(data_dir):
             if p == rat[1] or u == rat[0]:
                 r[rat[2] - 1] += 1
                 cat += categories[rat[1]]
-                t = datetime.fromtimestamp(r[3])
+                t = datetime.fromtimestamp(rat[3])
                 weekdays[t.weekday()] += 1
-                time.append(r[3])
+                time.append(rat[3])
                 line_no += 1
             else:
                 print(rat, line_no)
@@ -211,9 +211,9 @@ def create_user_info(data_dir):
             if p == rat[1] or u == rat[0]:
                 r[rat[2] - 1] += 1
                 cat += categories[rat[1]]
-                t = datetime.fromtimestamp(r[3])
+                t = datetime.fromtimestamp(rat[3])
                 weekdays[t.weekday()] += 1
-                time.append(r[3])
+                time.append(rat[3])
                 line_no += 1
             else:
                 print(rat, line_no)
