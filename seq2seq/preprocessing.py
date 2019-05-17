@@ -144,9 +144,9 @@ def create_user_info(data_dir):
     ratings = np.genfromtxt("%s/ratings.txt" % data_dir, np.int32, delimiter="::", )
     user_info = []
     time_info = []
-    fuser = open("%s/user_info_train.txt" % data_dir, "w")
-    ftime = open("%s/time_train.txt" % data_dir, "w")
-    for line in open("%s/implicit/train.txt" % data_dir):
+    fuser = open("%s/user_info_test.txt" % data_dir, "w")
+    ftime = open("%s/time_test.txt" % data_dir, "w")
+    for line in open("%s/implicit/test.txt" % data_dir):
         # read line
         list_p = line.strip().split()
         list_p = [int(p) for p in list_p]
@@ -189,8 +189,8 @@ if __name__ == '__main__':
     dataset = ["Office", "Garden"]
     fsum = open("data/summary.txt", "w")
     for type in dataset:
-        dir_r = "../cf-vae/data/%s"%type
-        create_amazon(dir_r, type, fsum)
+        # dir_r = "../cf-vae/data/%s"%type
+        # create_amazon(dir_r, type, fsum)
         create_user_info("data/%s"%type)
 
 
