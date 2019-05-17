@@ -221,7 +221,7 @@ def main():
             X_val, y_val = data.create_batch(range(len(data.val2)), data.val2, data.infer1)
             print(X_val.shape, y_val.shape, data.user_info_train.shape)
             for j in range(0, int(len(X_val) / batch_size)+1):
-                if (j + 1) * batch_size > len(data.val):
+                if (j + 1) * batch_size > len(data.val2):
                     X_b_val = X_val[j * batch_size:]
                     y_b = y_val[j * batch_size:]
                     t_b = data.user_info_train[j * batch_size:]
@@ -237,7 +237,6 @@ def main():
                     p_val = y_b_val
                 else:
                     p_val = np.concatenate((p_val, y_b_val), axis=0)
-                print(p_val.shape)
 
             recall, _, _ = calc_recall(p_val, data.val2, data.infer1)
             print("Loss val: %f, recall %f" % (loss_val, recall))
