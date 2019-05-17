@@ -98,6 +98,7 @@ class Seq2seq(object):
 
 
     def prediction(self, x, y, cat=None, y_cat=None, reuse=False):
+        x_ = x
         with tf.variable_scope("last_layer", reuse=reuse):
             for i in range(len(self.layers)):
                 x_ = layers.fully_connected(x_, self.layers[i], self.active_function, scope="mlp_%d" % i,
