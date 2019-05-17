@@ -165,8 +165,8 @@ class Seq2seq(object):
 
 def main():
     iter = 1000
-    batch_size = args.batch_size
     args = parser.parse_args()
+    batch_size = args.batch_size
     dataset = args.data
     type = args.type
     num_p = len(list(open("data/%s/item_id.txt"%dataset)))
