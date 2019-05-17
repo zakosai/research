@@ -114,7 +114,7 @@ class Dataset(object):
             self.test.append(tr[-self.w_size:])
             if self.time:
                 time = []
-                for j in range(len(tr)-self.w_size, len(tr)):
+                for j in range(len(tr)-self.w_size+1, len(tr)+1):
                     time.append(self.convert_time(time_test[i][j]))
 
                 self.time_emb_test.append(time)
