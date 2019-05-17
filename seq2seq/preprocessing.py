@@ -189,8 +189,8 @@ if __name__ == '__main__':
     dataset = ["Office", "Garden"]
     fsum = open("data/summary.txt", "w")
     for type in dataset:
-        dir_r = "data/%s"%type
+        dir_r = "../cf-vae/data/%s"%type
         create_amazon(dir_r, type, fsum)
-        create_user_info(dir_r)
+        create_user_info("data/%s"%type)
 
 
