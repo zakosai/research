@@ -139,7 +139,6 @@ def create_amazon(dir_r, type, fsum):
 
 
 def create_user_info(data_dir):
-    train = []
     categories = np.genfromtxt("%s/categories.txt" % data_dir, np.int8, delimiter=",")
     ratings = np.genfromtxt("%s/ratings.txt" % data_dir, np.int32, delimiter="::", )
     user_info = []

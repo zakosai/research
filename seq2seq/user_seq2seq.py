@@ -211,6 +211,7 @@ def main():
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
             X, y= data.create_batch(list_idx, data.X_iter, data.y_iter)
             t = data.user_info_train[list_idx]
+            print(X.shape, y.shape, t.shape)
 
             feed = {model.X: X, model.y:y, model.X_cat:t}
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
