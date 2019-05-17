@@ -218,6 +218,7 @@ def main():
         if i % 10 == 0:
             model.train = False
             X_val, y_val = data.create_batch(range(len(data.val2)), data.val2, data.infer1)
+            print(X_val.shape, y_val.shape, data.user_info_train.shape)
             for j in range(int(len(X_val) / batch_size)+1):
                 if (j + 1) * batch_size > len(data.val):
                     X_b_val = X_val[j * batch_size:]
