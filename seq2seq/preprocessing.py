@@ -186,7 +186,7 @@ def create_user_info(data_dir):
     ftime.close()
 
 if __name__ == '__main__':
-    dataset = ["ml-1m", "Office", "Garden"]
+    dataset = ["Office", "Garden"]
     fsum = open("data/summary.txt", "w")
     for type in dataset:
         dir_r = "data/%s"%type
