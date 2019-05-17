@@ -78,15 +78,18 @@ class Dataset(object):
         self.val = []
         self.val_infer = []
         self.test = []
+        list_u = []
         for i, tr in enumerate(tmp_test):
             if len(tr) > self.w_size+1:
                 n = np.random.randint((len(tr)-self.w_size-1))
                 self.val.append(tr[n:n + self.w_size])
                 self.val_infer.append([tr[n + self.w_size]])
+                list_u.append(i)
             self.test.append(tr[-self.w_size:])
 
         self.val = np.reshape(self.val, (len(self.val), self.w_size))
         self.test = np.reshape(self.test, (len(self.test), self.w_size))
+        self.user_info_val = self.user_info_test[list_u]
 
 
     def create_item_cat(self, folder):
