@@ -99,10 +99,10 @@ class Seq2seq(object):
 
     def prediction(self, x, y, cat=None, y_cat=None, reuse=False):
         x_ = x
-        layers = [600, self.n_products]
+        layer = [600, self.n_products]
         with tf.variable_scope("last_layer", reuse=reuse):
-            for i in range(len(layers)):
-                x_ = layers.fully_connected(x_, layers[i], self.active_function, scope="mlp_%d" % i,weights_regularizer=self.regularizer)
+            for i in range(len(layer)):
+                x_ = layers.fully_connected(x_, layer[i], self.active_function, scope="mlp_%d" % i,weights_regularizer=self.regularizer)
             out = x_
 
             if cat !=None:
