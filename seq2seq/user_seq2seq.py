@@ -173,20 +173,17 @@ def main():
     num_p = len(list(open("data/%s/item_id.txt"%dataset)))
     checkpoint_dir = "experiment/%s/" % (dataset)
 
-    data = Dataset(num_p, "data/%s/%s"%(dataset, type), args.w_size)
-    # data.hybrid = True
-    data.create_item_cat("data/%s"%(dataset))
-    data.create_user_info("data/%s"%dataset)
-    # text = load_npz("data/%s/item.npz"%dataset).toarray()
-    # print(text.shape)
-    # text = np.load("data/%s/text_doc2vec.npz"%dataset)
-    # text = text["v"]
-    # data.item_emb = text.toarray()
+    data = Dataset(num_p, "data/%s/%s"%(dataset, type), args.w_size, args.cat, args.time)
+
 
     model = Seq2seq()
     # model.p_dim = data.n_user
     model.w_size = args.w_size
-    model.p_dim = data.n_user + data.item_cat.shape[1]
+    model.p_dim = data.n_user
+    if args.cat:
+        model.p_dim += data.item_cat.shape[1]
+    if args.time:
+        model.p_dim += data.time_dim
     # model.p_dim = data.n_user
     # model.cat_dim = text.shape[1]
     model.cat_dim = data.user_info_train.shape[1]
@@ -200,7 +197,7 @@ def main():
 
     f = open("experiment/result.txt", "a")
     f.write("-------------------------\n")
-    f.write("Data: %s - num_p: %d - hybrid\nbilstm: True - n_layers: 2 - w_size:%d\n"%(data, data.n_item, data.w_size))
+    f.write("Data: %s - num_p: %d - hybrid\nbilstm: True - n_layers: 2 - w_size:%d\n"%(dataset, data.n_item, data.w_size))
     result = [0,0,0,0]
 
     for i in range(1, iter):
@@ -210,7 +207,10 @@ def main():
 
         for j in range(0, int(data.n_user / batch_size)):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
-            X, y= data.create_batch(list_idx, data.X_iter, data.y_iter)
+            if args.time:
+                X, y = data.create_batch(list_idx, data.X_iter, data.y_iter, data.time_emb)
+            else:
+                X, y= data.create_batch(list_idx, data.X_iter, data.y_iter)
             t = data.user_info_train[list_idx]
 
             feed = {model.X: X, model.y:y, model.X_cat:t}
@@ -218,7 +218,10 @@ def main():
 
         if i % 10 == 0:
             model.train = False
-            X_val, y_val = data.create_batch(range(len(data.val)), data.val, data.val_infer)
+            if args.time:
+                X_val, y_val = data.create_batch(range(len(data.val)), data.val, data.val_infer, data.time_val)
+            else:
+                X_val, y_val = data.create_batch(range(len(data.val)), data.val, data.val_infer)
             for j in range(0, int(len(X_val) / batch_size)+1):
                 if (j + 1) * batch_size > len(data.val):
                     X_b_val = X_val[j * batch_size:]
@@ -242,8 +245,10 @@ def main():
             if recall > max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'bilstm-model'))
-
-                X_test, y_test= data.create_batch(range(len(data.test)), data.test, data.infer2)
+                if args.time:
+                    X_test, y_test = data.create_batch(range(len(data.test)), data.test, data.infer2, data.time_test)
+                else:
+                    X_test, y_test= data.create_batch(range(len(data.test)), data.test, data.infer2)
                 for j in range(int(len(X_test) / batch_size) + 1):
                     if (j + 1) * batch_size > len(X_test):
                         X_b_val = X_test[j * batch_size:]
@@ -282,6 +287,9 @@ parser.add_argument('--type', type=str, default="implicit",
 parser.add_argument('--num_p', type=int, default=7780, help='number of product')
 parser.add_argument('--w_size', type=int, default=10, help='window size')
 parser.add_argument('--batch_size', type=int, default=1000)
+parser.add_argument('--cat', type=bool, default=False)
+parser.add_argument('--time', type=bool, default=False)
+
 
 if __name__ == '__main__':
     main()

@@ -1,20 +1,28 @@
 import numpy as np
+from datetime import datetime
 
 class Dataset(object):
-    def __init__(self, n_item, folder, w_size=10):
+    def __init__(self, n_item, folder, w_size=10, time=False, cat=False):
         self.w_size = w_size
 
         train_file = "%s/train.txt"%folder
         self.train, self.infer1 = self.read_file(train_file)
         test_file = "%s/test.txt"%folder
         tmp_test, self.infer2 = self.read_file(test_file)
-        self.create_val_test(tmp_test)
 
         self.n_user = len(self.train)
         self.n_item = n_item
         self.cat_dim = 18
         self.hybrid = False
-        self.item_cat = []
+        self.time_dim = 23
+        self.time = time
+        if self.time:
+            self.create_time(folder)
+        self.cat = cat
+        if self.cat:
+            self.create_item_cat(folder)
+        self.create_val_test(tmp_test)
+
 
 
     def read_file(self, filename):
@@ -36,14 +44,21 @@ class Dataset(object):
         self.y_iter = []
         self.val2 = []
         self.item_emb = np.zeros((self.n_item, self.n_user))
+        if self.time:
+            self.time_emb = np.zeros((len(self.train), self.w_size, self.time_dim))
         for i, tr in enumerate(self.train):
             if len(tr) > self.w_size:
                 n = np.random.randint(len(tr)-self.w_size)
                 self.X_iter.append(tr[n:n+self.w_size])
                 self.y_iter.append(tr[n+self.w_size])
             else:
+                n = 0
                 self.X_iter.append(tr)
                 self.y_iter.append(self.infer1[i][0])
+
+            if self.time:
+                for j in range(n+1, n+self.w_size+1):
+                    self.time_emb[i, self.train[i][j], :] = self.convert_time(self.time_train[i][j])
             self.item_emb[tr, [i]*len(tr)] = 1
             self.val2.append(tr[-self.w_size:])
 
@@ -51,18 +66,16 @@ class Dataset(object):
         self.X_iter = np.reshape(self.X_iter, (self.n_user, self.w_size))
         self.y_iter = np.array(self.y_iter)
         self.val2 = np.array(self.val2)
-        if self.item_cat != []:
+        if self.cat:
             self.item_emb = np.concatenate((self.item_emb, self.item_cat), axis=1)
         if self.hybrid:
             self.text = text
 
 
-    def create_batch(self, idx, X_iter, y_iter):
+    def create_batch(self, idx, X_iter, y_iter, time=None):
         n_batch = len(idx)
         X_batch = np.zeros((n_batch, self.w_size, self.item_emb.shape[1]))
         y_batch = np.zeros((n_batch, self.n_item))
-        # cat_batch = np.zeros((n_batch, self.w_size, self.cat_dim))
-        # y_cat_batch = np.zeros((n_batch, self.cat_dim))
         if self.hybrid:
             t_batch = np.zeros((n_batch, self.w_size, self.text.shape[1]))
         for i in range(n_batch):
@@ -70,11 +83,11 @@ class Dataset(object):
             y_batch[i, y_iter[idx[i]]] = 1
             if self.hybrid:
                 t_batch[i, :, :] = self.text[X_iter[idx[i]]]
-            # cat_batch[i, :, :] = self.item_cat[X_iter[idx[i]]]
-            # y_cat_batch[i, :] = self.item_cat[y_iter[idx[i]]]
 
         if self.hybrid:
             return X_batch, y_batch, t_batch
+        if self.time:
+            X_batch = np.concatenate((X_batch, time[idx]), axis=-1)
         return X_batch, y_batch
 
 
@@ -83,17 +96,35 @@ class Dataset(object):
         self.val_infer = []
         self.test = []
         list_u = []
+        self.time_val = []
+        self.time_test = []
         for i, tr in enumerate(tmp_test):
             if len(tr) > self.w_size+1:
                 n = np.random.randint((len(tr)-self.w_size-1))
                 self.val.append(tr[n:n + self.w_size])
                 self.val_infer.append([tr[n + self.w_size]])
                 list_u.append(i)
+                if self.time:
+                    time = []
+                    for j in range(n+1, n+self.w_size+1):
+                        time.append(self.convert_time(self.time_test[i][j]))
+
+                    self.time_val.append(time)
             self.test.append(tr[-self.w_size:])
+            if self.time:
+                time = []
+                for j in range(len(tr)-self.w_size, len(tr)):
+                    time.append(self.convert_time(self.time_test[i][j]))
+
+                self.time_test.append(time)
 
         self.val = np.reshape(self.val, (len(self.val), self.w_size))
         self.test = np.reshape(self.test, (len(self.test), self.w_size))
         self.list_u = list_u
+
+        if self.time:
+            self.time_val = np.reshape(self.time_val, (len(self.time_val), self.w_size, self.time_dim))
+            self.time_test = np.reshape(self.time_test, (len(self.time_test), self.w_size, self.time_dim))
 
 
     def create_item_cat(self, folder):
@@ -116,6 +147,49 @@ class Dataset(object):
         self.user_info_test = np.array(user_info).astype(np.float32)
         self.user_info_test = self.user_info_test[:, col]
         self.user_info_val = self.user_info_test[self.list_u]
+
+
+    def convert_time(self, t):
+        time = datetime.fromtimestamp(int(t))
+        hour = [0]*4
+        weekday = [0]*7
+        month = [0]*12
+
+        # hour
+        hour[int(time.hour/6)] = 1
+        weekday[time.weekday()] = 1
+        month[time.month] = 1
+
+        time = hour + weekday + month
+        return time
+
+    def create_time(self, folder):
+        filename = "%s/time_train.txt"%folder
+        self.time_train = []
+        for line in open(filename):
+            a = line.strip().split()
+            if a == []:
+                l = []
+            else:
+                l = [x for x in a[1:]]
+            self.time_train.append(l)
+
+        filename = "%s/time_test.txt" % folder
+        self.time_test = []
+        for line in open(filename):
+            a = line.strip().split()
+            if a == []:
+                l = []
+            else:
+                l = [x for x in a[1:]]
+            self.time_test.append(l)
+
+
+
+
+
+
+
 
 
 
