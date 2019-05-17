@@ -217,7 +217,7 @@ def main():
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
         if i % 10 == 0:
             model.train = False
-            X_val, y_val = data.create_batch(range(len(data.val2)), data.val2, data.val_infer1)
+            X_val, y_val = data.create_batch(range(len(data.val2)), data.val2, data.infer1)
             for j in range(int(len(X_val) / batch_size)+1):
                 if (j + 1) * batch_size > len(data.val):
                     X_b_val = X_val[j * batch_size:]
