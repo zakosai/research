@@ -199,6 +199,7 @@ def create_user_info(data_dir):
         # create arr
         no_item = len(list_p)
         r = [0] * 5
+        hour = [0]*4
         weekdays = [0] * 7
         cat = np.zeros(categories.shape[1])
         time = []
@@ -212,6 +213,7 @@ def create_user_info(data_dir):
                 r[rat[2] - 1] += 1
                 cat += categories[rat[1]]
                 t = datetime.fromtimestamp(rat[3])
+                hour[int(t.hour/6)] += 1
                 weekdays[t.weekday()] += 1
                 time.append(rat[3])
                 line_no += 1
@@ -229,7 +231,7 @@ def create_user_info(data_dir):
     ftime.close()
 
 if __name__ == '__main__':
-    dataset = ["Outdoor"]
+    dataset = ["Office"]
     fsum = open("data/summary.txt", "w")
     for type in dataset:
         # dir_r = "../cf-vae/data/%s"%type
