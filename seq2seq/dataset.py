@@ -143,12 +143,16 @@ class Dataset(object):
         self.user_info_train = np.array(user_info).astype(np.float32)
         col = [0] + list(range(6, self.user_info_train.shape[1]-1))
         self.user_info_train = self.user_info_train[:, col]
+        self.user_info_train[1:8] = self.user_info_train[1:8]/sum(self.user_info_train[1:8])
+        self.user_info_train[8:] = self.user_info_train[8:]/sum(self.user_info_train[8:])
 
         user_info = list(open("%s/user_info_test.txt" % folder))
         user_info = [u.strip() for u in user_info]
         user_info = [u.split(",")[1:] for u in user_info]
         self.user_info_test = np.array(user_info).astype(np.float32)
         self.user_info_test = self.user_info_test[:, col]
+        self.user_info_test[1:8] = self.user_info_test[1:8]/sum(self.user_info_test[1:8])
+        self.user_info_test[8:] = self.user_info_test[8:]/sum(self.user_info_test[8:])
         self.user_info_val = self.user_info_test[self.list_u]
 
 
