@@ -226,7 +226,7 @@ def create_user_info(data_dir):
         #     weekdays = np.array(weekdays)/sum(weekdays)
         #     cat = cat/sum(cat)
 
-        user_info.append([no_item] + r + hour+ weekdays + cat.tolist())
+        user_info.append([no_item] + r + weekdays + cat.tolist())
         fuser.write("%d,%s\n" % (u, ",".join([str(i) for i in user_info[-1]])))
         ftime.write("%d,%s\n" % (u, ",".join([str(i) for i in time])))
         time_info.append(time)
