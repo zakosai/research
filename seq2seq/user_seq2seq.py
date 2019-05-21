@@ -117,7 +117,7 @@ class Seq2seq(object):
     def build_model(self):
         self.X = tf.placeholder(tf.float32, [None, self.w_size, self.p_dim])
         self.X_cat = tf.placeholder(tf.float32, [None, self.cat_dim])
-        self.y = tf.placeholder(tf.float32, [None, self.n_products])
+        self.y = tf.placeholder(tf.float32, [None, self.w_size, self.n_products])
         # self.y_cat = tf.placeholder(tf.float32, [None, self.cat_dim])
 
         self.seq_len = tf.fill([tf.shape(self.X)[0]], self.w_size)
@@ -148,12 +148,13 @@ class Seq2seq(object):
         last_state = tf.concat([last_state, last_state_cat], axis=1)
 
         self.loss, self.predict = self.prediction(last_state, self.y)
-        # self.loss *=10
-        # for i in range(self.w_size-1):
-        #     x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden))
-        #     y = tf.reshape(self.X[:, i+1, -self.n_products:], (-1, self.n_products))
-        #     loss, _ = self.prediction(x, y, True)
-        #     self.loss += loss
+        self.loss *=10
+        for i in range(self.w_size-1):
+            x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden * 4))
+            x = tf.concat([x, last_state_cat], axis = 1)
+            y = tf.reshape(self.y[:, i+1, :], (-1, self.n_products))
+            loss, _ = self.prediction(x, y, reuse=True)
+            self.loss += loss
 
         # self.loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(self.y, self.predict, 100))
 
