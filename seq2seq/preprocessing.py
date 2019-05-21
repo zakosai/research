@@ -239,12 +239,13 @@ parser.add_argument('--data', type=str, default="Tool",
                     help='dataset name')
 
 if __name__ == '__main__':
-    args = parser.parse_args()
-    type = args.data
+    # args = parser.parse_args()
+    # type = args.data
+    dataset = ["CD", "Grocery", "Kitchen"]
     fsum = open("data/summary.txt", "w")
-    # for type in dataset:
+    for type in dataset:
         # dir_r = "../cf-vae/data/%s"%type
         # create_amazon(dir_r, type, fsum)
-    create_user_info("data/%s"%type)
+        create_user_info("data/%s"%type)
 
 
