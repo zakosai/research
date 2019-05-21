@@ -130,7 +130,12 @@ if args.type == "text":
     variables = load_npz(os.path.join(dir, "item.npz"))
     data = variables.toarray()
 else:
-    data = np.load(os.path.join(dir, "user_info_%s.npy"%data_type))
+    user_info = list(open(os.path.join(dir, "user_info_train.txt"))) + \
+                list(open(os.path.join(dir, "user_info_test.txt")))
+    user_info = [u.strip() for u in user_info]
+    user_info = [u.split(",") for u in user_info]
+    user_info = [u[1:] for u in user_info]
+    data = np.array(user_info).astype(np.float32)
 # data = np.delete(data, [7,8,9,10,11], axis=1)
 
 idx = np.random.rand(data.shape[0]) < 0.8
