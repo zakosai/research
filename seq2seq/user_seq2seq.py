@@ -13,7 +13,7 @@ class Seq2seq(object):
         self.w_size = 10
         self.p_dim = 100
         self.n_products = 3706
-        self.n_hidden = 128
+        self.n_hidden = 512
         self.learning_rate = 1e-4
         self.train = True
         self.cat_dim = 18
@@ -30,8 +30,7 @@ class Seq2seq(object):
             b_cell = tf.nn.rnn_cell.LSTMCell(n_hidden, state_is_tuple=True)
             b_cell = tf.contrib.rnn.DropoutWrapper(cell=b_cell, output_keep_prob=0.8)
         with tf.variable_scope("cell_op_%s"%scope):
-            outputs1, last_state = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, X, sequence_length=self.seq_len,
-                                                          dtype=tf.float32)
+            outputs1, last_state = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, X, sequence_length=self.seq_len,dtype=tf.float32)
 
         outputs = tf.concat(outputs1, 2)
 
