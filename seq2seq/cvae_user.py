@@ -35,9 +35,10 @@ class params_class:
         self.weight_decay = 2e-4
 
 class cf_vae_extend:
-    def __init__(self, num_users, num_items, num_factors, params, input_dim, encoding_dims, z_dim, decoding_dims, encoding_dims_str,
-                 decoding_dims_str, loss_type="cross_entropy", useTranse = False, eps = 1e-10, model=0, ckpt_folder='pre_model',
-                 initial=True, model_mat=None, user_dim=9975):
+    def __init__(self, num_users, num_items, num_factors, params, input_dim, encoding_dims,
+                 z_dim, decoding_dims, encoding_dims_str,decoding_dims_str,
+                 loss_type="cross_entropy", useTranse = False, eps = 1e-10, model=0,
+                 ckpt_folder='pre_model', initial=True, model_mat=None, user_dim=9975):
         self.num_users = num_users
         self.num_items = num_items
         self.num_factors = num_factors
@@ -804,13 +805,9 @@ def main():
                 for r in [0.1, 1, 10]:
                     params.lambda_r = r
                     if i > -1:
-                        model = cf_vae_extend(num_users=len(data['train_users']), num_items=len(data["train_items"]),
-                                              num_factors=num_factors,
-                                              params=params,
-                                              input_dim=dim, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200,
-                                                                                                                 400,dim],
-                                              decoding_dims_str=[200, 4526], loss_type='cross_entropy',
-                                              model = model_type, ckpt_folder=ckpt)
+                        model = cf_vae_extend(num_users=len(data['train_users']), num_items=len(data["train_items"]),num_factors=num_factors,params=params,input_dim=dim, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200, 400,dim],
+                        decoding_dims_str=[200, 4526], loss_type='cross_entropy',
+                        model = model_type, ckpt_folder=ckpt, user_dim=data['user_info'].shape[1])
                         model.fit(data["train_users"], data["train_items"], data["content"], params, data["test_users"], data['user_info'])
                         model.save_model(os.path.join(ckpt,"cf_vae_%d_%d.mat"%(model_type, i)))
                         # model.load_model("cf_vae.mat")
