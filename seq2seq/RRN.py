@@ -12,14 +12,12 @@ def main():
 
 
 class RRN:
-    def __init__(self, n_item, n_user):
+    def __init__(self):
         # params parser
         self.batch_size = 50
         self.n_step = 1
         self.lr = 0.01
         self.verbose = 10
-        self.n_item = n_item
-        self.n_user = n_user
         # Data
         dataSet = Data("ml-1m")
         self.train = dataSet.data.values
@@ -31,7 +29,6 @@ class RRN:
         self.add_loss()
         self.add_train_step()
         self.init_session()
-
 
     def add_placeholder(self):
         # user placeholder
@@ -46,14 +43,14 @@ class RRN:
     def add_embedding_layer(self):
         with tf.name_scope("userID_embedding"):
             # user id embedding
-            uid_onehot = tf.reshape(tf.one_hot(self.userID, self.n_user), shape=[-1, self.n_user])
+            uid_onehot = tf.reshape(tf.one_hot(self.userID, 6040), shape=[-1, 6040])
             # uid_onehot_rating = tf.multiply(self.rating, uid_onehot)
             uid_layer = tf.layers.dense(uid_onehot, units=128, activation=tf.nn.relu)
             self.uid_layer = tf.reshape(uid_layer, [-1, self.n_step, 128])
 
         with tf.name_scope("movie_embedding"):
             # movie id embedding
-            mid_onehot = tf.reshape(tf.one_hot(self.movieID, self.n_item), shape=[-1, self.n_item])
+            mid_onehot = tf.reshape(tf.one_hot(self.movieID, 3952), shape=[-1, 3952])
             # mid_onehot_rating = tf.multiply(self.rating, mid_onehot)
             mid_layer = tf.layers.dense(mid_onehot, units=128, activation=tf.nn.relu)
             self.mid_layer = tf.reshape(mid_layer, shape=[-1, self.n_step, 128])
@@ -146,33 +143,6 @@ class RRN:
             self.rating: np.array(ratings),
             self.dropout: dropout
         }
-
-    def createFeedDict2(self, train, test, dropout=1.):
-        userID = []
-        movieID = []
-        ratings = []
-
-        for uid, items in enumerate(train):
-            userID += [uid]*len(items)
-            movieID += items
-            ratings += [1]* len(items)
-
-        train_len = len(userID)
-
-        for uid, items in enumerate(test):
-            userID += [uid + train_len]*(len(items)-1)
-            movieID += items[:-1]
-            ratings += [1]*(len(items)-1)
-
-        return {
-            self.userID: np.array(userID),
-            self.movieID: np.array(movieID),
-            self.rating: np.array(ratings),
-            self.dropout: dropout
-
-        }
-
-
 
 
 if __name__ == '__main__':
