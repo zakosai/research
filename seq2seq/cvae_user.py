@@ -778,8 +778,9 @@ def main():
     # self.batch_size = 500
     # self.num_iter = 3000
     # self.EM_iter = 100
+    n_item = len(list(open(os.path.join(data_dir, "item_id.txt"))))
 
-    data = load_cvae_data(data_dir, 3706)
+    data = load_cvae_data(data_dir, n_item)
     np.random.seed(0)
     tf.set_random_seed(0)
 
