@@ -93,8 +93,8 @@ class cf_vae_extend:
                 # noisy_level = 1
                 # x = x + noisy_level*tf.random_normal(tf.shape(x))
                 reg_loss = 0
-                attention = dense(x, self.input_dim, scope='att_layer', activation=tf.nn.sigmoid)
-                x = multiply([x, attention], name='attention_mul')
+                # attention = dense(x, self.input_dim, scope='att_layer', activation=tf.nn.sigmoid)
+                # x = multiply([x, attention], name='attention_mul')
                 for i in range(depth_inf):
                     x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
@@ -197,8 +197,8 @@ class cf_vae_extend:
             x_u = self.x_u_
             depth_inf = len(encoding_dims)
 
-            attention = dense(x_u, self.user_dim, scope='att_layer', activation=tf.nn.sigmoid)
-            x_u = multiply([x_u, attention],name='attention_mul')
+            # attention = dense(x_u, self.user_dim, scope='att_layer', activation=tf.nn.sigmoid)
+            # x_u = multiply([x_u, attention],name='attention_mul')
             for i in range(depth_inf):
                 x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
