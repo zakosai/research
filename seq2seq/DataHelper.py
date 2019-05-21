@@ -6,7 +6,7 @@ import pandas as pd
 class Data:
     def __init__(self, name='ml-1m'):
         self.dataName = name
-        self.dataPath = "./data/" + self.dataName + "/"
+        self.dataPath = "data/" + self.dataName + "/"
         # Static Profile
         self.UserInfo = self.getUserInfo()
         self.MovieInfo = self.getMovieInfo()
