@@ -150,8 +150,10 @@ test_X = data[~idx]
 
 # model = vanilla_vae(input_dim=args.user_dim, encoding_dims=[100], z_dim=zdim, decoding_dims=[100, args.user_dim], loss='cross_entropy', ckpt_folder=ckpt)
 dim = train_X.shape[1]
-model = vanilla_vae(input_dim=dim, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200, 400, dim],
-                    loss='cross_entropy', ckpt_folder=ckpt)
+if args.type =="text":
+    model = vanilla_vae(input_dim=dim, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200, 400, dim],loss='cross_entropy', ckpt_folder=ckpt)
+else:
+    model = vanilla_vae(input_dim=dim, encoding_dims=[100], z_dim=zdim, decoding_dims=[100, dim], loss='cross_entropy', ckpt_folder=ckpt)
 # As there will be an additional layer from 100 to 50 in the encoder. in decoder, we also take this layer
                 # lr=0.01, batch_size=128, print_step=50)
 print('fitting data starts...')
