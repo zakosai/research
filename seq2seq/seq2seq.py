@@ -139,7 +139,7 @@ class Seq2seq(object):
         for i in range(self.w_size-1):
             x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden))
             y = tf.reshape(self.y[:, i+1, :], (-1, self.n_products))
-            loss, _ = self.prediction(x, y, True)
+            loss, _ = self.prediction(x, y, reuse=True)
             self.loss += loss
 
         # self.loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(self.y, self.predict, 100))
