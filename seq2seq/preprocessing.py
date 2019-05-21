@@ -7,6 +7,7 @@ import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.sparse import save_npz
 from datetime import datetime
+import argparse
 
 def parse(path):
     g = gzip.open(path, "rb")
@@ -233,12 +234,17 @@ def create_user_info(data_dir):
     fuser.close()
     ftime.close()
 
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('--data', type=str, default="Tool",
+                    help='dataset name')
+
 if __name__ == '__main__':
-    dataset = ["ml-1m"]
+    args = parser.parse_args()
+    type = args.data
     fsum = open("data/summary.txt", "w")
-    for type in dataset:
+    # for type in dataset:
         # dir_r = "../cf-vae/data/%s"%type
         # create_amazon(dir_r, type, fsum)
-        create_user_info("data/%s"%type)
+    create_user_info("data/%s"%type)
 
 
