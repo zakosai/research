@@ -37,7 +37,7 @@
 
 dataset="ml-1m Outdoor Garden Kitchen Grocery CD"
 for data in $dataset; do
-    mkdirs experiment/$data/cvae
+    mkdir experiment/$data/cvae
     python vae.py --data_dir=data/$data --ckpt_folder=experiment/$data/cvae
     python vae.py --data_dir=data/$data --ckpt_folder=experiment/$data/cvae --type=user
     python cvae_user.py --data_dir=data/$data --ckpt_folder=experiment/$data/cvae
