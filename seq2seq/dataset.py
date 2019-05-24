@@ -93,6 +93,27 @@ class Dataset(object):
             X_batch = np.concatenate((X_batch, time[idx]), axis=-1)
         return X_batch, y_batch
 
+    def create_batch_tmp(self, idx, X_iter, y_iter, time=None):
+        n_batch = len(idx)
+        cat_len = self.item_emb.shape[1] - self.n_user
+        X_batch = np.zeros((n_batch, self.w_size, cat_len))
+        y_batch = np.zeros((n_batch, self.w_size, cat_len))
+        if self.hybrid:
+            t_batch = np.zeros((n_batch, self.w_size, self.text.shape[1]))
+        for i in range(n_batch):
+            X_batch[i, :, :] = self.item_emb[X_iter[idx[i]]][:, self.n_user:]
+            for j in range(self.w_size-1):
+                y_batch[i, j, :] = self.item_emb[X_iter[idx[i], j+1]][self.n_user:]
+            y_batch[i, self.w_size-1, y_iter[idx[i]]] = 1
+            if self.hybrid:
+                t_batch[i, :, :] = self.text[X_iter[idx[i]]]
+
+        if self.hybrid:
+            return X_batch, y_batch, t_batch
+        if self.time:
+            X_batch = np.concatenate((X_batch, time[idx]), axis=-1)
+        return X_batch, y_batch
+
 
     def create_val_test(self, tmp_test, time_test):
         self.val = []
