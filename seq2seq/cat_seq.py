@@ -109,7 +109,7 @@ class Seq2seq(object):
 
     def build_model(self):
         self.X = tf.placeholder(tf.float32, [None, self.w_size, self.p_dim])
-        self.y = tf.placeholder(tf.float32, [None, self.w_size, self.n_products])
+        self.y = tf.placeholder(tf.float32, [None, self.w_size, self.p_dim])
         # self.y_cat = tf.placeholder(tf.float32, [None, self.cat_dim])
 
         self.seq_len = tf.fill([tf.shape(self.X)[0]], self.w_size)
