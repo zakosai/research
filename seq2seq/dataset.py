@@ -104,7 +104,7 @@ class Dataset(object):
             X_batch[i, :, :] = self.item_emb[X_iter[idx[i]]][:, self.n_user:]
             for j in range(self.w_size-1):
                 y_batch[i, j, :] = self.item_emb[X_iter[idx[i], j+1]][self.n_user:]
-            y_batch[i, self.w_size-1, :] = self.item_emb[y_iter[idx[i]]][:, self.n_user:]
+            y_batch[i, self.w_size-1, :] = self.item_emb[y_iter[idx[i]]][0][self.n_user:]
             if self.hybrid:
                 t_batch[i, :, :] = self.text[X_iter[idx[i]]]
 
