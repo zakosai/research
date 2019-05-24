@@ -14,7 +14,7 @@ class Seq2seq(object):
         self.w_size = 10
         self.p_dim = 100
         self.n_products = 3706
-        self.n_hidden = 64
+        self.n_hidden = 128
         self.learning_rate = 1e-3
         self.train = True
         self.cat_dim = 18
@@ -90,7 +90,7 @@ class Seq2seq(object):
 
     def prediction(self, x, y, cat=None, y_cat=None, reuse=False):
         with tf.variable_scope("last_layer", reuse=reuse):
-            out = layers.fully_connected(x, self.p_dim, tf.nn.tanh)
+            out = layers.fully_connected(x, self.cat_dim, tf.nn.tanh)
             # loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(y, out, 100))
 
             if cat !=None:
@@ -109,7 +109,7 @@ class Seq2seq(object):
 
     def build_model(self):
         self.X = tf.placeholder(tf.float32, [None, self.w_size, self.p_dim])
-        self.y = tf.placeholder(tf.float32, [None, self.w_size, self.p_dim])
+        self.y = tf.placeholder(tf.float32, [None, self.w_size, self.cat_dim])
         # self.y_cat = tf.placeholder(tf.float32, [None, self.cat_dim])
 
         self.seq_len = tf.fill([tf.shape(self.X)[0]], self.w_size)
@@ -134,7 +134,7 @@ class Seq2seq(object):
 
         # last_state = outputs
 
-        self.loss, self.predict = self.prediction(last_state, tf.reshape(self.y[:, -1, :], (-1, self.p_dim)))
+        self.loss, self.predict = self.prediction(last_state, tf.reshape(self.y[:, -1, :], (-1, self.cat_dim)))
         # self.loss *=10
         # for i in range(self.w_size-1):
         #     x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden *2**self.n_layer))
