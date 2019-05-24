@@ -90,7 +90,7 @@ class Seq2seq(object):
 
     def prediction(self, x, y, cat=None, y_cat=None, reuse=False):
         with tf.variable_scope("last_layer", reuse=reuse):
-            out = layers.fully_connected(x, self.n_products, tf.nn.tanh)
+            out = layers.fully_connected(x, self.p_dim, tf.nn.tanh)
             # loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(y, out, 100))
 
             if cat !=None:
