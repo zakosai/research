@@ -135,12 +135,12 @@ class Seq2seq(object):
         # last_state = outputs
 
         self.loss, self.predict = self.prediction(last_state, tf.reshape(self.y[:, -1, :], (-1, self.n_products)))
-        self.loss *=10
-        for i in range(self.w_size-1):
-            x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden *2**self.n_layer))
-            y = tf.reshape(self.y[:, i+1, :], (-1, self.n_products))
-            loss, _ = self.prediction(x, y, reuse=True)
-            self.loss += loss
+        # self.loss *=10
+        # for i in range(self.w_size-1):
+        #     x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden *2**self.n_layer))
+        #     y = tf.reshape(self.y[:, i+1, :], (-1, self.n_products))
+        #     loss, _ = self.prediction(x, y, reuse=True)
+        #     self.loss += loss
 
         # self.loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(self.y, self.predict, 100))
 
@@ -249,7 +249,7 @@ def main():
                     else:
                         y = np.concatenate((y, y_b_val), axis=0)
                 recall, hit, ndcg = calc_recall(y, data.test, data.infer2)
-                np.savez(os.path.join(checkpoint_dir, "pred"), p_val=y_val, p_test=y)
+                np.savez(os.path.join(checkpoint_dir, "pred_seq2seq_cattime"), p_val=y_val, p_test=y)
                 print("recall: %f, hit: %f, ndcg: %f" % (recall, hit, ndcg))
                 if recall > result[1]:
                     result = [i, recall, hit, ndcg]
