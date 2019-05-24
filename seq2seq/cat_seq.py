@@ -14,7 +14,7 @@ class Seq2seq(object):
         self.w_size = 10
         self.p_dim = 100
         self.n_products = 3706
-        self.n_hidden = 256
+        self.n_hidden = 64
         self.learning_rate = 1e-3
         self.train = True
         self.cat_dim = 18
@@ -167,7 +167,7 @@ def main():
     # model.p_dim = data.n_user
     model.n_products = data.n_item
     model.w_size = args.w_size
-    model.p_dim = data.n_user
+    model.p_dim = 0
     if args.cat:
         print(data.item_cat.shape[1])
         model.p_dim += data.item_cat.shape[1]
