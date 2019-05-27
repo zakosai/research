@@ -9,7 +9,7 @@ from scipy.sparse import load_npz
 
 
 class Seq2seq(object):
-    def __init__(self):
+    def __init__(self, n_layers=2):
         self.w_size = 10
         self.p_dim = 100
         self.n_products = 3706
@@ -21,6 +21,7 @@ class Seq2seq(object):
         # self.item_cat = item_cat.astype(np.float32)
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.active_function = tf.nn.tanh
+        self.n_layers = n_layers
 
 
     def encoder_BiLSTM(self, X, scope, n_hidden):
@@ -137,8 +138,8 @@ class Seq2seq(object):
 
         # assert tf.shape(self.X)[0] == tf.shape(self.X_cat)[0]
 
-
-        outputs, _ = self.encoder_biGRU(self.X, "1", self.n_hidden)
+        for i in range(self.n_layers):
+            outputs, _ = self.encoder_LSTM(self.X, "%d"(i+1), self.n_hidden*2**i)
 
         # outputs, _ = self.encoder_biGRU(outputs, "2", self.n_hidden*2)
         # with tf.variable_scope('attention'):
@@ -148,7 +149,8 @@ class Seq2seq(object):
         # with tf.variable_scope('dropout'):
         #     outputs = tf.nn.dropout(outputs, 0.8)
 
-        last_state = tf.reshape(outputs[:, -1, :], (tf.shape(self.X)[0], self.n_hidden*2))
+        last_state = tf.reshape(outputs[:, -1, :],
+                                (tf.shape(self.X)[0], self.n_hidden*2**self.n_layers))
         # last_state = outputs
 
         # Categories
@@ -163,7 +165,7 @@ class Seq2seq(object):
         self.loss, self.predict = self.prediction(last_state, tf.reshape(self.y[:, -1, :], (-1, self.n_products)))
         self.loss *=10
         for i in range(self.w_size-1):
-            x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden * 2))
+            x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden * 2**self.n_layers))
             x = tf.concat([x, last_state_cat], axis = 1)
             y = tf.reshape(self.y[:, i+1, :], (-1, self.n_products))
             loss, _ = self.prediction(x, y, reuse=True)
@@ -207,7 +209,7 @@ def main():
     saver = tf.train.Saver(max_to_keep=5)
     max_recall = 0
 
-    f = open("experiment/result.txt", "a")
+    f = open("experiment/%s/result.txt"%dataset, "a")
     f.write("-------------------------\n")
     f.write("Data: %s - num_p: %d - user info\nbilstm: True - n_layers: 2 - w_size:%d\n"
             %(dataset, data.n_item, data.w_size))
@@ -308,6 +310,7 @@ parser.add_argument('--w_size', type=int, default=10, help='window size')
 parser.add_argument('--batch_size', type=int, default=1000)
 parser.add_argument('--cat', type=bool, default=False)
 parser.add_argument('--time', type=bool, default=False)
+parser.add_argument('--n_layers', type=int, default=2)
 
 
 if __name__ == '__main__':
