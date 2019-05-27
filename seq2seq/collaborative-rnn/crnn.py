@@ -170,10 +170,12 @@ def run_epoch(session, train_model, valid_model, train_iter, valid_iter,
 def main(args):
     # Read (and optionally, truncate) the training and validation data.
     train_data = Dataset.from_path2(args.path, "train.txt")
+    print(train_data.num_users, train_data.num_items)
     if args.max_train_chunks is not None:
         size = args.max_train_chunks * args.chunk_size
         train_data.truncate_seqs(size)
     valid_data = Dataset.from_path2(args.path, "test.txt")
+    print(valid_data.num_users, valid_data.num_items)
     if args.max_valid_chunks is not None:
         size = args.max_valid_chunks * args.chunk_size
         valid_data.truncate_seqs(size, keep_first=True)
