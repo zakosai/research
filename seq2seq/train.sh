@@ -35,7 +35,7 @@
 #done
 
 
-dataset="ml-1m Outdoor Garden Kitchen Grocery CD"
+dataset="Grocery CD"
 for data in $dataset; do
     mkdir experiment/$data/cvae
     python vae.py --data_dir=data/$data --ckpt_folder=experiment/$data/cvae
