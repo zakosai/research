@@ -679,8 +679,10 @@ def load_cvae_data(data_dir, item_no):
   variables = load_npz(os.path.join(data_dir,"item.npz"))
   dataset = {}
   dataset["content"] = variables.toarray()
+  print(dataset["content"].shape)
   col = [0] + list(range(6, dataset["content"].shape[1]-1))
   dataset["content"] = dataset["content"][:, col]
+  print(dataset["content"].shape)
 
 
   dataset["train_users"], dataset["train_items"], dataset["test_users"], dataset["train_no"] = read_file(data_dir, item_no)
