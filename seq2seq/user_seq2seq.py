@@ -140,7 +140,7 @@ class Seq2seq(object):
 
         outputs, _ = self.encoder_biGRU(self.X, "1", self.n_hidden)
 
-        outputs, _ = self.encoder_biGRU(outputs, "2", self.n_hidden*2)
+        # outputs, _ = self.encoder_biGRU(outputs, "2", self.n_hidden*2)
         # with tf.variable_scope('attention'):
         #     outputs, self.alphas = self.attention(outputs)
         #
@@ -148,7 +148,7 @@ class Seq2seq(object):
         # with tf.variable_scope('dropout'):
         #     outputs = tf.nn.dropout(outputs, 0.8)
 
-        last_state = tf.reshape(outputs[:, -1, :], (tf.shape(self.X)[0], self.n_hidden*4))
+        last_state = tf.reshape(outputs[:, -1, :], (tf.shape(self.X)[0], self.n_hidden*2))
         # last_state = outputs
 
         # Categories
