@@ -678,11 +678,8 @@ class cf_vae_extend:
 def load_cvae_data(data_dir, item_no):
   variables = load_npz(os.path.join(data_dir,"item.npz"))
   dataset = {}
-  dataset["content"] = variables.toarray()
   print(dataset["content"].shape)
-  col = [0] + list(range(6, dataset["content"].shape[1]-1))
-  dataset["content"] = dataset["content"][:, col]
-  print(dataset["content"].shape)
+
 
 
   dataset["train_users"], dataset["train_items"], dataset["test_users"], dataset["train_no"] = read_file(data_dir, item_no)
@@ -692,6 +689,8 @@ def load_cvae_data(data_dir, item_no):
   user_info = [u.split(",") for u in user_info]
   user_info = [u[1:] for u in user_info]
   dataset['user_info'] = np.array(user_info).astype(np.float32)
+  col = [0] + list(range(6, dataset["user_info"].shape[1] - 1))
+  dataset["user_info"] = dataset["user_info"][:, col]
 
   return dataset
 
