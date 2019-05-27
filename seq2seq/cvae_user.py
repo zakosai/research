@@ -851,7 +851,7 @@ def main():
         model.save_model(os.path.join(ckpt, "cf_vae_%d.mat" % (model_type)))
         # model.load_model("cf_vae.mat")
         f = open(os.path.join(ckpt, "result_cvae_%d.txt" % model_type), 'a')
-        f.write("%d-----------%f----------%f----------%f\n" % (args.mat_file, u, v, r))
+        f.write("%d-----------%f----------%f----------%f\n" % (3, u, v, r))
         pred_all = model.predict_all()
         f.write("val: ")
         recall = model.predict_val(pred_all[:data['train_no']], data["train_users"][:data['train_no']],
