@@ -835,9 +835,12 @@ def main():
                                                                                        best_hyper[2]))
         f.close()
     else:
-        params.lambda_u = 0.1
-        params.lambda_v = 10
-        params.lambda_r = 0.1
+        u = [0.1, 1, 10]
+        v = [1,10, 100]
+        r = [0.1, 1, 10]
+        params.lambda_u = u[int(args.mat_file/9)]
+        params.lambda_v = v[int((args.mat_file%9)/3)]
+        params.lambda_r = r[int(args.mat_file%3)]
 
         model = cf_vae_extend(num_users=len(data['train_users']), num_items=len(data["train_items"]),
                               num_factors=num_factors, params=params, input_dim=dim, encoding_dims=[400, 200],
@@ -848,7 +851,7 @@ def main():
         model.save_model(os.path.join(ckpt, "cf_vae_%d.mat" % (model_type)))
         # model.load_model("cf_vae.mat")
         f = open(os.path.join(ckpt, "result_cvae_%d.txt" % model_type), 'a')
-        f.write("%d-----------%f----------%f----------%f\n" % (3, u, v, r))
+        f.write("%d-----------%f----------%f----------%f\n" % (args.mat_file, u, v, r))
         pred_all = model.predict_all()
         f.write("val: ")
         recall = model.predict_val(pred_all[:data['train_no']], data["train_users"][:data['train_no']],
