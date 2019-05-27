@@ -152,6 +152,7 @@ test_X = data[~idx]
 
 # model = vanilla_vae(input_dim=args.user_dim, encoding_dims=[100], z_dim=zdim, decoding_dims=[100, args.user_dim], loss='cross_entropy', ckpt_folder=ckpt)
 dim = train_X.shape[1]
+print(dim)
 if args.type =="text":
     model = vanilla_vae(input_dim=dim, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200, 400, dim],loss='cross_entropy', ckpt_folder=ckpt)
 else:
