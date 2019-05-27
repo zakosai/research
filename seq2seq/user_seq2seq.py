@@ -36,6 +36,19 @@ class Seq2seq(object):
 
         return outputs, last_state
 
+    def encoder_biGRU(self, X, scope, n_hidden):
+        with tf.variable_scope("cell_def_%s" % scope):
+            f_cell = tf.nn.rnn_cell.GRUCell(n_hidden)
+            f_cell = tf.contrib.rnn.DropoutWrapper(cell=f_cell, output_keep_prob=0.8)
+            b_cell = tf.nn.rnn_cell.GRUCell(n_hidden)
+            b_cell = tf.contrib.rnn.DropoutWrapper(cell=b_cell, output_keep_prob=0.8)
+        with tf.variable_scope("cell_op_%s" % scope):
+            outputs1, last_state = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, X, sequence_length=self.seq_len,dtype=tf.float32)
+
+        outputs = tf.concat(outputs1, 2)
+
+        return outputs, last_state
+
 
     def encoder_LSTM(self, X, n_layers):
         stack_cell = []
@@ -125,9 +138,9 @@ class Seq2seq(object):
         # assert tf.shape(self.X)[0] == tf.shape(self.X_cat)[0]
 
 
-        outputs, _ = self.encoder_BiLSTM(self.X, "1", self.n_hidden)
+        outputs, _ = self.encoder_biGRU(self.X, "1", self.n_hidden)
 
-        outputs, _ = self.encoder_BiLSTM(outputs, "2", self.n_hidden*2)
+        outputs, _ = self.encoder_biGRU(outputs, "2", self.n_hidden*2)
         # with tf.variable_scope('attention'):
         #     outputs, self.alphas = self.attention(outputs)
         #
