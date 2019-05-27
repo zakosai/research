@@ -678,8 +678,7 @@ class cf_vae_extend:
 def load_cvae_data(data_dir, item_no):
   variables = load_npz(os.path.join(data_dir,"item.npz"))
   dataset = {}
-  print(dataset["content"].shape)
-
+  dataset["content"] = variables.toarray()
 
 
   dataset["train_users"], dataset["train_items"], dataset["test_users"], dataset["train_no"] = read_file(data_dir, item_no)
