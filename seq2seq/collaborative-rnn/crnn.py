@@ -185,8 +185,7 @@ def main(args):
     tot_size = train_data.num_triplets + valid_data.num_triplets
 
     train_data.prepare_batches(args.chunk_size, args.batch_size)
-    valid_data.prepare_batches(args.chunk_size, args.batch_size,
-            batches_like=train_data)
+    valid_data.prepare_batches(args.chunk_size, args.batch_size)
 
     settings = {
         "chunk_size": args.chunk_size,
