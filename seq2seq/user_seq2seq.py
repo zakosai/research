@@ -139,7 +139,7 @@ class Seq2seq(object):
         # assert tf.shape(self.X)[0] == tf.shape(self.X_cat)[0]
 
         for i in range(self.n_layers):
-            outputs, _ = self.encoder_LSTM(self.X, "%d"(i+1), self.n_hidden*2**i)
+            outputs, _ = self.encoder_LSTM(self.X, "%d"%(i+1), self.n_hidden*2**i)
 
         # outputs, _ = self.encoder_biGRU(outputs, "2", self.n_hidden*2)
         # with tf.variable_scope('attention'):
