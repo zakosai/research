@@ -2,7 +2,7 @@ import numpy as np
 from datetime import datetime
 
 class Dataset(object):
-    def __init__(self, n_item, folder, w_size=10, time=False, cat=False, text=None):
+    def __init__(self, n_item, folder, w_size=10, time=False, cat=False, text=None, hybrid=False):
         self.w_size = w_size
 
         train_file = "%s/train.txt"%folder
@@ -13,7 +13,7 @@ class Dataset(object):
         self.n_user = len(self.train)
         self.n_item = n_item
         self.cat_dim = 18
-        self.hybrid = False
+        self.hybrid = hybrid
         self.time_dim = 23
         self.time = time
         time_test = None
@@ -71,10 +71,9 @@ class Dataset(object):
         if self.cat:
             self.item_emb = np.concatenate((self.item_emb, self.item_cat), axis=1)
         if self.hybrid:
-            self.text = text
-
-        if self.text !=None:
             self.item_emb = np.concatenate((self.item_emb, self.text), axis=1)
+
+
 
 
     def create_batch(self, idx, X_iter, y_iter, time=None):
