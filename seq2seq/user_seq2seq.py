@@ -17,7 +17,7 @@ class Seq2seq(object):
         self.learning_rate = 1e-4
         self.train = True
         self.cat_dim = 18
-        self.layers = [100, 20]
+        self.layers = [100, 50]
         # self.item_cat = item_cat.astype(np.float32)
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.active_function = tf.nn.tanh
@@ -164,13 +164,13 @@ class Seq2seq(object):
         last_state = tf.concat([last_state, last_state_cat], axis=1)
 
         self.loss, self.predict = self.prediction(last_state, tf.reshape(self.y[:, -1, :], (-1, self.n_products)))
-        self.loss *=10
-        for i in range(self.w_size-1):
-            x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden * 2**self.n_layers))
-            x = tf.concat([x, last_state_cat], axis = 1)
-            y = tf.reshape(self.y[:, i+1, :], (-1, self.n_products))
-            loss, _ = self.prediction(x, y, reuse=True)
-            self.loss += loss
+        # self.loss *=10
+        # for i in range(self.w_size-1):
+        #     x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden * 2**self.n_layers))
+        #     x = tf.concat([x, last_state_cat], axis = 1)
+        #     y = tf.reshape(self.y[:, i+1, :], (-1, self.n_products))
+        #     loss, _ = self.prediction(x, y, reuse=True)
+        #     self.loss += loss
 
         # self.loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(self.y, self.predict, 100))
 
