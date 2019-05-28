@@ -189,7 +189,7 @@ def main():
 
     num_p = len(list(open("data/%s/item_id.txt"%dataset)))
     checkpoint_dir = "experiment/%s/" % (dataset)
-    data = Dataset(num_p, "data/%s"%(dataset), args.w_size, cat=args.cat, time=args.time, text=text, hybrid=True)
+    data = Dataset(num_p, "data/%s"%(dataset), args.w_size, cat=args.cat, time=args.time, text=text, des=True)
     data.create_user_info("data/%s"%dataset)
 
 

@@ -2,7 +2,7 @@ import numpy as np
 from datetime import datetime
 
 class Dataset(object):
-    def __init__(self, n_item, folder, w_size=10, time=False, cat=False, text=None, hybrid=False):
+    def __init__(self, n_item, folder, w_size=10, time=False, cat=False, text=None, hybrid=False, des=False):
         self.w_size = w_size
 
         train_file = "%s/train.txt"%folder
@@ -24,6 +24,7 @@ class Dataset(object):
             self.create_item_cat(folder)
         self.create_val_test(tmp_test, time_test)
         self.text = text
+        self.des = des
 
 
 
@@ -70,7 +71,7 @@ class Dataset(object):
         self.val2 = np.array(self.val2)
         if self.cat:
             self.item_emb = np.concatenate((self.item_emb, self.item_cat), axis=1)
-        if self.hybrid:
+        if self.des:
             self.item_emb = np.concatenate((self.item_emb, self.text), axis=1)
 
 
