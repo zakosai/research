@@ -17,19 +17,19 @@ class Seq2seq(object):
         self.learning_rate = 1e-4
         self.train = True
         self.cat_dim = 18
-        self.layers = [100, 50, 20]
+        self.layers = [100, 20]
         # self.item_cat = item_cat.astype(np.float32)
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
-        self.active_function = tf.nn.relu
+        self.active_function = tf.nn.tanh
         self.n_layers = n_layers
 
 
     def encoder_BiLSTM(self, X, scope, n_hidden):
         with tf.variable_scope("cell_def_%s"%scope):
             f_cell = tf.nn.rnn_cell.LSTMCell(n_hidden, state_is_tuple=True)
-            f_cell = tf.contrib.rnn.DropoutWrapper(cell=f_cell, output_keep_prob=0.8)
+            f_cell = tf.contrib.rnn.DropoutWrapper(cell=f_cell, output_keep_prob=0.7)
             b_cell = tf.nn.rnn_cell.LSTMCell(n_hidden, state_is_tuple=True)
-            b_cell = tf.contrib.rnn.DropoutWrapper(cell=b_cell, output_keep_prob=0.8)
+            b_cell = tf.contrib.rnn.DropoutWrapper(cell=b_cell, output_keep_prob=0.7)
         with tf.variable_scope("cell_op_%s"%scope):
             outputs1, last_state = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, X, sequence_length=self.seq_len,dtype=tf.float32)
 
@@ -124,7 +124,7 @@ class Seq2seq(object):
 
                 loss = 10*self.loss_reconstruct(y, pred) + self.loss_reconstruct(y_cat, out_cat)
             else:
-                loss = self.loss_reconstruct(y, out)
+                loss = self.loss_reconstruct(y, out) +0.1 * tf.losses.get_regularization_loss()
 
         return loss, out
 
@@ -164,7 +164,7 @@ class Seq2seq(object):
         last_state = tf.concat([last_state, last_state_cat], axis=1)
 
         self.loss, self.predict = self.prediction(last_state, tf.reshape(self.y[:, -1, :], (-1, self.n_products)))
-        self.loss *=10
+        # self.loss *=10
         for i in range(self.w_size-1):
             x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden * 2**self.n_layers))
             x = tf.concat([x, last_state_cat], axis = 1)
