@@ -14,7 +14,7 @@ class Seq2seq(object):
         self.p_dim = 100
         self.n_products = 3706
         self.n_hidden = 512
-        self.learning_rate = 1e-3
+        self.learning_rate = 1e-4
         self.train = True
         self.cat_dim = 18
         self.layers = [100]
