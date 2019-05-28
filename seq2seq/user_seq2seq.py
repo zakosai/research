@@ -20,7 +20,7 @@ class Seq2seq(object):
         self.layers = [100, 50, 20]
         # self.item_cat = item_cat.astype(np.float32)
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
-        self.active_function = tf.nn.tanh
+        self.active_function = tf.nn.sigmoid
         self.n_layers = n_layers
 
 
@@ -113,7 +113,7 @@ class Seq2seq(object):
     def prediction(self, x, y, cat=None, y_cat=None, reuse=False):
         with tf.variable_scope("last_layer", reuse=reuse):
             out = layers.fully_connected(x, self.n_products)
-            out = tf.nn.leaky_relu(out, alpha=0.2)
+            # out = tf.nn.leaky_relu(out, alpha=0.2)
             # loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(y, out, 100))
 
             if cat !=None:
