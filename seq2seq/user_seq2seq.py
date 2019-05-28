@@ -164,7 +164,7 @@ class Seq2seq(object):
         last_state = tf.concat([last_state, last_state_cat], axis=1)
 
         self.loss, self.predict = self.prediction(last_state, tf.reshape(self.y[:, -1, :], (-1, self.n_products)))
-        # self.loss *=10
+        self.loss *=10
         for i in range(self.w_size-1):
             x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden * 2**self.n_layers))
             x = tf.concat([x, last_state_cat], axis = 1)
