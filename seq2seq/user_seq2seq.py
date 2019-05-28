@@ -20,7 +20,7 @@ class Seq2seq(object):
         self.layers = [100, 50, 20]
         # self.item_cat = item_cat.astype(np.float32)
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
-        self.active_function = tf.nn.sigmoid
+        self.active_function = tf.nn.relu
         self.n_layers = n_layers
 
 
