@@ -17,7 +17,7 @@ class Seq2seq(object):
         self.learning_rate = 1e-3
         self.train = True
         self.cat_dim = 18
-        self.layers = [100, 50]
+        self.layers = [100]
         # self.item_cat = item_cat.astype(np.float32)
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.active_function = tf.nn.tanh
