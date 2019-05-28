@@ -164,13 +164,13 @@ class Seq2seq(object):
         last_state = tf.concat([last_state, last_state_cat], axis=1)
 
         self.loss, self.predict = self.prediction(last_state, tf.reshape(self.y[:, -1, :], (-1, self.n_products)))
-        # self.loss *=10
-        # for i in range(self.w_size-1):
-        #     x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden * 2**self.n_layers))
-        #     x = tf.concat([x, last_state_cat], axis = 1)
-        #     y = tf.reshape(self.y[:, i+1, :], (-1, self.n_products))
-        #     loss, _ = self.prediction(x, y, reuse=True)
-        #     self.loss += loss
+        self.loss *=10
+        for i in range(self.w_size-1):
+            x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden * 2**self.n_layers))
+            x = tf.concat([x, last_state_cat], axis = 1)
+            y = tf.reshape(self.y[:, i+1, :], (-1, self.n_products))
+            loss, _ = self.prediction(x, y, reuse=True)
+            self.loss += loss
 
         # self.loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(self.y, self.predict, 100))
 
@@ -185,16 +185,18 @@ def main():
     batch_size = args.batch_size
     dataset = args.data
     type = args.type
+    text = load_npz("data/%s/item.npz" % dataset).toarray()
+
     num_p = len(list(open("data/%s/item_id.txt"%dataset)))
     checkpoint_dir = "experiment/%s/" % (dataset)
-    data = Dataset(num_p, "data/%s"%(dataset), args.w_size, cat=args.cat, time=args.time)
+    data = Dataset(num_p, "data/%s"%(dataset), args.w_size, cat=args.cat, time=args.time, text=text)
     data.create_user_info("data/%s"%dataset)
 
 
     model = Seq2seq()
     # model.p_dim = data.n_user
     model.w_size = args.w_size
-    model.p_dim = data.n_user
+    model.p_dim = data.n_user + dataset.text.shape[1]
     if args.cat:
         model.p_dim += data.item_cat.shape[1]
     if args.time:
