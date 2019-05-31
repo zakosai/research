@@ -34,6 +34,7 @@
 #    python hybrid_seq2seq.py --data=$t --w_size=4 --cat=True --time=True
 #done
 
+python preprocessing.py
 
 dataset="Grocery CD Office Kitchen Garden"
 for data in $dataset; do
