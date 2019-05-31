@@ -39,9 +39,9 @@ class Seq2seq(object):
 
     def encoder_biGRU(self, X, scope, n_hidden):
         with tf.variable_scope("cell_def_%s" % scope):
-            f_cell = tf.nn.rnn_cell.GRUCell(n_hidden, activation=tf.nn.relu)
+            f_cell = tf.nn.rnn_cell.GRUCell(n_hidden, activation=tf.nn.tanh)
             # f_cell = tf.contrib.rnn.DropoutWrapper(cell=f_cell, output_keep_prob=0.8)
-            b_cell = tf.nn.rnn_cell.GRUCell(n_hidden, activation=tf.nn.relu)
+            b_cell = tf.nn.rnn_cell.GRUCell(n_hidden, activation=tf.nn.tanh)
             # b_cell = tf.contrib.rnn.DropoutWrapper(cell=b_cell, output_keep_prob=0.8)
         with tf.variable_scope("cell_op_%s" % scope):
             outputs1, last_state = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, X, sequence_length=self.seq_len,dtype=tf.float32)
@@ -185,18 +185,18 @@ def main():
     batch_size = args.batch_size
     dataset = args.data
     type = args.type
-    text = load_npz("data/%s/item.npz" % dataset).toarray()
+    # text = load_npz("data/%s/item.npz" % dataset).toarray()
 
     num_p = len(list(open("data/%s/item_id.txt"%dataset)))
     checkpoint_dir = "experiment/%s/" % (dataset)
-    data = Dataset(num_p, "data/%s"%(dataset), args.w_size, cat=args.cat, time=args.time, text=text, des=True)
+    data = Dataset(num_p, "data/%s"%(dataset), args.w_size, cat=args.cat, time=args.time)
     data.create_user_info("data/%s"%dataset)
 
 
     model = Seq2seq()
     # model.p_dim = data.n_user
     model.w_size = args.w_size
-    model.p_dim = data.n_user + data.text.shape[1]
+    model.p_dim = data.n_user
     if args.cat:
         model.p_dim += data.item_cat.shape[1]
     if args.time:
