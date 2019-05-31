@@ -688,8 +688,8 @@ def load_cvae_data(data_dir, item_no):
   user_info = [u.split(",") for u in user_info]
   user_info = [u[1:] for u in user_info]
   dataset['user_info'] = np.array(user_info).astype(np.float32)
-  col = [0] + list(range(6, dataset["user_info"].shape[1] - 1))
-  dataset["user_info"] = dataset["user_info"][:, col]
+  # col = [0] + list(range(6, dataset["user_info"].shape[1] - 1))
+  # dataset["user_info"] = dataset["user_info"][:, col]
 
   return dataset
 
