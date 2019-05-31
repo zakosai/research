@@ -181,7 +181,7 @@ def main():
     saver = tf.train.Saver(max_to_keep=5)
     max_recall = 0
 
-    f = open("experiment/result.txt", "a")
+    f = open("experiment/%s/result.txt"%dataset, "a")
     f.write("-------------------------\n")
     f.write("Data: %s - num_p: %d - seq2seq\nbilstm: %s - n_layers: %d - w_size:%d\n"
             %(dataset, data.n_item, model.bilstm, model.n_layer, model.w_size))

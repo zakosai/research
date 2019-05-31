@@ -372,7 +372,7 @@ parser.add_argument('--data', type=str, default="Tool",
 if __name__ == '__main__':
     # args = parser.parse_args()
     # type = args.data
-    dataset = ["Garden", "Office"]
+    dataset = ["Garden", "Office", "Grocery", "CD", "Kitchen"]
     fsum = open("data/summary.txt", "w")
     for type in dataset:
         dir_r = "../cf-vae/data/%s"%type
