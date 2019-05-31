@@ -13,8 +13,8 @@ class Seq2seq(object):
         self.w_size = 10
         self.p_dim = 100
         self.n_products = 3706
-        self.n_hidden = 512
-        self.learning_rate = 1e-4
+        self.n_hidden = 256
+        self.learning_rate = 1e-3
         self.train = True
         self.cat_dim = 18
         self.layers = [100, 50]
@@ -295,7 +295,7 @@ def main():
                     result = [i, recall, hit, ndcg]
             model.train = True
         if i % 100 == 0 and model.learning_rate > 1e-6:
-            model.learning_rate /= 10
+            model.learning_rate /= 2
             print("decrease lr to %f" % model.learning_rate)
     f.write("iter: %d - recall: %f - hit: %f - ndcg: %f\n"
             % (result[0], result[1], result[2], result[3]))
