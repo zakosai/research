@@ -176,6 +176,7 @@ def create_amazon_based_on_ratings(dir_r, type, fsum):
         f.write("%d::%i::%d::%s\n" % (uid, iid, int(ratings.rating[i]), ratings.timestamp[i]))
     f.close()
 
+    ratings = rat
     print("Max item user rated: %d" % max([len(i) for i in ratings]))
     print("Min item user rated: %d" % min([len(i) for i in ratings]))
     print("Mean item user rated: %d" % np.mean([len(i) for i in ratings]))
@@ -199,7 +200,7 @@ def create_amazon_based_on_ratings(dir_r, type, fsum):
 
 
     # Divide train, test
-    ratings = rat
+
     shuffle_id = np.random.permutation(n_user)
     train_len = int(0.7 * n_user)
     train_id = shuffle_id[:train_len]
