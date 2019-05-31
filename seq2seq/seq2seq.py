@@ -156,7 +156,7 @@ def main():
     dataset = args.data
     type = args.type
     num_p = len(list(open("data/%s/item_id.txt"%(dataset))))
-    checkpoint_dir = "experiment/%s/%s/" % (dataset, type)
+    checkpoint_dir = "experiment/%s" % (dataset)
 
     data = Dataset(num_p, "data/%s"%(dataset), args.w_size, cat=args.cat, time=args.time)
     # data.create_item_cat("data/%s/%s"%(dataset, type))
