@@ -209,8 +209,8 @@ def create_amazon_based_on_ratings(dir_r, type, fsum):
     ftrain = open("%s/train.txt" % dir_w, "w")
     for idx in train_id:
         user = np.array(ratings[idx]).reshape((len(ratings[idx]), 3))
-        user = user[np.argsort(user[:, 2])]
-        item = list(user[:, 0])
+        # user = user[np.argsort(user[:, 2])]
+        item = [int(i) for i in list(user[:, 0])]
         item = [str(i) for i in item]
         ftrain.write("%d %s\n" % (idx, " ".join(item)))
     ftrain.close()
@@ -218,8 +218,8 @@ def create_amazon_based_on_ratings(dir_r, type, fsum):
     ftest = open("%s/test.txt" % dir_w, "w")
     for idx in test_id:
         user = np.array(ratings[idx]).reshape((len(ratings[idx]), 3))
-        user = user[np.argsort(user[:, 2])]
-        item = list(user[:, 0])
+        # user = user[np.argsort(user[:, 2])]
+        item = [int(i) for i in list(user[:, 0])]
         item = [str(i) for i in item]
         ftest.write("%d %s\n" % (idx, " ".join(item)))
     ftest.close()
