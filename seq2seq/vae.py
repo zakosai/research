@@ -136,8 +136,8 @@ else:
     user_info = [u.split(",") for u in user_info]
     user_info = [u[1:] for u in user_info]
     data = np.array(user_info).astype(np.float32)
-    col = [0] + list(range(6, data.shape[1] - 1))
-    data = data[:, col]
+    # col = [0] + list(range(6, data.shape[1] - 1))
+    # data = data[:, col]
 # data = np.delete(data, [7,8,9,10,11], axis=1)
 
 idx = np.random.rand(data.shape[0]) < 0.8
