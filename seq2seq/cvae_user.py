@@ -493,7 +493,7 @@ class cf_vae_extend:
                 idx = list(range(i*self.params.batch_size,len(u_data)))
             else:
                 idx = list(range((i*self.params.batch_size), (i+1)*self.params.batch_size))
-            exp_z_u = self.sess.run(self.z_u_mu, feed_dict={self.x_: u_data[idx]})
+            exp_z_u = self.sess.run(self.z_u_mu, feed_dict={self.x_u_: u_data[idx]})
             if i == 0:
                 self.exp_z_u = exp_z_u
             else:
