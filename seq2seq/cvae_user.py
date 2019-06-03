@@ -462,7 +462,16 @@ class cf_vae_extend:
 
     def get_exp_hidden(self, x_data, im_data, str_data, u_data):
         if self.model != 6:
-            self.exp_z = self.sess.run(self.z_mu, feed_dict={self.x_: x_data})
+            for i in range(int(len(x_data)/self.params.batch_size)+1):
+                if ((i+1)*self.params.batch_size) > len(x_data):
+                    idx = [(i*self.params.batch_size):len(x_data)]
+                else:
+                    idx = [(i*self.params.batch_size): (i+1)*self.params.batch_size]
+                exp_z = self.sess.run(self.z_mu, feed_dict={self.x_: x_data[idx]})
+                if i == 0:
+                    self.exp_z = exp_z
+                else:
+                    self.exp_z = np.concatenate((self.exp_z, exp_z))
         else:
             self.exp_z = 0
         if self.model == 1 or self.model == 2 or self.model == 6:
@@ -479,7 +488,18 @@ class cf_vae_extend:
         else:
             self.exp_z_s = 0
 
-        self.exp_z_u = self.sess.run(self.z_u_mu, feed_dict={self.x_u_:u_data})
+        for i in range(int(len(u_data)/self.params.batch_size)+1):
+            if ((i+1)*self.params.batch_size) > len(u_data):
+                idx = [(i*self.params.batch_size):len(u_data)]
+            else:
+                idx = [(i*self.params.batch_size): (i+1)*self.params.batch_size]
+            exp_z_u = self.sess.run(self.z_u_mu, feed_dict={self.x_: u_data[idx]})
+            if i == 0:
+                self.exp_z_u = exp_z_u
+            else:
+                self.exp_z_u = np.concatenate((self.exp_z_u, exp_z_u))
+
+        # self.exp_z_u = self.sess.run(self.z_u_mu, feed_dict={self.x_u_:u_data})
         return self.exp_z, self.exp_z_im, self.exp_z_s, self.exp_z_u
 
     def fit(self, users, items, x_data, params, test_users, u_data, im_data=None, str_data=None):
