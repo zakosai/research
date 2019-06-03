@@ -464,9 +464,9 @@ class cf_vae_extend:
         if self.model != 6:
             for i in range(int(len(x_data)/self.params.batch_size)+1):
                 if ((i+1)*self.params.batch_size) > len(x_data):
-                    idx = list(range(i*self.params.batch_size),len(x_data))
+                    idx = list(range(i*self.params.batch_size,len(x_data)))
                 else:
-                    idx = list(range((i*self.params.batch_size), (i+1)*self.params.batch_size))
+                    idx = list(range(i*self.params.batch_size, (i+1)*self.params.batch_size))
                 exp_z = self.sess.run(self.z_mu, feed_dict={self.x_: x_data[idx]})
                 if i == 0:
                     self.exp_z = exp_z
@@ -490,7 +490,7 @@ class cf_vae_extend:
 
         for i in range(int(len(u_data)/self.params.batch_size)+1):
             if ((i+1)*self.params.batch_size) > len(u_data):
-                idx = list(range((i*self.params.batch_size),len(u_data)))
+                idx = list(range(i*self.params.batch_size,len(u_data)))
             else:
                 idx = list(range((i*self.params.batch_size), (i+1)*self.params.batch_size))
             exp_z_u = self.sess.run(self.z_u_mu, feed_dict={self.x_: u_data[idx]})
