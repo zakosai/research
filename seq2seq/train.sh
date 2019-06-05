@@ -36,15 +36,15 @@
 
 python preprocessing.py
 
-dataset="Grocery CD Office Kitchen Garden"
+dataset="Garden Office Kitchen CD"
 for data in $dataset; do
     mkdir experiment/$data/ratings
-    python vae.py --data_dir=data/$data --ckpt_folder=experiment/$data/ratings
-    python vae.py --data_dir=data/$data --ckpt_folder=experiment/$data/ratings --type=user
-    python cvae_user.py --data_dir=data/$data --ckpt_folder=experiment/$data/cvae
-    python seq2seq.py --data=$data/ratings --bilstm=False --n_layers=1
-    python seq2seq.py --data=$data/ratings --cat=True --time=True
-    python user_seq2seq.py --data=$data/ratings --cat=True --time=True
+    python vae.py --data_dir=data/$data/ratings --ckpt_folder=experiment/$data/ratings
+    python vae.py --data_dir=data/$data/ratings --ckpt_folder=experiment/$data/ratings --type=user
+    python cvae_user.py --data_dir=data/$data/ratings --ckpt_folder=experiment/$data/ratings
+#    python seq2seq.py --data=$data/ratings --bilstm=False --n_layers=1
+#    python seq2seq.py --data=$data/ratings --cat=True --time=True
+#    python user_seq2seq.py --data=$data/ratings --cat=True --time=True
 done
 
 
