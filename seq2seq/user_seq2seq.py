@@ -295,7 +295,7 @@ def main():
                     result = [i, recall, hit, ndcg]
             model.train = True
         if i % 100 == 0 and model.learning_rate > 1e-6:
-            model.learning_rate /= 2
+            model.learning_rate /= 10
             print("decrease lr to %f" % model.learning_rate)
     f.write("iter: %d - recall: %f - hit: %f - ndcg: %f\n"
             % (result[0], result[1], result[2], result[3]))
