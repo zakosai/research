@@ -25,6 +25,7 @@ class Dataset(object):
         self.create_val_test(tmp_test, time_test)
         self.text = text
         self.des = des
+        self.n_item += 1
 
 
 
@@ -37,6 +38,8 @@ class Dataset(object):
                 l = []
             else:
                 l = [int(x) for x in a[1:-1]]
+            if len(l) < self.w_size+1:
+                l = [self.n_item]*(self.w_size+1-len(l)) + l
             train.append(l)
             infer.append([int(a[-1])])
         return train, infer
@@ -161,7 +164,9 @@ class Dataset(object):
         item_cat = list(open("%s/categories.txt"%folder))
         item_cat = [i.strip() for i in item_cat]
         item_cat = [i.split(",") for i in item_cat]
+        item_cat.append([0]*len(item_cat[0]))
         self.item_cat = np.array(item_cat).astype(np.uint8)
+
 
     def create_user_info(self, folder):
         user_info = list(open("%s/user_info_train.txt"%folder))
@@ -181,6 +186,8 @@ class Dataset(object):
 
 
     def convert_time(self, t):
+        if t == 0:
+            return [0]*23
         time = datetime.fromtimestamp(int(t))
         hour = [0]*4
         weekday = [0]*7
@@ -203,6 +210,9 @@ class Dataset(object):
                 l = []
             else:
                 l = [x for x in a[1:]]
+
+            if len(l) < self.w_size +1:
+                l = [0]*(self.w_size+1 - len(l)) + l
             self.time_train.append(l)
 
         filename = "%s/time_test.txt" % folder
@@ -213,6 +223,8 @@ class Dataset(object):
                 l = []
             else:
                 l = [x for x in a[1:]]
+            if len(l) < self.w_size +1:
+                l = [0]*(self.w_size+1 - len(l)) + l
             time_test.append(l)
         return time_test
 
