@@ -14,10 +14,10 @@ class Seq2seq(object):
         self.p_dim = 100
         self.n_products = 3706
         self.n_hidden = 256
-        self.learning_rate = 1e-4
+        self.learning_rate = 1e-3
         self.train = True
         self.cat_dim = 18
-        self.layers = [100, 50]
+        self.layers = [50]
         # self.item_cat = item_cat.astype(np.float32)
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.active_function = tf.nn.tanh
@@ -172,7 +172,7 @@ class Seq2seq(object):
         #     loss, _ = self.prediction(x, y, reuse=True)
         #     self.loss += loss
 
-        # self.loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(self.y, self.predict, 100))
+        self.loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(tf.reshape(self.y[:, -1, :], (-1, self.n_products)), self.predict, 100))
 
         # self.loss = self.loss_reconstruct(self.y, self.predict)
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
