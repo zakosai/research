@@ -38,8 +38,8 @@ class Dataset(object):
                 l = []
             else:
                 l = [int(x) for x in a[1:-1]]
-            if len(l) < self.w_size+1:
-                l = [self.n_item]*(self.w_size+1-len(l)) + l
+            if len(l) < self.w_size:
+                l = [self.n_item]*(self.w_size-len(l)) + l
             train.append(l)
             infer.append([int(a[-1])])
         return train, infer
