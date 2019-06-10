@@ -4,6 +4,7 @@ from datetime import datetime
 class Dataset(object):
     def __init__(self, n_item, folder, w_size=10, time=False, cat=False, text=None, hybrid=False, des=False):
         self.w_size = w_size
+        self.n_item = n_item
 
         train_file = "%s/train.txt"%folder
         self.train, self.infer1 = self.read_file(train_file)
@@ -11,7 +12,6 @@ class Dataset(object):
         tmp_test, self.infer2 = self.read_file(test_file)
 
         self.n_user = len(self.train)
-        self.n_item = n_item
         self.cat_dim = 18
         self.hybrid = hybrid
         self.time_dim = 23
