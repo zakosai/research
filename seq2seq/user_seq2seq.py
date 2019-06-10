@@ -172,7 +172,7 @@ class Seq2seq(object):
         #     loss, _ = self.prediction(x, y, reuse=True)
         #     self.loss += loss
 
-        self.loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(tf.reshape(self.y[:, -1, :], (-1, self.n_products)), self.predict, 100))
+        # self.loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(tf.reshape(self.y[:, -1, :], (-1, self.n_products)), self.predict, 100))
 
         # self.loss = self.loss_reconstruct(self.y, self.predict)
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
@@ -180,7 +180,7 @@ class Seq2seq(object):
 
 
 def main():
-    iter = 1000
+    iter = 300
     args = parser.parse_args()
     batch_size = args.batch_size
     dataset = args.data
