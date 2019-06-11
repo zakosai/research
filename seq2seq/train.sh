@@ -44,7 +44,7 @@ for data in $dataset; do
 #    python cvae_user.py --data_dir=data/$data/ratings --ckpt_folder=experiment/$data/ratings
 #    python seq2seq.py --data=$data/ratings --bilstm=False --n_layers=1
 #    python seq2seq.py --data=$data/ratings --cat=True --time=True
-    python user_seq2seq.py --data=$data/ratings --cat=True --time=True
+    python user_seq2seq.py --data=$data --cat=True --time=True
 done
 
 
