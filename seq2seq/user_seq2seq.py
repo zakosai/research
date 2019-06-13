@@ -112,7 +112,8 @@ class Seq2seq(object):
 
     def prediction(self, x, y, cat=None, y_cat=None, reuse=False):
         with tf.variable_scope("last_layer", reuse=reuse):
-            out = layers.fully_connected(x, self.n_products, tf.nn.tanh)
+            x_ = layers.fully_connected(x,50, self.active_function, scope="mlp",weights_regularizer=self.regularizer)
+            out = layers.fully_connected(x_, self.n_products, tf.nn.tanh)
             # out = tf.nn.leaky_relu(out, alpha=0.2)
             # loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(y, out, 100))
 
@@ -235,7 +236,7 @@ def main():
             feed = {model.X: X, model.y:y, model.X_cat:t}
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
-        if i % 1 == 0:
+        if i % 10 == 0:
             model.train = False
             if args.time:
                 X_val, y_val = data.create_batch(range(len(data.val)),
@@ -290,7 +291,7 @@ def main():
                         y = np.concatenate((y, y_b_val), axis=0)
                 recall, hit, ndcg = calc_recall(y, data.test, data.infer2)
                 np.savez(os.path.join(checkpoint_dir, "pred"), p_val=y_val, p_test=y)
-                print("recall: %f, hit: %f, ndcg: %f" % (recall, hit, ndcg))
+                print("iter: %d recall: %f, hit: %f, ndcg: %f" % (i, recall, hit, ndcg))
                 if recall > result[1]:
                     result = [i, recall, hit, ndcg]
             model.train = True
