@@ -209,10 +209,10 @@ class Dataset(object):
             if a == []:
                 l = []
             else:
-                l = [x for x in a[2:]]
+                l = [x for x in a[1:]]
 
-            if len(l) < self.w_size +1:
-                l = [0]*(self.w_size+1 - len(l)) + l
+            if len(l) < self.w_size:
+                l = [0]*(self.w_size - len(l)) + l
             self.time_train.append(l)
 
         filename = "%s/time_test.txt" % folder
@@ -222,7 +222,7 @@ class Dataset(object):
             if a == []:
                 l = []
             else:
-                l = [x for x in a[2:]]
+                l = [x for x in a[1:]]
             if len(l) < self.w_size:
                 l = [0]*(self.w_size - len(l)) + l
             time_test.append(l)
