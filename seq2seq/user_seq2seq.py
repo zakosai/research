@@ -235,7 +235,7 @@ def main():
             feed = {model.X: X, model.y:y, model.X_cat:t}
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
-        if i % 10 == 0:
+        if i % 1 == 0:
             model.train = False
             if args.time:
                 X_val, y_val = data.create_batch(range(len(data.val)),
