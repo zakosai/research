@@ -9,7 +9,7 @@ class Dataset(object):
         train_file = "%s/train.txt"%folder
         self.train, self.infer1 = self.read_file(train_file)
         test_file = "%s/test.txt"%folder
-        tmp_test, self.infer2 = self.read_file(test_file)
+        self.tmp_test, self.infer2 = self.read_file(test_file)
 
         self.n_user = len(self.train)
         self.cat_dim = 18
@@ -22,7 +22,7 @@ class Dataset(object):
         self.cat = cat
         if self.cat:
             self.create_item_cat(folder)
-        self.create_val_test(tmp_test, time_test)
+        self.create_val_test(self.tmp_test, time_test)
         self.text = text
         self.des = des
         self.n_item += 1
