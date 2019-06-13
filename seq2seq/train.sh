@@ -48,7 +48,7 @@ for data in $dataset; do
 #    for w in $wsize; do
 #        python user_seq2seq.py --data=$data --cat=True --time=True --w_size=$w
 #    done
-    python user_seq2seq.py --data=$data --cat=True --time=True --w_size=15
+    python user_seq2seq.py --data=$data --cat=True --time=True --w_size=15 --batch_size=500
 done
 
 
