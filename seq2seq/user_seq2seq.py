@@ -182,7 +182,7 @@ class Seq2seq(object):
 
 
 def main():
-    iter = 300
+    iter = 150
     args = parser.parse_args()
     batch_size = args.batch_size
     dataset = args.data
