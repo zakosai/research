@@ -126,7 +126,7 @@ class Seq2seq(object):
 
                 loss = 10*self.loss_reconstruct(y, pred) + self.loss_reconstruct(y_cat, out_cat)
             else:
-                loss = self.loss_reconstruct(y, out) +0.01 * tf.losses.get_regularization_loss()
+                loss = self.loss_reconstruct(y, out)
 
         return loss, out
 
