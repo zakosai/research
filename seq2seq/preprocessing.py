@@ -75,7 +75,7 @@ def create_amazon(dir_r, type, fsum):
     test_id = shuffle_id[train_len:]
 
     # os.mkdir("data/%s/implicit"%type)
-    ftrain = open("data/%s/implicit/train.txt" % type, "w")
+    ftrain = open("data/%s/train.txt" % type, "w")
     for idx in train_id:
         user = np.array(ratings[idx]).reshape((len(ratings[idx]), 3))
         user = user[np.argsort(user[:, 2])]
@@ -84,7 +84,7 @@ def create_amazon(dir_r, type, fsum):
         ftrain.write("%d %s\n" % (idx, " ".join(item)))
     ftrain.close()
 
-    ftest = open("data/%s/implicit/test.txt" % type, "w")
+    ftest = open("data/%s/test.txt" % type, "w")
     for idx in test_id:
         user = np.array(ratings[idx]).reshape((len(ratings[idx]), 3))
         user = user[np.argsort(user[:, 2])]
@@ -372,12 +372,12 @@ parser.add_argument('--data', type=str, default="Tool",
 if __name__ == '__main__':
     # args = parser.parse_args()
     # type = args.data
-    dataset = ["Grocery", "CD", "Kitchen"]
-    fsum = open("data/summary.txt", "w")
+    dataset = ["Toy", "Tool", "Automotive", "Baby", "Instrument", "AmzVideo", "Music", "Beauty"]
+    fsum = open("data/summary.txt", "a")
     for type in dataset:
         dir_r = "../cf-vae/data/%s"%type
-        # create_amazon(dir_r, type, fsum)
-        create_amazon_based_on_ratings(dir_r, type, fsum)
-        create_user_info("data/%s/ratings"%type)
+        create_amazon(dir_r, type, fsum)
+        # create_amazon_based_on_ratings(dir_r, type, fsum)
+        create_user_info("data/%s"%type)
 
 
