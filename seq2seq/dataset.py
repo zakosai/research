@@ -223,8 +223,8 @@ class Dataset(object):
                 l = []
             else:
                 l = [x for x in a[1:]]
-            if len(l) < self.w_size:
-                l = [0]*(self.w_size - len(l)) + l
+            if len(l) < self.w_size+1:
+                l = [0]*(self.w_size+1 - len(l)) + l
             time_test.append(l)
         return time_test
 
