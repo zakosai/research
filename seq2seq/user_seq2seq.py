@@ -17,7 +17,7 @@ class Seq2seq(object):
         self.learning_rate = 1e-3
         self.train = True
         self.cat_dim = 18
-        self.layers = [50]
+        self.layers = [100, 50]
         # self.item_cat = item_cat.astype(np.float32)
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.active_function = tf.nn.tanh
@@ -164,13 +164,13 @@ class Seq2seq(object):
         last_state = tf.concat([last_state, last_state_cat], axis=1)
 
         self.loss, self.predict = self.prediction(last_state, tf.reshape(self.y[:, -1, :], (-1, self.n_products)))
-        self.loss *=10
-        for i in range(self.w_size-1):
-            x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden/2))
-            x = tf.concat([x, last_state_cat], axis=1)
-            y = tf.reshape(self.y[:, i, :], (-1, self.n_products))
-            loss, _ = self.prediction(x, y, reuse=True)
-            self.loss += loss
+        # self.loss *=10
+        # for i in range(self.w_size-1):
+        #     x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden/2))
+        #     x = tf.concat([x, last_state_cat], axis=1)
+        #     y = tf.reshape(self.y[:, i, :], (-1, self.n_products))
+        #     loss, _ = self.prediction(x, y, reuse=True)
+        #     self.loss += loss
 
         # self.loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(tf.reshape(self.y[:, -1, :], (-1, self.n_products)), self.predict, 100))
 
@@ -263,7 +263,7 @@ def main():
 
             recall, _, _ = calc_recall(p_val, data.val, data.val_infer)
             print("Loss val: %f, recall %f" % (loss_val, recall))
-            if recall > max_recall:
+            if recall >= max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'bilstm-model'))
                 if args.time:
