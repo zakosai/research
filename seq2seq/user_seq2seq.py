@@ -104,7 +104,7 @@ class Seq2seq(object):
         log_softmax_var = -tf.nn.log_softmax(x_recon)
 
         neg_ll = tf.reduce_mean(tf.reduce_sum(
-            log_softmax_var * x * 10 + (1-x)*(1-log_softmax_var),
+            log_softmax_var * x,
             axis=-1))
         # return tf.reduce_mean(tf.abs(x - x_recon))
 
