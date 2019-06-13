@@ -101,7 +101,7 @@ class Seq2seq(object):
 
 
     def loss_reconstruct(self, x, x_recon):
-        log_softmax_var = tf.nn.log_softmax(x_recon)
+        log_softmax_var = -tf.nn.log_softmax(x_recon)
 
         neg_ll = tf.reduce_mean(tf.reduce_sum(
             log_softmax_var * x,
