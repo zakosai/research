@@ -112,7 +112,7 @@ class Seq2seq(object):
 
     def prediction(self, x, y, cat=None, y_cat=None, reuse=False):
         with tf.variable_scope("last_layer", reuse=reuse):
-            x_ = layers.fully_connected(x,50, self.active_function, scope="mlp",weights_regularizer=self.regularizer)
+            # x_ = layers.fully_connected(x,50, self.active_function, scope="mlp",weights_regularizer=self.regularizer)
             out = layers.fully_connected(x_, self.n_products, tf.nn.tanh)
             # out = tf.nn.leaky_relu(out, alpha=0.2)
             # loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(y, out, 100))
@@ -125,7 +125,7 @@ class Seq2seq(object):
 
                 loss = 10*self.loss_reconstruct(y, pred) + self.loss_reconstruct(y_cat, out_cat)
             else:
-                loss = self.loss_reconstruct(y, out) +0.1 * tf.losses.get_regularization_loss()
+                loss = self.loss_reconstruct(y, out) +0.01 * tf.losses.get_regularization_loss()
 
         return loss, out
 
