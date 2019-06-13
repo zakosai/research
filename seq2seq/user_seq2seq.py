@@ -263,7 +263,7 @@ def main():
                 else:
                     p_val = np.concatenate((p_val, y_b_val), axis=0)
 
-            recall, _, _ = calc_recall(p_val, data.tmp_test, data.val_infer)
+            recall, _, _ = calc_recall(p_val, data.val, data.val_infer)
             print("Loss val: %f, recall %f" % (loss_val, recall))
             if recall >= max_recall:
                 max_recall = recall
