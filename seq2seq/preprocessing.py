@@ -26,7 +26,7 @@ def getDF(path):
 def create_amazon(dir_r, type, fsum):
     fsum.write("-----------------------------------------------\n %s - %s\n"%(type, dir_r))
     data = getDF("%s/reviews.json.gz"%dir_r) #read review
-    # os.makedirs("data/%s"%type)
+    os.makedirs("data/%s"%type)
 
     item_unique = sorted(data.asin.unique())
     user_unique = sorted(data.reviewerID.unique())
