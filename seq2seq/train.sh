@@ -36,7 +36,7 @@
 
 #python preprocessing.py
 
-dataset="Automotive Baby Instrument AmzVideo Music Beauty Toy Tool"
+dataset="Automotive Baby AmzVideo Beauty Toy Tool"
 wsize="7 10 15"
 for data in $dataset; do
     mkdir experiment/$data
