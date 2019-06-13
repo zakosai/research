@@ -114,7 +114,7 @@ class Seq2seq(object):
         with tf.variable_scope("last_layer", reuse=reuse):
             x_ = x
             # x_ = layers.fully_connected(x,50, self.active_function, scope="mlp",weights_regularizer=self.regularizer)
-            out = layers.fully_connected(x_, self.n_products)
+            out = layers.fully_connected(x_, self.n_products, tf.nn.relu)
             # out = tf.nn.leaky_relu(out, alpha=0.2)
             # loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(y, out, 100))
 
@@ -153,7 +153,7 @@ class Seq2seq(object):
         #     outputs = tf.nn.dropout(outputs, 0.8)
 
         last_state = tf.reshape(outputs[:, -1, :],
-                                (tf.shape(self.X)[0], self.n_hidden/(2)))
+                                (tf.shape(self.X)[0], self.n_hidden*2/(4*(self.n_layers-1))))
         # last_state = outputs
 
         # Categories
