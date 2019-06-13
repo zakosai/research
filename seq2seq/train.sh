@@ -36,7 +36,7 @@
 
 #python preprocessing.py
 
-dataset="Kitchen CD Grocery"
+dataset="CD Grocery"
 wsize="4 7 10 15"
 for data in $dataset; do
 #    mkdir experiment/$data/ratings
