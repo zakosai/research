@@ -173,15 +173,15 @@ class Dataset(object):
         user_info = [u.strip() for u in user_info]
         user_info = [u.split(",")[1:] for u in user_info]
         self.user_info_train = np.array(user_info).astype(np.float32)
-        col = [0] + list(range(6, self.user_info_train.shape[1]-1))
-        self.user_info_train = self.user_info_train[:, col]
+        # col = [0] + list(range(6, self.user_info_train.shape[1]-1))
+        # self.user_info_train = self.user_info_train[:, col]
 
 
         user_info = list(open("%s/user_info_test.txt" % folder))
         user_info = [u.strip() for u in user_info]
         user_info = [u.split(",")[1:] for u in user_info]
         self.user_info_test = np.array(user_info).astype(np.float32)
-        self.user_info_test = self.user_info_test[:, col]
+        # self.user_info_test = self.user_info_test[:, col]
         self.user_info_val = self.user_info_test[self.list_u]
 
 
@@ -211,8 +211,8 @@ class Dataset(object):
             else:
                 l = [x for x in a[1:]]
 
-            if len(l) < self.w_size:
-                l = [0]*(self.w_size - len(l)) + l
+            if len(l) < self.w_size+1:
+                l = [0]*(self.w_size+1 - len(l)) + l
             self.time_train.append(l)
 
         filename = "%s/time_test.txt" % folder
@@ -227,9 +227,6 @@ class Dataset(object):
                 l = [0]*(self.w_size+1 - len(l)) + l
             time_test.append(l)
         return time_test
-
-
-
 
 
 def calc_recall(pred, train, test, k=10, type=None):
