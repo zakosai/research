@@ -36,15 +36,15 @@
 
 #python preprocessing.py
 
-dataset="Automotive Baby AmzVideo Beauty Toy Tool"
-wsize="7 10 15"
+dataset="book"
+wsize="10"
 for data in $dataset; do
     mkdir experiment/$data
     mkdir experiment/$data/cvae
 #    python seq2seq.py --data=$data/ratings --bilstm=False --n_layers=1
 #    python seq2seq.py --data=$data/ratings --cat=True --time=True
     for w in $wsize; do
-        python user_seq2seq.py --data=$data --cat=True --time=True --w_size=$w
+        python user_seq2seq.py --data=$data --time=True --w_size=$w
     done
     python vae.py --data_dir=data/$data --ckpt_folder=experiment/$data/cvae
     python vae.py --data_dir=data/$data --ckpt_folder=experiment/$data/cvae --type=user

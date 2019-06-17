@@ -193,9 +193,9 @@ def main():
     num_p = len(list(open("data/%s/item_id.txt"%dataset)))
     checkpoint_dir = "experiment/%s/" % (dataset)
     data = Dataset(num_p, "data/%s"%(dataset), args.w_size, cat=args.cat, time=args.time)
-    variables = load_npz("data/%s/item.npz"%dataset)
-    variables = np.append(variables.toarray(), [[0]*variables.toarray().shape[1]], axis=0)
-    data.item_cat = np.concatenate((data.item_cat, variables), axis=-1)
+    # variables = load_npz("data/%s/item.npz"%dataset)
+    # variables = np.append(variables.toarray(), [[0]*variables.toarray().shape[1]], axis=0)
+    # data.item_cat = np.concatenate((data.item_cat, variables), axis=-1)
 
     data.create_user_info("data/%s"%dataset)
 

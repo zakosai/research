@@ -271,7 +271,7 @@ def create_amazon_based_on_ratings(dir_r, type, fsum):
 
 
 def create_user_info(data_dir):
-    categories = np.genfromtxt("%s/categories.txt" % data_dir, np.int8, delimiter=",")
+    # categories = np.genfromtxt("%s/categories.txt" % data_dir, np.int8, delimiter=",")
     if data_dir == "data/ml-1m":
         ratings = np.genfromtxt("%s/ratings.txt" % data_dir, np.int32, delimiter=" ", )
     else:
@@ -291,7 +291,7 @@ def create_user_info(data_dir):
         no_item = len(list_p)
         r = [0] * 5
         weekdays = [0] * 7
-        cat = np.zeros(categories.shape[1])
+        # cat = np.zeros(categories.shape[1])
         time = []
         tmp_rating = ratings[np.where(ratings[:, 0] == u)]
         line_no = 0
@@ -301,7 +301,7 @@ def create_user_info(data_dir):
             rat = tmp_rating[line_no]
             if p == rat[1] or u == rat[0]:
                 r[rat[2] - 1] += 1
-                cat += categories[rat[1]]
+                # cat += categories[rat[1]]
                 t = datetime.fromtimestamp(rat[3])
                 weekdays[t.weekday()] += 1
                 time.append(rat[3])
@@ -312,7 +312,7 @@ def create_user_info(data_dir):
         #     weekdays = np.array(weekdays)/sum(weekdays)
         #     cat = cat/sum(cat)
 
-        user_info.append([no_item] + r + weekdays + cat.tolist())
+        user_info.append([no_item] + r + weekdays)
         fuser.write("%d,%s\n" % (u, ",".join([str(i) for i in user_info[-1]])))
         ftime.write("%d,%s\n" % (u, ",".join([str(i) for i in time])))
         time_info.append(time)
@@ -336,7 +336,7 @@ def create_user_info(data_dir):
         r = [0] * 5
         hour = [0]*4
         weekdays = [0] * 7
-        cat = np.zeros(categories.shape[1])
+        # cat = np.zeros(categories.shape[1])
         time = []
         tmp_rating = ratings[np.where(ratings[:, 0] == u)]
         line_no = 0
@@ -346,7 +346,7 @@ def create_user_info(data_dir):
             rat = tmp_rating[line_no]
             if p == rat[1] or u == rat[0]:
                 r[rat[2] - 1] += 1
-                cat += categories[rat[1]]
+                # cat += categories[rat[1]]
                 t = datetime.fromtimestamp(rat[3])
                 hour[int(t.hour/6)] += 1
                 weekdays[t.weekday()] += 1
@@ -358,7 +358,7 @@ def create_user_info(data_dir):
         #     weekdays = np.array(weekdays)/sum(weekdays)
         #     cat = cat/sum(cat)
 
-        user_info.append([no_item] + r + weekdays + cat.tolist())
+        user_info.append([no_item] + r + weekdays)
         fuser.write("%d,%s\n" % (u, ",".join([str(i) for i in user_info[-1]])))
         ftime.write("%d,%s\n" % (u, ",".join([str(i) for i in time])))
         time_info.append(time)
@@ -372,11 +372,11 @@ parser.add_argument('--data', type=str, default="Tool",
 if __name__ == '__main__':
     # args = parser.parse_args()
     # type = args.data
-    dataset = ["Beauty"]
-    fsum = open("data/summary.txt", "a")
+    dataset = ["book"]
+    # fsum = open("data/summary.txt", "a")
     for type in dataset:
-        dir_r = "../cf-vae/data/%s"%type
-        create_amazon(dir_r, type, fsum)
+        # dir_r = "../cf-vae/data/%s"%type
+        # create_amazon(dir_r, type, fsum)
         # create_amazon_based_on_ratings(dir_r, type, fsum)
         create_user_info("data/%s"%type)
 
