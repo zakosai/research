@@ -194,7 +194,9 @@ def main():
     checkpoint_dir = "experiment/%s/" % (dataset)
     data = Dataset(num_p, "data/%s"%(dataset), args.w_size, cat=args.cat, time=args.time)
     variables = load_npz("data/%s/item.npz"%dataset)
+    print(data.item_cat.shape, variables.toarray().shape)
     data.item_cat = np.concatenate((data.item_cat, variables.toarray()), axis=-1)
+
     data.create_user_info("data/%s"%dataset)
 
 
