@@ -193,6 +193,8 @@ def main():
     num_p = len(list(open("data/%s/item_id.txt"%dataset)))
     checkpoint_dir = "experiment/%s/" % (dataset)
     data = Dataset(num_p, "data/%s"%(dataset), args.w_size, cat=args.cat, time=args.time)
+    variables = load_npz(os.path.join(dir, "item.npz"))
+    data.cat = np.concatenate((data.cat, variables.toarray()), axis=-1)
     data.create_user_info("data/%s"%dataset)
 
 
