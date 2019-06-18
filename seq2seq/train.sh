@@ -44,7 +44,7 @@ for data in $dataset; do
 #    python seq2seq.py --data=$data/ratings --bilstm=False --n_layers=1
 #    python seq2seq.py --data=$data/ratings --cat=True --time=True
     for w in $wsize; do
-        python user_seq2seq.py --data=$data --time=True --w_size=$w
+        python user_seq2seq.py --data=$data --time=True --cat=True --w_size=$w
     done
 #    python vae.py --data_dir=data/$data --ckpt_folder=experiment/$data/cvae
 #    python vae.py --data_dir=data/$data --ckpt_folder=experiment/$data/cvae --type=user
