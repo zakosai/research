@@ -18,7 +18,7 @@ class Seq2seq(object):
         self.learning_rate = 1e-3
         self.train = True
         self.cat_dim = 18
-        self.layers = [100, 50]
+        self.layers = [500, 100, 50]
         # self.item_cat = item_cat.astype(np.float32)
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.active_function = tf.nn.tanh
@@ -184,7 +184,7 @@ class Seq2seq(object):
 
 
 def main():
-    iter = 500
+    iter = 150
     args = parser.parse_args()
     batch_size = args.batch_size
     dataset = args.data
@@ -247,7 +247,6 @@ def main():
             model.train = False
             for j in range(0, int(math.ceil(float(len(data.val)) / batch_size))):
                 idx = list(range(j * batch_size, min((j + 1) * batch_size, len(data.val))))
-                print(idx)
                 if args.time:
                     X_b_val, y_b, u = data.create_batch(idx, data.val[idx[0]:idx[-1]+1],
                                                         data.val_infer[idx[0]:idx[-1]+1],
