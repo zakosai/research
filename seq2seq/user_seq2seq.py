@@ -4,6 +4,7 @@ import numpy as np
 import argparse
 from dataset import Dataset, calc_recall
 import os
+import math
 from scipy.sparse import load_npz
 
 
@@ -234,35 +235,28 @@ def main():
         for j in range(0, int(data.n_user / batch_size)):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
             if args.time:
-                X, y = data.create_batch(list_idx, data.X_iter, data.y_iter, data.time_emb)
+                X, y, u = data.create_batch(list_idx, data.X_iter, data.y_iter, data.time_emb)
             else:
-                X, y= data.create_batch(list_idx, data.X_iter, data.y_iter)
-            t = data.user_info_train[list_idx]
+                X, y, u = data.create_batch(list_idx, data.X_iter, data.y_iter)
+            t = np.concatenate((data.user_info_train[list_idx], u), axis=-1)
 
             feed = {model.X: X, model.y:y, model.X_cat:t}
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
         if i % 10 == 0:
             model.train = False
-            if args.time:
-                X_val, y_val = data.create_batch(range(len(data.val)),
-                                                 data.val, data.val_infer, data.time_emb_val)
-            else:
-                X_val, y_val = data.create_batch(range(len(data.val)),
-                                                 data.val, data.val_infer)
-            for j in range(0, int(len(X_val) / batch_size)+1):
-                if (j + 1) * batch_size > len(data.val):
-                    X_b_val = X_val[j * batch_size:]
-                    y_b = y_val[j * batch_size:]
-                    t_b = data.user_info_val[j * batch_size:]
+
+            for j in range(0, math.ceil(len(data.val) / batch_size)):
+                idx = list(range(j * batch_size, min((j + 1) * batch_size), len(data.val)))
+                if args.time:
+                    X_b_val, y_b, u = data.create_batch(idx, data.val[idx], data.val_infer[idx],
+                                                        data.time_emb_val[idx])
                 else:
-                    X_b_val = X_val[j * batch_size:(j + 1) * batch_size]
-                    y_b = y_val[j * batch_size:(j + 1) * batch_size]
-                    t_b = data.user_info_val[j * batch_size:(j + 1) * batch_size]
+                    X_b_val, y_b, u = data.create_batch(idx, data.val[idx], data.val_infer[idx])
+                t_b = np.concatenate((data.user_info_val[idx], u), axis=-1)
 
                 feed = {model.X: X_b_val, model.X_cat:t_b, model.y:y_b}
-                loss_val, y_b_val = sess.run([model.loss, model.predict],
-                                           feed_dict=feed)
+                loss_val, y_b_val = sess.run([model.loss, model.predict],feed_dict=feed)
                 if j == 0:
                     p_val = y_b_val
                 else:
@@ -273,28 +267,25 @@ def main():
             if recall >= max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'bilstm-model'))
-                if args.time:
-                    X_test, y_test = data.create_batch(range(len(data.test)), data.test,
-                                                       data.infer2, data.time_emb_test)
-                else:
-                    X_test, y_test= data.create_batch(range(len(data.test)), data.test,
-                                                      data.infer2)
-                for j in range(int(len(X_test) / batch_size) + 1):
-                    if (j + 1) * batch_size > len(X_test):
-                        X_b_val = X_test[j * batch_size:]
-                        y_b = y_test[j * batch_size:]
-                        t_b = data.user_info_test[j * batch_size:]
+
+                for j in range(math.ceil(len(data.test)/batch_size)):
+                    idx = list(range(j*batch_size, min((j+1)*batch_size, len(data.test))))
+                    if args.time:
+                        X_b_test, y_b, u = data.create_batch(idx, data.test[idx],
+                                                          data.infer2[idx],
+                                                          data.time_emb_test[idx])
                     else:
-                        X_b_val = X_test[j * batch_size:(j + 1) * batch_size]
-                        y_b = y_test[j * batch_size:(j + 1) * batch_size]
-                        t_b = data.user_info_test[j * batch_size:(j + 1) * batch_size]
-                    feed = {model.X: X_b_val, model.X_cat: t_b, model.y: y_b}
+                        X_b_test, y_b, u = data.create_batch(idx, data.test[idx], data.infer2[idx])
+                    t_b = np.concatenate((data.user_info_test[idx], u), axis=-1)
+                    feed = {model.X: X_b_test, model.X_cat: t_b, model.y: y_b}
                     loss_val, y_b_val = sess.run([model.loss, model.predict],
                                                  feed_dict=feed)
                     if j == 0:
                         y = y_b_val
+                        y_val = y_b
                     else:
                         y = np.concatenate((y, y_b_val), axis=0)
+                        y_val = np.concatenate((y_val, y_b), axis=0)
                 recall, hit, ndcg = calc_recall(y, data.tmp_test, data.infer2)
                 np.savez(os.path.join(checkpoint_dir, "pred"), p_val=y_val, p_test=y)
                 print("iter: %d recall: %f, hit: %f, ndcg: %f" % (i, recall, hit, ndcg))
