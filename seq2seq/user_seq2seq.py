@@ -247,6 +247,7 @@ def main():
             model.train = False
             for j in range(0, int(math.ceil(float(len(data.val)) / batch_size))):
                 idx = list(range(j * batch_size, min((j + 1) * batch_size, len(data.val))))
+                print(idx)
                 if args.time:
                     X_b_val, y_b, u = data.create_batch(idx, data.val[idx], data.val_infer[idx],
                                                         data.time_emb_val[idx])
@@ -270,7 +271,6 @@ def main():
 
                 for j in range(int(math.ceil(float(len(data.test))/batch_size))):
                     idx = list(range(j*batch_size, min((j+1)*batch_size, len(data.test))))
-                    print(idx)
                     if args.time:
                         X_b_test, y_b, u = data.create_batch(idx, data.test[idx],
                                                           data.infer2[idx],
