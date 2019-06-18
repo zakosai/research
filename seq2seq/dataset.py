@@ -78,9 +78,7 @@ class Dataset(object):
             self.item_emb = np.concatenate((self.item_emb, self.text), axis=1)
 
 
-
-
-    def create_batch(self, idx, X_iter, y_iter, time=None):
+    def create_batch(self, idx, X_iter, y_iter, item_list, time=None):
         n_batch = len(idx)
         X_batch = np.zeros((n_batch, self.w_size, self.item_emb.shape[1]))
         y_batch = np.zeros((n_batch, self.w_size, self.n_item))
@@ -90,9 +88,9 @@ class Dataset(object):
         for i in range(n_batch):
             X_batch[i, :, :] = self.item_emb[X_iter[idx[i]]]
             u = [0]*self.n_item
-            last_item_id = self.train[idx[i]].index(X_iter[idx[i], -1])
+            last_item_id = item_list[idx[i]].index(X_iter[idx[i], -1])
             for j in range(last_item_id+1):
-                u[self.train[idx[i]][j]] = 1
+                u[item_list[idx[i]][j]] = 1
             for j in range(self.w_size-1):
                 y_batch[i, j, X_iter[idx[i], j+1]] = 1
             y_batch[i, self.w_size-1, y_iter[idx[i]]] = 1
@@ -134,11 +132,13 @@ class Dataset(object):
         self.val_infer = []
         self.test = []
         list_u = []
+        self.tmp_val = []
         self.time_emb_val = []
         self.time_emb_test = []
         for i, tr in enumerate(tmp_test):
             if len(tr) > self.w_size+1:
                 n = np.random.randint((len(tr)-self.w_size-1))
+                self.tmp_val.append(tr)
                 self.val.append(tr[n:n + self.w_size])
                 self.val_infer.append([tr[n + self.w_size]])
                 list_u.append(i)

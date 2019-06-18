@@ -235,9 +235,9 @@ def main():
         for j in range(0, int(data.n_user / batch_size)):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
             if args.time:
-                X, y, u = data.create_batch(list_idx, data.X_iter, data.y_iter, data.time_emb)
+                X, y, u = data.create_batch(list_idx, data.X_iter, data.y_iter, data.train, data.time_emb)
             else:
-                X, y, u = data.create_batch(list_idx, data.X_iter, data.y_iter)
+                X, y, u = data.create_batch(list_idx, data.X_iter, data.y_iter, data.train)
             t = np.concatenate((data.user_info_train[list_idx], u), axis=-1)
 
             feed = {model.X: X, model.y:y, model.X_cat:t}
@@ -251,9 +251,11 @@ def main():
                 if args.time:
                     X_b_val, y_b, u = data.create_batch(idx, data.val[idx[0]:idx[-1]+1],
                                                         data.val_infer[idx[0]:idx[-1]+1],
+                                                        data.tmp_val[idx[0]:idx[-1]+1],
                                                         data.time_emb_val[idx[0]:idx[-1]+1])
                 else:
                     X_b_val, y_b, u = data.create_batch(idx, data.val[idx[0]:idx[-1]+1],
+                                                        data.tmp_val[idx[0]:idx[-1] + 1],
                                                         data.val_infer[idx[0]:idx[-1]+1])
                 t_b = np.concatenate((data.user_info_val[idx], u), axis=-1)
 
@@ -276,9 +278,11 @@ def main():
                     if args.time:
                         X_b_test, y_b, u = data.create_batch(idx, data.test[idx[0]:idx[-1]+1],
                                                           data.infer2[idx[0]:idx[-1]+1],
+                                                          data.tmp_test[idx[0]:idx[-1] + 1],
                                                           data.time_emb_test[idx[0]:idx[-1]+1])
                     else:
                         X_b_test, y_b, u = data.create_batch(idx, data.test[idx[0]:idx[-1]+1],
+                                                             data.tmp_test[idx[0]:idx[-1] + 1],
                                                              data.infer2[idx[0]: idx[-1]+1])
                     t_b = np.concatenate((data.user_info_test[idx], u), axis=-1)
                     feed = {model.X: X_b_test, model.X_cat: t_b, model.y: y_b}
