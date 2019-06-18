@@ -245,8 +245,7 @@ def main():
 
         if i % 10 == 0:
             model.train = False
-            print(len(data.val), len(data.test), int(math.ceil(len(data.val) / batch_size)))
-            for j in range(0, int(math.ceil(len(data.val) / batch_size))):
+            for j in range(0, int(math.ceil(float(len(data.val)) / batch_size))):
                 idx = list(range(j * batch_size, min((j + 1) * batch_size), len(data.val)))
                 if args.time:
                     X_b_val, y_b, u = data.create_batch(idx, data.val[idx], data.val_infer[idx],
@@ -269,7 +268,7 @@ def main():
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'bilstm-model'))
 
-                for j in range(int(math.ceil(len(data.test)/batch_size))):
+                for j in range(int(math.ceil(float(len(data.test))/batch_size))):
                     idx = list(range(j*batch_size, min((j+1)*batch_size, len(data.test))))
                     if args.time:
                         X_b_test, y_b, u = data.create_batch(idx, data.test[idx],
