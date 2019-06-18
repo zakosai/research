@@ -92,7 +92,7 @@ class Dataset(object):
             u = [0]*self.n_item
             last_item_id = self.train[idx[i]].index(X_iter[idx[i], -1])
             for j in range(last_item_id+1):
-                u[self.train[i][j]] = 1
+                u[self.train[idx[i]][j]] = 1
             for j in range(self.w_size-1):
                 y_batch[i, j, X_iter[idx[i], j+1]] = 1
             y_batch[i, self.w_size-1, y_iter[idx[i]]] = 1
