@@ -245,7 +245,7 @@ def main():
 
         if i % 10 == 0:
             model.train = False
-            print(int(math.ceil(len(data.val) / batch_size)))
+            print(len(data.val), len(data.test), int(math.ceil(len(data.val) / batch_size)))
             for j in range(0, int(math.ceil(len(data.val) / batch_size))):
                 idx = list(range(j * batch_size, min((j + 1) * batch_size), len(data.val)))
                 if args.time:
