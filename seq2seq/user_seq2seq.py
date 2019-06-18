@@ -211,7 +211,7 @@ def main():
         model.p_dim += data.time_dim
     # model.p_dim = data.n_user
     # model.cat_dim = text.shape[1]
-    model.cat_dim = data.user_info_train.shape[1]
+    model.cat_dim = data.user_info_train.shape[1] + data.n_item
     model.n_products = data.n_item
     model.build_model()
 
