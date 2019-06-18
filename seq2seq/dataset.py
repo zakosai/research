@@ -84,21 +84,28 @@ class Dataset(object):
         n_batch = len(idx)
         X_batch = np.zeros((n_batch, self.w_size, self.item_emb.shape[1]))
         y_batch = np.zeros((n_batch, self.w_size, self.n_item))
+        u_batch =[]
         if self.hybrid:
             t_batch = np.zeros((n_batch, self.w_size, self.text.shape[1]))
         for i in range(n_batch):
             X_batch[i, :, :] = self.item_emb[X_iter[idx[i]]]
+            u = [0]*self.n_item
+            last_item_id = self.train[idx[i]].index(X_iter[idx[i], -1])
+            for j in range(last_item_id+1):
+                u[self.train[i][j]] = 1
             for j in range(self.w_size-1):
                 y_batch[i, j, X_iter[idx[i], j+1]] = 1
             y_batch[i, self.w_size-1, y_iter[idx[i]]] = 1
+            u_batch.append(u)
             if self.hybrid:
                 t_batch[i, :, :] = self.text[X_iter[idx[i]]]
 
         if self.hybrid:
-            return X_batch, y_batch, t_batch
+            return X_batch, y_batch, t_batch, np.array(u_batch).reshape((n_batch, self.n_item))
         if self.time:
             X_batch = np.concatenate((X_batch, time[idx]), axis=-1)
-        return X_batch, y_batch
+
+        return X_batch, y_batch, np.array(u_batch).reshape((n_batch, self.n_item))
 
     def create_batch_tmp(self, idx, X_iter, y_iter, time=None):
         n_batch = len(idx)
