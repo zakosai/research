@@ -296,6 +296,7 @@ def main():
             print("decrease lr to %f" % model.learning_rate)
     f.write("iter: %d - recall: %f - hit: %f - ndcg: %f\n"
             % (result[0], result[1], result[2], result[3]))
+    f.write("Last result- recall: %d - hit: %f - ndcg:%f\n"%(recall, hit, ndcg))
     print(max_recall)
 
 
