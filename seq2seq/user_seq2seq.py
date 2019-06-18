@@ -246,7 +246,7 @@ def main():
         if i % 10 == 0:
             model.train = False
             for j in range(0, int(math.ceil(float(len(data.val)) / batch_size))):
-                idx = list(range(j * batch_size, min((j + 1) * batch_size), len(data.val)))
+                idx = list(range(j * batch_size, min((j + 1) * batch_size, len(data.val))))
                 if args.time:
                     X_b_val, y_b, u = data.create_batch(idx, data.val[idx], data.val_infer[idx],
                                                         data.time_emb_val[idx])
