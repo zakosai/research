@@ -249,10 +249,12 @@ def main():
                 idx = list(range(j * batch_size, min((j + 1) * batch_size, len(data.val))))
                 print(idx)
                 if args.time:
-                    X_b_val, y_b, u = data.create_batch(idx, data.val[idx], data.val_infer[idx],
-                                                        data.time_emb_val[idx])
+                    X_b_val, y_b, u = data.create_batch(idx, data.val[idx[0]:idx[-1]+1],
+                                                        data.val_infer[idx[0]:idx[-1]+1],
+                                                        data.time_emb_val[idx[0]:idx[-1]+1])
                 else:
-                    X_b_val, y_b, u = data.create_batch(idx, data.val[idx], data.val_infer[idx])
+                    X_b_val, y_b, u = data.create_batch(idx, data.val[idx[0]:idx[-1]+1],
+                                                        data.val_infer[idx[0]:idx[-1]+1])
                 t_b = np.concatenate((data.user_info_val[idx], u), axis=-1)
 
                 feed = {model.X: X_b_val, model.X_cat:t_b, model.y:y_b}
@@ -272,11 +274,12 @@ def main():
                 for j in range(int(math.ceil(float(len(data.test))/batch_size))):
                     idx = list(range(j*batch_size, min((j+1)*batch_size, len(data.test))))
                     if args.time:
-                        X_b_test, y_b, u = data.create_batch(idx, data.test[idx],
-                                                          data.infer2[idx],
-                                                          data.time_emb_test[idx])
+                        X_b_test, y_b, u = data.create_batch(idx, data.test[idx[0]:idx[-1]+1],
+                                                          data.infer2[idx[0]:idx[-1]+1],
+                                                          data.time_emb_test[idx[0]:idx[-1]+1])
                     else:
-                        X_b_test, y_b, u = data.create_batch(idx, data.test[idx], data.infer2[idx])
+                        X_b_test, y_b, u = data.create_batch(idx, data.test[idx[0]:idx[-1]+1],
+                                                             data.infer2[idx[0]: idx[-1]+1])
                     t_b = np.concatenate((data.user_info_test[idx], u), axis=-1)
                     feed = {model.X: X_b_test, model.X_cat: t_b, model.y: y_b}
                     loss_val, y_b_val = sess.run([model.loss, model.predict],feed_dict=feed)
