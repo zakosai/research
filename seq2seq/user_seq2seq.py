@@ -257,6 +257,7 @@ def main():
 
                 feed = {model.X: X_b_val, model.X_cat:t_b, model.y:y_b}
                 loss_val, y_b_val = sess.run([model.loss, model.predict],feed_dict=feed)
+                print(j)
                 if j == 0:
                     p_val = y_b_val
                 else:
@@ -278,8 +279,7 @@ def main():
                         X_b_test, y_b, u = data.create_batch(idx, data.test[idx], data.infer2[idx])
                     t_b = np.concatenate((data.user_info_test[idx], u), axis=-1)
                     feed = {model.X: X_b_test, model.X_cat: t_b, model.y: y_b}
-                    loss_val, y_b_val = sess.run([model.loss, model.predict],
-                                                 feed_dict=feed)
+                    loss_val, y_b_val = sess.run([model.loss, model.predict],feed_dict=feed)
                     if j == 0:
                         y = y_b_val
                         y_val = y_b
