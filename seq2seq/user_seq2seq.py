@@ -270,6 +270,7 @@ def main():
 
                 for j in range(int(math.ceil(float(len(data.test))/batch_size))):
                     idx = list(range(j*batch_size, min((j+1)*batch_size, len(data.test))))
+                    print(idx)
                     if args.time:
                         X_b_test, y_b, u = data.create_batch(idx, data.test[idx],
                                                           data.infer2[idx],
