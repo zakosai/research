@@ -18,7 +18,7 @@ class Seq2seq(object):
         self.learning_rate = 1e-3
         self.train = True
         self.cat_dim = 18
-        self.layers = [500, 100]
+        self.layers = [100, 50]
         # self.item_cat = item_cat.astype(np.float32)
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.active_function = tf.nn.tanh
@@ -194,9 +194,9 @@ def main():
     num_p = len(list(open("data/%s/item_id.txt"%dataset)))
     checkpoint_dir = "experiment/%s/" % (dataset)
     data = Dataset(num_p, "data/%s"%(dataset), args.w_size, cat=args.cat, time=args.time)
-    variables = load_npz("data/%s/item.npz"%dataset)
-    variables = np.append(variables.toarray(), [[0]*variables.toarray().shape[1]], axis=0)
-    data.item_cat = np.concatenate((data.item_cat, variables), axis=-1)
+    # variables = load_npz("data/%s/item.npz"%dataset)
+    # variables = np.append(variables.toarray(), [[0]*variables.toarray().shape[1]], axis=0)
+    # data.item_cat = np.concatenate((data.item_cat, variables), axis=-1)
 
     data.create_user_info("data/%s"%dataset)
 
