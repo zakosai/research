@@ -211,7 +211,7 @@ def main():
         model.p_dim += data.time_dim
     # model.p_dim = data.n_user
     # model.cat_dim = text.shape[1]
-    model.cat_dim = data.user_info_train.shape[1] + data.n_item
+    model.cat_dim = data.n_item
     model.n_products = data.n_item
     model.build_model()
 
@@ -240,7 +240,7 @@ def main():
                 X, y, u = data.create_batch(list_idx, data.X_iter, data.y_iter, data.train)
             t = np.concatenate((data.user_info_train[list_idx], u), axis=-1)
 
-            feed = {model.X: X, model.y:y, model.X_cat:t}
+            feed = {model.X: X, model.y:y, model.X_cat:u}
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
         if i % 10 == 0:
@@ -254,7 +254,7 @@ def main():
                     X_b_val, y_b, u = data.create_batch(idx, data.val,data.tmp_val, data.val_infer)
                 t_b = np.concatenate((data.user_info_val[idx], u), axis=-1)
 
-                feed = {model.X: X_b_val, model.X_cat:t_b, model.y:y_b}
+                feed = {model.X: X_b_val, model.X_cat:u, model.y:y_b}
                 loss_val, y_b_val = sess.run([model.loss, model.predict],feed_dict=feed)
                 if j == 0:
                     p_val = y_b_val
@@ -277,7 +277,7 @@ def main():
                         X_b_test, y_b, u = data.create_batch(idx, data.test,data.tmp_test,
                                                              data.infer2)
                     t_b = np.concatenate((data.user_info_test[idx], u), axis=-1)
-                    feed = {model.X: X_b_test, model.X_cat: t_b, model.y: y_b}
+                    feed = {model.X: X_b_test, model.X_cat: u, model.y: y_b}
                     loss_val, y_b_val = sess.run([model.loss, model.predict],feed_dict=feed)
                     if j == 0:
                         y = y_b_val
