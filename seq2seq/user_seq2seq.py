@@ -18,7 +18,7 @@ class Seq2seq(object):
         self.learning_rate = 1e-3
         self.train = True
         self.cat_dim = 18
-        self.layers = [100, 50]
+        self.layers = [500, 100]
         # self.item_cat = item_cat.astype(np.float32)
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.active_function = tf.nn.tanh
@@ -28,9 +28,11 @@ class Seq2seq(object):
     def encoder_BiLSTM(self, X, scope, n_hidden):
         with tf.variable_scope("cell_def_%s"%scope):
             f_cell = tf.nn.rnn_cell.LSTMCell(n_hidden, state_is_tuple=True)
-            f_cell = tf.contrib.rnn.DropoutWrapper(cell=f_cell, output_keep_prob=0.8)
+            if self.train:
+                f_cell = tf.contrib.rnn.DropoutWrapper(cell=f_cell, output_keep_prob=0.8)
             b_cell = tf.nn.rnn_cell.LSTMCell(n_hidden, state_is_tuple=True)
-            b_cell = tf.contrib.rnn.DropoutWrapper(cell=b_cell, output_keep_prob=0.8)
+            if self.train:
+                b_cell = tf.contrib.rnn.DropoutWrapper(cell=b_cell, output_keep_prob=0.8)
         with tf.variable_scope("cell_op_%s"%scope):
             outputs1, last_state = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, X, sequence_length=self.seq_len,dtype=tf.float32)
 
