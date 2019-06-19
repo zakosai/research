@@ -274,7 +274,7 @@ def main():
                                                           data.tmp_test,
                                                           data.time_emb_test)
                     else:
-                        X_b_test, y_b, u = data.create_batch(idx, data.test, data.tmp_test, data.infer2)
+                        X_b_test, y_b, u = data.create_batch(idx, data.test, data.infer2, data.tmp_test)
                     t_b = np.concatenate((data.user_info_test[idx], u), axis=-1)
                     feed = {model.X: X_b_test, model.X_cat: t_b, model.y: y_b}
                     loss_val, y_b_val = sess.run([model.loss, model.predict],feed_dict=feed)
