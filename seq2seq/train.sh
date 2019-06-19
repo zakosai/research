@@ -36,8 +36,8 @@
 
 #python preprocessing.py
 
-dataset="Automotive Baby Beauty book CD Grocery Kitchen Outdoor Tool Toy"
-wsize="10 15"
+dataset="Automotive Baby Beauty CD Grocery Kitchen Outdoor Tool Toy"
+wsize="20"
 for data in $dataset; do
 #    mkdir experiment/$data
 #    mkdir experiment/$data/cvae
@@ -52,6 +52,6 @@ for data in $dataset; do
 #    python user_seq2seq.py --data=$data --cat=True --time=True --w_size=15 --batch_size=200
 done
 
-
+python user_seq2seq.py --data=book --time=True --w_size=20
 
 
