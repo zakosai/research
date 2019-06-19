@@ -180,10 +180,10 @@ class Dataset(object):
         user_info = [u.strip() for u in user_info]
         user_info = [u.split(",")[1:] for u in user_info]
         self.user_info_train = np.array(user_info).astype(np.float32)
-        self.user_info_train[:, 1:6] = (self.user_info_train[:, 1:6].T/np.sum(self.user_info_train[:, 1:6])).T
-        self.user_info_train[:, 6:13] = (self.user_info_train[:, 6:13].T/np.sum(self.user_info_train[:, 6:13])).T
-        self.user_info_train[:, 13:] = (self.user_info_train[:, 13:].T/np.sum(self.user_info_train[:, 13:])).T
-        self.user_info_train = self.user_info_train[:, 1:]
+        # self.user_info_train[:, 1:6] = (self.user_info_train[:, 1:6].T/np.sum(self.user_info_train[:, 1:6])).T
+        # self.user_info_train[:, 6:13] = (self.user_info_train[:, 6:13].T/np.sum(self.user_info_train[:, 6:13])).T
+        # self.user_info_train[:, 13:] = (self.user_info_train[:, 13:].T/np.sum(self.user_info_train[:, 13:])).T
+        # self.user_info_train = self.user_info_train[:, 1:]
 
         # col = [0] + list(range(6, self.user_info_train.shape[1]-1))
         # self.user_info_train = self.user_info_train[:, col]
@@ -193,10 +193,10 @@ class Dataset(object):
         user_info = [u.strip() for u in user_info]
         user_info = [u.split(",")[1:] for u in user_info]
         self.user_info_test = np.array(user_info).astype(np.float32)
-        self.user_info_test[:, 1:6] = (self.user_info_test[:, 1:6].T / np.sum(self.user_info_test[:, 1:6])).T
-        self.user_info_test[:, 6:13] = (self.user_info_test[:, 6:13].T / np.sum(self.user_info_test[:, 6:13])).T
-        self.user_info_test[:, 13:] = (self.user_info_test[:, 13:].T / np.sum(self.user_info_test[:, 13:])).T
-        self.user_info_test = self.user_info_test[:, 1:]
+        # self.user_info_test[:, 1:6] = (self.user_info_test[:, 1:6].T / np.sum(self.user_info_test[:, 1:6])).T
+        # self.user_info_test[:, 6:13] = (self.user_info_test[:, 6:13].T / np.sum(self.user_info_test[:, 6:13])).T
+        # self.user_info_test[:, 13:] = (self.user_info_test[:, 13:].T / np.sum(self.user_info_test[:, 13:])).T
+        # self.user_info_test = self.user_info_test[:, 1:]
         # self.user_info_test = self.user_info_test[:, col]
         self.user_info_val = self.user_info_test[self.list_u]
 
