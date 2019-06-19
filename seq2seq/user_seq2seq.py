@@ -251,7 +251,7 @@ def main():
                     X_b_val, y_b, u = data.create_batch(idx, data.val, data.val_infer,
                                                         data.tmp_val,data.time_emb_val)
                 else:
-                    X_b_val, y_b, u = data.create_batch(idx, data.val,data.tmp_val, data.val_infer)
+                    X_b_val, y_b, u = data.create_batch(idx, data.val, data.val_infer, data.tmp_val)
                 t_b = np.concatenate((data.user_info_val[idx], u), axis=-1)
 
                 feed = {model.X: X_b_val, model.X_cat:t_b, model.y:y_b}
@@ -274,8 +274,7 @@ def main():
                                                           data.tmp_test,
                                                           data.time_emb_test)
                     else:
-                        X_b_test, y_b, u = data.create_batch(idx, data.test,data.tmp_test,
-                                                             data.infer2)
+                        X_b_test, y_b, u = data.create_batch(idx, data.test, data.tmp_test, data.infer2)
                     t_b = np.concatenate((data.user_info_test[idx], u), axis=-1)
                     feed = {model.X: X_b_test, model.X_cat: t_b, model.y: y_b}
                     loss_val, y_b_val = sess.run([model.loss, model.predict],feed_dict=feed)
