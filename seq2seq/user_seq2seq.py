@@ -144,7 +144,7 @@ class Seq2seq(object):
         # assert tf.shape(self.X)[0] == tf.shape(self.X_cat)[0]
 
         for i in range(self.n_layers):
-            outputs, _ = self.encoder_BiLSTM(self.X,  str(i+1), self.n_hidden/(2**i))
+            outputs, _ = self.encoder_BiLSTM(self.X,  str(i+1), self.n_hidden/(4**i))
 
         # outputs, _ = self.encoder_biGRU(outputs, "2", self.n_hidden*2)
         # with tf.variable_scope('attention'):
@@ -155,7 +155,7 @@ class Seq2seq(object):
         #     outputs = tf.nn.dropout(outputs, 0.8)
 
         last_state = tf.reshape(outputs[:, -1, :],
-                                (tf.shape(self.X)[0], self.n_hidden*2/(2*(self.n_layers-1))))
+                                (tf.shape(self.X)[0], self.n_hidden*2/(4*(self.n_layers-1))))
         # last_state = outputs
 
         # Categories

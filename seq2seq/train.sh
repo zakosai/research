@@ -37,7 +37,7 @@
 #python preprocessing.py
 
 dataset="Automotive Baby Beauty CD Grocery Kitchen Outdoor Tool Toy"
-wsize="20"
+wsize="15"
 for data in $dataset; do
 #    mkdir experiment/$data
 #    mkdir experiment/$data/cvae
