@@ -99,13 +99,14 @@ class Translation:
 def create_dataset(dataset="ml-1m", type=1, num_p=7780):
     dense_train, dense_infer1 = read_data("data/%s/train.txt"%(dataset))
     train = one_hot_vector(dense_train, num_p)
-    val = train[:400]
-    dense_val = dense_train[:400]
-    dense_infer_val = dense_infer1[:400]
+    train_no = int(len(train)*0.8)
+    val = train[train_no:]
+    dense_val = dense_train[train_no:]
+    dense_infer_val = dense_infer1[train_no:]
 
-    train = train[400:]
-    dense_train = dense_train[400:]
-    dense_infer1 = dense_infer1[400:]
+    train = train[:train_no]
+    dense_train = dense_train[:train_no]
+    dense_infer1 = dense_infer1[:train_no]
 
     dense_test, dense_infer2 = read_data("data/%s/test.txt"%(dataset))
     test = one_hot_vector(dense_test, num_p)
