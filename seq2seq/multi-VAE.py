@@ -296,7 +296,7 @@ def main():
             print("Loss val: %f, recall %f" % (loss_val, recall))
             if recall > max_recall:
                 max_recall = recall
-                saver.save(sess, os.path.join(checkpoint_dir, 'multi-VAE-model'), i)
+                saver.save(sess, os.path.join(checkpoint_dir, 'multi-VAE-model'))
 
 
                 # y_ab = y_ab[test_B]
