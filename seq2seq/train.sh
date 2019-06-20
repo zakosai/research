@@ -36,7 +36,7 @@
 
 #python preprocessing.py
 
-dataset="Automotive Baby Beauty CD Grocery Kitchen Outdoor Tool Toy"
+dataset="Automotive Baby Beauty CD Grocery Kitchen Outdoor Tool Toy Office"
 wsize="5 10"
 for data in $dataset; do
 #    mkdir experiment/$data
@@ -44,8 +44,11 @@ for data in $dataset; do
 #    python seq2seq.py --data=$data/ratings --bilstm=False --n_layers=1
 #    python seq2seq.py --data=$data/ratings --cat=True --time=True
     for w in $wsize; do
-        python user_seq2seq.py --data=$data --time=True --cat=True --w_size=$w
+        python seq2seq.py --data=$data --bilstm=False --n_layers=1 --w_size=$w
+        python seq2seq.py --data=$data --w_size=$w
+        python seq2seq.py --data=$data --bilstm=False --n_layers=1 --w_size=$w --cat=True --time=True
     done
+    python multi-VAE.py --data=$data
 #    python vae.py --data_dir=data/$data --ckpt_folder=experiment/$data/cvae
 #    python vae.py --data_dir=data/$data --ckpt_folder=experiment/$data/cvae --type=user
 #    python cvae_user.py --data_dir=data/$data --ckpt_folder=experiment/$data/cvae
@@ -54,4 +57,7 @@ done
 
 python user_seq2seq.py --data=book --time=True --w_size=20
 
-
+python user_seq2seq.py --data=Tool --time=True --cat=True --w_size=5
+python user_seq2seq.py --data=Tool --time=True --cat=True --w_size=10
+python user_seq2seq.py --data=Toy --time=True --cat=True --w_size=5
+python user_seq2seq.py --data=Toy --time=True --cat=True --w_size=10
