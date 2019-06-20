@@ -237,7 +237,7 @@ def calc_rmse(pred, test):
     return np.sqrt(np.mean((test-pred)**2))
 
 def main():
-    iter = 3000
+    iter = 1500
     batch_size= 500
     args = parser.parse_args()
     dataset = args.data
@@ -261,7 +261,7 @@ def main():
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
-    saver = tf.train.Saver(max_to_keep=20)
+    saver = tf.train.Saver(max_to_keep=1)
     max_recall = 0
 
     f = open("experiment/%s/result.txt" % dataset, "a")
