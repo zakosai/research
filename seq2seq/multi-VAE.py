@@ -264,7 +264,11 @@ def main():
     saver = tf.train.Saver(max_to_keep=20)
     max_recall = 0
 
+    f = open("experiment/%s/result.txt" % dataset, "a")
+    f.write("-------------------------\n")
+    f.write("Data: %s - Multi-VAE\n"%dataset)
 
+    result =[0, 0, 0]
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(num_u)
         train_cost = 0
@@ -301,13 +305,17 @@ def main():
                                            feed_dict={model.x: data['test']})
                 recall, hit, ndcg = calc_recall(y, data['dense_test'], data['dense_infer2'])
                 print("Loss test: %f, recall: %f, hit: %f, ndcg: %f" % (loss_test, recall, hit, ndcg))
+                if recall > result[0]:
+                    result = [recall, hit, ndcg]
             model.train = True
         if i%100 == 0 and model.learning_rate > 1e-6:
             model.learning_rate /= 2
             print("decrease lr to %f"%model.learning_rate)
 
-
+    f.write("iter: %d - recall: %f - hit: %f - ndcg: %f\n" % (result[0], result[1], result[2], result[3]))
+    f.write("Last result- recall: %d - hit: %f - ndcg:%f\n" % (recall, hit, ndcg))
     print(max_recall)
+
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Tool",
