@@ -268,7 +268,7 @@ def main():
     f.write("-------------------------\n")
     f.write("Data: %s - Multi-VAE\n"%dataset)
 
-    result =[0, 0, 0]
+    result =[0, 0, 0, 0]
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(num_u)
         train_cost = 0
@@ -306,7 +306,7 @@ def main():
                 recall, hit, ndcg = calc_recall(y, data['dense_test'], data['dense_infer2'])
                 print("Loss test: %f, recall: %f, hit: %f, ndcg: %f" % (loss_test, recall, hit, ndcg))
                 if recall > result[0]:
-                    result = [recall, hit, ndcg]
+                    result = [i, recall, hit, ndcg]
             model.train = True
         if i%100 == 0 and model.learning_rate > 1e-6:
             model.learning_rate /= 2
