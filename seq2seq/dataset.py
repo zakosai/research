@@ -78,7 +78,7 @@ class Dataset(object):
             self.item_emb = np.concatenate((self.item_emb, self.text), axis=1)
 
 
-    def create_batch(self, idx, X_iter, y_iter, item_list, time=None):
+    def create_batch_(self, idx, X_iter, y_iter, item_list, time=None):
         n_batch = len(idx)
         X_batch = np.zeros((n_batch, self.w_size, self.item_emb.shape[1]))
         y_batch = np.zeros((n_batch, self.w_size, self.n_item))
@@ -104,6 +104,28 @@ class Dataset(object):
             X_batch = np.concatenate((X_batch, time[idx]), axis=-1)
 
         return X_batch, y_batch, np.array(u_batch).reshape((n_batch, self.n_item))
+
+    def create_batch(self, idx, X_iter, y_iter, item_list, time=None):
+        n_batch = len(idx)
+        X_batch = np.zeros((n_batch, self.w_size, self.item_emb.shape[1]))
+        y_batch = np.zeros((n_batch, self.w_size, self.n_item))
+        if self.hybrid:
+            t_batch = np.zeros((n_batch, self.w_size, self.text.shape[1]))
+        for i in range(n_batch):
+            X_batch[i, :, :] = self.item_emb[X_iter[idx[i]]]
+
+            for j in range(self.w_size-1):
+                y_batch[i, j, X_iter[idx[i], j+1]] = 1
+            y_batch[i, self.w_size-1, y_iter[idx[i]]] = 1
+            if self.hybrid:
+                t_batch[i, :, :] = self.text[X_iter[idx[i]]]
+
+        if self.hybrid:
+            return X_batch, y_batch, t_batch
+        if self.time:
+            X_batch = np.concatenate((X_batch, time[idx]), axis=-1)
+
+        return X_batch, y_batch
 
     def create_batch_tmp(self, idx, X_iter, y_iter, time=None):
         n_batch = len(idx)
