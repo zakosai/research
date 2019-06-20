@@ -105,7 +105,7 @@ class Dataset(object):
 
         return X_batch, y_batch, np.array(u_batch).reshape((n_batch, self.n_item))
 
-    def create_batch(self, idx, X_iter, y_iter, item_list, time=None):
+    def create_batch(self, idx, X_iter, y_iter, time=None):
         n_batch = len(idx)
         X_batch = np.zeros((n_batch, self.w_size, self.item_emb.shape[1]))
         y_batch = np.zeros((n_batch, self.w_size, self.n_item))
