@@ -97,7 +97,7 @@ class Translation:
 
 
 def create_dataset(dataset="ml-1m", type=1, num_p=7780):
-    dense_train, dense_infer1 = read_data("data/%s/%s/train.txt"%(dataset, type))
+    dense_train, dense_infer1 = read_data("data/%s/train.txt"%(dataset))
     train = one_hot_vector(dense_train, num_p)
     val = train[:400]
     dense_val = dense_train[:400]
@@ -107,7 +107,7 @@ def create_dataset(dataset="ml-1m", type=1, num_p=7780):
     dense_train = dense_train[400:]
     dense_infer1 = dense_infer1[400:]
 
-    dense_test, dense_infer2 = read_data("data/%s/%s/test.txt"%(dataset, type))
+    dense_test, dense_infer2 = read_data("data/%s/test.txt"%(dataset))
     test = one_hot_vector(dense_test, num_p)
 
     data = {'train': train,
@@ -243,7 +243,7 @@ def main():
     dataset = args.data
     type = args.type
     num_p = args.num_p
-    checkpoint_dir = "experiment/%s/%s/" % (dataset, type)
+    checkpoint_dir = "experiment/%s" % (dataset)
     data = create_dataset(dataset, type, num_p)
     num_u = len(data['dense_train'])
     train = data['train']
