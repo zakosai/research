@@ -15,7 +15,7 @@ class Seq2seq(object):
         self.p_dim = 100
         self.n_products = 3706
         self.n_hidden = 256
-        self.learning_rate = 1e-3
+        self.learning_rate = 1e-4
         self.train = True
         self.cat_dim = 18
         self.n_layer = n_layer
@@ -150,7 +150,7 @@ class Seq2seq(object):
 
 
 def main():
-    iter = 1000
+    iter = 150
     batch_size = 500
     args = parser.parse_args()
     dataset = args.data
