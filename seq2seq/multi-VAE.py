@@ -96,7 +96,9 @@ class Translation:
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
 
-def create_dataset(dataset="ml-1m", type=1, num_p=7780):
+def create_dataset(dataset="ml-1m"):
+    num_p = len(list(open("data/%s/item_id.txt"%dataset)))
+    print(num_p)
     dense_train, dense_infer1 = read_data("data/%s/train.txt"%(dataset))
     train = one_hot_vector(dense_train, num_p)
     train_no = int(len(train)*0.8)
@@ -245,7 +247,7 @@ def main():
     type = args.type
     num_p = args.num_p
     checkpoint_dir = "experiment/%s" % (dataset)
-    data = create_dataset(dataset, type, num_p)
+    data = create_dataset(dataset)
     num_u = len(data['dense_train'])
     train = data['train']
 
