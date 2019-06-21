@@ -78,7 +78,7 @@ class Dataset(object):
             self.item_emb = np.concatenate((self.item_emb, self.text), axis=1)
 
 
-    def create_batch_(self, idx, X_iter, y_iter, item_list, time=None):
+    def create_batch_u(self, idx, X_iter, y_iter, item_list, time=None):
         n_batch = len(idx)
         X_batch = np.zeros((n_batch, self.w_size, self.item_emb.shape[1]))
         y_batch = np.zeros((n_batch, self.w_size, self.n_item))
