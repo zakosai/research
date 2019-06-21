@@ -100,7 +100,7 @@ def create_dataset(dataset="ml-1m", num_p=7780):
 
     dense_train, dense_infer1 = read_data("data/%s/train.txt"%(dataset))
     train = one_hot_vector(dense_train, num_p)
-    train_no = int(len(train)*0.8)
+    train_no = int(len(train)*0.9)
     val = train[train_no:]
     dense_val = dense_train[train_no:]
     dense_infer_val = dense_infer1[train_no:]
@@ -292,11 +292,17 @@ def main():
         # Validation Process
         if i%10 == 0:
             model.train = False
-            loss_val, y_val = sess.run([model.loss, model.x_recon],
-                                              feed_dict={model.x:data['val']})
+            for j in range(int(len(data['val'])/batch_size)+1):
+                last_idx = min((j+1)*batch_size, len(data['val']))
+                x_val = data['val'][j*batch_size:last_idx]
+                loss_b_val, y_b_val = sess.run([model.loss, model.x_recon], feed_dict={model.x: x_val})
+                if j == 0:
+                    y_val = y_b_val
+                else:
+                    y_val = np.concatenate((y_val, y_b_val), axis=0)
 
             recall, _, _ = calc_recall(y_val, data['dense_val'], data['dense_infer_val'])
-            print("Loss val: %f, recall %f" % (loss_val, recall))
+            print("Loss val: %f, recall %f" % (loss_b_val, recall))
             if recall > max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'multi-VAE-model'))
@@ -304,10 +310,17 @@ def main():
 
                 # y_ab = y_ab[test_B]
                 # y_ba = y_ba[test_A]
-                loss_test, y = sess.run([model.loss, model.x_recon],
-                                           feed_dict={model.x: data['test']})
-                recall, hit, ndcg = calc_recall(y, data['dense_test'], data['dense_infer2'])
-                print("Loss test: %f, recall: %f, hit: %f, ndcg: %f" % (loss_test, recall, hit, ndcg))
+                for j in range(int(len(data['test']) / batch_size) + 1):
+                    last_idx = min((j + 1) * batch_size, len(data['test']))
+                    x_test = data['test'][j * batch_size:last_idx]
+                    loss_b_test, y_b_test = sess.run([model.loss, model.x_recon], feed_dict={model.x: x_test})
+                    if j == 0:
+                        y_test = y_b_test
+                    else:
+                        y_test = np.concatenate((y_test, y_b_test), axis=0)
+
+                recall, hit, ndcg = calc_recall(y_test, data['dense_test'], data['dense_infer2'])
+                print("Loss test: %f, recall: %f, hit: %f, ndcg: %f" % (loss_b_test, recall, hit, ndcg))
                 if recall > result[0]:
                     result = [i, recall, hit, ndcg]
             model.train = True
@@ -325,7 +338,8 @@ parser.add_argument('--data',  type=str, default="Tool",
                    help='dataset name')
 parser.add_argument('--type',  type=str, default="implicit",
                    help='1p or 8p')
-parser.add_argument('--num_p', type=int, default=7780, help='number of product')
+parser.add_argument('--batch_size', type=int, default=500, help='number of batch_size')
+parser.add_argument('--iter', type=int, default=1500, help='number of iter')
 
 
 if __name__ == '__main__':
