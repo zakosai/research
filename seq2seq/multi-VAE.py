@@ -96,7 +96,7 @@ class Translation:
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
 
-def create_dataset(dataset="ml-1m", num_p):
+def create_dataset(dataset="ml-1m", num_p=7780):
 
     dense_train, dense_infer1 = read_data("data/%s/train.txt"%(dataset))
     train = one_hot_vector(dense_train, num_p)
