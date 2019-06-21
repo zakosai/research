@@ -321,7 +321,7 @@ def main():
 
                 recall, hit, ndcg = calc_recall(y_test, data['dense_test'], data['dense_infer2'])
                 print("Loss test: %f, recall: %f, hit: %f, ndcg: %f" % (loss_b_test, recall, hit, ndcg))
-                if recall > result[0]:
+                if recall > result[1]:
                     result = [i, recall, hit, ndcg]
             model.train = True
         if i%100 == 0 and model.learning_rate > 1e-6:

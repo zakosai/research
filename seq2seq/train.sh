@@ -36,19 +36,19 @@
 
 #python preprocessing.py
 
-dataset="Automotive Baby Beauty CD Grocery Kitchen Outdoor Tool Toy Office"
+dataset="Baby Beauty CD Grocery Kitchen Outdoor Tool Toy Office"
 wsize="5 10"
 for data in $dataset; do
 #    mkdir experiment/$data
 #    mkdir experiment/$data/cvae
 #    python seq2seq.py --data=$data/ratings --bilstm=False --n_layers=1
 #    python seq2seq.py --data=$data/ratings --cat=True --time=True
-    for w in $wsize; do
-        python seq2seq.py --data=$data --bilstm=False --n_layers=1 --w_size=$w
-        python seq2seq.py --data=$data --w_size=$w
-        python seq2seq.py --data=$data --bilstm=False --n_layers=1 --w_size=$w --cat=True --time=True
-    done
-    python multi-VAE.py --data=$data
+#    for w in $wsize; do
+#        python seq2seq.py --data=$data --bilstm=False --n_layers=1 --w_size=$w
+#        python seq2seq.py --data=$data --w_size=$w
+#        python seq2seq.py --data=$data --bilstm=False --n_layers=1 --w_size=$w --cat=True --time=True
+#    done
+    python multi-VAE.py --data=$data --iter=400
 #    python vae.py --data_dir=data/$data --ckpt_folder=experiment/$data/cvae
 #    python vae.py --data_dir=data/$data --ckpt_folder=experiment/$data/cvae --type=user
 #    python cvae_user.py --data_dir=data/$data --ckpt_folder=experiment/$data/cvae
