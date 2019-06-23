@@ -128,7 +128,7 @@ class D2Dseq(object):
                                                     self.batch_size, self.keep_prob, self.dec_emb_size)
 
         training_logits = tf.identity(train_output.rnn_output, name='logits')
-        self.inference_logits = tf.identity(infer_output.rnn_out, name='predictions')
+        self.inference_logits = tf.identity(infer_output.rnn_output, name='predictions')
         self.infer_output = infer_output
 
         masks = tf.sequence_mask(self.target_sequence_length, max_target_sentence_length, dtype=tf.float32, name='masks')
