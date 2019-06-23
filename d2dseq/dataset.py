@@ -46,7 +46,7 @@ class Dataset(object):
 
             tmp_target = self.dataset['rating_B'][i]
             target_sequence.append(len(tmp_target))
-            tmp_target = tmp_target + [self.emb_B]*(max_target_legth - len(tmp_target))
+            tmp_target = tmp_target + [self.eos_B]*(max_target_legth - len(tmp_target))
             target_batch.append(tmp_target)
             tmp_target = [self.go] + tmp_target[:-1]
 
