@@ -196,7 +196,10 @@ def main():
                         model.dec_emb_input: target_emb_batch,
                         model.target_sequence_length: target_seq}
                 infer, loss = sess.run([model.inference_logits, model.cost], feed_dict=feed)
-                infer = infer[:, target_seq, :].reshape((len(idx), data.n_user))
+                tmp_infer = []
+                for i in range(len(target_seq)):
+                    tmp_infer.append(infer[i, target_seq[i], :])
+                infer = np.array(tmp_infer).reshape((len(idx), data.n_user))
                 if j == 0:
                     target = target_batch
                     infer_all = infer
