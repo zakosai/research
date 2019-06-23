@@ -196,11 +196,10 @@ def main():
                         model.dec_emb_input: target_emb_batch,
                         model.target_sequence_length: target_seq}
                 infer, loss = sess.run([model.inference_logits, model.cost], feed_dict=feed)
-                print(infer.shape)
-                print(infer)
+                infer = infer[:, target_seq, :].reshape((len(idx), data.n_user))
                 if j == 0:
                     target = target_batch
-                    infer_all = infer
+                    infer_all = infer[]
                 else:
                     target = np.concatenate((target, target_batch), axis=0)
                     infer_all = np.concatenate((infer_all, infer), axis=0)
