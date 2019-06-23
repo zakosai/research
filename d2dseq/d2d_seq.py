@@ -124,7 +124,7 @@ class D2Dseq(object):
 
         train_output, infer_output = self.decoding_layer(self.dec_emb_input, enc_states, self.target_sequence_length,
                                                    max_target_sentence_length, self.n_hidden, self.n_layers,
-                                                    self.batch_size, self.keep_prob, self.dec_emb_size)
+                                                    tf.shape(self.target_data)[0], self.keep_prob, self.dec_emb_size)
 
         training_logits = tf.identity(train_output.rnn_output, name='logits')
         self.inference_logits = tf.identity(infer_output.rnn_output, name='predictions')
