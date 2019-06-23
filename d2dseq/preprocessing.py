@@ -49,7 +49,7 @@ def convert_dataset(filename, user, item, dataset):
 def statistic(data, f, name="A"):
     len_user = [len(i) for i in data]
     print("Dataset %s - min: %d - mean: %d - max: %d"%(name, min(len_user), np.mean(len_user), max(len_user)))
-    f.write("\trating set %s - min: %d - mean: %d - max: %d\n" % (name, min(len_user), np.mean(len_user), max(len_user)))
+    f.write("\t rating set %s - min: %d - mean: %d - max: %d\n" % (name, min(len_user), np.mean(len_user), max(len_user)))
 
 
 def main(A, B):
@@ -76,7 +76,7 @@ def main(A, B):
     f = open("data/summary.txt", "a")
     f.write("--------------------------------------------------\n")
     f.write("Dataset: %s_%s\n"%(A, B))
-    f.write("\tuser_no: %d - %s_no: %d - %s_no: %d\n"(len(user), A, len(item_A), B, len(item_B)))
+    f.write("\t user_no: %d - %s_no: %d - %s_no: %d\n"%(len(user), A, len(item_A), B, len(item_B)))
 
     # convert user, item
     rating_A = convert_dataset("%s/ratingA.txt"%save_dir, user, item_A, dA)
