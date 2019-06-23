@@ -80,7 +80,7 @@ def main(A, B):
 
     # convert user, item
     rating_A = convert_dataset("%s/ratingA.txt"%save_dir, user, item_A, dA)
-    rating_B = convert_dataset("%s/ratingA.txt"%save_dir, user, item_A, dA)
+    rating_B = convert_dataset("%s/ratingB.txt"%save_dir, user, item_B, dB)
 
     # statistic two new datasets
     statistic(rating_A, f, A)
