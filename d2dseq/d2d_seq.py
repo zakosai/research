@@ -226,12 +226,12 @@ def main():
                 if recall > result[1]:
                     result = [i, recall, hit, ndcg]
             model.train = True
-            if i % 100 == 0 and model.lr > 1e-6:
-                model.lr /= 10
-                print("decrease lr to %f" % model.lr)
-        f.write("iter: %d - recall: %f - hit: %f - ndcg: %f\n" % (result[0], result[1], result[2], result[3]))
-        f.write("Last result- recall: %d - hit: %f - ndcg:%f\n" % (recall, hit, ndcg))
-        print(max_recall)
+        if i % 100 == 0 and model.lr > 1e-6:
+            model.lr /= 10
+            print("decrease lr to %f" % model.lr)
+    f.write("iter: %d - recall: %f - hit: %f - ndcg: %f\n" % (result[0], result[1], result[2], result[3]))
+    f.write("Last result- recall: %d - hit: %f - ndcg:%f\n" % (recall, hit, ndcg))
+    print(max_recall)
 
 
 
