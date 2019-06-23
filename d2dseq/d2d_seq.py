@@ -199,7 +199,7 @@ def main():
                 tmp_infer = []
                 for i in range(len(target_seq)):
                     tmp_infer.append(infer[i, target_seq[i]-1, :])
-                infer = np.array(tmp_infer).reshape((len(idx), data.n_user))
+                infer = np.array(tmp_infer).reshape((len(idx), data.n_item_B))
                 if j == 0:
                     target = target_batch
                     infer_all = infer
