@@ -65,7 +65,71 @@ class Dataset(object):
                 target_sequence)
 
 
-# np.set_printoptions(threshold=np.inf)
+def calc_recall(pred, train, test, k=10, type=None):
+    pred_ab = np.argsort(-pred)
+    recall = []
+    ndcg = []
+    hit = 0
+    for i in range(len(pred_ab)):
+        p = pred_ab[i, :k + len(train[i])]
+        p = p.tolist()
+        for u in train[i]:
+            if u in p:
+                p.remove(u)
+        p = p[:k]
+        hits = set(test[i]) & set(p)
+        # print(test[i], p, hits)
+
+        # recall
+        recall_val = float(len(hits)) / len(test[i])
+        recall.append(recall_val)
+
+        # hit
+        hits_num = len(hits)
+        if hits_num > 0:
+            hit += 1
+
+        # ncdg
+        score = []
+        for j in range(k):
+            if p[j] in hits:
+                score.append(1)
+            else:
+                score.append(0)
+        actual = dcg_score(score, pred[i, p], k)
+        best = dcg_score(score, score, k)
+        if best == 0:
+            ndcg.append(0)
+        else:
+            ndcg.append(float(actual) / best)
+
+    # print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
+
+    return np.mean(np.array(recall)), float(hit) / len(pred_ab), np.mean(ndcg)
+
+def dcg_score(y_true, y_score, k=50):
+    """Discounted cumulative gain (DCG) at rank K.
+
+    Parameters
+    ----------
+    y_true : array, shape = [n_samples]
+        Ground truth (true relevance labels).
+    y_score : array, shape = [n_samples, n_classes]
+        Predicted scores.
+    k : int
+        Rank.
+
+    Returns
+    -------
+    score : float
+    """
+    order = np.argsort(y_score)[::-1]
+    y_true = np.take(y_true, order[:k])
+
+    gain = 2 ** y_true - 1
+
+    discounts = np.log2(np.arange(len(y_true)) + 2)
+    return np.sum(gain / discounts)
 
 
 
