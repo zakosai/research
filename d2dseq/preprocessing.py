@@ -97,7 +97,7 @@ def main(A, B):
                'rating_B': rating_B,
                'test_id':test_id,
                'val_id':val_id}
-    f = open("%s/dataset.obj", "wb")
+    f = open("%s/dataset.obj"%save_dir, "wb")
     pickle.dump(dataset, f)
     f.close()
 
@@ -105,6 +105,7 @@ if __name__ == '__main__':
     dataset = ["Health", "Grocery", "Kitchen", "Garden"]
     for i in range(len(dataset)):
         for j in range(i+1, len(dataset)):
+            print("%s - %s"%(dataset[i], dataset[j]))
             main(dataset[i], dataset[j])
 
 
