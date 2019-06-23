@@ -114,9 +114,9 @@ class D2Dseq(object):
             """
 
         self.input_data = tf.placeholder(tf.float32, [None, None, self.enc_emb_size])
-        self.target_data = tf.placeholder(tf.float32, [None, None])
+        self.target_data = tf.placeholder(tf.int32, [None, None])
         self.dec_emb_input = tf.placeholder(tf.float32, [None, None, self.dec_emb_size])
-        target_sequence_length = tf.fill([tf.shape(self.target_data)[0]], tf.shape(self.target_data)[1])
+        self.target_sequence_length = tf.placeholder(tf.int32, [None])
         input_sequence_legth = tf.fill([tf.shape(self.input_data)[0]], tf.shape(self.input_data)[1])
 
 
@@ -124,14 +124,14 @@ class D2Dseq(object):
 
         # dec_input = self.process_decoder_input(target_data)
 
-        train_output, infer_output = self.decoding_layer(self.dec_emb_input, enc_states, target_sequence_length,
+        train_output, infer_output = self.decoding_layer(self.dec_emb_input, enc_states, self.target_sequence_length,
                                                     self.max_target_sentence_length, self.n_hidden, self.n_layers,
                                                     self.batch_size, self.keep_prob, self.dec_emb_size)
 
         training_logits = tf.identity(train_output.rnn_output, name='logits')
         self.inference_logits = tf.identity(infer_output.sample_id, name='predictions')
 
-        masks = tf.sequence_mask(target_sequence_length, self.max_target_sequence_length, dtype=tf.float32, name='masks')
+        masks = tf.sequence_mask(self.target_sequence_length, self.max_target_sentence_length, dtype=tf.float32, name='masks')
 
         with tf.name_scope("optimization"):
             # Loss function - weighted softmax cross entropy
@@ -157,27 +157,31 @@ def main():
     batch_size = args.batch_size
 
     data = Dataset(args.data, args.seq_length)
-    sess = tf.Session()
-    sess.run(tf.global_variables_initializer())
-    saver = tf.train.Saver(max_to_keep=5)
-    max_recall = 0
+
 
     model = D2Dseq(data.n_item_A, data.n_item_B, batch_size, data.n_user, data.n_user, data.seq_len,
                    data.max_target_sequence, data.go, data.eos_A, data.eos_B)
-    train_id = np.array(set(range(data.n_user)) - set(data.dataset['val_id'] - set(data.dataset['test_id'])))
+    model.build_model()
+    train_id = list(set(range(data.n_user)) - set(data.dataset['val_id']) - set(data.dataset['test_id']))
     train_no = len(train_id)
     test_id = np.array(data.dataset['test_id'])
     test_no = len(test_id)
     val_id = np.array(data.dataset['val_id'])
     val_no = len(val_id)
 
+    sess = tf.Session()
+    sess.run(tf.global_variables_initializer())
+    saver = tf.train.Saver(max_to_keep=5)
+    max_recall = 0
+
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(train_id)
         for j in range(int(train_no/batch_size)):
-            input_emb_batch, target_batch, target_emb_batch = data.create_batch(shuffle_idx[j*batch_size:(j+1)*batch_size])
+            input_emb_batch, target_batch, target_emb_batch, target_seq = data.create_batch(shuffle_idx[j*batch_size:(j+1)*batch_size])
             feed = {model.input_data: input_emb_batch,
                     model.target_data: target_batch,
-                    model.dec_emb_input: target_emb_batch}
+                    model.dec_emb_input: target_emb_batch,
+                    model.target_sequence_length: target_seq}
 
             loss, _ = sess.run([model.cost, model.train_op], feed_dict=feed)
 
@@ -189,7 +193,8 @@ def main():
                 input_emb_batch, target_batch, target_emb_batch = data.create_batch(val_id[idx])
                 feed = {model.input_data: input_emb_batch,
                         model.target_data: target_batch,
-                        model.dec_emb_input: target_emb_batch}
+                        model.dec_emb_input: target_emb_batch,
+                        model.target_sequence_length: target_seq}
                 infer, loss = sess.run([model.inference_logits, model.cost], feed_dict=feed)
 
 
