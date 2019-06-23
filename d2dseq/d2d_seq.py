@@ -18,7 +18,6 @@ class D2Dseq(object):
         self.go_id = go_id
         self.eos_A = eos_A
         self.eos_B = eos_B
-        self.n_item_target += 2
         self.max_target_sentence_length = max_target_sentence_length
         self.n_layers = n_layers
         self.keep_prob = 0.7
@@ -148,7 +147,7 @@ class D2Dseq(object):
 
 def main():
     parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('--data', type=str, default="data/Health_Grocery", help='dataset name')
+    parser.add_argument('--data', type=str, default="Health_Grocery", help='dataset name')
     parser.add_argument('--seq_length', type=int, default=20, help='sequence length encode')
     parser.add_argument('--iter', type=int, default=300, help='sequence length encode')
     parser.add_argument('--batch_size', type=int, default=500, help='sequence length encode')
@@ -156,7 +155,7 @@ def main():
     iter = args.iter
     batch_size = args.batch_size
 
-    data = Dataset(args.data, args.seq_length)
+    data = Dataset("data/%s"%args.data, args.seq_length)
 
 
     model = D2Dseq(data.n_item_A, data.n_item_B, batch_size, data.n_user, data.n_user, data.seq_len,
@@ -168,11 +167,14 @@ def main():
     test_no = len(test_id)
     val_id = np.array(data.dataset['val_id'])
     val_no = len(val_id)
+    f = open("experiment/%s/result.txt" % args.data, "a")
+    f.write("-------------------------\n")
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(max_to_keep=5)
     max_recall = 0
+    result = [0, 0, 0, 0]
 
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(train_id)
@@ -188,7 +190,7 @@ def main():
         print("Loss last batch: %f"%loss)
 
         if i%1 == 0:
-            for j in range(int(train_no / batch_size)+1):
+            for j in range(int(val_no / batch_size)+1):
                 idx = list(range(j * batch_size, min((j + 1) * batch_size, val_no)))
                 input_emb_batch, target_batch, target_emb_batch, target_seq = data.create_batch(val_id[idx])
                 feed = {model.input_data: input_emb_batch,
@@ -209,7 +211,36 @@ def main():
             print(target.shape, infer_all.shape)
             recall, hit, ndcg = calc_recall(infer_all, target[:, :-1], target[:, -1])
             print("iter: %d recall: %f, hit: %f, ndcg: %f" % (i, recall, hit, ndcg))
-
+            if recall > max_recall:
+                max_recall = recall
+                for j in range(int(test_no / batch_size) + 1):
+                    idx = list(range(j * batch_size, min((j + 1) * batch_size, test_no)))
+                    input_emb_batch, target_batch, target_emb_batch, target_seq = data.create_batch(test_id[idx])
+                    feed = {model.input_data: input_emb_batch, model.target_data: target_batch,
+                            model.dec_emb_input: target_emb_batch, model.target_sequence_length: target_seq}
+                    infer, loss = sess.run([model.inference_logits, model.cost], feed_dict=feed)
+                    tmp_infer = []
+                    for i in range(len(target_seq)):
+                        tmp_infer.append(infer[i, target_seq[i] - 1, :])
+                    infer = np.array(tmp_infer).reshape((len(idx), data.n_item_B))
+                    if j == 0:
+                        target = target_batch
+                        infer_all = infer
+                    else:
+                        target = np.concatenate((target, target_batch), axis=0)
+                        infer_all = np.concatenate((infer_all, infer), axis=0)
+                print(target.shape, infer_all.shape)
+                recall, hit, ndcg = calc_recall(infer_all, target[:, :-1], target[:, -1])
+                print("iter: %d recall: %f, hit: %f, ndcg: %f" % (i, recall, hit, ndcg))
+                if recall > result[1]:
+                    result = [i, recall, hit, ndcg]
+            model.train = True
+            if i % 100 == 0 and model.lr > 1e-6:
+                model.lr /= 10
+                print("decrease lr to %f" % model.lr)
+        f.write("iter: %d - recall: %f - hit: %f - ndcg: %f\n" % (result[0], result[1], result[2], result[3]))
+        f.write("Last result- recall: %d - hit: %f - ndcg:%f\n" % (recall, hit, ndcg))
+        print(max_recall)
 
 
 
