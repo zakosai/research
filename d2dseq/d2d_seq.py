@@ -199,7 +199,7 @@ def main():
                 infer = infer[:, target_seq, :].reshape((len(idx), data.n_user))
                 if j == 0:
                     target = target_batch
-                    infer_all = infer[]
+                    infer_all = infer
                 else:
                     target = np.concatenate((target, target_batch), axis=0)
                     infer_all = np.concatenate((infer_all, infer), axis=0)
