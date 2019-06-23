@@ -199,9 +199,9 @@ def main():
                         model.target_data: target_batch,
                         model.dec_emb_input: target_emb_batch,
                         model.target_sequence_length: target_seq}
-                infer, loss = sess.run([model.inference_logits, model.cost], feed_dict=feed)
+                tmpinfer, loss = sess.run([model.inference_logits, model.cost], feed_dict=feed)
                 for i in range(len(target_seq)):
-                    infer.append(infer[i, target_seq[i]-1, :])
+                    infer.append(tmp_infer[i, target_seq[i]-1, :])
                     train.append(target_batch[i, :target_seq[i]-1])
                     test.append([target_batch[i, target_seq[i]-1]])
             recall, hit, ndcg = calc_recall(infer, train, test)
@@ -216,13 +216,9 @@ def main():
                     input_emb_batch, target_batch, target_emb_batch, target_seq = data.create_batch(test_id[idx])
                     feed = {model.input_data: input_emb_batch, model.target_data: target_batch,
                             model.dec_emb_input: target_emb_batch, model.target_sequence_length: target_seq}
-                    infer, loss = sess.run([model.inference_logits, model.cost], feed_dict=feed)
-                    tmp_infer = []
+                    tmp_infer, loss = sess.run([model.inference_logits, model.cost], feed_dict=feed)
                     for i in range(len(target_seq)):
-                        tmp_infer.append(infer[i, target_seq[i] - 1, :])
-                    infer = np.array(tmp_infer).reshape((len(idx), data.n_item_B))
-                    for i in range(len(target_seq)):
-                        infer.append(infer[i, target_seq[i] - 1, :])
+                        infer.append(tmp_infer[i, target_seq[i] - 1, :])
                         train.append(target_batch[i, :target_seq[i] - 1])
                         test.append([target_batch[i, target_seq[i] - 1]])
                 recall, hit, ndcg = calc_recall(infer, train, test)
