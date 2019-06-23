@@ -204,6 +204,7 @@ def main():
                     infer.append(tmp_infer[i, target_seq[i]-1, :])
                     train.append(target_batch[i, :target_seq[i]-1])
                     test.append([target_batch[i, target_seq[i]-1]])
+            infer = np.array(infer).reshape((val_no, data.n_item_B))
             recall, hit, ndcg = calc_recall(infer, train, test)
             print("loss: %f recall: %f" % (loss, recall))
             if recall > max_recall:
@@ -221,6 +222,7 @@ def main():
                         infer.append(tmp_infer[i, target_seq[i] - 1, :])
                         train.append(target_batch[i, :target_seq[i] - 1])
                         test.append([target_batch[i, target_seq[i] - 1]])
+                infer = np.array(infer).reshape((test_no, data.n_item_B))
                 recall, hit, ndcg = calc_recall(infer, train, test)
                 print("iter: %d recall: %f, hit: %f, ndcg: %f" % (i, recall, hit, ndcg))
                 if recall > result[1]:
