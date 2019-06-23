@@ -188,8 +188,7 @@ def main():
 
         if i%1 == 0:
             for j in range(int(train_no / batch_size)+1):
-                print(j, val_no)
-                idx = list(range(j * batch_size, min((j + 1) * batch_size), val_no))
+                idx = list(range(j * batch_size, min((j + 1) * batch_size, val_no)))
                 input_emb_batch, target_batch, target_emb_batch, target_seq = data.create_batch(val_id[idx])
                 feed = {model.input_data: input_emb_batch,
                         model.target_data: target_batch,
