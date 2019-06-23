@@ -198,8 +198,7 @@ def main():
                 infer, loss = sess.run([model.inference_logits, model.cost], feed_dict=feed)
                 tmp_infer = []
                 for i in range(len(target_seq)):
-                    print(target_seq[i])
-                    tmp_infer.append(infer[i, target_seq[i], :])
+                    tmp_infer.append(infer[i, target_seq[i]-1, :])
                 infer = np.array(tmp_infer).reshape((len(idx), data.n_user))
                 if j == 0:
                     target = target_batch
