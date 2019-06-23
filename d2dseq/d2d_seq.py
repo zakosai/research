@@ -188,8 +188,10 @@ def main():
             loss, _ = sess.run([model.cost, model.train_op], feed_dict=feed)
 
         print("Loss last batch: %f"%loss)
-
         if i%1 == 0:
+            infer = []
+            train = []
+            test = []
             for j in range(int(val_no / batch_size)+1):
                 idx = list(range(j * batch_size, min((j + 1) * batch_size, val_no)))
                 input_emb_batch, target_batch, target_emb_batch, target_seq = data.create_batch(val_id[idx])
@@ -198,21 +200,17 @@ def main():
                         model.dec_emb_input: target_emb_batch,
                         model.target_sequence_length: target_seq}
                 infer, loss = sess.run([model.inference_logits, model.cost], feed_dict=feed)
-                tmp_infer = []
                 for i in range(len(target_seq)):
-                    tmp_infer.append(infer[i, target_seq[i]-1, :])
-                infer = np.array(tmp_infer).reshape((len(idx), data.n_item_B))
-                if j == 0:
-                    target = target_batch
-                    infer_all = infer
-                else:
-                    target = np.concatenate((target, target_batch), axis=0)
-                    infer_all = np.concatenate((infer_all, infer), axis=0)
-            print(target.shape, infer_all.shape)
-            recall, hit, ndcg = calc_recall(infer_all, target[:, :-1], target[:, -1])
-            print("iter: %d recall: %f, hit: %f, ndcg: %f" % (i, recall, hit, ndcg))
+                    infer.append(infer[i, target_seq[i]-1, :])
+                    train.append(target_batch[i, :target_seq[i]-1])
+                    test.append([target_batch[i, target_seq[i]-1]])
+            recall, hit, ndcg = calc_recall(infer, train, test)
+            print("loss: %f recall: %f" % (loss, recall))
             if recall > max_recall:
                 max_recall = recall
+                infer = []
+                train = []
+                test = []
                 for j in range(int(test_no / batch_size) + 1):
                     idx = list(range(j * batch_size, min((j + 1) * batch_size, test_no)))
                     input_emb_batch, target_batch, target_emb_batch, target_seq = data.create_batch(test_id[idx])
@@ -223,14 +221,11 @@ def main():
                     for i in range(len(target_seq)):
                         tmp_infer.append(infer[i, target_seq[i] - 1, :])
                     infer = np.array(tmp_infer).reshape((len(idx), data.n_item_B))
-                    if j == 0:
-                        target = target_batch
-                        infer_all = infer
-                    else:
-                        target = np.concatenate((target, target_batch), axis=0)
-                        infer_all = np.concatenate((infer_all, infer), axis=0)
-                print(target.shape, infer_all.shape)
-                recall, hit, ndcg = calc_recall(infer_all, target[:, :-1], target[:, -1])
+                    for i in range(len(target_seq)):
+                        infer.append(infer[i, target_seq[i] - 1, :])
+                        train.append(target_batch[i, :target_seq[i] - 1])
+                        test.append([target_batch[i, target_seq[i] - 1]])
+                recall, hit, ndcg = calc_recall(infer, train, test)
                 print("iter: %d recall: %f, hit: %f, ndcg: %f" % (i, recall, hit, ndcg))
                 if recall > result[1]:
                     result = [i, recall, hit, ndcg]
