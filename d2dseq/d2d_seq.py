@@ -118,19 +118,20 @@ class D2Dseq(object):
         self.dec_emb_input = tf.placeholder(tf.float32, [None, None, self.dec_emb_size])
         self.target_sequence_length = tf.placeholder(tf.int32, [None])
         input_sequence_legth = tf.fill([tf.shape(self.input_data)[0]], tf.shape(self.input_data)[1])
+        max_target_sentence_length = tf.shape(self.target_data)[1]
 
         enc_outputs, enc_states = self.encoder_LSTM(self.input_data, self.n_layers, input_sequence_legth)
 
         # dec_input = self.process_decoder_input(target_data)
 
         train_output, infer_output = self.decoding_layer(self.dec_emb_input, enc_states, self.target_sequence_length,
-                                                    tf.shape(self.target_data)[1], self.n_hidden, self.n_layers,
+                                                   max_target_sentence_length, self.n_hidden, self.n_layers,
                                                     self.batch_size, self.keep_prob, self.dec_emb_size)
 
         training_logits = tf.identity(train_output.rnn_output, name='logits')
         self.inference_logits = tf.identity(infer_output.sample_id, name='predictions')
 
-        masks = tf.sequence_mask(self.target_sequence_length, self.max_target_sentence_length, dtype=tf.float32, name='masks')
+        masks = tf.sequence_mask(self.target_sequence_length, max_target_sentence_length, dtype=tf.float32, name='masks')
 
         with tf.name_scope("optimization"):
             # Loss function - weighted softmax cross entropy
