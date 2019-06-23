@@ -195,8 +195,9 @@ def main():
                         model.target_data: target_batch,
                         model.dec_emb_input: target_emb_batch,
                         model.target_sequence_length: target_seq}
-                infer, loss = sess.run([model.infer_output, model.cost], feed_dict=feed)
+                infer, loss = sess.run([model.inference_logits, model.cost], feed_dict=feed)
                 print(infer.shape)
+                print(infer)
                 if j == 0:
                     target = target_batch
                     infer_all = infer
