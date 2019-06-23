@@ -1,7 +1,6 @@
 import tensorflow as tf
 import argparse
-import pickle
-from dataset import Dataset
+from dataset import Dataset, calc_recall
 import numpy as np
 
 
@@ -187,15 +186,27 @@ def main():
 
         print("Loss last batch: %f"%loss)
 
-        if i%10 == 0:
+        if i%1 == 0:
             for j in range(int(train_no / batch_size)+1):
                 idx = list(range(j * batch_size, min((j + 1) * batch_size), val_no))
-                input_emb_batch, target_batch, target_emb_batch = data.create_batch(val_id[idx])
+                input_emb_batch, target_batch, target_emb_batch, target_seq = data.create_batch(val_id[idx])
                 feed = {model.input_data: input_emb_batch,
                         model.target_data: target_batch,
                         model.dec_emb_input: target_emb_batch,
                         model.target_sequence_length: target_seq}
                 infer, loss = sess.run([model.inference_logits, model.cost], feed_dict=feed)
+                print(infer.shape)
+                if j == 0:
+                    target = target_batch
+                    infer_all = infer
+                else:
+                    target = np.concatenate((target, target_batch), axis=0)
+                    infer_all = np.concatenate((infer_all, infer), axis=0)
+            print(target.shape, infer_all.shape)
+            recall, hit, ndcg = calc_recall(infer_all, target[:, :-1], target[:, -1])
+            print("iter: %d recall: %f, hit: %f, ndcg: %f" % (i, recall, hit, ndcg))
+
+
 
 
 if __name__ == '__main__':
