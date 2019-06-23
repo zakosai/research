@@ -129,6 +129,7 @@ class D2Dseq(object):
 
         training_logits = tf.identity(train_output.rnn_output, name='logits')
         self.inference_logits = tf.identity(infer_output.sample_id, name='predictions')
+        self.infer_output = infer_output
 
         masks = tf.sequence_mask(self.target_sequence_length, max_target_sentence_length, dtype=tf.float32, name='masks')
 
@@ -194,7 +195,7 @@ def main():
                         model.target_data: target_batch,
                         model.dec_emb_input: target_emb_batch,
                         model.target_sequence_length: target_seq}
-                infer, loss = sess.run([model.inference_logits, model.cost], feed_dict=feed)
+                infer, loss = sess.run([model.infer_output, model.cost], feed_dict=feed)
                 print(infer.shape)
                 if j == 0:
                     target = target_batch
