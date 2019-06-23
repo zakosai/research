@@ -199,7 +199,7 @@ def main():
                         model.target_data: target_batch,
                         model.dec_emb_input: target_emb_batch,
                         model.target_sequence_length: target_seq}
-                tmpinfer, loss = sess.run([model.inference_logits, model.cost], feed_dict=feed)
+                tmp_infer, loss = sess.run([model.inference_logits, model.cost], feed_dict=feed)
                 for i in range(len(target_seq)):
                     infer.append(tmp_infer[i, target_seq[i]-1, :])
                     train.append(target_batch[i, :target_seq[i]-1])
