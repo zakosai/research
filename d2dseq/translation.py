@@ -454,10 +454,11 @@ def main():
                                                                      model.loss_val_b, model.y_BA, model.y_AB],
                                               feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
 
-
-            recall = calc_recall(y_ba, dense_A_val, [10]) + calc_recall(y_ab, dense_B_val, [10])
-            print("Loss gen: %f, Loss val a: %f, Loss val b: %f, recall %f" % (loss_gen, loss_val_a, loss_val_b,
-                                                                               recall))
+            recall_val_A, _ = calc_recall(y_ba, dense_A_val, [10])
+            recall_val_B, _ = calc_recall(y_ab, dense_B_val, [10])
+            recall = recall_val_A + recall_val_B
+            print("Loss gen: %f, Loss val a: %f, Loss val b: %f, recall %f" %
+                  (loss_gen, loss_val_a, loss_val_b, recall))
             if recall > max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
