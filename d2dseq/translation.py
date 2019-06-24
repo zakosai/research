@@ -228,13 +228,13 @@ class Translation:
 def create_dataset(dataset, swap=False):
     data = pickle.load(open("data/%s/dataset.obj"%dataset, "rb"))
     if not swap:
-        num_A = list(open("data/%s/itemA.txt"%dataset))
-        num_B = list(open("data/%s/itemB.txt"%dataset))
+        num_A = len(list(open("data/%s/itemA.txt"%dataset)))
+        num_B = len(list(open("data/%s/itemB.txt"%dataset)))
         dense_A = data['rating_A']
         dense_B = data['rating_B']
     else:
-        num_B = list(open("data/%s/itemA.txt"%dataset))
-        num_A = list(open("data/%s/itemB.txt"%dataset))
+        num_B = len(list(open("data/%s/itemA.txt"%dataset)))
+        num_A = len(list(open("data/%s/itemB.txt"%dataset)))
         dense_B = data['rating_A']
         dense_A = data['rating_B']
 
