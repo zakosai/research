@@ -308,7 +308,7 @@ def calc_recall(pred, test, m=[100], type=None):
         print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
 
 
-    return np.mean(np.array(recall))
+    return np.mean(np.array(recall)), np.mean(ndcg)
 
 def dcg_score(y_true, y_score, k=50):
     """Discounted cumulative gain (DCG) at rank K.
@@ -401,8 +401,13 @@ def main():
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(max_to_keep=20)
     max_recall = 0
-    dense_A_val = dense_A[train_size:train_size+val_size]
-    dense_B_val = dense_B[train_size:train_size+val_size]
+    dense_A_val = [dense_A[i] for i in val_id]
+    dense_B_val = [dense_B[i] for i in val_id]
+
+    f = open("experiment/%s/result.txt" % args.data, "a")
+    f.write("-------------------------\n")
+    f.write("D2D-TM \n")
+    result = []
 
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(train_size)
@@ -450,7 +455,7 @@ def main():
                                               feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
 
 
-            recall = calc_recall(y_ba, dense_A_val, [50]) + calc_recall(y_ab, dense_B_val, [50])
+            recall = calc_recall(y_ba, dense_A_val, [10]) + calc_recall(y_ab, dense_B_val, [10])
             print("Loss gen: %f, Loss val a: %f, Loss val b: %f, recall %f" % (loss_gen, loss_val_a, loss_val_b,
                                                                                recall))
             if recall > max_recall:
@@ -464,43 +469,22 @@ def main():
                 # y_ab = y_ab[test_B]
                 # y_ba = y_ba[test_A]
 
-                calc_recall(y_ba, dense_A_test, k, type="A")
-                calc_recall(y_ab, dense_B_test, k, type="B")
+                recall_A, ndcg_A = calc_recall(y_ba, dense_A_test, [10], type="A")
+                recall_B, ndcg_B = calc_recall(y_ab, dense_B_test, [10], type="B")
+                if recall_A > result[1] or recall_B > result[3]:
+                    result = [i, recall_A, ndcg_A, recall_B, ndcg_B]
 
             model.train = True
         if i%100 == 0:
             model.learning_rate /= 10
             print("decrease lr to %f"%model.learning_rate)
-
-            # pred = np.array(y_ab).flatten()
-            # test = np.array(user_B_val).flatten()
-            # rmse = calc_rmse(pred, test)
-            # print("Loss val a: %f, Loss val b: %f, rmse %f" % (loss_val_a, loss_val_b, rmse))
-            # if rmse < max_recall:
-            #     max_recall = rmse
-            #     saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
+    f.write("iter: %d - recall A : %f - ndcg A: %f - recall B : %f - ndcg B: %f\n" %
+            (result[0], result[1], result[2], result[3], result[4]))
+    f.write("Last result- recall A: %d - ndcg A:%f - recall B: %d - ndcg B:%f\n" %
+            (recall_A, ndcg_A, recall_B, ndcg_B))
 
     print(max_recall)
-    # model.train = False
-    # loss_test_a, loss_test_b, y_ab, y_ba = sess.run([model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
-    #                         feed_dict={model.x_A: user_A_test[200:],model.x_B: user_B_test[200:]})
-    # print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
-    # model.train = True
-    #
-    # dense_A_test = dense_A[(train_size+200):]
-    # dense_B_test = dense_B[(train_size+200):]
-    #
-    #
-    # print("recall B: %f"%(calc_recall(y_ab, dense_B_test)))
-    # print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
 
-    # pred_a = np.array(y_ba).flatten()
-    # test_a = np.array(user_A_test).flatten()
-    # print("rmse A %f"%calc_rmse(pred_a, test_a))
-    #
-    # pred_a = np.array(y_ab).flatten()
-    # test_a = np.array(user_B_test).flatten()
-    # print("rmse B %f" % calc_rmse(pred_a, test_a))
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data',  type=str, default="Health_Grocery",
