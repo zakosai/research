@@ -22,7 +22,7 @@ class Dataset(object):
 
         self.eos_A = self.n_item_A
         self.eos_B = self.n_item_B
-        self.go = self.n_item_B
+        self.go = self.n_item_B + 1
         self.n_item_B += 2
         self.n_item_A += 1
 
@@ -35,7 +35,7 @@ class Dataset(object):
 
         for i, r in enumerate(rating):
             for j in range(len(r)-type):
-                emb[i, j] = 1
+                emb[r[j], i] = 1
         return emb
 
 
