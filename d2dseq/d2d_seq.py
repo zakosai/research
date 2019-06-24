@@ -173,9 +173,9 @@ def main():
     f.write("-------------------------\n")
     A, B = args.data.split("_")
     if args.swap:
-        f.write("A: %s - B: %s"%(B, A))
+        f.write("A: %s - B: %s\n"%(B, A))
     else:
-        f.write("A: %s - B: %s"%(A, B))
+        f.write("A: %s - B: %s\n"%(A, B))
 
 
     sess = tf.Session()
