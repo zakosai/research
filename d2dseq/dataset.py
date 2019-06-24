@@ -2,12 +2,20 @@ import pickle
 import numpy as np
 
 class Dataset(object):
-    def __init__(self, folder, seq_len):
+    def __init__(self, folder, seq_len, swap=False):
         self.n_user = len(list(open("%s/user.txt"%folder)))
         self.n_item_A = len(list(open("%s/itemA.txt"%folder)))
         self.n_item_B = len(list(open("%s/itemB.txt"%folder)))
-
         self.dataset = pickle.load(open("%s/dataset.obj"%folder, "rb"))
+
+        if swap:
+            tmp = self.n_item_A
+            self.n_item_A = self.n_item_B
+            self.n_item_B = tmp
+            tmp = self.dataset['rating_A']
+            self.dataset['rating_A'] = self.dataset['rating_B']
+            self.dataset['rating_B'] = tmp
+            tmp = 0
 
         self.seq_len = seq_len
         self.max_target_sequence = max([len(i) for i in self.dataset['rating_B']])
