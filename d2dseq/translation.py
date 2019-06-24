@@ -407,7 +407,7 @@ def main():
     f = open("experiment/%s/result.txt" % args.data, "a")
     f.write("-------------------------\n")
     f.write("D2D-TM \n")
-    result = []
+    result = [0, 0, 0, 0, 0]
 
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(train_size)
