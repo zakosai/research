@@ -399,7 +399,7 @@ def main():
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
-    saver = tf.train.Saver(max_to_keep=20)
+    saver = tf.train.Saver(max_to_keep=1)
     max_recall = 0
     dense_A_val = [dense_A[i] for i in val_id]
     dense_B_val = [dense_B[i] for i in val_id]
@@ -461,7 +461,7 @@ def main():
                   (loss_gen, loss_val_a, loss_val_b, recall))
             if recall > max_recall:
                 max_recall = recall
-                saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
+                saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'))
                 loss_test_a, loss_test_b, y_ab, y_ba = sess.run(
                     [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
                  feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
