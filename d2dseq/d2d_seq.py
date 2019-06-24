@@ -151,11 +151,13 @@ def main():
     parser.add_argument('--seq_length', type=int, default=20, help='sequence length encode')
     parser.add_argument('--iter', type=int, default=300, help='sequence length encode')
     parser.add_argument('--batch_size', type=int, default=500, help='sequence length encode')
+    parser.add_argument('--swap', type=bool, default=False, help='swap domain A and B')
+
     args = parser.parse_args()
     iter = args.iter
     batch_size = args.batch_size
 
-    data = Dataset("data/%s"%args.data, args.seq_length)
+    data = Dataset("data/%s"%args.data, args.seq_length, args.swap)
 
 
     model = D2Dseq(data.n_item_A, data.n_item_B, batch_size, data.n_user, data.n_user, data.seq_len,
@@ -169,6 +171,12 @@ def main():
     val_no = len(val_id)
     f = open("experiment/%s/result.txt" % args.data, "a")
     f.write("-------------------------\n")
+    A, B = args.data.split("_")
+    if args.swap:
+        f.write("A: %s - B: %s"%(B, A))
+    else:
+        f.write("A: %s - B: %s"%(A, B))
+
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
