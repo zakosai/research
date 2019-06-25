@@ -365,6 +365,50 @@ def create_user_info(data_dir):
     fuser.close()
     ftime.close()
 
+
+def create_gru4rec(dataset):
+    data = pd.read_csv("data/%s/ratings.txt"%dataset, sep="::", header=None)
+    data.columns = ["user_id", "item_id", "rating", "date"]
+    index = pd.DatetimeIndex(data.date)
+    data.date = index.astype(np.int64) // 10 ** 9
+    data = data.sort_values(by=["user_id", "date"])
+
+    test_id = list(open("data/%s/test.txt"%dataset))
+    test_id = [int(t.strip().split(" ")[0]) for t in test_id]
+
+    train_session = []
+    train_time = []
+    test_session = []
+    test_time = []
+    user_id = 0
+    date = -1
+    for _, row in data.iterrows():
+        if row.user_id == user_id and row.date == date:
+            item_list.append(row.item_id)
+        else:
+            if date != -1 and len(item_list) > 0:
+                if user_id in test_id:
+                    test_session.append(item_list)
+                    test_time.append(date)
+                else:
+                    train_session.append(item_list)
+                    train_time.append(date)
+            item_list = []
+            user_id = row.user_id
+            date = row.date
+
+    def write_file(sess, time, type="train"):
+        f = open("GRU4Rec_Tensorflow/data/%s/%s.txt"%(dataset, type), "w")
+        f.write("SessionId,ItemId,Timestamps\n")
+        for j, s in enumerate(sess):
+            for i in s:
+                f.write("%d,%d,%d\n"%(j, i, time[j]))
+        f.close()
+
+    write_file(train_session, train_time, "train")
+    write_file(test_session, test_time, "test")
+
+
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--data', type=str, default="Tool",
                     help='dataset name')
@@ -372,12 +416,13 @@ parser.add_argument('--data', type=str, default="Tool",
 if __name__ == '__main__':
     # args = parser.parse_args()
     # type = args.data
-    dataset = ["book"]
+    dataset = ["book", "Garden", "Automotive", "Beauty", "Grocery", "Outdoor", "Office"]
     # fsum = open("data/summary.txt", "a")
     for type in dataset:
         # dir_r = "../cf-vae/data/%s"%type
         # create_amazon(dir_r, type, fsum)
-        # create_amazon_based_on_ratings(dir_r, type, fsum)
-        create_user_info("data/%s"%type)
+        # # create_amazon_based_on_ratings(dir_r, type, fsum)
+        # create_user_info("data/%s"%type)
+        create_gru4rec(type)
 
 
