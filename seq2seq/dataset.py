@@ -226,7 +226,7 @@ class Dataset(object):
     def convert_time(self, t):
         if t == 0:
             return [0]*23
-        time = datetime.fromtimestamp(int(t))
+        time = datetime.utcfromtimestamp(int(t))
         hour = [0]*4
         weekday = [0]*7
         month = [0]*12

@@ -26,7 +26,10 @@ def getDF(path):
 def create_amazon(dir_r, type, fsum):
     fsum.write("-----------------------------------------------\n %s - %s\n"%(type, dir_r))
     data = getDF("%s/reviews.json.gz"%dir_r) #read review
-    os.makedirs("data/%s"%type)
+    if not os.path.exists("data/%s"%type):
+        os.makedirs("data/%s"%type)
+    data.sort_values(by=['reviewerID', 'unixReviewTime'], inplace=True)
+
 
     item_unique = sorted(data.asin.unique())
     user_unique = sorted(data.reviewerID.unique())
@@ -44,10 +47,10 @@ def create_amazon(dir_r, type, fsum):
         uid = user_unique.index(r.reviewerID)
         iid = item_unique.index(r.asin)
         if ratings[uid] == 0:
-            ratings[uid] = [[iid, r.overall, r.reviewTime]]
+            ratings[uid] = [[iid, r.overall, r.unixReviewTime]]
         else:
-            ratings[uid].append([iid, r.overall, r.reviewTime])
-        f.write("%d::%i::%d::%s\n" % (uid, iid, int(r.overall), r.reviewTime))
+            ratings[uid].append([iid, r.overall, r.unixReviewTime])
+        f.write("%d,%i,%d,%s\n" % (uid, iid, int(r.overall), r.unixReviewTime))
     f.close()
 
     print("Max item user rated: %d" % max([len(i) for i in ratings]))
@@ -77,7 +80,7 @@ def create_amazon(dir_r, type, fsum):
     # os.mkdir("data/%s/implicit"%type)
     ftrain = open("data/%s/train.txt" % type, "w")
     for idx in train_id:
-        user = np.array(ratings[idx]).reshape((len(ratings[idx]), 3))
+        user = np.array(ratings[idx]).reshape((len(ratings[idx]), 3)).astype(np.int32)
         user = user[np.argsort(user[:, 2])]
         item = list(user[:, 0])
         item = [str(i) for i in item]
@@ -86,7 +89,7 @@ def create_amazon(dir_r, type, fsum):
 
     ftest = open("data/%s/test.txt" % type, "w")
     for idx in test_id:
-        user = np.array(ratings[idx]).reshape((len(ratings[idx]), 3))
+        user = np.array(ratings[idx]).reshape((len(ratings[idx]), 3)).astype(np.int32)
         user = user[np.argsort(user[:, 2])]
         item = list(user[:, 0])
         item = [str(i) for i in item]
@@ -185,8 +188,6 @@ def create_amazon_based_on_ratings(dir_r, type, fsum):
     fsum.write("Min item user rated: %d\n" % min([len(i) for i in ratings]))
     fsum.write("Mean item user rated: %d\n" % np.mean([len(i) for i in ratings]))
 
-
-
     # write user_id, item_id to file
     f = open("%s/user_id.txt" % dir_w, "w")
     f.write("\n".join(user_unique))
@@ -195,9 +196,6 @@ def create_amazon_based_on_ratings(dir_r, type, fsum):
     f = open("%s/item_id.txt" % dir_w, "w")
     f.write("\n".join(item_unique))
     f.close()
-
-
-
 
     # Divide train, test
 
@@ -209,7 +207,7 @@ def create_amazon_based_on_ratings(dir_r, type, fsum):
     ftrain = open("%s/train.txt" % dir_w, "w")
     for idx in train_id:
         user = np.array(ratings[idx]).reshape((len(ratings[idx]), 3))
-        # user = user[np.argsort(user[:, 2])]
+        user = user[np.argsort(user[:, 2])]
         item = [int(i) for i in list(user[:, 0])]
         item = [str(i) for i in item]
         ftrain.write("%d %s\n" % (idx, " ".join(item)))
@@ -218,7 +216,7 @@ def create_amazon_based_on_ratings(dir_r, type, fsum):
     ftest = open("%s/test.txt" % dir_w, "w")
     for idx in test_id:
         user = np.array(ratings[idx]).reshape((len(ratings[idx]), 3))
-        # user = user[np.argsort(user[:, 2])]
+        user = user[np.argsort(user[:, 2])]
         item = [int(i) for i in list(user[:, 0])]
         item = [str(i) for i in item]
         ftest.write("%d %s\n" % (idx, " ".join(item)))
@@ -275,7 +273,7 @@ def create_user_info(data_dir):
     if data_dir == "data/ml-1m":
         ratings = np.genfromtxt("%s/ratings.txt" % data_dir, np.int32, delimiter=" ", )
     else:
-        ratings = np.genfromtxt("%s/ratings.txt" % data_dir, np.int32, delimiter="::", )
+        ratings = np.genfromtxt("%s/ratings.txt" % data_dir, np.int32, delimiter=",", )
     user_info = []
     time_info = []
     fuser = open("%s/user_info_train.txt" % data_dir, "w")
@@ -302,7 +300,7 @@ def create_user_info(data_dir):
             if p == rat[1] or u == rat[0]:
                 r[rat[2] - 1] += 1
                 # cat += categories[rat[1]]
-                t = datetime.fromtimestamp(rat[3])
+                t = datetime.utcfromtimestamp(int(rat[3]))
                 weekdays[t.weekday()] += 1
                 time.append(rat[3])
                 line_no += 1
@@ -347,7 +345,7 @@ def create_user_info(data_dir):
             if p == rat[1] or u == rat[0]:
                 r[rat[2] - 1] += 1
                 # cat += categories[rat[1]]
-                t = datetime.fromtimestamp(rat[3])
+                t = datetime.utcfromtimestamp(int(rat[3]))
                 hour[int(t.hour/6)] += 1
                 weekdays[t.weekday()] += 1
                 time.append(rat[3])
@@ -387,7 +385,7 @@ def create_gru4rec(dataset):
             item_list.append(row.item_id)
         else:
             if date != -1 and len(item_list) > 0:
-                if user_id in test_id:
+                if user_id in test_id and len(item_list) > 1:
                     test_session.append(item_list)
                     test_time.append(date)
                 else:
@@ -414,15 +412,19 @@ parser.add_argument('--data', type=str, default="Tool",
                     help='dataset name')
 
 if __name__ == '__main__':
-    # args = parser.parse_args()
-    # type = args.data
-    dataset = ["book", "Garden", "Automotive", "Beauty", "Grocery", "Outdoor", "Office"]
-    # fsum = open("data/summary.txt", "a")
-    for type in dataset:
-        # dir_r = "../cf-vae/data/%s"%type
-        # create_amazon(dir_r, type, fsum)
-        # # create_amazon_based_on_ratings(dir_r, type, fsum)
-        # create_user_info("data/%s"%type)
-        create_gru4rec(type)
+    args = parser.parse_args()
+    type = args.data
+    fsum = open("data/summary.txt", "a")
+    create_amazon("data/%s"%type, type, fsum)
+    create_user_info("data/%s"%type)
+    fsum.close()
+    # dataset = ["book", "Garden", "Automotive", "Beauty", "Grocery", "Outdoor", "Office"]
+    # # fsum = open("data/summary.txt", "a")
+    # for type in dataset:
+    #     # dir_r = "../cf-vae/data/%s"%type
+    #     # create_amazon(dir_r, type, fsum)
+    #     # # create_amazon_based_on_ratings(dir_r, type, fsum)
+    #     # create_user_info("data/%s"%type)
+    #     create_gru4rec(type)
 
 
