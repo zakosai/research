@@ -213,7 +213,8 @@ class Seq2seq(object):
         # out_cat, _ = self.encoder_BiLSTM(self.X_cat, "cat2", self.n_hidden*2)
         # print(out_cat.shape)
         # last_state_cat = tf.reshape(out_cat[:, -1, :], (-1, self.n_hidden*4))
-        z, z_mu, z_sigma = self.encode(self.X_cat, [600, 200])
+        self.z_dim = 200
+        z, z_mu, z_sigma = self.encode(self.X_cat, [600])
         x_recon = self.decode(z, [600])
         last_state = tf.concat([last_state, z], axis=1)
         # last_state_cat = self.mlp(self.X_cat)
