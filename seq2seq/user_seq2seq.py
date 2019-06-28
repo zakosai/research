@@ -9,7 +9,6 @@ import math
 from scipy.sparse import load_npz
 
 
-
 class Seq2seq(object):
     def __init__(self, n_layers=2):
         self.w_size = 10
@@ -148,7 +147,6 @@ class Seq2seq(object):
             for i in range(len(self.layers)):
                 x_ = layers.fully_connected(x_, self.layers[i], self.active_function, scope="mlp_%d" % i,weights_regularizer=self.regularizer)
         return x_
-
 
 
     def loss_reconstruct(self, x, x_recon):
@@ -355,7 +353,6 @@ def main():
             % (result[0], result[1], result[2], result[3]))
     f.write("Last result- recall: %f - hit: %f - ndcg:%f\n"%(recall_test, hit, ndcg))
     print(max_recall)
-
 
 
 parser = argparse.ArgumentParser(description='Process some integers.')
