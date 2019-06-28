@@ -9,7 +9,6 @@ import math
 from scipy.sparse import load_npz
 
 
-
 class Seq2seq(object):
     def __init__(self, n_layers=2):
         self.w_size = 10
@@ -150,7 +149,6 @@ class Seq2seq(object):
         return x_
 
 
-
     def loss_reconstruct(self, x, x_recon):
         log_softmax_var = -tf.nn.log_softmax(x_recon)
 
@@ -213,17 +211,19 @@ class Seq2seq(object):
         # out_cat, _ = self.encoder_BiLSTM(self.X_cat, "cat2", self.n_hidden*2)
         # print(out_cat.shape)
         # last_state_cat = tf.reshape(out_cat[:, -1, :], (-1, self.n_hidden*4))
-        self.z_dim = 200
-        z, z_mu, z_sigma = self.encode(self.X_cat, [600])
-        x_recon = self.decode(z, [600])
-        last_state = tf.concat([last_state, z], axis=1)
-        # last_state_cat = self.mlp(self.X_cat)
-        # last_state_cat = tf.reshape(last_state_cat, (tf.shape(self.X)[0], self.layers[-1]))
-        # last_state = tf.concat([last_state, last_state_cat], axis=1)
+        # self.z_dim = 200
+        # self.eps = 1e-10
+        # z, z_mu, z_sigma = self.encode(self.X_cat, [600])
+        # x_recon = self.decode(z, [600, self.cat_dim])
+        # last_state = tf.concat([last_state, z], axis=1)
+        last_state_cat = self.mlp(self.X_cat)
+        last_state_cat = tf.reshape(last_state_cat, (tf.shape(self.X)[0], self.layers[-1]))
+        last_state = tf.concat([last_state, last_state_cat], axis=1)
 
         self.loss, self.predict = self.prediction(last_state, tf.reshape(self.y[:, -1, :], (-1, self.n_products)))
-        self.loss += 0.1 * self.loss_kl(z_mu, z_sigma) + 100 * self.loss_reconstruct(x,x_recon) + \
-                    0.1* tf.losses.get_regularization_loss()
+        # self.loss += 1e-3 * self.loss_kl(z_mu, z_sigma) + \
+        #             0.1 * self.loss_reconstruct(self.X_cat,x_recon) + \
+        #             1e-3* tf.losses.get_regularization_loss()
         # self.loss *=10
         # for i in range(self.w_size-1):
         #     x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden/2))
@@ -240,9 +240,9 @@ class Seq2seq(object):
 
 
 def main():
-    iter = 150
     args = parser.parse_args()
     batch_size = args.batch_size
+    iter = args.iter
     dataset = args.data
     type = args.type
     # text = load_npz("data/%s/item.npz" % dataset).toarray()
@@ -267,7 +267,7 @@ def main():
         model.p_dim += data.time_dim
     # model.p_dim = data.n_user
     # model.cat_dim = text.shape[1]
-    model.cat_dim = data.user_info_train.shape[1] + data.n_item
+    model.cat_dim = data.n_item
     model.n_products = data.n_item
     model.build_model()
 
@@ -340,20 +340,19 @@ def main():
                     else:
                         y = np.concatenate((y, y_b_val), axis=0)
                         y_val = np.concatenate((y_val, y_b), axis=0)
-                recall, hit, ndcg = calc_recall(y, data.tmp_test, data.infer2)
+                recall_test, hit, ndcg = calc_recall(y, data.tmp_test, data.infer2)
                 np.savez(os.path.join(checkpoint_dir, "pred"), p_val=y_val, p_test=y)
-                print("iter: %d recall: %f, hit: %f, ndcg: %f" % (i, recall, hit, ndcg))
-                if recall > result[1]:
-                    result = [i, recall, hit, ndcg]
+                print("iter: %d recall: %f, hit: %f, ndcg: %f" % (i, recall_test, hit, ndcg))
+                if recall_test > result[1]:
+                    result = [i, recall_test, hit, ndcg]
             model.train = True
         if i % 100 == 0 and model.learning_rate > 1e-6:
             model.learning_rate /= 10
             print("decrease lr to %f" % model.learning_rate)
     f.write("iter: %d - recall: %f - hit: %f - ndcg: %f\n"
             % (result[0], result[1], result[2], result[3]))
-    f.write("Last result- recall: %f - hit: %f - ndcg:%f\n"%(recall, hit, ndcg))
+    f.write("Last result- recall: %f - hit: %f - ndcg:%f\n"%(recall_test, hit, ndcg))
     print(max_recall)
-
 
 
 parser = argparse.ArgumentParser(description='Process some integers.')
@@ -367,6 +366,7 @@ parser.add_argument('--batch_size', type=int, default=1000)
 parser.add_argument('--cat', type=bool, default=False)
 parser.add_argument('--time', type=bool, default=False)
 parser.add_argument('--n_layers', type=int, default=2)
+parser.add_argument('--iter', type=int, default=150)
 
 
 if __name__ == '__main__':
