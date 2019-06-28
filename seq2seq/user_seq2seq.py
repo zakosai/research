@@ -238,9 +238,9 @@ def main():
                 X, y, u = data.create_batch_u(list_idx, data.X_iter, data.y_iter, data.train, data.time_emb)
             else:
                 X, y, u = data.create_batch_u(list_idx, data.X_iter, data.y_iter, data.train)
-            t = np.concatenate((data.user_info_train[list_idx], u), axis=-1)
+            # u = np.concatenate((data.user_info_train[list_idx], u), axis=-1)
 
-            feed = {model.X: X, model.y:y, model.X_cat:t}
+            feed = {model.X: X, model.y:y, model.X_cat:u}
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
         if i % 10 == 0:
@@ -252,9 +252,9 @@ def main():
                                                         data.tmp_val,data.time_emb_val)
                 else:
                     X_b_val, y_b, u = data.create_batch_u(idx, data.val, data.val_infer, data.tmp_val)
-                t_b = np.concatenate((data.user_info_val[idx], u), axis=-1)
+                # u = np.concatenate((data.user_info_val[idx], u), axis=-1)
 
-                feed = {model.X: X_b_val, model.X_cat:t_b, model.y:y_b}
+                feed = {model.X: X_b_val, model.X_cat:u, model.y:y_b}
                 loss_val, y_b_val = sess.run([model.loss, model.predict],feed_dict=feed)
                 if j == 0:
                     p_val = y_b_val
@@ -275,8 +275,8 @@ def main():
                                                           data.time_emb_test)
                     else:
                         X_b_test, y_b, u = data.create_batch_u(idx, data.test, data.infer2, data.tmp_test)
-                    t_b = np.concatenate((data.user_info_test[idx], u), axis=-1)
-                    feed = {model.X: X_b_test, model.X_cat: t_b, model.y: y_b}
+                    # t_b = np.concatenate((data.user_info_test[idx], u), axis=-1)
+                    feed = {model.X: X_b_test, model.X_cat: u, model.y: y_b}
                     loss_val, y_b_val = sess.run([model.loss, model.predict],feed_dict=feed)
                     if j == 0:
                         y = y_b_val
@@ -295,7 +295,7 @@ def main():
             print("decrease lr to %f" % model.learning_rate)
     f.write("iter: %d - recall: %f - hit: %f - ndcg: %f\n"
             % (result[0], result[1], result[2], result[3]))
-    f.write("Last result- recall: %d - hit: %f - ndcg:%f\n"%(recall, hit, ndcg))
+    f.write("Last result- recall: %f - hit: %f - ndcg:%f\n"%(recall, hit, ndcg))
     print(max_recall)
 
 
