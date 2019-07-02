@@ -30,9 +30,11 @@ def create_amazon(dir_r, type, fsum):
         os.makedirs("data/%s"%type)
     data.sort_values(by=['reviewerID', 'unixReviewTime'], inplace=True)
 
-
+    group = data.groupby(['reviewerID'])
+    len_group = group.apply(lambda x: len(x))
+    user_unique = len_group[len_group >= 15].keys().tolist()
     item_unique = sorted(data.asin.unique())
-    user_unique = sorted(data.reviewerID.unique())
+    # user_unique = sorted(data.reviewerID.unique())
     print("# num of user: %d \n# num of item: %d" % (len(user_unique), len(item_unique)))
     fsum.write("# num of user: %d \n# num of item: %d\n" % (len(user_unique), len(item_unique)))
 
@@ -44,13 +46,14 @@ def create_amazon(dir_r, type, fsum):
     ratings = [0] * n_user
     f = open("data/%s/ratings.txt" % type, "w")
     for _, r in data.iterrows():
-        uid = user_unique.index(r.reviewerID)
-        iid = item_unique.index(r.asin)
-        if ratings[uid] == 0:
-            ratings[uid] = [[iid, r.overall, r.unixReviewTime]]
-        else:
-            ratings[uid].append([iid, r.overall, r.unixReviewTime])
-        f.write("%d,%i,%d,%s\n" % (uid, iid, int(r.overall), r.unixReviewTime))
+        if r.reviewerID in user_unique:
+            uid = user_unique.index(r.reviewerID)
+            iid = item_unique.index(r.asin)
+            if ratings[uid] == 0:
+                ratings[uid] = [[iid, r.overall, r.unixReviewTime]]
+            else:
+                ratings[uid].append([iid, r.overall, r.unixReviewTime])
+            f.write("%d,%i,%d,%s\n" % (uid, iid, int(r.overall), r.unixReviewTime))
     f.close()
 
     print("Max item user rated: %d" % max([len(i) for i in ratings]))
