@@ -365,7 +365,7 @@ def create_user_info(data_dir):
 
 
 def create_gru4rec(dataset):
-    data = pd.read_csv("data/%s/ratings.txt"%dataset, sep="::", header=None)
+    data = pd.read_csv("data/%s/ratings.txt"%dataset, sep=",", header=None)
     data.columns = ["user_id", "item_id", "rating", "date"]
     index = pd.DatetimeIndex(data.date)
     data.date = index.astype(np.int64) // 10 ** 9
@@ -396,7 +396,7 @@ def create_gru4rec(dataset):
             date = row.date
 
     def write_file(sess, time, type="train"):
-        f = open("GRU4Rec_Tensorflow/data/%s/%s.txt"%(dataset, type), "w")
+        f = open("GRU4Rec_TensorFlow/data/%s/%s.txt"%(dataset, type), "w")
         f.write("SessionId,ItemId,Timestamps\n")
         for j, s in enumerate(sess):
             for i in s:
@@ -415,9 +415,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
     type = args.data
     fsum = open("data/summary.txt", "a")
-    create_amazon("data/%s"%type, type, fsum)
+    create_amazon("../cf-vae/data/%s"%type, type, fsum)
     create_user_info("data/%s"%type)
     fsum.close()
+    # create_gru4rec(type)
     # dataset = ["book", "Garden", "Automotive", "Beauty", "Grocery", "Outdoor", "Office"]
     # # fsum = open("data/summary.txt", "a")
     # for type in dataset:
