@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
-dataset="Garden Automotive Beauty Grocery Outdoor Tool Toy Office Pet "
+dataset="Pet Clothing Phone"
+for data in $dataset; do
+    python user_seq2seq.py --data=$data --cat=True --time=True --w_size=4
+done
+
+dataset="TV CD Kitchen Kindle Health App Electronics Books"
 wsize="5 10"
 for data in $dataset; do
     for w in $wsize; do
