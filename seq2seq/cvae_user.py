@@ -526,26 +526,6 @@ class cf_vae_extend:
 
     def save_model(self, save_path_pmf):
         # self.saver.save(self.sess, save_path_weights)
-        sio.savemat(save_path_pmf, {"U":self.U, "V":self.V, "Z":self.exp_z, "Z_im":self.exp_z_im})
-        print "all parameters saved"
-
-    def load_model(self, load_path_pmf):
-        # self.saver.restore(self.sess, load_path_weights)
-        data = sio.loadmat(load_path_pmf)
-        try:
-            self.U = data["U"]
-            self.V = data["V"]
-            self.exp_z = data["Z"]
-            self.exp_z_im = data["Z_im"]
-            print "model loaded"
-        except:
-            self.U = data["m_U"]
-            self.V = data["m_V"]
-            self.exp_z = data["m_theta"]
-            print "model loaded"
-
-    def save_model(self, save_path_pmf):
-        # self.saver.save(self.sess, save_path_weights)
         scipy.io.savemat(save_path_pmf, {"U":self.U, "V":self.V, "Z":self.exp_z, "Z_im":self.exp_z_im})
         print "all parameters saved"
 
@@ -618,7 +598,7 @@ class cf_vae_extend:
         recall_avgs = []
         precision_avgs = []
         mapk_avgs = []
-        for m in [10]:
+        for m in [50]:
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
             ndcg = []
@@ -639,19 +619,19 @@ class cf_vae_extend:
                 except:
                     pass
                 recall_vals.append(recall_val)
-                # pred = np.array(pred_all[i])
-                # score = []
-                # for k in range(m):
-                #     if top_M[k] in hits:
-                #         score.append(1)
-                #     else:
-                #         score.append(0)
-                # actual = self.dcg_score(score, pred[top_M], m)
-                # best = self.dcg_score(score, score, m)
-                # if best ==0:
-                #     ndcg.append(0)
-                # else:
-                #     ndcg.append(float(actual)/best)
+                pred = np.array(pred_all[i])
+                score = []
+                for k in range(m):
+                    if top_M[k] in hits:
+                        score.append(1)
+                    else:
+                        score.append(0)
+                actual = self.dcg_score(score, pred[top_M], m)
+                best = self.dcg_score(score, score, m)
+                if best ==0:
+                    ndcg.append(0)
+                else:
+                    ndcg.append(float(actual)/best)
                 # precision = float(hits_num) / float(m)
                 # precision_vals.append(precision)
 
@@ -660,13 +640,13 @@ class cf_vae_extend:
             # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
             #                        [u for u in user_all if len(u)!=0], m)
 
-            print("recall %f, hit: %f, NDCG:"%(recall_avg, float(hit)/len(user_all),))
+            print("recall %f, hit: %f, NDCG: %f"%(recall_avg, float(hit)/len(user_all),np.mean(ndcg)))
             #print recall_avg
             if file != None:
                 file.write("m = %d, recall = %f\t"%(m, recall_avg))
             # precision_avgs.append(precision_avg)
         return recall_avg
-    def dcg_score(self, y_true, y_score, k=5):
+    def dcg_score(self, y_true, y_score, k=50):
         """Discounted cumulative gain (DCG) at rank K.
 
         Parameters

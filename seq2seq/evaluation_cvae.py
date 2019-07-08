@@ -3,7 +3,7 @@ __author__ = 'linh'
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.sparse import load_npz
-from cvae_user import cf_vae_extend, params
+from cvae_user import cf_vae_extend, params_class
 import argparse
 import os
 import scipy
@@ -85,7 +85,7 @@ def read_file(dir, item_no):
 
     return train, item, infer, train_no
 
-params = params()
+params = params_class()
 params.lambda_u = 1
 params.lambda_v = 10
 params.lambda_r = 0.1
@@ -93,8 +93,9 @@ params.C_a = 1
 params.C_b = 0.01
 params.max_iter_m = 1
 
+n_item = len(list(open(os.path.join(data_dir, "item_id.txt"))))
 
-data = load_cvae_data(data_dir)
+data = load_cvae_data(data_dir, n_item)
 num_factors = 50
 model = cf_vae_extend(num_users=6040, num_items=3706, num_factors=num_factors, params=params,
     input_dim=8000, encoding_dims=[200, 100], z_dim = 50, decoding_dims=[100, 200, 8000], decoding_dims_str=[100,200, 1863],
@@ -103,6 +104,6 @@ model = cf_vae_extend(num_users=6040, num_items=3706, num_factors=num_factors, p
 
 # d = os.path.join(ckpt, "vae.mat")
 # print(d)
-model.load_model(os.path.join(ckpt, extend_file))
+model.load_model(extend_file)
 pred = model.predict_all()
 model.predict_val(pred, data['train_users'], data['test_users'])
