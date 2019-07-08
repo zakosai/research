@@ -7,6 +7,9 @@ done
 dataset="TV CD Kitchen Kindle Health App Electronics Books"
 wsize="5 10"
 for data in $dataset; do
+    mkdir experiment/$data
+    mkdir experiment/$data/cvae
+    python preprocessing.py --data=$data
     for w in $wsize; do
         python seq2seq.py --data=$data --bilstm=False --n_layers=1 --w_size=$w
         python user_seq2seq.py --data=$data --cat=True --time=True --w_size=$w
