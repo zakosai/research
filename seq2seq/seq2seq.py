@@ -162,8 +162,9 @@ def main():
     # data.create_item_cat("data/%s/%s"%(dataset, type))
 
     # data.item_emb = text.toarray()
-
+    print(args.bilstm)
     model = Seq2seq(args.n_layers, args.bilstm)
+    print(model.bilstm)
     # model.p_dim = data.n_user
     model.n_products = data.n_item
     model.w_size = args.w_size
