@@ -253,7 +253,7 @@ def main():
     data.create_user_info("data/%s"%dataset)
 
 
-    model = Seq2seq()
+    model = Seq2seq(model_type=args.model_type)
     # model.p_dim = data.n_user
     model.w_size = args.w_size
     model.p_dim = data.n_user
