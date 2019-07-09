@@ -19,10 +19,10 @@ class Seq2seq(object):
         self.train = True
         self.cat_dim = 18
         self.layers = [1000, 100]
-        # self.item_cat = item_cat.astype(np.float32)
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.active_function = tf.nn.tanh
         self.n_layers = n_layers
+        self.model_type = 'bilstm'
 
 
     def encoder_BiLSTM(self, X, scope, n_hidden):
@@ -185,56 +185,20 @@ class Seq2seq(object):
         self.X = tf.placeholder(tf.float32, [None, self.w_size, self.p_dim])
         self.X_cat = tf.placeholder(tf.float32, [None, self.cat_dim])
         self.y = tf.placeholder(tf.float32, [None, self.w_size, self.n_products])
-        # self.y_cat = tf.placeholder(tf.float32, [None, self.cat_dim])
 
         self.seq_len = tf.fill([tf.shape(self.X)[0]], self.w_size)
-
-        # assert tf.shape(self.X)[0] == tf.shape(self.X_cat)[0]
-
+        outputs = self.X
         for i in range(self.n_layers):
-            outputs, _ = self.encoder_BiLSTM(self.X,  str(i+1), self.n_hidden/(4**i))
-
-        # outputs, _ = self.encoder_biGRU(outputs, "2", self.n_hidden*2)
-        # with tf.variable_scope('attention'):
-        #     outputs, self.alphas = self.attention(outputs)
-        #
-        # # Dropout
-        # with tf.variable_scope('dropout'):
-        #     outputs = tf.nn.dropout(outputs, 0.8)
+            outputs, _ = self.encoder_BiLSTM(outputs,  str(i+1), self.n_hidden/(4**i))
 
         last_state = tf.reshape(outputs[:, -1, :],
                                 (tf.shape(self.X)[0], self.n_hidden*2/(4*(self.n_layers-1))))
-        # last_state = outputs
 
-        # Categories
-        # out_cat, _ = self.encoder_BiLSTM(self.X_cat, "cat", self.n_hidden)
-        # out_cat, _ = self.encoder_BiLSTM(self.X_cat, "cat2", self.n_hidden*2)
-        # print(out_cat.shape)
-        # last_state_cat = tf.reshape(out_cat[:, -1, :], (-1, self.n_hidden*4))
-        # self.z_dim = 200
-        # self.eps = 1e-10
-        # z, z_mu, z_sigma = self.encode(self.X_cat, [600])
-        # x_recon = self.decode(z, [600, self.cat_dim])
-        # last_state = tf.concat([last_state, z], axis=1)
         last_state_cat = self.mlp(self.X_cat)
         last_state_cat = tf.reshape(last_state_cat, (tf.shape(self.X)[0], self.layers[-1]))
         last_state = tf.concat([last_state, last_state_cat], axis=1)
 
         self.loss, self.predict = self.prediction(last_state, tf.reshape(self.y[:, -1, :], (-1, self.n_products)))
-        # self.loss += 1e-3 * self.loss_kl(z_mu, z_sigma) + \
-        #             0.1 * self.loss_reconstruct(self.X_cat,x_recon) + \
-        #             1e-3* tf.losses.get_regularization_loss()
-        # self.loss *=10
-        # for i in range(self.w_size-1):
-        #     x = tf.reshape(outputs[:, i, :], (-1, self.n_hidden/2))
-        #     x = tf.concat([x, last_state_cat], axis=1)
-        #     y = tf.reshape(self.y[:, i, :], (-1, self.n_products))
-        #     loss, _ = self.prediction(x, y, reuse=True)
-        #     self.loss += loss
-
-        # self.loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(tf.reshape(self.y[:, -1, :], (-1, self.n_products)), self.predict, 100))
-
-        # self.loss = self.loss_reconstruct(self.y, self.predict)
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
 
