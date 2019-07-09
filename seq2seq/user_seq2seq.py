@@ -28,9 +28,9 @@ class Seq2seq(object):
     def encoder_BiLSTM(self, X, scope, n_hidden):
         with tf.variable_scope("cell_def_%s"%scope):
             f_cell = tf.nn.rnn_cell.LSTMCell(n_hidden, state_is_tuple=True)
-            f_cell = tf.contrib.rnn.DropoutWrapper(cell=f_cell, output_keep_prob=0.7)
+            f_cell = tf.contrib.rnn.DropoutWrapper(cell=f_cell, output_keep_prob=0.9)
             b_cell = tf.nn.rnn_cell.LSTMCell(n_hidden, state_is_tuple=True)
-            b_cell = tf.contrib.rnn.DropoutWrapper(cell=b_cell, output_keep_prob=0.7)
+            b_cell = tf.contrib.rnn.DropoutWrapper(cell=b_cell, output_keep_prob=0.9)
         with tf.variable_scope("cell_op_%s"%scope):
             outputs1, last_state = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, X, sequence_length=self.seq_len,dtype=tf.float32)
 
@@ -41,9 +41,9 @@ class Seq2seq(object):
     def encoder_biGRU(self, X, scope, n_hidden):
         with tf.variable_scope("cell_def_%s" % scope):
             f_cell = tf.nn.rnn_cell.GRUCell(n_hidden, activation=tf.nn.tanh)
-            f_cell = tf.contrib.rnn.DropoutWrapper(cell=f_cell, output_keep_prob=0.7)
+            f_cell = tf.contrib.rnn.DropoutWrapper(cell=f_cell, output_keep_prob=0.9)
             b_cell = tf.nn.rnn_cell.GRUCell(n_hidden, activation=tf.nn.tanh)
-            b_cell = tf.contrib.rnn.DropoutWrapper(cell=b_cell, output_keep_prob=0.7)
+            b_cell = tf.contrib.rnn.DropoutWrapper(cell=b_cell, output_keep_prob=0.9)
         with tf.variable_scope("cell_op_%s" % scope):
             outputs1, last_state = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, X, sequence_length=self.seq_len,dtype=tf.float32)
 
@@ -59,7 +59,7 @@ class Seq2seq(object):
                 cell = tf.contrib.rnn.LSTMCell(self.n_hidden, state_is_tuple=True)
                 # cell = tf.contrib.rnn.AttentionCellWrapper(
                 #     cell, attn_length=24, state_is_tuple=True)
-                cell = tf.contrib.rnn.DropoutWrapper(cell=cell, output_keep_prob=0.7)
+                cell = tf.contrib.rnn.DropoutWrapper(cell=cell, output_keep_prob=0.9)
                 stack_cell.append(cell)
 
         stack = tf.contrib.rnn.MultiRNNCell(stack_cell, state_is_tuple=True)
@@ -76,7 +76,7 @@ class Seq2seq(object):
                 cell = tf.contrib.rnn.GRUCell(self.n_hidden, activation=tf.nn.tanh)
                 # cell = tf.contrib.rnn.AttentionCellWrapper(
                 #     cell, attn_length=24, state_is_tuple=True)
-                cell = tf.contrib.rnn.DropoutWrapper(cell=cell, output_keep_prob=0.7)
+                cell = tf.contrib.rnn.DropoutWrapper(cell=cell, output_keep_prob=0.9)
                 stack_cell.append(cell)
 
         stack = tf.contrib.rnn.MultiRNNCell(stack_cell, state_is_tuple=True)
