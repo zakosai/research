@@ -270,10 +270,10 @@ parser.add_argument('--type', type=str, default="implicit",
                     help='1p or 8p')
 parser.add_argument('--num_p', type=int, default=7780, help='number of product')
 parser.add_argument('--w_size', type=int, default=10, help='window size')
-parser.add_argument('--bilstm', type=bool, default=False, help='window size')
 parser.add_argument('--n_layers', type=int, default=2, help='window size')
 parser.add_argument('--cat', type=bool, default=False, help='window size')
 parser.add_argument('--time', type=bool, default=False, help='window size')
+parser.add_argument('--bilstm', type=bool, default=False, help='window size')
 
 if __name__ == '__main__':
     main()
