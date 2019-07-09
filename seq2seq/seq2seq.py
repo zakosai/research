@@ -116,13 +116,13 @@ class Seq2seq(object):
 
         # assert tf.shape(self.X)[0] == tf.shape(self.X_cat)[0]
 
+        outputs = self.X
         if self.bilstm:
             for i in range(self.n_layer):
-                outputs, _ = self.encoder_BiLSTM(self.X, str(i+1), self.n_hidden*2**i)
+                outputs, _ = self.encoder_BiLSTM(outputs, str(i+1), self.n_hidden*2**i)
             last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden * 2**(i+1)))
         else:
-            for i in range(self.n_layer):
-                outputs, _ = self.encoder_LSTM(self.X, str(i+1), self.n_hidden)
+            outputs, _ = self.encoder_LSTM(self.X, self.n_layer)
             last_state = tf.reshape(outputs[:, -1, :], (-1, self.n_hidden))
 
         # with tf.variable_scope('attention'):
