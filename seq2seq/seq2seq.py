@@ -38,11 +38,11 @@ class Seq2seq(object):
         return outputs, last_state
 
 
-    def encoder_LSTM(self, X, n_layers):
+    def encoder_LSTM(self, X, scope, n_hidden):
         stack_cell = []
         for i in range(n_layers):
             with tf.variable_scope("encoder_%d"%i):
-                cell = tf.contrib.rnn.LSTMCell(self.n_hidden, state_is_tuple=True)
+                cell = tf.contrib.rnn.LSTMCell(n_hidden, state_is_tuple=True)
                 # cell = tf.contrib.rnn.AttentionCellWrapper(
                 #     cell, attn_length=24, state_is_tuple=True)
                 cell = tf.contrib.rnn.DropoutWrapper(cell=cell, output_keep_prob=0.8)
@@ -162,9 +162,7 @@ def main():
     # data.create_item_cat("data/%s/%s"%(dataset, type))
 
     # data.item_emb = text.toarray()
-    print(args.bilstm)
     model = Seq2seq(args.n_layers, args.bilstm)
-    print(model.bilstm)
     # model.p_dim = data.n_user
     model.n_products = data.n_item
     model.w_size = args.w_size

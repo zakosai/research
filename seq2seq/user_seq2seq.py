@@ -10,7 +10,7 @@ from scipy.sparse import load_npz
 
 
 class Seq2seq(object):
-    def __init__(self, n_layers=2):
+    def __init__(self, n_layers=2, model_type='bilstm'):
         self.w_size = 10
         self.p_dim = 100
         self.n_products = 3706
@@ -22,7 +22,7 @@ class Seq2seq(object):
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.active_function = tf.nn.tanh
         self.n_layers = n_layers
-        self.model_type = 'bilstm'
+        self.model_type = model_type
 
 
     def encoder_BiLSTM(self, X, scope, n_hidden):
@@ -57,6 +57,23 @@ class Seq2seq(object):
         for i in range(n_layers):
             with tf.variable_scope("encoder_%d"%i):
                 cell = tf.contrib.rnn.LSTMCell(self.n_hidden, state_is_tuple=True)
+                # cell = tf.contrib.rnn.AttentionCellWrapper(
+                #     cell, attn_length=24, state_is_tuple=True)
+                cell = tf.contrib.rnn.DropoutWrapper(cell=cell, output_keep_prob=0.8)
+                stack_cell.append(cell)
+
+        stack = tf.contrib.rnn.MultiRNNCell(stack_cell, state_is_tuple=True)
+
+        # The second output is the last state and we will not use that
+        outputs, last_state = tf.nn.dynamic_rnn(stack, X, self.seq_len, dtype=tf.float32)
+
+        return outputs, last_state
+
+    def encoder_gru(self, X, n_layers):
+        stack_cell = []
+        for i in range(n_layers):
+            with tf.variable_scope("encoder_%d"%i):
+                cell = tf.contrib.rnn.GRUCell(self.n_hidden, activation=tf.nn.tanh)
                 # cell = tf.contrib.rnn.AttentionCellWrapper(
                 #     cell, attn_length=24, state_is_tuple=True)
                 cell = tf.contrib.rnn.DropoutWrapper(cell=cell, output_keep_prob=0.8)
@@ -188,11 +205,26 @@ class Seq2seq(object):
 
         self.seq_len = tf.fill([tf.shape(self.X)[0]], self.w_size)
         outputs = self.X
-        for i in range(self.n_layers):
-            outputs, _ = self.encoder_BiLSTM(outputs,  str(i+1), self.n_hidden/(4**i))
+        if self.model_type == 'bilstm':
+            for i in range(self.n_layers):
+                outputs, _ = self.encoder_BiLSTM(outputs,  str(i+1), self.n_hidden/(4**i))
 
-        last_state = tf.reshape(outputs[:, -1, :],
-                                (tf.shape(self.X)[0], self.n_hidden*2/(4*(self.n_layers-1))))
+            last_state = tf.reshape(outputs[:, -1, :],
+                                    (tf.shape(self.X)[0], self.n_hidden*2/(4*(self.n_layers-1))))
+        if self.model_type == 'bigru':
+            for i in range(self.n_layers):
+                outputs, _ = self.encoder_biGRU(outputs, str(i + 1), self.n_hidden / (4 ** i))
+
+            last_state = tf.reshape(outputs[:, -1, :],
+                                    (tf.shape(self.X)[0], self.n_hidden * 2 / (4 * (self.n_layers - 1))))
+        elif self.model_type == 'lstm':
+            outputs, _ = self.encoder_LSTM(self.X, self.n_layers)
+            last_state = tf.reshape(outputs[:, -1, :],
+                                   (tf.shape(self.X)[0], self.n_hidden * 2 / (2 * (self.n_layers - 1))))
+        elif self.model_type == 'gru':
+            outputs, _ = self.encoder_gru(self.X, self.n_layers)
+            last_state = tf.reshape(outputs[:, -1, :],
+                                    (tf.shape(self.X)[0], self.n_hidden * 2 / (2 * (self.n_layers - 1))))
 
         last_state_cat = self.mlp(self.X_cat)
         last_state_cat = tf.reshape(last_state_cat, (tf.shape(self.X)[0], self.layers[-1]))
@@ -331,6 +363,7 @@ parser.add_argument('--cat', type=bool, default=False)
 parser.add_argument('--time', type=bool, default=False)
 parser.add_argument('--n_layers', type=int, default=2)
 parser.add_argument('--iter', type=int, default=150)
+parser.add_argument('--model_type', type=str, default='bilstm')
 
 
 if __name__ == '__main__':
