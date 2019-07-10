@@ -210,21 +210,21 @@ class Seq2seq(object):
                 outputs, _ = self.encoder_BiLSTM(outputs,  str(i+1), self.n_hidden/(4**i))
 
             last_state = tf.reshape(outputs[:, -1, :],
-                                    (tf.shape(self.X)[0], self.n_hidden*2/(4*(self.n_layers-1))))
+                                    (tf.shape(self.X)[0], self.n_hidden*2/(4**(self.n_layers-1))))
         if self.model_type == 'bigru':
             for i in range(self.n_layers):
                 outputs, _ = self.encoder_biGRU(outputs, str(i + 1), self.n_hidden / (4 ** i))
 
             last_state = tf.reshape(outputs[:, -1, :],
-                                    (tf.shape(self.X)[0], self.n_hidden * 2 / (4 * (self.n_layers - 1))))
+                                    (tf.shape(self.X)[0], self.n_hidden * 2 / (4**(self.n_layers - 1))))
         elif self.model_type == 'lstm':
             outputs, _ = self.encoder_LSTM(self.X, self.n_layers)
             last_state = tf.reshape(outputs[:, -1, :],
-                                   (tf.shape(self.X)[0], self.n_hidden * 2 / (2 * (self.n_layers - 1))))
+                                   (tf.shape(self.X)[0], self.n_hidden * 2 / (2**(self.n_layers - 1))))
         elif self.model_type == 'gru':
             outputs, _ = self.encoder_gru(self.X, self.n_layers)
             last_state = tf.reshape(outputs[:, -1, :],
-                                    (tf.shape(self.X)[0], self.n_hidden * 2 / (2 * (self.n_layers - 1))))
+                                    (tf.shape(self.X)[0], self.n_hidden * 2 / (2**(self.n_layers - 1))))
 
         last_state_cat = self.mlp(self.X_cat)
         last_state_cat = tf.reshape(last_state_cat, (tf.shape(self.X)[0], self.layers[-1]))
