@@ -221,8 +221,7 @@ class Seq2seq(object):
 
 
 
-def main():
-    args = parser.parse_args()
+def main(args):
     batch_size = args.batch_size
     iter = args.iter
     dataset = args.data
@@ -337,20 +336,17 @@ def main():
     print(max_recall)
 
 
-parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument('--data', type=str, default="Tool",
-                    help='dataset name')
-parser.add_argument('--type', type=str, default="implicit",
-                    help='1p or 8p')
-parser.add_argument('--num_p', type=int, default=7780, help='number of product')
-parser.add_argument('--w_size', type=int, default=10, help='window size')
-parser.add_argument('--batch_size', type=int, default=1000)
-parser.add_argument('--cat', type=bool, default=False)
-parser.add_argument('--time', type=bool, default=False)
-parser.add_argument('--n_layers', type=int)
-parser.add_argument('--iter', type=int, default=150)
-parser.add_argument('--model_type', type=str, default='bilstm')
-
-
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('--data', type=str, default="Tool", help='dataset name')
+    parser.add_argument('--type', type=str, default="implicit", help='1p or 8p')
+    parser.add_argument('--num_p', type=int, default=7780, help='number of product')
+    parser.add_argument('--w_size', type=int, default=10, help='window size')
+    parser.add_argument('--batch_size', type=int, default=1000)
+    parser.add_argument('--cat', type=bool, default=False)
+    parser.add_argument('--time', type=bool, default=False)
+    parser.add_argument('--n_layers', type=int)
+    parser.add_argument('--iter', type=int, default=150)
+    parser.add_argument('--model_type', type=str, default='bilstm')
+    args = parser.parse_args()
+    main(args)
