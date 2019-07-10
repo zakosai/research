@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-dataset="Automotive Beauty Grocery Outdoor Tool Toy Office Pet Music Instrument Clothing Video Phone"
+dataset="Beauty Grocery Outdoor Tool Toy Office Pet Music Instrument Clothing Video Phone"
 wsize="5 10"
 for data in $dataset; do
     for w in $wsize; do
