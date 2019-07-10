@@ -258,8 +258,8 @@ def main(args):
 
     f = open("experiment/%s/result.txt"%dataset, "a")
     f.write("-------------------------\n")
-    f.write("Data: %s - num_p: %d - user info\nbilstm: True - n_layers: 2 - w_size:%d - model_type: %s\n"
-            %(dataset, data.n_item, data.w_size, model.model_type))
+    f.write("Data: %s - num_p: %d - user info\nbilstm: True - n_layers: %d - w_size:%d - model_type: %s\n"
+            %(dataset, data.n_item, model.n_layers, data.w_size, model.model_type))
     f.write("cat: %s - time: %s\n" % (args.cat, args.time))
     result = [0,0,0,0]
 
