@@ -155,6 +155,7 @@ class Dataset(object):
         self.tmp_val = []
         self.time_emb_val = []
         self.time_emb_test = []
+        val_size = int(len(tmp_test)*0.17)
         for i, tr in enumerate(tmp_test):
             # if len(tr) > self.w_size+1:
             #     n = np.random.randint((len(tr)-self.w_size-1))
@@ -175,9 +176,9 @@ class Dataset(object):
                     time.append(self.convert_time(time_test[i][j]))
 
                 self.time_emb_test.append(time)
-        self.val = self.test[:int(len(tmp_test)*0.17)]
-        self.time_emb_val = self.time_emb_test[:int(len(tmp_test*0.17))]
-        self.val_infer = self.infer2[:int(len(tmp_test)*0.17)]
+        self.val = self.test[:val_size]
+        self.time_emb_val = self.time_emb_test[:val_size]
+        self.val_infer = self.infer2[:val_size]
         self.val = np.reshape(self.val, (len(self.val), self.w_size))
         self.test = np.reshape(self.test, (len(self.test), self.w_size))
         self.list_u = list_u
