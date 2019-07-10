@@ -347,7 +347,7 @@ parser.add_argument('--w_size', type=int, default=10, help='window size')
 parser.add_argument('--batch_size', type=int, default=1000)
 parser.add_argument('--cat', type=bool, default=False)
 parser.add_argument('--time', type=bool, default=False)
-parser.add_argument('--n_layers', type=int, default=2)
+parser.add_argument('--n_layers', type=int)
 parser.add_argument('--iter', type=int, default=150)
 parser.add_argument('--model_type', type=str, default='bilstm')
 
