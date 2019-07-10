@@ -206,11 +206,11 @@ class Seq2seq(object):
         elif self.model_type == 'lstm':
             outputs, _ = self.encoder_LSTM(self.X, self.n_layers)
             last_state = tf.reshape(outputs[:, -1, :],
-                                   (tf.shape(self.X)[0], self.n_hidden / (2**(self.n_layers - 1))))
+                                   (tf.shape(self.X)[0], self.n_hidden))
         elif self.model_type == 'gru':
             outputs, _ = self.encoder_gru(self.X, self.n_layers)
             last_state = tf.reshape(outputs[:, -1, :],
-                                    (tf.shape(self.X)[0], self.n_hidden / (2**(self.n_layers - 1))))
+                                    (tf.shape(self.X)[0], self.n_hidden))
 
         last_state_cat = self.mlp(self.X_cat)
         last_state_cat = tf.reshape(last_state_cat, (tf.shape(self.X)[0], self.layers[-1]))
