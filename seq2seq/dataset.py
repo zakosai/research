@@ -27,8 +27,6 @@ class Dataset(object):
         self.des = des
         self.n_item += 1
 
-
-
     def read_file(self, filename):
         train = []
         infer = []
@@ -158,18 +156,18 @@ class Dataset(object):
         self.time_emb_val = []
         self.time_emb_test = []
         for i, tr in enumerate(tmp_test):
-            if len(tr) > self.w_size+1:
-                n = np.random.randint((len(tr)-self.w_size-1))
-                self.tmp_val.append(tr)
-                self.val.append(tr[n:n + self.w_size])
-                self.val_infer.append([tr[n + self.w_size]])
-                list_u.append(i)
-                if self.time:
-                    time = []
-                    for j in range(n+1, n+self.w_size+1):
-                        time.append(self.convert_time(time_test[i][j]))
-
-                    self.time_emb_val.append(time)
+            # if len(tr) > self.w_size+1:
+            #     n = np.random.randint((len(tr)-self.w_size-1))
+            #     self.tmp_val.append(tr)
+            #     self.val.append(tr[n:n + self.w_size])
+            #     self.val_infer.append([tr[n + self.w_size]])
+            #     list_u.append(i)
+            #     if self.time:
+            #         time = []
+            #         for j in range(n+1, n+self.w_size+1):
+            #             time.append(self.convert_time(time_test[i][j]))
+            #
+            #         self.time_emb_val.append(time)
             self.test.append(tr[-self.w_size:])
             if self.time:
                 time = []
@@ -177,7 +175,9 @@ class Dataset(object):
                     time.append(self.convert_time(time_test[i][j]))
 
                 self.time_emb_test.append(time)
-
+        self.val = self.test[:int(len(tmp_test)*0.17)]
+        self.time_emb_val = self.time_emb_test[:int(len(tmp_test*0.17))]
+        self.val_infer = self.infer2[:int(len(tmp_test)*0.17)]
         self.val = np.reshape(self.val, (len(self.val), self.w_size))
         self.test = np.reshape(self.test, (len(self.test), self.w_size))
         self.list_u = list_u
