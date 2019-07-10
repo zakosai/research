@@ -267,7 +267,7 @@ class Dataset(object):
         return time_test
 
 
-def calc_recall(pred, train, test, k=10, type=None):
+def calc_recall(pred, train, test, k=50, type=None):
     pred_ab = np.argsort(-pred)
     recall = []
     ndcg = []
