@@ -179,6 +179,7 @@ class Dataset(object):
         self.val = self.test[:val_size]
         self.time_emb_val = self.time_emb_test[:val_size]
         self.val_infer = self.infer2[:val_size]
+        self.tmp_val = tmp_test[:val_size]
         list_u = list(range(val_size))
         self.val = np.reshape(self.val, (len(self.val), self.w_size))
         self.test = np.reshape(self.test, (len(self.test), self.w_size))
