@@ -136,7 +136,6 @@ class Seq2seq(object):
         # return tf.reduce_mean(tf.abs(x - x_recon))
         return neg_ll
 
-
     def attention(self, inputs):
         # Trainable parameters
         hidden_size = inputs.shape[2].value
@@ -165,18 +164,6 @@ class Seq2seq(object):
                 x_ = layers.fully_connected(x_, self.layers[i], self.active_function, scope="mlp_%d" % i,weights_regularizer=self.regularizer)
         return x_
 
-
-    def loss_reconstruct(self, x, x_recon):
-        log_softmax_var = -tf.nn.log_softmax(x_recon)
-
-        neg_ll = tf.reduce_mean(tf.reduce_sum(
-            log_softmax_var * x,
-            axis=-1))
-        # return tf.reduce_mean(tf.abs(x - x_recon))
-
-        return neg_ll
-
-
     def prediction(self, x, y, cat=None, y_cat=None, reuse=False):
         with tf.variable_scope("last_layer", reuse=reuse):
             x_ = x
@@ -196,7 +183,6 @@ class Seq2seq(object):
                 loss = self.loss_reconstruct(y, out)
 
         return loss, out
-
 
     def build_model(self):
         self.X = tf.placeholder(tf.float32, [None, self.w_size, self.p_dim])
@@ -220,11 +206,11 @@ class Seq2seq(object):
         elif self.model_type == 'lstm':
             outputs, _ = self.encoder_LSTM(self.X, self.n_layers)
             last_state = tf.reshape(outputs[:, -1, :],
-                                   (tf.shape(self.X)[0], self.n_hidden * 2 / (2**(self.n_layers - 1))))
+                                   (tf.shape(self.X)[0], self.n_hidden / (2**(self.n_layers - 1))))
         elif self.model_type == 'gru':
             outputs, _ = self.encoder_gru(self.X, self.n_layers)
             last_state = tf.reshape(outputs[:, -1, :],
-                                    (tf.shape(self.X)[0], self.n_hidden * 2 / (2**(self.n_layers - 1))))
+                                    (tf.shape(self.X)[0], self.n_hidden / (2**(self.n_layers - 1))))
 
         last_state_cat = self.mlp(self.X_cat)
         last_state_cat = tf.reshape(last_state_cat, (tf.shape(self.X)[0], self.layers[-1]))
