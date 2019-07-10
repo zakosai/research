@@ -236,8 +236,7 @@ def main(args):
     # data.item_cat = np.concatenate((data.item_cat, variables), axis=-1)
 
     data.create_user_info("data/%s"%dataset)
-
-
+    print(args.n_layers, args.model_type)
     model = Seq2seq(n_layers=args.n_layers, model_type=args.model_type)
     # model.p_dim = data.n_user
     model.w_size = args.w_size
