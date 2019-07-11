@@ -3,7 +3,7 @@ python user_seq2seq.py --data=Beauty --cat=True --time=True --w_size=5 --n_layer
 python user_seq2seq.py --data=Beauty --cat=True --time=True --w_size=5 --n_layers=1 --model_type=bilstm
 python user_seq2seq.py --data=Beauty --cat=True --time=True --w_size=10 --n_layers=2 --model_type=bilstm
 python user_seq2seq.py --data=Beauty --cat=True --time=True --w_size=10 --n_layers=1 --model_type=bilstm
-dataset="Beauty Grocery Outdoor Tool Toy Office Pet Music Instrument Clothing Video Phone"
+dataset="Grocery Outdoor Tool Toy Office Pet Music Instrument Clothing Video Phone"
 wsize="5"
 for data in $dataset; do
     for w in $wsize; do
