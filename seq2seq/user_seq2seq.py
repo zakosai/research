@@ -265,7 +265,6 @@ def main(args):
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(data.n_user)
         data.create_train_iter()
-
         for j in range(0, int(data.n_user / batch_size)):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
             if args.time:
@@ -278,7 +277,6 @@ def main(args):
 
             feed = {model.X: X, model.y:y, model.X_cat:u}
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
-
         if i % 10 == 0:
             model.train = False
             for j in range(0, int(math.ceil(float(len(data.val)) / batch_size))):
@@ -287,8 +285,9 @@ def main(args):
                     X_b_val, y_b, u = data.create_batch_u(idx, data.val, data.val_infer,
                                                         data.tmp_val,data.time_emb_val)
                 else:
-                    X_b_val, y_b, u = data.create_batch_u(idx, data.val, data.val_infer, data.tmp_val)
-                # u = np.concatenate((data.user_info_val[idx], u), axis=-1)
+                    X_b_val, y_b, u = data.create_batch_u(idx, data.val,
+                                                          data.val_infer, data.tmp_val)
+                u = np.concatenate((data.user_info_val[idx], u), axis=-1)
 
                 feed = {model.X: X_b_val, model.X_cat:u, model.y:y_b}
                 loss_val, y_b_val = sess.run([model.loss, model.predict],feed_dict=feed)
@@ -311,7 +310,7 @@ def main(args):
                                                           data.time_emb_test)
                     else:
                         X_b_test, y_b, u = data.create_batch_u(idx, data.test, data.infer2, data.tmp_test)
-                    # t_b = np.concatenate((data.user_info_test[idx], u), axis=-1)
+                    u = np.concatenate((data.user_info_test[idx], u), axis=-1)
                     feed = {model.X: X_b_test, model.X_cat: u, model.y: y_b}
                     loss_val, y_b_val = sess.run([model.loss, model.predict],feed_dict=feed)
                     if j == 0:
