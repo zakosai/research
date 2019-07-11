@@ -10,20 +10,19 @@ from scipy.sparse import load_npz
 
 
 class Seq2seq(object):
-    def __init__(self, n_layers=2, model_type='bilstm'):
+    def __init__(self, n_layers=2, model_type='bilstm', global_dim=18):
         self.w_size = 10
         self.p_dim = 100
         self.n_products = 3706
         self.n_hidden = 512
         self.learning_rate = 1e-3
         self.train = True
-        self.cat_dim = 18
+        self.global_dim = global_dim
         self.layers = [1000, 100]
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.active_function = tf.nn.tanh
         self.n_layers = n_layers
         self.model_type = model_type
-
 
     def encoder_BiLSTM(self, X, scope, n_hidden):
         with tf.variable_scope("cell_def_%s"%scope):
@@ -32,10 +31,10 @@ class Seq2seq(object):
             b_cell = tf.nn.rnn_cell.LSTMCell(n_hidden, state_is_tuple=True)
             b_cell = tf.contrib.rnn.DropoutWrapper(cell=b_cell, output_keep_prob=0.8)
         with tf.variable_scope("cell_op_%s"%scope):
-            outputs1, last_state = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, X, sequence_length=self.seq_len,dtype=tf.float32)
-
+            outputs1, last_state = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, X,
+                                                                   sequence_length=self.seq_len,
+                                                                   dtype=tf.float32)
         outputs = tf.concat(outputs1, 2)
-
         return outputs, last_state
 
     def encoder_biGRU(self, X, scope, n_hidden):
@@ -45,10 +44,10 @@ class Seq2seq(object):
             b_cell = tf.nn.rnn_cell.GRUCell(n_hidden, activation=tf.nn.tanh)
             b_cell = tf.contrib.rnn.DropoutWrapper(cell=b_cell, output_keep_prob=0.8)
         with tf.variable_scope("cell_op_%s" % scope):
-            outputs1, last_state = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, X, sequence_length=self.seq_len,dtype=tf.float32)
-
+            outputs1, last_state = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, X,
+                                                                   sequence_length=self.seq_len,
+                                                                   dtype=tf.float32)
         outputs = tf.concat(outputs1, 2)
-
         return outputs, last_state
 
 
@@ -66,7 +65,6 @@ class Seq2seq(object):
 
         # The second output is the last state and we will not use that
         outputs, last_state = tf.nn.dynamic_rnn(stack, X, self.seq_len, dtype=tf.float32)
-
         return outputs, last_state
 
     def encoder_gru(self, X, n_layers):
@@ -83,7 +81,6 @@ class Seq2seq(object):
 
         # The second output is the last state and we will not use that
         outputs, last_state = tf.nn.dynamic_rnn(stack, X, self.seq_len, dtype=tf.float32)
-
         return outputs, last_state
 
     def enc(self, x, scope, encode_dim, reuse=False):
@@ -93,7 +90,7 @@ class Seq2seq(object):
         #     x_ = tf.nn.dropout(x_, 0.3)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
-                x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
+                x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d" % i,
                                      weights_regularizer=self.regularizer)
         return x_
 
@@ -156,69 +153,63 @@ class Seq2seq(object):
 
         return output, alphas
 
-
     def mlp(self, x):
         x_ = x
         with tf.variable_scope("mlp"):
             for i in range(len(self.layers)):
-                x_ = layers.fully_connected(x_, self.layers[i], self.active_function, scope="mlp_%d" % i,weights_regularizer=self.regularizer)
+                x_ = layers.fully_connected(x_, self.layers[i], self.active_function,
+                                            scope="mlp_%d" % i,weights_regularizer=self.regularizer)
         return x_
 
-    def prediction(self, x, y, cat=None, y_cat=None, reuse=False):
+    def prediction(self, x, y, reuse=False):
         with tf.variable_scope("last_layer", reuse=reuse):
             x_ = x
-            # x_ = layers.fully_connected(x,50, self.active_function, scope="mlp",weights_regularizer=self.regularizer)
             out = layers.fully_connected(x_, self.n_products, tf.nn.tanh)
             # out = tf.nn.leaky_relu(out, alpha=0.2)
             # loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(y, out, 100))
-
-            if cat !=None:
-                pred_cat = layers.fully_connected(cat, self.cat_dim, tf.nn.tanh)
-                pred_cat = tf.reshape(pred_cat, [-1, self.cat_dim, 1])
-                out_cat = tf.matmul(tf.broadcast_to(self.item_cat, [tf.shape(cat)[0], self.item_cat.shape[0],self.item_cat.shape[1]]),  pred_cat)
-                pred = out_cat * out
-
-                loss = 10*self.loss_reconstruct(y, pred) + self.loss_reconstruct(y_cat, out_cat)
-            else:
-                loss = self.loss_reconstruct(y, out)
+            loss = self.loss_reconstruct(y, out)
 
         return loss, out
 
     def build_model(self):
-        self.X = tf.placeholder(tf.float32, [None, self.w_size, self.p_dim])
-        self.X_cat = tf.placeholder(tf.float32, [None, self.cat_dim])
+        self.X_local = tf.placeholder(tf.float32, [None, self.w_size, self.p_dim])
+        self.X_global = tf.placeholder(tf.float32, [None, self.global_dim])
         self.y = tf.placeholder(tf.float32, [None, self.w_size, self.n_products])
 
-        self.seq_len = tf.fill([tf.shape(self.X)[0]], self.w_size)
-        outputs = self.X
+        self.seq_len = tf.fill([tf.shape(self.X_local)[0]], self.w_size)
+        outputs = self.X_local
+        n_hidden = self.n_hidden * 4
         if self.model_type == 'bilstm':
             for i in range(self.n_layers):
-                outputs, _ = self.encoder_BiLSTM(outputs,  str(i+1), self.n_hidden/(4**i))
+                n_hidden /= 4
+                outputs, _ = self.encoder_BiLSTM(outputs,  str(i+1), n_hidden)
 
             last_state = tf.reshape(outputs[:, -1, :],
-                                    (tf.shape(self.X)[0], self.n_hidden*2/(4**(self.n_layers-1))))
+                                    (tf.shape(self.X_local)[0], n_hidden * 2))
         if self.model_type == 'bigru':
             for i in range(self.n_layers):
-                outputs, _ = self.encoder_biGRU(outputs, str(i + 1), self.n_hidden / (4 ** i))
+                n_hidden /= 4
+                outputs, _ = self.encoder_biGRU(outputs, str(i + 1), n_hidden)
 
             last_state = tf.reshape(outputs[:, -1, :],
-                                    (tf.shape(self.X)[0], self.n_hidden * 2 / (4**(self.n_layers - 1))))
+                                    (tf.shape(self.X_local)[0], n_hidden * 2))
         elif self.model_type == 'lstm':
-            outputs, _ = self.encoder_LSTM(self.X, self.n_layers)
+            outputs, _ = self.encoder_LSTM(self.X_local, self.n_layers)
             last_state = tf.reshape(outputs[:, -1, :],
-                                   (tf.shape(self.X)[0], self.n_hidden))
+                                   (tf.shape(self.X_local)[0], self.n_hidden))
         elif self.model_type == 'gru':
-            outputs, _ = self.encoder_gru(self.X, self.n_layers)
+            outputs, _ = self.encoder_gru(self.X_local, self.n_layers)
             last_state = tf.reshape(outputs[:, -1, :],
-                                    (tf.shape(self.X)[0], self.n_hidden))
+                                    (tf.shape(self.X_local)[0], self.n_hidden))
 
-        last_state_cat = self.mlp(self.X_cat)
-        last_state_cat = tf.reshape(last_state_cat, (tf.shape(self.X)[0], self.layers[-1]))
-        last_state = tf.concat([last_state, last_state_cat], axis=1)
+        last_state_global = self.mlp(self.X_global)
+        last_state_global = tf.reshape(last_state_global,
+                                       (tf.shape(self.X_global)[0], self.layers[-1]))
+        last_state = tf.concat([last_state, last_state_global], axis=1)
 
-        self.loss, self.predict = self.prediction(last_state, tf.reshape(self.y[:, -1, :], (-1, self.n_products)))
+        self.loss, self.predict = self.prediction(last_state,
+                                                  tf.reshape(self.y[:, -1, :], (-1, self.n_products)))
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
-
 
 
 def main(args):
@@ -245,7 +236,7 @@ def main(args):
         model.p_dim += data.time_dim
     # model.p_dim = data.n_user
     # model.cat_dim = text.shape[1]
-    model.cat_dim = data.n_item
+    model.user_dim = data.n_item + data.user_info_train.shape[1]
     model.n_products = data.n_item
     model.build_model()
 
