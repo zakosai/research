@@ -265,8 +265,9 @@ def main(args):
                 X, y, u = data.create_batch_u(list_idx, data.X_iter,
                                               data.y_iter, data.train)
             u = np.concatenate((data.user_info_train[list_idx], u), axis=-1)
-
-            feed = {model.X: X, model.y:y, model.X_cat:u}
+            feed = {model.X_local: X,
+                    model.y: y,
+                    model.X_global: u}
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
         if i % 10 == 0:
             model.train = False
@@ -279,9 +280,10 @@ def main(args):
                     X_b_val, y_b, u = data.create_batch_u(idx, data.val,
                                                           data.val_infer, data.tmp_val)
                 u = np.concatenate((data.user_info_val[idx], u), axis=-1)
-
-                feed = {model.X: X_b_val, model.X_cat:u, model.y:y_b}
-                loss_val, y_b_val = sess.run([model.loss, model.predict],feed_dict=feed)
+                feed = {model.X_local: X_b_val,
+                        model.X_global: u,
+                        model.y: y_b}
+                loss_val, y_b_val = sess.run([model.loss, model.predict], feed_dict=feed)
                 if j == 0:
                     p_val = y_b_val
                 else:
@@ -292,18 +294,19 @@ def main(args):
             if recall >= max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'bilstm-model'))
-
                 for j in range(int(math.ceil(float(len(data.test))/batch_size))):
                     idx = list(range(j*batch_size, min((j+1)*batch_size, len(data.test))))
                     if args.time:
-                        X_b_test, y_b, u = data.create_batch_u(idx, data.test,data.infer2,
+                        X_b_test, y_b, u = data.create_batch_u(idx, data.test, data.infer2,
                                                           data.tmp_test,
                                                           data.time_emb_test)
                     else:
                         X_b_test, y_b, u = data.create_batch_u(idx, data.test, data.infer2, data.tmp_test)
                     u = np.concatenate((data.user_info_test[idx], u), axis=-1)
-                    feed = {model.X: X_b_test, model.X_cat: u, model.y: y_b}
-                    loss_val, y_b_val = sess.run([model.loss, model.predict],feed_dict=feed)
+                    feed = {model.X_local: X_b_test,
+                            model.X_global: u,
+                            model.y: y_b}
+                    loss_val, y_b_val = sess.run([model.loss, model.predict], feed_dict=feed)
                     if j == 0:
                         y = y_b_val
                         y_val = y_b
