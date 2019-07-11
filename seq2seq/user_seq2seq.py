@@ -225,18 +225,16 @@ def main(args):
     batch_size = args.batch_size
     iter = args.iter
     dataset = args.data
-    type = args.type
-    # text = load_npz("data/%s/item.npz" % dataset).toarray()
 
-    num_p = len(list(open("data/%s/item_id.txt"%dataset)))
-    checkpoint_dir = "experiment/%s/" % (dataset)
-    data = Dataset(num_p, "data/%s"%(dataset), args.w_size, cat=args.cat, time=args.time)
-    # variables = load_npz("data/%s/item.npz"%dataset)
-    # variables = np.append(variables.toarray(), [[0]*variables.toarray().shape[1]], axis=0)
-    # data.item_cat = np.concatenate((data.item_cat, variables), axis=-1)
+    num_p = len(list(open("data/%s/item_id.txt" % dataset)))
+    checkpoint_dir = "experiment/%s/" % dataset
+    data = Dataset(n_item=num_p,
+                   folder="data/%s" % dataset,
+                   w_size=args.w_size,
+                   cat=args.cat,
+                   time=args.time)
 
-    data.create_user_info("data/%s"%dataset)
-    print(args.n_layers, args.model_type)
+    data.create_user_info("data/%s" % dataset)
     model = Seq2seq(n_layers=args.n_layers, model_type=args.model_type)
     # model.p_dim = data.n_user
     model.w_size = args.w_size
@@ -258,23 +256,25 @@ def main(args):
 
     f = open("experiment/%s/result.txt"%dataset, "a")
     f.write("-------------------------\n")
-    f.write("Data: %s - num_p: %d - user info\nbilstm: True - n_layers: %d - w_size:%d - model_type: %s\n"
-            %(dataset, data.n_item, model.n_layers, data.w_size, model.model_type))
+    f.write("Data: %s - num_p: %d - user info\n"
+            "bilstm: True - n_layers: %d - w_size:%d - model_type: %s\n"
+            % (dataset, data.n_item, model.n_layers, data.w_size, model.model_type))
     f.write("cat: %s - time: %s\n" % (args.cat, args.time))
-    result = [0,0,0,0]
+    result = [0, 0, 0, 0]
 
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(data.n_user)
-        train_cost = 0
         data.create_train_iter()
 
         for j in range(0, int(data.n_user / batch_size)):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
             if args.time:
-                X, y, u = data.create_batch_u(list_idx, data.X_iter, data.y_iter, data.train, data.time_emb)
+                X, y, u = data.create_batch_u(list_idx, data.X_iter, data.y_iter,
+                                              data.train, data.time_emb)
             else:
-                X, y, u = data.create_batch_u(list_idx, data.X_iter, data.y_iter, data.train)
-            # u = np.concatenate((data.user_info_train[list_idx], u), axis=-1)
+                X, y, u = data.create_batch_u(list_idx, data.X_iter,
+                                              data.y_iter, data.train)
+            u = np.concatenate((data.user_info_train[list_idx], u), axis=-1)
 
             feed = {model.X: X, model.y:y, model.X_cat:u}
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
