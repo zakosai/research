@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
-dataset="Pet Music Instrument Clothing Video Phone Grocery Outdoor Tool Toy Office "
+dataset="Music Instrument Clothing Video Phone Grocery Outdoor Tool Toy Office Pet"
 wsize="5"
 for data in $dataset; do
     for w in $wsize; do
-        python seq2seq.py --data=$data --n_layers=1 --w_size=$w
         python user_seq2seq.py --data=$data --cat=True --time=True --w_size=$w --n_layers=2 --model_type=bilstm
         python user_seq2seq.py --data=$data --cat=True --time=True --w_size=$w --n_layers=1 --model_type=bilstm
         python user_seq2seq.py --data=$data --cat=True --time=True --w_size=$w --model_type=bigru --n_layers=2
         python user_seq2seq.py --data=$data --cat=True --time=True --w_size=$w --model_type=bigru --n_layers=1
         python user_seq2seq.py --data=$data --cat=True --time=True --w_size=$w --model_type=gru --n_layers=1
-
+        python seq2seq.py --data=$data --n_layers=1 --w_size=$w
     done
 done
 python user_seq2seq.py --data=Beauty --cat=True --time=True --w_size=5 --n_layers=2 --model_type=bilstm
