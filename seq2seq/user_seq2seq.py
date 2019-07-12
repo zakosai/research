@@ -226,7 +226,8 @@ def main(args):
                    time=args.time)
 
     data.create_user_info("data/%s" % dataset)
-    model = Seq2seq(n_layers=args.n_layers, model_type=args.model_type)
+    user_dim = data.n_item + data.user_info_train.shape[1]
+    model = Seq2seq(n_layers=args.n_layers, model_type=args.model_type, global_dim=user_dim)
     # model.p_dim = data.n_user
     model.w_size = args.w_size
     model.p_dim = data.n_user
@@ -236,7 +237,6 @@ def main(args):
         model.p_dim += data.time_dim
     # model.p_dim = data.n_user
     # model.cat_dim = text.shape[1]
-    model.user_dim = data.n_item + data.user_info_train.shape[1]
     model.n_products = data.n_item
     model.build_model()
 
