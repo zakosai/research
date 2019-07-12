@@ -6,13 +6,9 @@ class Dataset(object):
         self.w_size = w_size
         self.n_item = n_item
 
-        train_file = "%s/train.txt"%folder
-        self.train, self.infer1 = self.read_file(train_file)
-        test_file = "%s/test.txt"%folder
-        self.tmp_test, self.infer2 = self.read_file(test_file)
-
+        self.train, self.infer1 = self.read_file("%s/train.txt" % folder)
+        self.tmp_test, self.infer2 = self.read_file("%s/test.txt" % folder)
         self.n_user = len(self.train)
-        self.cat_dim = 18
         self.hybrid = hybrid
         self.time_dim = 23
         self.time = time
@@ -42,7 +38,6 @@ class Dataset(object):
             infer.append([int(a[-1])])
         return train, infer
 
-
     def create_train_iter(self, text=[]):
         self.X_iter = []
         self.y_iter = []
@@ -66,7 +61,6 @@ class Dataset(object):
             self.item_emb[tr, [i]*len(tr)] = 1
             self.val2.append(tr[-self.w_size:])
 
-
         self.X_iter = np.reshape(self.X_iter, (self.n_user, self.w_size))
         self.y_iter = np.array(self.y_iter)
         self.val2 = np.array(self.val2)
@@ -74,7 +68,6 @@ class Dataset(object):
             self.item_emb = np.concatenate((self.item_emb, self.item_cat), axis=1)
         if self.des:
             self.item_emb = np.concatenate((self.item_emb, self.text), axis=1)
-
 
     def create_batch_u(self, idx, X_iter, y_iter, item_list, time=None):
         n_batch = len(idx)
