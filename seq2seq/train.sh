@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
-python user_seq2seq.py --data=Beauty --cat=True --time=True --w_size=5 --n_layers=2 --model_type=bilstm
-python user_seq2seq.py --data=Beauty --cat=True --time=True --w_size=5 --n_layers=1 --model_type=bilstm
-python user_seq2seq.py --data=Beauty --cat=True --time=True --w_size=10 --n_layers=2 --model_type=bilstm
-python user_seq2seq.py --data=Beauty --cat=True --time=True --w_size=10 --n_layers=1 --model_type=bilstm
-dataset="Grocery Outdoor Tool Toy Office Pet Music Instrument Clothing Video Phone"
+dataset="Pet Music Instrument Clothing Video Phone Grocery Outdoor Tool Toy Office "
 wsize="5"
 for data in $dataset; do
     for w in $wsize; do
@@ -16,6 +12,10 @@ for data in $dataset; do
 
     done
 done
+python user_seq2seq.py --data=Beauty --cat=True --time=True --w_size=5 --n_layers=2 --model_type=bilstm
+python user_seq2seq.py --data=Beauty --cat=True --time=True --w_size=5 --n_layers=1 --model_type=bilstm
+python user_seq2seq.py --data=Beauty --cat=True --time=True --w_size=10 --n_layers=2 --model_type=bilstm
+python user_seq2seq.py --data=Beauty --cat=True --time=True --w_size=10 --n_layers=1 --model_type=bilstm
 
 dataset="Baby TV CD Kitchen Kindle Health Electronics"
 wsize="5 10"
