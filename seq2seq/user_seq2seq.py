@@ -301,7 +301,8 @@ def main(args):
                                                           data.tmp_test,
                                                           data.time_emb_test)
                     else:
-                        X_b_test, y_b, u = data.create_batch_u(idx, data.test, data.infer2, data.tmp_test)
+                        X_b_test, y_b, u = data.create_batch_u(idx, data.test,
+                                                               data.infer2, data.tmp_test)
                     u = np.concatenate((data.user_info_test[idx], u), axis=-1)
                     feed = {model.X_local: X_b_test,
                             model.X_global: u,
@@ -324,7 +325,7 @@ def main(args):
             print("decrease lr to %f" % model.learning_rate)
     f.write("iter: %d - recall: %f - hit: %f - ndcg: %f\n"
             % (result[0], result[1], result[2], result[3]))
-    f.write("Last result- recall: %f - hit: %f - ndcg:%f\n"%(recall_test, hit, ndcg))
+    f.write("Last result- recall: %f - hit: %f - ndcg:%f\n" % (recall_test, hit, ndcg))
     print(max_recall)
 
 
