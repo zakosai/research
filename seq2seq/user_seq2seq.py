@@ -181,7 +181,7 @@ class Seq2seq(object):
         n_hidden = self.n_hidden * 4
         if self.model_type == 'bilstm':
             for i in range(self.n_layers):
-                n_hidden /= 4
+                n_hidden /= 2
                 outputs, _ = self.encoder_BiLSTM(outputs,  str(i+1), n_hidden)
 
             last_state = tf.reshape(outputs[:, -1, :],
