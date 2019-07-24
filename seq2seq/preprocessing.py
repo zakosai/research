@@ -23,26 +23,24 @@ def getDF(path):
         i += 1
     return pd.DataFrame.from_dict(df, orient='index')
 
+
 def create_amazon(dir_r, type, fsum):
-    fsum.write("-----------------------------------------------\n %s - %s\n"%(type, dir_r))
-    data = getDF("%s/reviews.json.gz"%dir_r) #read review
-    if not os.path.exists("data/%s"%type):
-        os.makedirs("data/%s"%type)
+    fsum.write("-----------------------------------------------\n %s - %s\n" % (type, dir_r))
+    data = getDF("%s/reviews.json.gz" % dir_r) #read review
+    if not os.path.exists("data/%s" % type):
+        os.makedirs("data/%s" % type)
     data.sort_values(by=['reviewerID', 'unixReviewTime'], inplace=True)
 
     group = data.groupby(['reviewerID'])
     len_group = group.apply(lambda x: len(x))
     user_unique = len_group[len_group >= 15].keys().tolist()
     item_unique = sorted(data.asin.unique())
-    # user_unique = sorted(data.reviewerID.unique())
-    print("# num of user: %d \n# num of item: %d" % (len(user_unique), len(item_unique)))
-    fsum.write("# num of user: %d \n# num of item: %d\n" % (len(user_unique), len(item_unique)))
-
-    # Group data following user
-
     n_user = len(user_unique)
     n_item = len(item_unique)
+    print("# num of user: %d \n# num of item: %d" % (n_user, n_item))
+    fsum.write("# num of user: %d \n# num of item: %d\n" % (n_user, n_item))
 
+    # Group data following user
     ratings = [0] * n_user
     f = open("data/%s/ratings.txt" % type, "w")
     for _, r in data.iterrows():
@@ -59,7 +57,6 @@ def create_amazon(dir_r, type, fsum):
     print("Max item user rated: %d" % max([len(i) for i in ratings]))
     print("Min item user rated: %d" % min([len(i) for i in ratings]))
     print("Mean item user rated: %d" % np.mean([len(i) for i in ratings]))
-
     fsum.write("Max item user rated: %d\n" % max([len(i) for i in ratings]))
     fsum.write("Min item user rated: %d\n" % min([len(i) for i in ratings]))
     fsum.write("Mean item user rated: %d\n" % np.mean([len(i) for i in ratings]))
@@ -72,7 +69,6 @@ def create_amazon(dir_r, type, fsum):
     f = open("data/%s/user_id.txt" % type, "w")
     f.write("\n".join(user_unique))
     f.close()
-
 
     # Prepare train, test
     shuffle_id = np.random.permutation(n_user)
@@ -89,7 +85,6 @@ def create_amazon(dir_r, type, fsum):
         item = [str(i) for i in item]
         ftrain.write("%d %s\n" % (idx, " ".join(item)))
     ftrain.close()
-
     ftest = open("data/%s/test.txt" % type, "w")
     for idx in test_id:
         user = np.array(ratings[idx]).reshape((len(ratings[idx]), 3)).astype(np.int32)
@@ -100,7 +95,6 @@ def create_amazon(dir_r, type, fsum):
     ftest.close()
 
     fsum.write("Train num: %d, test num: %d\n"%(len(train_id), len(test_id)))
-
 
     # Hybrid
     data_item = getDF("%s/meta.json.gz" % dir_r)
@@ -120,15 +114,14 @@ def create_amazon(dir_r, type, fsum):
     f.close()
 
     # tf-idf
-
     vectorizer = TfidfVectorizer()
     X = vectorizer.fit_transform(text)
     save_npz("data/%s/item.npz" % type, X)
 
+    # Category
     categories = data_item.categories.tolist()
     categories = [i for cat in categories for c in cat for i in c]
     categories = list(set(categories))
-
     f = open("data/%s/categories.txt" % type, "w")
     for c in list_cat:
         arr = ['0'] * len(categories)
@@ -137,7 +130,6 @@ def create_amazon(dir_r, type, fsum):
         f.write(",".join(arr))
         f.write("\n")
     f.close()
-
     f = open("data/%s/list_categories.txt"%type, "w")
     f.write("\n".join(categories))
     f.close()
@@ -154,8 +146,6 @@ def create_amazon_based_on_ratings(dir_r, type, fsum):
     ratings = pd.read_csv("%s/ratings.csv"%dir_r, header=None)
     ratings.rename(index=str, columns={0: "user", 1: "item", 2: "rating", 3: "timestamp"}, inplace=True)
 
-
-
     # group user, pick ones who rated more than 10 items
     group = ratings.groupby(['user'])
     len_group = group.apply(lambda x: len(x))
@@ -166,9 +156,8 @@ def create_amazon_based_on_ratings(dir_r, type, fsum):
     item_unique = pd.unique(ratings.item).tolist()
     n_user = len(user_unique)
     n_item = len(item_unique)
-
-    print("# num of user: %d \n# num of item: %d" % (len(user_unique), len(item_unique)))
-    fsum.write("# num of user: %d \n# num of item: %d\n" % (len(user_unique), len(item_unique)))
+    print("# num of user: %d \n# num of item: %d" % (n_user, n_item))
+    fsum.write("# num of user: %d \n# num of item: %d\n" % (n_user, n_item))
 
     rat = [0] * n_user
     f = open("%s/ratings.txt" % dir_w, "w")
@@ -272,7 +261,6 @@ def create_amazon_based_on_ratings(dir_r, type, fsum):
 
 
 def create_user_info(data_dir):
-    # categories = np.genfromtxt("%s/categories.txt" % data_dir, np.int8, delimiter=",")
     if data_dir == "data/ml-1m":
         ratings = np.genfromtxt("%s/ratings.txt" % data_dir, np.int32, delimiter=" ", )
     else:
@@ -410,17 +398,15 @@ def create_gru4rec(dataset):
     write_file(test_session, test_time, "test")
 
 
-parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument('--data', type=str, default="Tool",
-                    help='dataset name')
-
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('--data', type=str, default="Tool", help='dataset name')
     args = parser.parse_args()
     type = args.data
-    fsum = open("data/summary.txt", "a")
-    create_amazon("../cf-vae/data/%s"%type, type, fsum)
-    create_user_info("data/%s"%type)
-    fsum.close()
+    # fsum = open("data/summary.txt", "a")
+    # create_amazon("../cf-vae/data/%s" % type, type, fsum)
+    # create_user_info("data/%s" % type)
+    # fsum.close()
     # create_gru4rec(type)
     # dataset = ["book", "Garden", "Automotive", "Beauty", "Grocery", "Outdoor", "Office"]
     # # fsum = open("data/summary.txt", "a")
@@ -429,6 +415,6 @@ if __name__ == '__main__':
     #     # create_amazon(dir_r, type, fsum)
     #     # # create_amazon_based_on_ratings(dir_r, type, fsum)
     #     # create_user_info("data/%s"%type)
-    #     create_gru4rec(type)
+    create_gru4rec(type)
 
 
