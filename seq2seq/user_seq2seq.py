@@ -188,7 +188,7 @@ class Seq2seq(object):
                                     (tf.shape(self.X_local)[0], n_hidden * 2))
         if self.model_type == 'bigru':
             for i in range(self.n_layers):
-                n_hidden /= 4
+                n_hidden /= 2
                 outputs, _ = self.encoder_biGRU(outputs, str(i + 1), n_hidden)
 
             last_state = tf.reshape(outputs[:, -1, :],
