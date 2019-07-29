@@ -405,7 +405,7 @@ if __name__ == '__main__':
     type = args.data
     # fsum = open("data/summary.txt", "a")
     # create_amazon("../cf-vae/data/%s" % type, type, fsum)
-    # create_user_info("data/%s" % type)
+    create_user_info(args.data)
     # fsum.close()
     # create_gru4rec(type)
     # dataset = ["book", "Garden", "Automotive", "Beauty", "Grocery", "Outdoor", "Office"]
@@ -415,6 +415,6 @@ if __name__ == '__main__':
     #     # create_amazon(dir_r, type, fsum)
     #     # # create_amazon_based_on_ratings(dir_r, type, fsum)
     #     # create_user_info("data/%s"%type)
-    create_gru4rec(type)
+    # create_gru4rec(type)
 
 
