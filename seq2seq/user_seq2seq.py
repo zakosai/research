@@ -14,11 +14,11 @@ class Seq2seq(object):
         self.w_size = 10
         self.p_dim = 100
         self.n_products = 3706
-        self.n_hidden = 512
+        self.n_hidden = 128
         self.learning_rate = 1e-3
         self.train = True
         self.global_dim = global_dim
-        self.layers = [1000, 100]
+        self.layers = [100]
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.active_function = tf.nn.tanh
         self.n_layers = n_layers
@@ -216,6 +216,7 @@ def main(args):
     batch_size = args.batch_size
     iter = args.iter
     dataset = args.data
+    print(args.cat, args.time)
 
     num_p = len(list(open("data/%s/item_id.txt" % dataset)))
     checkpoint_dir = "experiment/%s/" % dataset
@@ -342,4 +343,5 @@ if __name__ == '__main__':
     parser.add_argument('--iter', type=int, default=150)
     parser.add_argument('--model_type', type=str, default='bilstm')
     args = parser.parse_args()
+    print(args.cat, args.time)
     main(args)
