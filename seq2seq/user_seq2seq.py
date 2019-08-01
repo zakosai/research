@@ -14,11 +14,11 @@ class Seq2seq(object):
         self.w_size = 10
         self.p_dim = 100
         self.n_products = 3706
-        self.n_hidden = 64
+        self.n_hidden = 32
         self.learning_rate = 1e-3
         self.train = True
         self.global_dim = global_dim
-        self.layers = [100]
+        self.layers = [200, 50]
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.active_function = tf.nn.tanh
         self.n_layers = n_layers
