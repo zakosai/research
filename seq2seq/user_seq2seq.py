@@ -18,7 +18,7 @@ class Seq2seq(object):
         self.learning_rate = 1e-3
         self.train = True
         self.global_dim = global_dim
-        self.layers = [50]
+        self.layers = [100]
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.active_function = tf.nn.tanh
         self.n_layers = n_layers
@@ -178,7 +178,7 @@ class Seq2seq(object):
 
         self.seq_len = tf.fill([tf.shape(self.X_local)[0]], self.w_size)
         outputs = self.X_local
-        n_hidden = self.n_hidden * 4
+        n_hidden = self.n_hidden * 2
         if self.model_type == 'bilstm':
             for i in range(self.n_layers):
                 n_hidden /= 2
