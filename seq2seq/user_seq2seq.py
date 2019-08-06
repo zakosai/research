@@ -171,13 +171,21 @@ class Seq2seq(object):
 
         return loss, out
 
+    def decrease_input_dimension(self, X):
+        X = tf.reshape(X, [None, self.p_dim])
+        output = layers.fully_connected(X, 100 , self.active_function,
+                                            scope="decrease_dimension",weights_regularizer=self.regularizer)
+        output = tf.reshape(output, [None, self.w_size, self.p_dim])
+        return output
+
+
     def build_model(self):
         self.X_local = tf.placeholder(tf.float32, [None, self.w_size, self.p_dim])
         self.X_global = tf.placeholder(tf.float32, [None, self.global_dim])
         self.y = tf.placeholder(tf.float32, [None, self.w_size, self.n_products])
 
         self.seq_len = tf.fill([tf.shape(self.X_local)[0]], self.w_size)
-        outputs = self.X_local
+        outputs = self.decrease_input_dimension(self.X_local)
         n_hidden = self.n_hidden * 2
         if self.model_type == 'bilstm':
             for i in range(self.n_layers):
