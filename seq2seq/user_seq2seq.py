@@ -174,9 +174,9 @@ class Seq2seq(object):
     def decrease_input_dimension(self, X):
         batch = tf.shape(X)[0]
         X = tf.reshape(X, [batch*self.w_size, self.p_dim])
-        output = layers.fully_connected(X, 150, self.active_function,
+        output = layers.fully_connected(X, 50, self.active_function,
                                             scope="decrease_dimension",weights_regularizer=self.regularizer)
-        output = tf.reshape(output, [batch, self.w_size, 150])
+        output = tf.reshape(output, [batch, self.w_size, 50])
         return output
 
 
