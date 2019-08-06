@@ -176,7 +176,7 @@ class Seq2seq(object):
         X = tf.reshape(X, [batch*self.w_size, self.p_dim])
         output = layers.fully_connected(X, 100, self.active_function,
                                             scope="decrease_dimension",weights_regularizer=self.regularizer)
-        output = tf.reshape(output, [batch, self.w_size, self.p_dim])
+        output = tf.reshape(output, [batch, self.w_size, 100])
         return output
 
 
