@@ -172,10 +172,11 @@ class Seq2seq(object):
         return loss, out
 
     def decrease_input_dimension(self, X):
-        X = tf.reshape(X, [None, self.p_dim])
+        batch = X.shape[0]
+        X = tf.reshape(X, [batch*self.w_size, self.p_dim])
         output = layers.fully_connected(X, 100 , self.active_function,
                                             scope="decrease_dimension",weights_regularizer=self.regularizer)
-        output = tf.reshape(output, [None, self.w_size, self.p_dim])
+        output = tf.reshape(output, [batch, self.w_size, self.p_dim])
         return output
 
 
