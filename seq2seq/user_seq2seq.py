@@ -174,9 +174,9 @@ class Seq2seq(object):
     def decrease_input_dimension(self, X):
         batch = tf.shape(X)[0]
         X = tf.reshape(X, [batch*self.w_size, self.p_dim])
-        output = layers.fully_connected(X, 50, self.active_function,
+        output = layers.fully_connected(X, 100, self.active_function,
                                             scope="decrease_dimension",weights_regularizer=self.regularizer)
-        output = tf.reshape(output, [batch, self.w_size, 50])
+        output = tf.reshape(output, [batch, self.w_size, 100])
         return output
 
 
@@ -216,7 +216,7 @@ class Seq2seq(object):
                                        (tf.shape(self.X_global)[0], self.layers[-1]))
         last_state = tf.concat([last_state, last_state_global], axis=1)
 
-        self.loss, self.predict = self.prediction(last_state_global,
+        self.loss, self.predict = self.prediction(last_state,
                                                   tf.reshape(self.y[:, -1, :], (-1, self.n_products)))
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
