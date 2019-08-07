@@ -274,7 +274,7 @@ def main(args):
             else:
                 X, y, u = data.create_batch_u(list_idx, data.X_iter,
                                               data.y_iter, data.train)
-            # u = np.concatenate((data.user_info_train[list_idx], u), axis=-1)
+            u = np.concatenate((data.user_info_train[list_idx], u), axis=-1)
             feed = {model.X_local: X,
                     model.y: y,
                     model.X_global: u}
@@ -289,7 +289,7 @@ def main(args):
                 else:
                     X_b_val, y_b, u = data.create_batch_u(idx, data.val,
                                                           data.val_infer, data.tmp_val)
-                # u = np.concatenate((data.user_info_val[idx], u), axis=-1)
+                u = np.concatenate((data.user_info_val[idx], u), axis=-1)
                 feed = {model.X_local: X_b_val,
                         model.X_global: u,
                         model.y: y_b}
@@ -313,7 +313,7 @@ def main(args):
                     else:
                         X_b_test, y_b, u = data.create_batch_u(idx, data.test,
                                                                data.infer2, data.tmp_test)
-                    # u = np.concatenate((data.user_info_test[idx], u), axis=-1)
+                    u = np.concatenate((data.user_info_test[idx], u), axis=-1)
                     feed = {model.X_local: X_b_test,
                             model.X_global: u,
                             model.y: y_b}
