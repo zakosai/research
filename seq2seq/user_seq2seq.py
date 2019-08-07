@@ -216,7 +216,7 @@ class Seq2seq(object):
                                        (tf.shape(self.X_global)[0], self.layers[-1]))
         last_state = tf.concat([last_state, last_state_global], axis=1)
 
-        self.loss, self.predict = self.prediction(last_state,
+        self.loss, self.predict = self.prediction(last_state_global,
                                                   tf.reshape(self.y[:, -1, :], (-1, self.n_products)))
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
@@ -236,7 +236,7 @@ def main(args):
                    time=args.time)
 
     data.create_user_info("data/%s" % dataset)
-    user_dim = data.n_item + data.user_info_train.shape[1]
+    user_dim = data.n_item
     model = Seq2seq(n_layers=args.n_layers, model_type=args.model_type, global_dim=user_dim)
     # model.p_dim = data.n_user
     model.w_size = args.w_size
@@ -274,7 +274,7 @@ def main(args):
             else:
                 X, y, u = data.create_batch_u(list_idx, data.X_iter,
                                               data.y_iter, data.train)
-            u = np.concatenate((data.user_info_train[list_idx], u), axis=-1)
+            # u = np.concatenate((data.user_info_train[list_idx], u), axis=-1)
             feed = {model.X_local: X,
                     model.y: y,
                     model.X_global: u}
