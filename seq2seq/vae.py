@@ -97,9 +97,9 @@ class vanilla_vae:
         else:
             saver.restore(sess, ckpt_file)
 
-        # z_mu = sess.run(z_mu, feed_dict={x_:x_input})
-        # print(z_mu.shape)
-        # np.save(os.path.join(self.ckpt, scope), z_mu)
+        z_mu = sess.run(z_mu, feed_dict={x_:x_input})
+        print(z_mu.shape)
+        np.save(os.path.join(self.ckpt, scope), z_mu)
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 
