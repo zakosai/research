@@ -8,6 +8,7 @@ class Dataset(object):
 
         self.train, self.infer1 = self.read_file("%s/train.txt" % folder)
         self.tmp_test, self.infer2 = self.read_file("%s/test.txt" % folder)
+        self.item_emb = np.load("%s/cvae/text.npy")
         self.n_user = len(self.train)
         self.hybrid = hybrid
         self.time_dim = 23
@@ -42,7 +43,7 @@ class Dataset(object):
         self.X_iter = []
         self.y_iter = []
         self.val2 = []
-        self.item_emb = np.zeros((self.n_item, self.n_user))
+        # self.item_emb = np.zeros((self.n_item, self.n_user))
         if self.time:
             self.time_emb = np.zeros((len(self.train), self.w_size, self.time_dim))
         for i, tr in enumerate(self.train):
@@ -58,7 +59,7 @@ class Dataset(object):
             if self.time:
                 for j in range(n+1, n+self.w_size+1):
                     self.time_emb[i, j-n-1, :] = self.convert_time(self.time_train[i][j])
-            self.item_emb[tr, [i]*len(tr)] = 1
+            # self.item_emb[tr, [i]*len(tr)] = 1
             self.val2.append(tr[-self.w_size:])
 
         self.X_iter = np.reshape(self.X_iter, (self.n_user, self.w_size))
