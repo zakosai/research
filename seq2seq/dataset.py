@@ -8,7 +8,7 @@ class Dataset(object):
 
         self.train, self.infer1 = self.read_file("%s/train.txt" % folder)
         self.tmp_test, self.infer2 = self.read_file("%s/test.txt" % folder)
-        self.item_emb = np.load("%s/cvae/text.npy")
+        self.item_emb = np.load("%s/cvae/text.npy" % folder)
         self.n_user = len(self.train)
         self.hybrid = hybrid
         self.time_dim = 23
