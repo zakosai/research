@@ -30,7 +30,7 @@ class Data(object):
             # if len(l) < self.w_size:
             #     l = [self.n_item] * (self.w_size - len(l)) + l
             train.append(l)
-            infer.append([int(a[-1])])
+            infer.append(int(a[-1]))
         return train, infer
 
     def get_batch_train(self, ids):
@@ -41,7 +41,7 @@ class Data(object):
             train_len_i = len(self.train[ids[i]])
             r = np.random.randint(0, train_len_i - self.w_size - 1) if train_len_i > self.w_size + 1 else 0
             train[i, max(-train_len_i + 1, -self.w_size):] = self.train[ids[i]][r : min(r + self.w_size, train_len_i-1)]
-            next_item.append([self.train[ids[i]][min(r + self.w_size, train_len_i-1)]])
+            next_item.append(self.train[ids[i]][min(r + self.w_size, train_len_i-1)])
 
         return train.astype(np.int32), next_item
 
@@ -115,7 +115,7 @@ class Model(object):
     def build_model(self):
         self.user_ids = tf.placeholder(tf.int32, [None])
         self.item_ids = tf.placeholder(tf.int32, [None, self.w_size])
-        self.next_item = tf.placeholder(tf.int32, [None, 1])
+        self.next_item = tf.placeholder(tf.int32, [None])
         self.seq_len = tf.fill([tf.shape(self.item_ids)[0]], self.w_size)
 
         # Get embedding
