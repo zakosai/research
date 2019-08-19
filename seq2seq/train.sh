@@ -19,4 +19,4 @@
 
 python vae.py --data_dir=data/Tool --ckpt_folder=experiment/Tool
 mv experiment/Tool/text.npy data/Tool/
-python python user_seq2seq.py --data=Tool --cat=True  --time=True --w_size=5 --n_layers=1 --model_type=bigru --iter=500
+python user_seq2seq.py --data=Tool --cat=True  --time=True --w_size=5 --n_layers=1 --model_type=bigru --iter=500
