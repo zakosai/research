@@ -10,7 +10,7 @@ from dataset import calc_recall
 class Data(object):
     def __init__(self, w_size, folder):
         self.w_size = w_size
-        self.n_item = len(list(open("%s/item_id.txt")))
+        self.n_item = len(list(open("%s/item_id.txt" % folder)))
 
         self.train, self.infer1 = self.read_file("%s/train.txt" % folder)
         self.tmp_test, self.infer2 = self.read_file("%s/test.txt" % folder)
