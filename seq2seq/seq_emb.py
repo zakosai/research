@@ -146,7 +146,7 @@ def main(args):
     iter = args.iter
     dataset = args.data
     w_size = args.w_size
-    data = Data(w_size, dataset)
+    data = Data(w_size, "data/%s" % dataset)
 
     checkpoint_dir = "experiment/%s/" % dataset
     model = Model(user_no=data.n_user,
