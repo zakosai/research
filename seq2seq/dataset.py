@@ -24,6 +24,7 @@ class Dataset(object):
         self.text = text
         self.des = des
         self.n_item += 1
+        self.flag = True
 
     def read_file(self, filename):
         train = []
@@ -66,8 +67,9 @@ class Dataset(object):
         self.X_iter = np.reshape(self.X_iter, (self.n_user, self.w_size))
         self.y_iter = np.array(self.y_iter)
         self.val2 = np.array(self.val2)
-        if self.cat:
+        if self.cat and self.flag:
             self.item_emb = np.concatenate((self.item_emb, self.item_cat), axis=1)
+            self.flag = False
         if self.des:
             self.item_emb = np.concatenate((self.item_emb, self.text), axis=1)
 
