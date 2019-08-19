@@ -38,10 +38,10 @@ class Data(object):
         next_item = []
 
         for i in ids:
-            train_len_i = len(train[i])
+            train_len_i = len(self.train[i])
             r = np.random.randint(0, len(train_len_i) - self.w_size - 1) if train_len_i > self.w_size else 0
-            train[i, max(-train_len_i, -self.w_size):] = train[i][r:-1]
-            next_item.append(train[i][-1])
+            train[i, max(-train_len_i, -self.w_size):] = self.train[i][r:-1]
+            next_item.append(self.train[i][-1])
 
         return train.astype(np.int32), next_item
 
