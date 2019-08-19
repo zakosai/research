@@ -39,7 +39,7 @@ class Data(object):
 
         for i in range(len(ids)):
             train_len_i = len(self.train[ids[i]])
-            r = np.random.randint(0, len(train_len_i) - self.w_size - 1) if train_len_i > self.w_size else 0
+            r = np.random.randint(0, train_len_i - self.w_size - 1) if train_len_i > self.w_size else 0
             train[i, max(-train_len_i - 1, -self.w_size):] = self.train[ids[i]][r : min(r + self.w_size, train_len_i-1)]
             next_item.append(self.train[ids[i]][min(r + self.w_size, train_len_i-1)])
 
