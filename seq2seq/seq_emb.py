@@ -188,7 +188,7 @@ def main(args):
                     model.next_item: next_item}
             loss_val, y_val = sess.run([model.loss, model.predict], feed_dict=feed)
 
-            recall, _, _ = calc_recall(y_val, data.train, next_item, ids=val_ids)
+            recall, _, _ = calc_recall(y_val, data.train, [[i] for i in next_item], ids=val_ids)
             print("Loss val: %f, recall %f" % (loss_val, recall))
             if recall >= max_recall:
                 max_recall = recall
@@ -206,7 +206,7 @@ def main(args):
                     else:
                         y = np.concatenate((y, y_b_val), axis=0)
                         y_val = np.concatenate((y_val, next_item), axis=0)
-                recall_test, hit, ndcg = calc_recall(y, data.tmp_test, data.infer2)
+                recall_test, hit, ndcg = calc_recall(y, data.tmp_test, [[i] for i in data.infer2])
                 np.savez(os.path.join(checkpoint_dir, "pred"), p_val=y_val, p_test=y)
                 print("iter: %d recall: %f, hit: %f, ndcg: %f" % (i, recall_test, hit, ndcg))
                 if recall_test > result[1]:
