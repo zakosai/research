@@ -3,6 +3,7 @@ from tensorflow.contrib import rnn, layers
 import numpy as np
 import os
 import math
+import argparse
 from dataset import calc_recall
 
 
@@ -168,7 +169,7 @@ def main(args):
             dataset, data.n_item, model.n_layers, data.w_size, "embedding"))
     result = [0, 0, 0, 0]
     shuffle_idx = np.random.permutation(data.n_user)
-    val_ids = shuffle_idx[:batch_size]
+    val_ids = shuffle_idx[:min(batch_size, data.n_user)]
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(data.n_user)
         for j in range(0, int(data.n_user / batch_size)):
@@ -218,6 +219,23 @@ def main(args):
             % (result[0], result[1], result[2], result[3]))
     f.write("Last result- recall: %f - hit: %f - ndcg:%f\n" % (recall_test, hit, ndcg))
     print(max_recall)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('--data', type=str, default="Tool", help='dataset name')
+    # parser.add_argument('--type', type=str, default="implicit", help='1p or 8p')
+    # parser.add_argument('--num_p', type=int, default=7780, help='number of product')
+    parser.add_argument('--w_size', type=int, default=10, help='window size')
+    parser.add_argument('--batch_size', type=int, default=1000)
+    parser.add_argument('--cat', type=bool, default=False)
+    parser.add_argument('--time', type=bool, default=False)
+    parser.add_argument('--n_layers', type=int)
+    parser.add_argument('--iter', type=int, default=150)
+    parser.add_argument('--model_type', type=str, default='bilstm')
+    args = parser.parse_args()
+    print(args.cat, args.time)
+    main(args)
 
 
 
