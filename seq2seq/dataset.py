@@ -264,13 +264,13 @@ class Dataset(object):
         return time_test
 
 
-def calc_recall(pred, train, test, k=50, type=None, ids=None):
+def calc_recall(pred, train, test, k=50, type=None, ids=[]):
     pred_ab = np.argsort(-pred)
     recall = []
     ndcg = []
     hit = 0
     for i in range(len(pred_ab)):
-        id = i if ids == None else ids[i]
+        id = i if len(ids) == 0 else ids[i]
         p = pred_ab[i, :k + len(train[id])]
         p = p.tolist()
         for u in train[id]:
