@@ -81,7 +81,7 @@ class Model(object):
             b_cell = tf.contrib.rnn.DropoutWrapper(cell=b_cell, output_keep_prob=0.8)
         with tf.variable_scope("cell_op_%s" % scope):
             outputs1, last_state = tf.nn.bidirectional_dynamic_rnn(f_cell, b_cell, X,
-                                                                   sequence_length=self.seq_len,
+                                                                   sequence_length=self.w_size,
                                                                    dtype=tf.float32)
         outputs = tf.concat(outputs1, 2)
         return outputs, last_state
