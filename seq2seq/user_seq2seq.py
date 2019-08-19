@@ -23,6 +23,7 @@ class Seq2seq(object):
         self.active_function = tf.nn.tanh
         self.n_layers = n_layers
         self.model_type = model_type
+        self.global_only = False
 
     def encoder_BiLSTM(self, X, scope, n_hidden):
         with tf.variable_scope("cell_def_%s"%scope):
@@ -216,7 +217,11 @@ class Seq2seq(object):
                                        (tf.shape(self.X_global)[0], self.layers[-1]))
         last_state = tf.concat([last_state, last_state_global], axis=1)
 
-        self.loss, self.predict = self.prediction(last_state,
+        if self.global_only:
+            self.loss, self.predict = self.prediction(last_state_global,
+                                                      tf.reshape(self.y[:, -1, :], (-1, self.n_products)))
+        else:
+            self.loss, self.predict = self.prediction(last_state,
                                                   tf.reshape(self.y[:, -1, :], (-1, self.n_products)))
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
@@ -248,6 +253,7 @@ def main(args):
     # model.p_dim = data.n_user
     # model.cat_dim = text.shape[1]
     model.n_products = data.n_item
+    model.global_only = args.global_only
     model.build_model()
 
     sess = tf.Session()
@@ -351,6 +357,7 @@ if __name__ == '__main__':
     parser.add_argument('--n_layers', type=int)
     parser.add_argument('--iter', type=int, default=150)
     parser.add_argument('--model_type', type=str, default='bilstm')
+    parser.add_argument('--global_only', type=bool, default=False)
     args = parser.parse_args()
     print(args.cat, args.time)
     main(args)
