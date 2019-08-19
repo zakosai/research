@@ -237,10 +237,10 @@ def main(args):
 
     data.create_user_info("data/%s" % dataset)
     user_dim = data.n_item
-    model = Seq2seq(n_layers=args.n_layers, model_type=args.model_type, global_dim=data.item_emb.shape[1])
+    model = Seq2seq(n_layers=args.n_layers, model_type=args.model_type, global_dim=user_dim)
     # model.p_dim = data.n_user
     model.w_size = args.w_size
-    model.p_dim = data.n_user
+    model.p_dim = data.item_emb.shape[1]
     if args.cat:
         model.p_dim += data.item_cat.shape[1]
     if args.time:
