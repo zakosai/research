@@ -37,11 +37,11 @@ class Data(object):
         train = np.ones((len(ids), self.w_size)) * self.n_item
         next_item = []
 
-        for i in ids:
-            train_len_i = len(self.train[i])
+        for i in range(len(ids)):
+            train_len_i = len(self.train[ids[i]])
             r = np.random.randint(0, len(train_len_i) - self.w_size - 1) if train_len_i > self.w_size else 0
-            train[i, max(-train_len_i - 1, -self.w_size):] = self.train[i][r:-1]
-            next_item.append(self.train[i][-1])
+            train[i, max(-train_len_i - 1, -self.w_size):] = self.train[ids[i]][r : min(r + self.w_size, train_len_i-1)]
+            next_item.append(self.train[ids[i]][min(r + self.w_size, train_len_i-1)])
 
         return train.astype(np.int32), next_item
 
