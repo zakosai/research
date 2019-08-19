@@ -39,9 +39,9 @@ class Data(object):
 
         for i in range(len(ids)):
             train_len_i = len(self.train[ids[i]])
-            r = np.random.randint(0, train_len_i - self.w_size - 1) if train_len_i > self.w_size else 0
+            r = np.random.randint(0, train_len_i - self.w_size - 1) if train_len_i > self.w_size + 1 else 0
             train[i, max(-train_len_i + 1, -self.w_size):] = self.train[ids[i]][r : min(r + self.w_size, train_len_i-1)]
-            next_item.append(self.train[ids[i]][min(r + self.w_size, train_len_i-1)])
+            next_item.append([self.train[ids[i]][min(r + self.w_size, train_len_i-1)]])
 
         return train.astype(np.int32), next_item
 
@@ -49,8 +49,8 @@ class Data(object):
         test = np.ones((len(ids), self.w_size)) * self.n_item
         next_item = [label[i] for i in ids]
 
-        for i in ids:
-            test[i, max(-len(data[i]), -self.w_size):] = data[i]
+        for i in range(len(ids)):
+            test[i, max(-len(data[ids[i]]), -self.w_size):] = data[ids[i]][max(-len(data[ids[i]]), -self.w_size):]
 
         return test.astype(np.int32), next_item
 
@@ -115,13 +115,13 @@ class Model(object):
     def build_model(self):
         self.user_ids = tf.placeholder(tf.int32, [None])
         self.item_ids = tf.placeholder(tf.int32, [None, self.w_size])
-        self.next_item = tf.placeholder(tf.int32, [None])
+        self.next_item = tf.placeholder(tf.int32, [None, 1])
         self.seq_len = tf.fill([tf.shape(self.item_ids)[0]], self.w_size)
 
         # Get embedding
         user_embeddings = tf.get_variable("user_embeddings", [self.user_no, self.user_embedding_size])
         embedded_user_ids = tf.nn.embedding_lookup(user_embeddings, self.user_ids)
-        item_embeddings = tf.get_variable("item_embeddings", [self.item_no, self.item_embedding_size])
+        item_embeddings = tf.get_variable("item_embeddings", [self.item_no + 1, self.item_embedding_size])
         embedded_item_ids = tf.nn.embedding_lookup(item_embeddings, self.item_ids)
 
         # Bi-GRU for local
@@ -168,8 +168,8 @@ def main(args):
             "bilstm: True - n_layers: %d - w_size:%d - model_type: %s\n" % (
             dataset, data.n_item, model.n_layers, data.w_size, "embedding"))
     result = [0, 0, 0, 0]
-    shuffle_idx = np.random.permutation(data.n_user)
-    val_ids = shuffle_idx[:min(batch_size, data.n_user)]
+    shuffle_idx = np.random.permutation(len(data.infer1))
+    val_ids = shuffle_idx[:min(batch_size, len(data.infer1))]
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(data.n_user)
         for j in range(0, int(data.n_user / batch_size)):
