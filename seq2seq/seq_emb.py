@@ -166,7 +166,7 @@ def main(args):
     f.write("-------------------------\n")
     f.write("Data: %s - num_p: %d - user info\n"
             "bilstm: True - n_layers: %d - w_size:%d - model_type: %s\n" % (
-            dataset, data.n_item, model.n_layers, data.w_size, "embedding"))
+            dataset, data.n_item, model.n_layers, data.w_size, "emb2-zdim100"))
     result = [0, 0, 0, 0]
     shuffle_idx = np.random.permutation(len(data.infer1))
     val_ids = shuffle_idx[:min(batch_size, len(data.infer1))]
