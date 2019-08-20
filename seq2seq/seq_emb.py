@@ -66,7 +66,7 @@ class Model(object):
         self.w_size = w_size
 
         # Hyper-paramter for network
-        self.n_hidden = 64
+        self.n_hidden = 32
         self.layers = [100]
         self.n_layers = n_layers
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
