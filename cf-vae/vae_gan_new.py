@@ -11,6 +11,10 @@ def loss_discriminator(A, B):
     return loss_A + loss_B
 
 
+def loss_gen(A):
+    return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=A, labels=tf.ones_like(A)))
+
+
 def loss_reconstruct(label, logits):
     loss = label * tf.log(1e-10 + logits) + (1 - label) * tf.log(1e-10 + 1 - logits)
     loss = tf.reduce_sum(loss, 1)
@@ -42,30 +46,35 @@ def build_model(d2d):
     d2d.y_BA = d2d.decode(z_B, "A", d2d.decode_dim_A, True, True)
 
     # Loss VAE
-    loss_rec = loss_reconstruct(x_A, y_AA)
-    loss_kl_A = loss_kl(z_mu_A, z_sigma_A)
-    loss_rec_fake = loss_reconstruct(x_B, d2d.y_AB)
+    loss_rec = d2d.loss_reconstruct(x_A, y_AA)
+    loss_kl_A = d2d.loss_kl(z_mu_A, z_sigma_A)
+    loss_rec_fake = d2d.loss_reconstruct(x_B, d2d.y_AB)
     loss_VAE_A = 0.1 * loss_kl_A + loss_rec + loss_rec_fake
     # loss_VAE_A = d2d.lambda_1 * d2d.loss_kl(z_mu_A, z_sigma_A) + d2d.loss_reconstruct(x_A, y_AA) +\
     #     d2d.loss_reconstruct(x_B, d2d.y_AB)
-    loss_VAE_B = d2d.lambda_1 * loss_kl(z_mu_B, z_sigma_B) + loss_reconstruct(x_B, y_BB) +\
-        loss_reconstruct(x_A, d2d.y_BA)
+    loss_VAE_B = d2d.lambda_1 * d2d.loss_kl(z_mu_B, z_sigma_B) + d2d.loss_reconstruct(x_B, y_BB) +\
+        d2d.loss_reconstruct(x_A, d2d.y_BA)
     d2d.loss_VAE = loss_VAE_A + loss_VAE_B
 
     # GAN
-    av_A = d2d.adversal(z_A, "adv", [20, 1])
-    av_B = d2d.adversal(z_B, "adv", [20, 1], reuse=True)
+    z_AB = d2d.encode(d2d.y_AB, "B", d2d.encode_dim_B, True, True, True)
+    z_BA = d2d.encode(d2d.y_BA, "A", d2d.encode_dim_A, True, True, True)
+    av_A = d2d.adversal(z_A, "adv_A", [20, 1])
+    av_B = d2d.adversal(z_B, "adv_B", [20, 1])
+    av_AB = d2d.adversal(z_AB, "adv_B", [20, 1], True)
+    av_BA = d2d.adversal(z_BA, "adv_A", [20, 1], True)
 
     # Loss GAN
-    d2d.loss_gen = loss_discriminator(av_B, av_A)
-    d2d.loss_dis = loss_discriminator(av_A, av_B)
+    d2d.loss_gen = loss_gen(av_A) + loss_gen(av_B)
+    d2d.loss_dis = loss_discriminator(av_A, av_BA) + loss_discriminator(av_B, av_BA)
 
-    adv_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv")
+    adv_vars_A = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_A")
+    adv_vars_B = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_B")
     vae_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="vae")
     d2d.train_op_gen = tf.train.AdamOptimizer(d2d.learning_rate).minimize(d2d.loss_gen + d2d.loss_VAE,
                                                                                      var_list=vae_vars)
     d2d.train_op_dis = tf.train.AdamOptimizer(d2d.learning_rate).minimize(d2d.loss_dis,
-                                                                              var_list=adv_vars)
+                                                                              var_list=adv_vars_A + adv_vars_B)
     d2d.loss = [loss_rec, loss_kl_A, loss_rec_fake]
 
 def main():
