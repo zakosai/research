@@ -32,10 +32,10 @@ def build_model(d2d):
 
 
     # Loss VAE
-    loss_VAE_A = d2d.lambda_1 * d2d.loss_kl(z_mu_A, z_sigma_A) + d2d.lambda_2 * d2d.loss_reconstruct(x_A, y_AA) +\
-        d2d.lambda_2 * d2d.loss_reconstruct(x_B, d2d.y_AB)
-    loss_VAE_B = d2d.lambda_1 * d2d.loss_kl(z_mu_B, z_sigma_B) + d2d.lambda_2 * d2d.loss_reconstruct(x_B, y_BB) +\
-        d2d.lambda_2 * d2d.loss_reconstruct(x_A, d2d.y_BA)
+    loss_VAE_A = d2d.lambda_1 * d2d.loss_kl(z_mu_A, z_sigma_A) + d2d.loss_reconstruct(x_A, y_AA) +\
+        d2d.loss_reconstruct(x_B, d2d.y_AB)
+    loss_VAE_B = d2d.lambda_1 * d2d.loss_kl(z_mu_B, z_sigma_B) + d2d.loss_reconstruct(x_B, y_BB) +\
+        d2d.loss_reconstruct(x_A, d2d.y_BA)
     d2d.loss_VAE = loss_VAE_A + loss_VAE_B
 
     # GAN
