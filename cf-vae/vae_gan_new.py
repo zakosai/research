@@ -53,7 +53,6 @@ def build_model(d2d):
     d2d.loss_VAE = loss_VAE_A + loss_VAE_B
 
     # GAN
-    z_AB = d2d.encode(d2d.y_AB, "B", d2d.encode_dim_B, True, True)
     av_A = d2d.adversal(z_A, "adv", [20, 1])
     av_B = d2d.adversal(z_B, "adv", [20, 1], reuse=True)
 
