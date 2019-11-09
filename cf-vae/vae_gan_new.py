@@ -6,8 +6,8 @@ from translation import Translation, create_dataset, calc_recall
 
 
 def loss_discriminator(A, B):
-    loss_A = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(A, tf.zeros_like(A)))
-    loss_B = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(B, tf.ones_like(B)))
+    loss_A = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=A, labels=tf.zeros_like(A)))
+    loss_B = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=B, labels=tf.ones_like(B)))
     return loss_A + loss_B
 
 
