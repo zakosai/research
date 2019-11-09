@@ -10,8 +10,16 @@ def loss_discriminator(A, B):
     loss_B = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=B, labels=tf.ones_like(B)))
     return loss_A + loss_B
 
+
 def loss_reconstruct(label, logits):
-    return tf.reduce_mean(tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(logits=logits, labels=label), axis=1))
+    loss = label * tf.log(1e-10 + logits) + (1 - label) * tf.log(1e-10 + 1 - logits)
+    loss = tf.reduce_sum(loss, 1)
+    return -tf.reduce_mean(loss)
+
+
+def loss_kl(mu, sigma):
+    return 0.5 * tf.reduce_mean(tf.reduce_sum(
+        tf.square(mu) + tf.square(sigma) - tf.log(1e-8 + tf.square(sigma)) - 1, 1))
 
 
 def build_model(d2d):
@@ -34,17 +42,18 @@ def build_model(d2d):
     d2d.y_BA = d2d.decode(z_B, "A", d2d.decode_dim_A, True, True)
 
     # Loss VAE
-    loss_rec = d2d.loss_reconstruct(x_A, y_AA)
-    loss_kl = d2d.loss_kl(z_mu_A, z_sigma_A)
-    loss_rec_fake = d2d.loss_reconstruct(x_B, d2d.y_AB)
+    loss_rec = loss_reconstruct(x_A, y_AA)
+    loss_kl = loss_kl(z_mu_A, z_sigma_A)
+    loss_rec_fake = loss_reconstruct(x_B, d2d.y_AB)
     loss_VAE_A = 0.1 * loss_kl + loss_rec + loss_rec_fake
     # loss_VAE_A = d2d.lambda_1 * d2d.loss_kl(z_mu_A, z_sigma_A) + d2d.loss_reconstruct(x_A, y_AA) +\
     #     d2d.loss_reconstruct(x_B, d2d.y_AB)
-    loss_VAE_B = d2d.lambda_1 * d2d.loss_kl(z_mu_B, z_sigma_B) + d2d.loss_reconstruct(x_B, y_BB) +\
-        d2d.loss_reconstruct(x_A, d2d.y_BA)
+    loss_VAE_B = d2d.lambda_1 * loss_kl(z_mu_B, z_sigma_B) + loss_reconstruct(x_B, y_BB) +\
+        loss_reconstruct(x_A, d2d.y_BA)
     d2d.loss_VAE = loss_VAE_A + loss_VAE_B
 
     # GAN
+    z_AB = d2d.encode(d2d.y_AB, "B", d2d.encode_dim_B, True, True)
     av_A = d2d.adversal(z_A, "adv", [20, 1])
     av_B = d2d.adversal(z_B, "adv", [20, 1], reuse=True)
 
