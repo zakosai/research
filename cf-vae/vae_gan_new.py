@@ -39,8 +39,8 @@ def build_model(d2d):
     d2d.loss_VAE = loss_VAE_A + loss_VAE_B
 
     # GAN
-    av_A = d2d.adversal(z_A, [20,1], scope="adv")
-    av_B = d2d.adversal(z_B, [20, 1], scope="adv", reuse=True)
+    av_A = d2d.adversal(z_A, "adv", [20, 1])
+    av_B = d2d.adversal(z_B, "adv", [20, 1], reuse=True)
 
     # Loss GAN
     d2d.loss_gen = loss_discriminator(av_B, av_A)
