@@ -45,7 +45,7 @@ def build_model(d2d):
     loss_rec = loss_reconstruct(x_A, y_AA)
     loss_kl_A = loss_kl(z_mu_A, z_sigma_A)
     loss_rec_fake = loss_reconstruct(x_B, d2d.y_AB)
-    loss_VAE_A = 0.1 * loss_kl + loss_rec + loss_rec_fake
+    loss_VAE_A = 0.1 * loss_kl_A + loss_rec + loss_rec_fake
     # loss_VAE_A = d2d.lambda_1 * d2d.loss_kl(z_mu_A, z_sigma_A) + d2d.loss_reconstruct(x_A, y_AA) +\
     #     d2d.loss_reconstruct(x_B, d2d.y_AB)
     loss_VAE_B = d2d.lambda_1 * loss_kl(z_mu_B, z_sigma_B) + loss_reconstruct(x_B, y_BB) +\
