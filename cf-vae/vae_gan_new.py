@@ -31,8 +31,12 @@ def build_model(d2d):
     d2d.y_BA = d2d.decode(z_B, "A", d2d.decode_dim_A, True, True)
 
     # Loss VAE
-    loss_VAE_A = d2d.lambda_1 * d2d.loss_kl(z_mu_A, z_sigma_A) + d2d.loss_reconstruct(x_A, y_AA) +\
-        d2d.loss_reconstruct(x_B, d2d.y_AB)
+    loss_rec = d2d.loss_reconstruct(x_A, y_AA)
+    loss_kl = d2d.loss_kl(z_mu_A, z_sigma_A)
+    loss_rec_fake = d2d.loss_reconstruct(x_B, d2d.y_AB)
+    loss_VAE_A = 0.1 * loss_kl + loss_rec + loss_rec_fake
+    # loss_VAE_A = d2d.lambda_1 * d2d.loss_kl(z_mu_A, z_sigma_A) + d2d.loss_reconstruct(x_A, y_AA) +\
+    #     d2d.loss_reconstruct(x_B, d2d.y_AB)
     loss_VAE_B = d2d.lambda_1 * d2d.loss_kl(z_mu_B, z_sigma_B) + d2d.loss_reconstruct(x_B, y_BB) +\
         d2d.loss_reconstruct(x_A, d2d.y_BA)
     d2d.loss_VAE = loss_VAE_A + loss_VAE_B
@@ -51,6 +55,7 @@ def build_model(d2d):
                                                                                      var_list=vae_vars)
     d2d.train_op_dis = tf.train.AdamOptimizer(d2d.learning_rate).minimize(d2d.loss_dis,
                                                                               var_list=adv_vars)
+    d2d.loss = [loss_rec, loss_kl, loss_rec_fake]
 
 def main():
     iter = 300
@@ -131,10 +136,11 @@ def main():
         if i%10 == 0:
             model.train = False
             print("Loss last batch: loss gen %f, loss dis %f, loss vae %f" % (loss_gen, loss_dis, loss_vae))
-            loss_gen, y_ba, y_ab = sess.run([model.loss_gen,model.y_BA, model.y_AB],
+            loss_gen, y_ba, y_ab, loss = sess.run([model.loss_gen,model.y_BA, model.y_AB, model.loss],
                                               feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
             recall = calc_recall(y_ba, dense_A_val, [50]) + calc_recall(y_ab, dense_B_val, [50])
             print("Loss gen: %f, recall %f" % (loss_gen, recall))
+            print(loss)
             if recall > max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'))
