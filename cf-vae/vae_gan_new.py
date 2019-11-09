@@ -34,9 +34,9 @@ def build_model(d2d):
     d2d.y_BA = d2d.decode(z_B, "A", d2d.decode_dim_A, True, True)
 
     # Loss VAE
-    loss_rec = loss_reconstruct(x_A, y_AA)
+    loss_rec = d2d.loss_reconstruct(x_A, y_AA)
     loss_kl = d2d.loss_kl(z_mu_A, z_sigma_A)
-    loss_rec_fake = loss_reconstruct(x_B, d2d.y_AB)
+    loss_rec_fake = d2d.loss_reconstruct(x_B, d2d.y_AB)
     loss_VAE_A = 0.1 * loss_kl + loss_rec + loss_rec_fake
     # loss_VAE_A = d2d.lambda_1 * d2d.loss_kl(z_mu_A, z_sigma_A) + d2d.loss_reconstruct(x_A, y_AA) +\
     #     d2d.loss_reconstruct(x_B, d2d.y_AB)
