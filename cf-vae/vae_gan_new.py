@@ -30,7 +30,6 @@ def build_model(d2d):
     d2d.y_AB = d2d.decode(z_A, "B", d2d.decode_dim_B, True, True)
     d2d.y_BA = d2d.decode(z_B, "A", d2d.decode_dim_A, True, True)
 
-
     # Loss VAE
     loss_VAE_A = d2d.lambda_1 * d2d.loss_kl(z_mu_A, z_sigma_A) + d2d.loss_reconstruct(x_A, y_AA) +\
         d2d.loss_reconstruct(x_B, d2d.y_AB)
