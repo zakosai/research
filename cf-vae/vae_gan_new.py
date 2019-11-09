@@ -43,7 +43,7 @@ def build_model(d2d):
 
     # Loss VAE
     loss_rec = loss_reconstruct(x_A, y_AA)
-    loss_kl = loss_kl(z_mu_A, z_sigma_A)
+    loss_kl_A = loss_kl(z_mu_A, z_sigma_A)
     loss_rec_fake = loss_reconstruct(x_B, d2d.y_AB)
     loss_VAE_A = 0.1 * loss_kl + loss_rec + loss_rec_fake
     # loss_VAE_A = d2d.lambda_1 * d2d.loss_kl(z_mu_A, z_sigma_A) + d2d.loss_reconstruct(x_A, y_AA) +\
@@ -67,7 +67,7 @@ def build_model(d2d):
                                                                                      var_list=vae_vars)
     d2d.train_op_dis = tf.train.AdamOptimizer(d2d.learning_rate).minimize(d2d.loss_dis,
                                                                               var_list=adv_vars)
-    d2d.loss = [loss_rec, loss_kl, loss_rec_fake]
+    d2d.loss = [loss_rec, loss_kl_A, loss_rec_fake]
 
 def main():
     iter = 300
