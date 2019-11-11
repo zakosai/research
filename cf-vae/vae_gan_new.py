@@ -71,7 +71,7 @@ def build_model(d2d):
     adv_vars_A = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_A")
     adv_vars_B = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_B")
     vae_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="vae")
-    d2d.train_op_gen = tf.train.AdamOptimizer(d2d.learning_rate).minimize(d2d.loss_gen + d2d.loss_VAE,
+    d2d.train_op_gen = tf.train.AdamOptimizer(d2d.learning_rate).minimize(10*d2d.loss_gen + d2d.loss_VAE,
                                                                                      var_list=vae_vars)
     d2d.train_op_dis = tf.train.AdamOptimizer(d2d.learning_rate).minimize(d2d.loss_dis,
                                                                               var_list=adv_vars_A + adv_vars_B)
