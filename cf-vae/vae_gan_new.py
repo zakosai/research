@@ -153,7 +153,7 @@ def main():
             _, loss_gen, loss_vae = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE], feed_dict=feed)
             _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
 
-        if i%10 == 0:
+        if i%1 == 0:
             model.train = False
             print("Loss last batch: loss gen %f, loss dis %f, loss vae %f" % (loss_gen, loss_dis, loss_vae))
             loss_gen, y_ba, y_ab, loss = sess.run([model.loss_gen,model.y_BA, model.y_AB, model.loss],
