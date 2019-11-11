@@ -3,6 +3,8 @@ import numpy as np
 import os
 import argparse
 from translation import Translation, create_dataset, calc_recall
+import tensorflow_probability as tfp
+
 
 
 def loss_discriminator(A, B):
@@ -67,8 +69,8 @@ def build_model(d2d):
     # Loss GAN
     # d2d.loss_gen = loss_gen(av_A) + loss_gen(av_B)
     # d2d.loss_dis = loss_discriminator(av_A, av_BA) + loss_discriminator(av_B, av_AB)
-    loss_kl_mu_A = tf.keras.losses.KLDivergence(z_mu_A, z_mu_B)
-    loss_kl_mu_B = tf.keras.losses.KLDivergence(z_mu_B, z_mu_A)
+    loss_kl_mu_A = tfp.distributions.kl_divergence(z_mu_A, z_mu_B)
+    loss_kl_mu_B = tfp.distributions.kl_divergence(z_mu_B, z_mu_A)
 
     adv_vars_A = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv")
     # adv_vars_B = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_B")
