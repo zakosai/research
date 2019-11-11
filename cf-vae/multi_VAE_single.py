@@ -137,7 +137,7 @@ def main():
             loss_val_a, y_b = sess.run([model.loss, model.x_recon],
                                               feed_dict={model.x:user_A_val})
             print(len(y_b[0]))
-            recall = calc_recall(y_b, dense_A_val, [np.where(i==1)[0] for i in user_A_val],[50])
+            recall = calc_recall(y_b, dense_A_val, [np.where(j==1)[0] for j in user_A_val],[50])
             print("Loss val a: %f, recall %f" % (loss_val_a, recall))
             if recall > max_recall:
                 max_recall = recall
@@ -148,7 +148,7 @@ def main():
 
                 # y_ab = y_ab[test_B]
                 # y_ba = y_ba[test_A]
-                calc_recall(y_b, dense_A_test, [np.where(i==1)[0] for i in user_A_test], k,"A")
+                calc_recall(y_b, dense_A_test, [np.where(j==1)[0] for j in user_A_test], k,"A")
             model.train = True
         if i%100 == 0:
             model.learning_rate /= 2
