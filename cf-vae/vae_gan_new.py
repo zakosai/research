@@ -80,7 +80,7 @@ def build_model(d2d):
     d2d.train_op_gen_A = tf.train.AdamOptimizer(d2d.learning_rate).minimize(loss_kl_mu_A + loss_VAE_A)
     d2d.train_op_gen_B = tf.train.AdamOptimizer(d2d.learning_rate).minimize(loss_kl_mu_B + loss_VAE_B)
     d2d.loss = [loss_rec, loss_kl_A, loss_rec_fake]
-    d2d.loss_gen = 0
+    d2d.loss_gen = loss_kl_mu_A
 
 def main():
     iter = 300
