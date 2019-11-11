@@ -123,9 +123,7 @@ class Translation:
 
         log_softmax_var = tf.nn.log_softmax(x_recon)
 
-        neg_ll = -tf.reduce_mean(tf.reduce_sum(
-            log_softmax_var * x,
-            axis=-1))
+        neg_ll = -tf.reduce_mean(log_softmax_var * x)
         return neg_ll
 
 
@@ -192,7 +190,6 @@ class Translation:
                     self.lambda_4 * self.loss_reconstruct(x_A,y_BA) + self.lambda_4 * self.loss_reconstruct(x_A, y_ABA)
         loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB) + self.lambda_4 * \
                     self.loss_reconstruct(x_B,y_AB) + self.lambda_4 * self.loss_reconstruct(x_B, y_BAB)
-
 
 
         self.loss_CC = loss_CC_A + loss_CC_B
