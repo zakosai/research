@@ -12,7 +12,7 @@ def loss_discriminator(A, B):
 
 
 def loss_gen(A):
-    return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=A, labels=tf.ones_like(A))*0.5)
+    return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=A, labels=tf.ones_like(A)))
 
 
 def loss_reconstruct(label, logits):
@@ -71,10 +71,12 @@ def build_model(d2d):
     adv_vars_A = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv")
     # adv_vars_B = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_B")
     vae_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="vae")
-    d2d.train_op_gen = tf.train.AdamOptimizer(d2d.learning_rate).minimize(d2d.loss_gen + d2d.loss_VAE,
-                                                                                     var_list=vae_vars)
-    d2d.train_op_dis = tf.train.AdamOptimizer(d2d.learning_rate).minimize(d2d.loss_dis,
-                                                                              var_list=adv_vars_A)
+    # d2d.train_op_gen = tf.train.AdamOptimizer(d2d.learning_rate).minimize(d2d.loss_gen + d2d.loss_VAE,
+    #                                                                                  var_list=vae_vars)
+    # d2d.train_op_dis = tf.train.AdamOptimizer(d2d.learning_rate).minimize(d2d.loss_dis,
+    #                                                                           var_list=adv_vars_A)
+    d2d.train_op_gen_A = tf.train.AdamOptimizer(d2d.learning_rate).minimize(loss_gen(av_A) + loss_VAE_A)
+    d2d.train_op_gen_B = tf.train.AdamOptimizer(d2d.learning_rate).minimize(loss_gen(av_B) + loss_VAE_B)
     d2d.loss = [loss_rec, loss_kl_A, loss_rec_fake]
 
 def main():
@@ -150,7 +152,8 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            _, loss_gen, loss_vae = sess.run([model.train_op_gen, model.loss_gen, model.loss_VAE], feed_dict=feed)
+            _, _, loss_gen, loss_vae = sess.run([model.train_op_gen_A, model.train_op_gen_B,
+                                                 model.loss_gen, model.loss_VAE], feed_dict=feed)
             _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
 
         if i%1 == 0:
