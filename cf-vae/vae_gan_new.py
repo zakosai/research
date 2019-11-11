@@ -3,7 +3,6 @@ import numpy as np
 import os
 import argparse
 from translation import Translation, create_dataset, calc_recall
-import tensorflow_probability as tfp
 
 
 
