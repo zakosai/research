@@ -50,7 +50,7 @@ def build_model(d2d):
     loss_rec = d2d.loss_reconstruct(x_A, y_AA)
     loss_kl_A = d2d.loss_kl(z_mu_A, z_sigma_A)
     loss_rec_fake = d2d.loss_reconstruct(x_B, d2d.y_AB)
-    loss_VAE_A = 0.1 * loss_kl_A + 100 * loss_rec + 100 * loss_rec_fake
+    loss_VAE_A = 0.1 * loss_kl_A + 100 * loss_rec
     # loss_VAE_A = d2d.lambda_1 * d2d.loss_kl(z_mu_A, z_sigma_A) + d2d.loss_reconstruct(x_A, y_AA) +\
     #     d2d.loss_reconstruct(x_B, d2d.y_AB)
     loss_VAE_B = d2d.lambda_1 * d2d.loss_kl(z_mu_B, z_sigma_B) + 100 * d2d.loss_reconstruct(x_B, y_BB) +\
@@ -79,7 +79,7 @@ def build_model(d2d):
     # d2d.train_op_dis = tf.train.AdamOptimizer(d2d.learning_rate).minimize(d2d.loss_dis,
     #                                                                           var_list=adv_vars_A)
     d2d.train_op_gen_A = tf.train.AdamOptimizer(d2d.learning_rate).minimize(loss_VAE_A)
-    d2d.train_op_gen_B = tf.train.AdamOptimizer(d2d.learning_rate).minimize(loss_VAE_B)
+    # d2d.train_op_gen_B = tf.train.AdamOptimizer(d2d.learning_rate).minimize(loss_VAE_B)
     d2d.loss = [loss_rec, loss_kl_A, loss_rec_fake]
     d2d.loss_gen = loss_kl_mu_A
 
