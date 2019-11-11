@@ -43,8 +43,8 @@ def build_model(d2d):
     y_BB = d2d.decode(z_B, "B", d2d.decode_dim_B, False, True)
 
     # Fake
-    d2d.y_AB = d2d.decode(z_A, "B", d2d.decode_dim_B, True, True)
-    d2d.y_BA = d2d.decode(z_B, "A", d2d.decode_dim_A, True, True)
+    d2d.y_AB = d2d.decode(z_B, "B", d2d.decode_dim_B, True, True)
+    d2d.y_BA = d2d.decode(z_A, "A", d2d.decode_dim_A, True, True)
 
     # Loss VAE
     loss_rec = d2d.loss_reconstruct(x_A, y_AA)
