@@ -158,6 +158,7 @@ def main():
             _, _, loss_gen, loss_vae = sess.run([model.train_op_gen_A, model.train_op_gen_B,
                                                  model.loss_gen, model.loss_VAE], feed_dict=feed)
             # _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
+            loss_dis = 0
 
         if i%1 == 0:
             model.train = False
