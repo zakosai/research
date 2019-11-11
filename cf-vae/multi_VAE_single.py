@@ -54,13 +54,19 @@ def main():
     user_A_train = user_A[:train_size]
     user_B_train = user_B[:train_size]
 
-    user_A_val = user_A[train_size:train_size+val_size]
-    user_B_val = user_B[train_size:train_size+val_size]
-    user_A_test = user_A[train_size+val_size:]
-    user_B_test = user_B[train_size+val_size:]
+    # user_A_val = user_A[train_size:train_size+val_size]
+    # user_B_val = user_B[train_size:train_size+val_size]
+    # user_A_test = user_A[train_size+val_size:]
+    # user_B_test = user_B[train_size+val_size:]
 
     dense_A_test = dense_A[(train_size + val_size):]
     dense_B_test = dense_B[(train_size + val_size):]
+    dense_A_val = dense_A[train_size:train_size + val_size]
+    dense_B_val = dense_B[train_size:train_size + val_size]
+    user_A_val = one_hot_vector([i[:-10] for i in dense_A_val], num_A)
+    user_A_test = one_hot_vector([i[:-10] for i in dense_A_test], num_A)
+    dense_A_val = [i[-10:] for i in dense_A_val]
+    dense_A_test = [i[-10:] for i in dense_A_test]
 
     print("Train A")
     if A == "Drama" or A=="Romance":
@@ -78,8 +84,6 @@ def main():
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(max_to_keep=3)
     max_recall = 0
-    dense_A_val = dense_A[train_size:train_size+val_size]
-    dense_B_val = dense_B[train_size:train_size+val_size]
 
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(train_size)
