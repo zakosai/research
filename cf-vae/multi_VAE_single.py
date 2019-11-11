@@ -6,7 +6,7 @@ from tensorflow.contrib.framework import argsort
 import numpy as np
 import os
 import argparse
-from multiVAE import Translation, read_data, one_hot_vector, calc_recall
+from multiVAE import Translation, read_data, one_hot_vector, dcg_score
 
 
 def create_dataset(A="Health", B="Clothing"):
@@ -27,6 +27,36 @@ def create_dataset(A="Health", B="Clothing"):
     user_B = one_hot_vector(dense_B, num_B)
 
     return user_A, user_B, dense_A, dense_B, num_A, num_B
+
+
+def calc_recall(pred, test, train, m=[100], type=None):
+    for k in m:
+        recall = []
+        ndcg = []
+        for i in range(len(pred)):
+            p = np.argsort(pred[i])[::-1][:k+len(train[i])]
+            p = list(set(p) - set(train[i]))[:k]
+            hits = set(test[i]) & set(p)
+
+            #recall
+            recall_val = float(len(hits)) / len(test[i])
+            recall.append(recall_val)
+
+            #ncdg
+            score = []
+            for j in range(k):
+                if p[j] in hits:
+                    score.append(1)
+                else:
+                    score.append(0)
+            actual = dcg_score(score, pred[i, p], k)
+            best = dcg_score(score, score, k)
+            if best == 0:
+                ndcg.append(0)
+            else:
+                ndcg.append(float(actual) / best)
+
+        print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
 
 
 def main():
@@ -106,7 +136,7 @@ def main():
             loss_val_a, y_b = sess.run([model.loss, model.x_recon],
                                               feed_dict={model.x:user_A_val})
             print(len(y_b[0]))
-            recall = calc_recall(y_b, dense_A_val, [50])
+            recall = calc_recall(y_b, dense_A_val, [np.where(i==1)[0] for i in user_A_val],[50])
             print("Loss val a: %f, recall %f" % (loss_val_a, recall))
             if recall > max_recall:
                 max_recall = recall
@@ -117,7 +147,7 @@ def main():
 
                 # y_ab = y_ab[test_B]
                 # y_ba = y_ba[test_A]
-                calc_recall(y_b, dense_A_test, k, "A")
+                calc_recall(y_b, dense_A_test, [np.where(i==1)[0] for i in user_A_test], k,"A")
             model.train = True
         if i%100 == 0:
             model.learning_rate /= 2
