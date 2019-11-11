@@ -60,7 +60,7 @@ def build_model(d2d):
     # z_AB = d2d.encode(d2d.y_AB, "B", d2d.encode_dim_B, True, True, True)
     # z_BA = d2d.encode(d2d.y_BA, "A", d2d.encode_dim_A, True, True, True)
     av_A = d2d.adversal(z_A, "adv", [20, 1])
-    av_B = d2d.adversal(z_B, "adv", [20, 1])
+    av_B = d2d.adversal(z_B, "adv", [20, 1], True)
     # av_AB = d2d.adversal(z_AB, "adv_B", [20, 1], True)
     # av_BA = d2d.adversal(z_BA, "adv_A", [20, 1], True)
 
