@@ -156,7 +156,7 @@ def main():
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            _, _, loss_gen, loss_vae = sess.run([model.train_op_gen_A, model.train_op_gen_B,
+            _, loss_gen, loss_vae = sess.run([model.train_op_gen_A,
                                                  model.loss_gen, model.loss_VAE], feed_dict=feed)
             # _, loss_dis = sess.run([model.train_op_dis, model.loss_dis], feed_dict=feed)
             loss_dis = 0
