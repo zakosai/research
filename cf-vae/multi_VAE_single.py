@@ -36,7 +36,10 @@ def main():
     A = args.A
     B = args.B
     checkpoint_dir = "translation/%s_%s/" % (A, B)
-    user_A, user_B, dense_A, dense_B, num_A, num_B = create_dataset(A, B)
+    if args.switch:
+        user_B, user_A, dense_B, dense_A, num_B, num_A = create_dataset(A, B)
+    else:
+        user_A, user_B, dense_A, dense_B, num_A, num_B = create_dataset(A, B)
 
     print(num_A, num_B)
     z_dim = 50
@@ -129,6 +132,8 @@ parser.add_argument('--A',  type=str, default="Health",
 parser.add_argument('--B',  type=str, default='Grocery',
                    help='domain B')
 parser.add_argument('--k', type=int, default=100, help='top-K')
+parser.add_argument('--switch', type=bool, default=False)
+
 
 
 if __name__ == '__main__':
