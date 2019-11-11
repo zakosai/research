@@ -12,7 +12,7 @@ def loss_discriminator(A, B):
 
 
 def loss_gen(A):
-    return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=A, labels=tf.ones_like(A)))
+    return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=A, labels=tf.ones_like(A))*0.5)
 
 
 def loss_reconstruct(label, logits):
@@ -57,24 +57,24 @@ def build_model(d2d):
     d2d.loss_VAE = loss_VAE_A + loss_VAE_B
 
     # GAN
-    z_AB = d2d.encode(d2d.y_AB, "B", d2d.encode_dim_B, True, True, True)
-    z_BA = d2d.encode(d2d.y_BA, "A", d2d.encode_dim_A, True, True, True)
-    av_A = d2d.adversal(z_A, "adv_A", [20, 1])
-    av_B = d2d.adversal(z_B, "adv_B", [20, 1])
-    av_AB = d2d.adversal(z_AB, "adv_B", [20, 1], True)
-    av_BA = d2d.adversal(z_BA, "adv_A", [20, 1], True)
+    # z_AB = d2d.encode(d2d.y_AB, "B", d2d.encode_dim_B, True, True, True)
+    # z_BA = d2d.encode(d2d.y_BA, "A", d2d.encode_dim_A, True, True, True)
+    av_A = d2d.adversal(z_A, "adv", [20, 1])
+    av_B = d2d.adversal(z_B, "adv", [20, 1])
+    # av_AB = d2d.adversal(z_AB, "adv_B", [20, 1], True)
+    # av_BA = d2d.adversal(z_BA, "adv_A", [20, 1], True)
 
     # Loss GAN
     d2d.loss_gen = loss_gen(av_A) + loss_gen(av_B)
-    d2d.loss_dis = loss_discriminator(av_A, av_BA) + loss_discriminator(av_B, av_AB)
+    d2d.loss_dis = loss_discriminator(av_A, av_B)
 
-    adv_vars_A = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_A")
-    adv_vars_B = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_B")
+    adv_vars_A = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv")
+    # adv_vars_B = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_B")
     vae_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="vae")
-    d2d.train_op_gen = tf.train.AdamOptimizer(d2d.learning_rate).minimize(10*d2d.loss_gen + d2d.loss_VAE,
+    d2d.train_op_gen = tf.train.AdamOptimizer(d2d.learning_rate).minimize(d2d.loss_gen + d2d.loss_VAE,
                                                                                      var_list=vae_vars)
     d2d.train_op_dis = tf.train.AdamOptimizer(d2d.learning_rate).minimize(d2d.loss_dis,
-                                                                              var_list=adv_vars_A + adv_vars_B)
+                                                                              var_list=adv_vars_A)
     d2d.loss = [loss_rec, loss_kl_A, loss_rec_fake]
 
 def main():
