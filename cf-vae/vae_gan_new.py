@@ -68,8 +68,8 @@ def build_model(d2d):
     # Loss GAN
     # d2d.loss_gen = loss_gen(av_A) + loss_gen(av_B)
     # d2d.loss_dis = loss_discriminator(av_A, av_BA) + loss_discriminator(av_B, av_AB)
-    loss_kl_mu_A = tf.reduce_mean(tf.reduce_sum((z_mu_A-z_mu_B)**2, axis=1))
-    loss_kl_mu_B = tf.reduce_mean(tf.reduce_sum((z_mu_B-z_mu_A)**2, axis=1))
+    loss_kl_mu_A = tf.reduce_mean(tf.nn.l2_loss(z_mu_A-z_mu_B))
+    loss_kl_mu_B = tf.reduce_mean(tf.nn.l2_loss(z_mu_B-z_mu_A))
 
     adv_vars_A = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv")
     # adv_vars_B = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_B")
