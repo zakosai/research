@@ -66,7 +66,7 @@ def build_model(d2d):
 
     # Loss GAN
     d2d.loss_gen = loss_gen(av_A) + loss_gen(av_B)
-    d2d.loss_dis = loss_discriminator(av_A, av_BA) + loss_discriminator(av_B, av_BA)
+    d2d.loss_dis = loss_discriminator(av_A, av_BA) + loss_discriminator(av_B, av_AB)
 
     adv_vars_A = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_A")
     adv_vars_B = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_B")
