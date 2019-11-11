@@ -97,10 +97,10 @@ def main():
     dense_B_test = dense_B[(train_size + val_size):]
     dense_A_val = dense_A[train_size:train_size + val_size]
     dense_B_val = dense_B[train_size:train_size + val_size]
-    user_A_val = one_hot_vector([i[:-10] for i in dense_A_val], num_A)
-    user_A_test = one_hot_vector([i[:-10] for i in dense_A_test], num_A)
-    dense_A_val = [i[-10:] for i in dense_A_val]
-    dense_A_test = [i[-10:] for i in dense_A_test]
+    user_A_val = one_hot_vector([i[:-5] for i in dense_A_val], num_A)
+    user_A_test = one_hot_vector([i[:-5] for i in dense_A_test], num_A)
+    dense_A_val = [i[-5:] for i in dense_A_val]
+    dense_A_test = [i[-5:] for i in dense_A_test]
 
     print("Train A")
     if A == "Drama" or A=="Romance":
