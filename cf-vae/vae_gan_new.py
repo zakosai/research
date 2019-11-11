@@ -59,8 +59,8 @@ def build_model(d2d):
     d2d.loss_VAE = loss_VAE_A + loss_VAE_B
 
     # GAN
-    # z_AB, z_mu_AB, z_sigma_AB = d2d.encode(d2d.y_AB, "B", d2d.encode_dim_B, True, True, True)
-    # z_BA, z_mu_BA, z_sigma_BA = d2d.encode(d2d.y_BA, "A", d2d.encode_dim_A, True, True, True)
+    z_AB, z_mu_AB, z_sigma_AB = d2d.encode(d2d.y_AB, "B", d2d.encode_dim_B, True, True, True)
+    z_BA, z_mu_BA, z_sigma_BA = d2d.encode(d2d.y_BA, "A", d2d.encode_dim_A, True, True, True)
     # av_A = d2d.adversal(z_mu_A, "adv", [20, 1])
     # av_B = d2d.adversal(z_mu_B, "adv", [20, 1], True)
     # av_AB = d2d.adversal(z_AB, "adv_B", [20, 1], True)
@@ -69,8 +69,8 @@ def build_model(d2d):
     # Loss GAN
     # d2d.loss_gen = loss_gen(av_A) + loss_gen(av_B)
     # d2d.loss_dis = loss_discriminator(av_A, av_BA) + loss_discriminator(av_B, av_AB)
-    loss_kl_mu_A = tfp.distributions.kl_divergence(z_mu_A, z_mu_B)
-    loss_kl_mu_B = tfp.distributions.kl_divergence(z_mu_B, z_mu_A)
+    loss_kl_mu_A = tf.reduce_mean((z_mu_A-z_mu_BA)**2)
+    loss_kl_mu_B = tf.reduce_mean((z_mu_B-z_mu_AB)**2)
 
     adv_vars_A = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv")
     # adv_vars_B = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="adv_B")
