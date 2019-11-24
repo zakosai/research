@@ -97,10 +97,10 @@ def main():
     dense_B_test = dense_B[(train_size + val_size):]
     dense_A_val = dense_A[train_size:train_size + val_size]
     dense_B_val = dense_B[train_size:train_size + val_size]
-    user_A_val = one_hot_vector([i[:-5] for i in dense_A_val], num_A)
-    user_A_test = one_hot_vector([i[:-5] for i in dense_A_test], num_A)
-    dense_A_val = [i[-5:] for i in dense_A_val]
-    dense_A_test = [i[-5:] for i in dense_A_test]
+    user_A_val = one_hot_vector([i[:-args.n_predict] for i in dense_A_val], num_A)
+    user_A_test = one_hot_vector([i[:-args.n_predict] for i in dense_A_test], num_A)
+    dense_A_val = [i[-args.n_predict:] for i in dense_A_val]
+    dense_A_test = [i[-args.n_predict:] for i in dense_A_test]
 
     print("Train A")
     if A == "Drama" or A=="Romance":
@@ -134,11 +134,10 @@ def main():
         # Validation Process
         if i%10 == 0:
             model.train = False
-            loss_val_a, y_b = sess.run([model.loss, model.x_recon],
+            loss_val, y = sess.run([model.loss, model.x_recon],
                                               feed_dict={model.x:user_A_val})
-            print(len(y_b[0]))
-            recall = calc_recall(y_b, dense_A_val, [np.where(j==1)[0] for j in user_A_val],[50])
-            print("Loss val a: %f, recall %f" % (loss_val_a, recall))
+            recall = calc_recall(y, dense_A_val, [np.where(j==1)[0] for j in user_A_val],[50])
+            print("Loss val a: %f, recall %f" % (loss_val, recall))
             if recall > max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'multi-VAE-model'))
@@ -164,6 +163,8 @@ parser.add_argument('--B',  type=str, default='Grocery',
                    help='domain B')
 parser.add_argument('--k', type=int, default=100, help='top-K')
 parser.add_argument('--switch', type=bool, default=False)
+parser.add_argument('--n_predict', type=int, default=5)
+
 
 
 
