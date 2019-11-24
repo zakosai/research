@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 import os
 import argparse
-from translation import Translation, create_dataset, dcg_score
+from translation import Translation, create_dataset, dcg_score, one_hot_vector
 
 
 def calc_recall(pred, test, m=[100], type=None, n_predict=5):
@@ -82,14 +82,15 @@ def main(args):
     user_A_train = user_A[:train_size]
     user_B_train = user_B[:train_size]
 
-    user_A_val = user_A[train_size:train_size+val_size]
-    user_B_val = user_B[train_size:train_size+val_size]
-    user_A_test = user_A[train_size+val_size:]
-    user_B_test = user_B[train_size+val_size:]
-
     dense_A_test = dense_A[(train_size + val_size):]
     dense_B_test = dense_B[(train_size + val_size):]
+    dense_A_val = dense_A[train_size:train_size+val_size]
+    dense_B_val = dense_B[train_size:train_size+val_size]
 
+    user_A_val = one_hot_vector([i[:-args.n_predict] for i in dense_A_val], num_A)
+    user_A_test = one_hot_vector([i[:-args.n_predict] for i in dense_A_test], num_A)
+    user_B_val = one_hot_vector([i[:-args.n_predict] for i in dense_B_val], num_B)
+    user_B_test = one_hot_vector([i[:-args.n_predict] for i in dense_B_test], num_B)
 
     model = Translation(batch_size, num_A, num_B, encoding_dim_A, decoding_dim_A, encoding_dim_B,
                         decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-3, lambda_2=1,
@@ -100,8 +101,6 @@ def main(args):
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(max_to_keep=3)
     max_recall = 0
-    dense_A_val = dense_A[train_size:train_size+val_size]
-    dense_B_val = dense_B[train_size:train_size+val_size]
 
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(train_size)
@@ -145,7 +144,7 @@ def main(args):
             loss_gen, loss_dis, loss_vae, loss_cc))
             #                                                                         loss_vae, loss_gan, loss_cc))
             loss_gen, loss_val_a, loss_val_b, y_ba, y_ab = sess.run([model.loss_gen, model.loss_val_a,
-                                                                     model.loss_val_b, model.y_BA, model.y_AB],
+                                                                     model.loss_val_b, model.y_AA, model.y_BB],
                                               feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
 
             recall = calc_recall(y_ba, dense_A_val, [50], args.n_predict) + \
@@ -156,7 +155,7 @@ def main(args):
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'))
                 loss_test_a, loss_test_b, y_ab, y_ba = sess.run(
-                    [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
+                    [model.loss_val_a, model.loss_val_b, model.y_BB, model.y_AA],
                  feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
                 print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
 
