@@ -145,7 +145,7 @@ def main(args):
             loss_gen, loss_dis, loss_vae, loss_cc))
             #                                                                         loss_vae, loss_gan, loss_cc))
             loss_gen, loss_val_a, loss_val_b, y_ba, y_ab = sess.run([model.loss_gen, model.loss_val_a,
-                                                                     model.loss_val_b, model.y_BA, model.y_AB],
+                                                                     model.loss_val_b, model.y_AA, model.y_BB],
                                               feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
 
             recall = calc_recall(y_ba, dense_A_val, [50], args.n_predict) + \
@@ -156,7 +156,7 @@ def main(args):
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'))
                 loss_test_a, loss_test_b, y_ab, y_ba = sess.run(
-                    [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
+                    [model.loss_val_a, model.loss_val_b, model.y_AA, model.y_BB],
                  feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
                 print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
 
