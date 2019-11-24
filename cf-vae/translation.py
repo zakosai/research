@@ -406,10 +406,10 @@ def load_rating(path, thred, test_size):
         i += 1
     return dense_A, dense_B
 
-def main():
+
+def main(args):
     iter = 300
     batch_size= 500
-    args = parser.parse_args()
     A = args.A
     B = args.B
     checkpoint_dir = "translation/%s_%s/"%(A,B)
@@ -589,15 +589,15 @@ def main():
     # test_a = np.array(user_B_test).flatten()
     # print("rmse B %f" % calc_rmse(pred_a, test_a))
 
-parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument('--A',  type=str, default="Health",
-                   help='domain A')
-parser.add_argument('--B',  type=str, default='Grocery',
-                   help='domain B')
-parser.add_argument('--k',  type=int, default=100,
-                   help='top-K')
+
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('--A', type=str, default="Health", help='domain A')
+    parser.add_argument('--B', type=str, default='Grocery', help='domain B')
+    parser.add_argument('--k', type=int, default=100, help='top-K')
+    args = parser.parse_args()
+
+    main(args)
 
 
 

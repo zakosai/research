@@ -34,8 +34,8 @@ def calc_recall(pred, test, train, m=[100], type=None):
         recall = []
         ndcg = []
         for i in range(len(pred)):
-            p = np.argsort(pred[i])[::-1][:k+len(train[i])]
-            p = list(set(p) - set(train[i]))[:k]
+            pred[i, train[i]] = min(pred[i])
+            p = np.argsort(-pred[i])[:k]
             hits = set(test[i]) & set(p)
 
             #recall
