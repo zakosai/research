@@ -42,7 +42,7 @@ def calc_recall(pred, test, m=[100], type=None, n_predict=5):
 
 
 def main(args):
-    iter = 300
+    iter = 50
     batch_size= 500
 
     A = args.A
@@ -113,7 +113,7 @@ def main(args):
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            if i <50:
+            if i <20:
                 _, loss_vae = sess.run([model.train_op_VAE_A, model.loss_VAE], feed_dict=feed)
                 _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
                 loss_gen = loss_dis = loss_cc = 0
@@ -143,10 +143,11 @@ def main(args):
             print("Loss last batch: loss gen %f, loss dis %f, loss vae %f,loss cc %f" % (
             loss_gen, loss_dis, loss_vae, loss_cc))
             #                                                                         loss_vae, loss_gan, loss_cc))
-            loss_gen, loss_val_a, loss_val_b, y_ba, y_ab = sess.run([model.loss_gen, model.loss_val_a,
-                                                                     model.loss_val_b, model.y_AA, model.y_BB],
+            loss_gen, loss_val_a, loss_val_b, y_ba, y_aa, y_ab, y_bb = sess.run([model.loss_gen, model.loss_val_a,
+                                                                     model.loss_val_b, model.y_BA, model.y_AA, model.y_AB, model.y_BB],
                                               feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
-
+            y_ab = y_bb + y_ab
+            y_ba = y_aa + y_ba
             recall = calc_recall(y_ba, dense_A_val, [50], args.n_predict) + \
                      calc_recall(y_ab, dense_B_val, [50], args.n_predict)
             print("Loss gen: %f, Loss val a: %f, Loss val b: %f, recall %f" % (loss_gen, loss_val_a, loss_val_b,
@@ -154,9 +155,10 @@ def main(args):
             if recall > max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'))
-                loss_test_a, loss_test_b, y_ab, y_ba = sess.run(
-                    [model.loss_val_a, model.loss_val_b, model.y_BB, model.y_AA],
+                loss_test_a, loss_test_b, y_ab, y_ba, y_aa, y_bb = sess.run(
+                    [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA, model.y_AA, model.y_BB],
                  feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
+
                 print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
 
                 # y_ab = y_ab[test_B]
@@ -181,7 +183,7 @@ def main(args):
 
 
             model.train = True
-        if i%100 == 0:
+        if i%50 == 0:
             model.learning_rate /= 10
             print("decrease lr to %f"%model.learning_rate)
 
