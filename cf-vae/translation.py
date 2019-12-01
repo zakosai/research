@@ -123,7 +123,7 @@ class Translation:
 
         log_softmax_var = tf.nn.log_softmax(x_recon)
 
-        neg_ll = -0.99 * tf.reduce_mean(log_softmax_var * x) - 0.01 * tf.reduce_mean((1-log_softmax_var) * (1-x))
+        neg_ll = -tf.reduce_mean(log_softmax_var * x)
         return neg_ll
 
 
