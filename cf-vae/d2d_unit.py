@@ -120,7 +120,7 @@ class Translation:
     def loss_reconstruct(self, x, x_recon):
 
         # log_softmax_var = tf.nn.log_softmax(x_recon)
-        log_softmax_var = tf.contrib.sparsemax.sparsemax(x_recon)
+        log_softmax_var = tf.log(tf.contrib.sparsemax.sparsemax(x_recon))
 
         neg_ll = -tf.reduce_mean(log_softmax_var * x)
         # neg_ll = tf.contrib.sparsemax.sparsemax_loss(x_recon, tf.contrib.sparsemax.sparsemax(x_recon), x)
@@ -135,9 +135,9 @@ class Translation:
         loss_real = tf.reduce_mean(tf.squared_difference(x, 1))
         loss_fake = tf.reduce_mean(tf.squared_difference(x_fake, 0))
         return loss_real + loss_fake
+
     def loss_generator(self, x):
         return tf.reduce_mean(tf.squared_difference(x, 1))
-
 
     def build_model(self):
         self.x_A = tf.placeholder(tf.float32, [None, self.dim_A], name='input_A')
@@ -205,8 +205,6 @@ class Translation:
                         self.loss_generator(y_AB) + self.loss_generator(y_ABA) + self.loss_generator(y_BAB) +\
                         self.loss_generator(y_BA)
         # self.loss_gen = drself.loss_CC + 0.1 * tf.losses.get_regularization_loss() - loss_d_A - loss_d_B
-
-
 
         self.loss_dis = loss_d_A + loss_d_B
 
@@ -285,6 +283,7 @@ def test_same_domain(dense, num_product):
             input_user[i, d[j]] = 1
         dense_test[i] = d[num_input:]
     return input_user, dense_test
+
 
 def calc_recall_same_domain(pred, test, m=[100], type=None):
 
