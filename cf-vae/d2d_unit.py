@@ -40,8 +40,8 @@ class Translation:
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.5)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
@@ -56,8 +56,8 @@ class Translation:
 
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)-1):
                 x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
@@ -73,7 +73,7 @@ class Translation:
 
         with tf.variable_scope(scope, reuse=reuse):
             # if self.train:
-            # x_ = tf.nn.dropout(x_, 0.7)
+            x_ = tf.nn.dropout(x_, 0.7)
             for i in range(len(adv_dim)-1):
                 x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
             x_ = fully_connected(x_, adv_dim[-1], scope="adv_last")
@@ -81,8 +81,8 @@ class Translation:
 
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i],  scope="share_%d"%i,
@@ -97,7 +97,6 @@ class Translation:
     def gen_z(self, h, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
             z_mu = fully_connected(h, self.z_dim, self.active_function, scope="z_mu", weights_regularizer=self.regularizer)
-            z_mu = batch_norm(z_mu)
             z_sigma = fully_connected(h, self.z_dim,  self.active_function, scope="z_sigma",
                                       weights_regularizer=self.regularizer)
             e = tf.random_normal(tf.shape(z_mu))
@@ -105,16 +104,14 @@ class Translation:
         return z, z_mu, z_sigma
 
     def encode(self, x, scope, dim, reuse_enc, reuse_share, reuse_z=False):
-        with tf.variable_scope("vae"):
-            h = self.enc(x, "encode_%s"%scope, dim, reuse_enc)
-            h = self.share_layer(h, "encode", self.share_dim, reuse_share)
-            z, z_mu, z_sigma = self.gen_z(h, "encode", reuse=reuse_z)
+        h = self.enc(x, "encode_%s"%scope, dim, reuse_enc)
+        h = self.share_layer(h, "encode", self.share_dim, reuse_share)
+        z, z_mu, z_sigma = self.gen_z(h, "encode", reuse=reuse_z)
         return z, z_mu, z_sigma
 
     def decode(self, x, scope, dim, reuse_dec, reuse_share):
-        with tf.variable_scope("vae"):
-            x = self.share_layer(x, "decode", self.share_dim[::-1], reuse_share)
-            x = self.dec(x, "decode_%s"%scope, dim, reuse_dec)
+        x = self.share_layer(x, "decode", self.share_dim[::-1], reuse_share)
+        x = self.dec(x, "decode_%s"%scope, dim, reuse_dec)
         return x
 
     def loss_kl(self, mu, sigma):
@@ -122,11 +119,14 @@ class Translation:
 
     def loss_reconstruct(self, x, x_recon):
 
-        log_softmax_var = tf.nn.log_softmax(x_recon)
-        # log_softmax_var = tf.contrib.sparsemax.sparsemax(x_recon)
+        # log_softmax_var = tf.nn.log_softmax(x_recon)
+        log_softmax_var = tf.contrib.sparsemax.sparsemax(x_recon)
 
         neg_ll = -tf.reduce_mean(log_softmax_var * x)
+        # neg_ll = tf.contrib.sparsemax.sparsemax_loss(x_recon, tf.contrib.sparsemax.sparsemax(x_recon), x)
+        # neg_ll = tf.reduce_mean(tf.reduce_sum(neg_ll, axis=-1))
         return neg_ll
+
 
     def loss_recsys(self, pred, label):
         return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(label, pred), axis=1))
@@ -135,7 +135,6 @@ class Translation:
         loss_real = tf.reduce_mean(tf.squared_difference(x, 1))
         loss_fake = tf.reduce_mean(tf.squared_difference(x_fake, 0))
         return loss_real + loss_fake
-
     def loss_generator(self, x):
         return tf.reduce_mean(tf.squared_difference(x, 1))
 
@@ -192,6 +191,7 @@ class Translation:
                     self.lambda_4 * self.loss_reconstruct(x_A,y_BA) + self.lambda_4 * self.loss_reconstruct(x_A, y_ABA)
         loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB) + self.lambda_4 * \
                     self.loss_reconstruct(x_B,y_AB) + self.lambda_4 * self.loss_reconstruct(x_B, y_BAB)
+
 
 
         self.loss_CC = loss_CC_A + loss_CC_B
@@ -481,7 +481,7 @@ def main(args):
             feed = {model.x_A: x_A,
                     model.x_B: x_B}
 
-            if i <50:
+            if i <20:
                 _, loss_vae = sess.run([model.train_op_VAE_A, model.loss_VAE], feed_dict=feed)
                 _, loss_vae = sess.run([model.train_op_VAE_B, model.loss_VAE], feed_dict=feed)
                 loss_gen = loss_dis = loss_cc = 0
@@ -526,27 +526,12 @@ def main(args):
                     [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
                  feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
                 print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
-                np.savez(os.path.join(checkpoint_dir, "pred.npz"), y_ab=y_ab, y_ba=y_ba)
 
                 # y_ab = y_ab[test_B]
                 # y_ba = y_ba[test_A]
 
                 calc_recall(y_ba, dense_A_test, k, type="A")
                 calc_recall(y_ab, dense_B_test, k, type="B")
-                pred = np.argsort(-y_ba)[:, :10]
-                f = open(os.path.join(checkpoint_dir, "predict_%s.txt"%A), "w")
-                for p in pred:
-                    w = [str(i) for i in p]
-                    f.write(','.join(w))
-                    f.write("\n")
-                f.close()
-                pred = np.argsort(-y_ab)[:, :10]
-                f = open(os.path.join(checkpoint_dir, "predict_%s.txt" % B), "w")
-                for p in pred:
-                    w = [str(i) for i in p]
-                    f.write(','.join(w))
-                    f.write("\n")
-                f.close()
 
                 #test same domain
                 # input_A_test, domain_A_test = test_same_domain(dense_A_test, num_A)
@@ -571,6 +556,26 @@ def main(args):
             #     saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
 
     print(max_recall)
+    # model.train = False
+    # loss_test_a, loss_test_b, y_ab, y_ba = sess.run([model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
+    #                         feed_dict={model.x_A: user_A_test[200:],model.x_B: user_B_test[200:]})
+    # print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
+    # model.train = True
+    #
+    # dense_A_test = dense_A[(train_size+200):]
+    # dense_B_test = dense_B[(train_size+200):]
+    #
+    #
+    # print("recall B: %f"%(calc_recall(y_ab, dense_B_test)))
+    # print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
+
+    # pred_a = np.array(y_ba).flatten()
+    # test_a = np.array(user_A_test).flatten()
+    # print("rmse A %f"%calc_rmse(pred_a, test_a))
+    #
+    # pred_a = np.array(y_ab).flatten()
+    # test_a = np.array(user_B_test).flatten()
+    # print("rmse B %f" % calc_rmse(pred_a, test_a))
 
 
 if __name__ == '__main__':
