@@ -126,8 +126,6 @@ class Translation:
         # log_softmax_var = tf.contrib.sparsemax.sparsemax(x_recon)
 
         neg_ll = -tf.reduce_mean(log_softmax_var * x)
-        # neg_ll = tf.contrib.sparsemax.sparsemax_loss(x_recon, tf.contrib.sparsemax.sparsemax(x_recon), x)
-        # neg_ll = tf.reduce_mean(tf.reduce_sum(neg_ll, axis=-1))
         return neg_ll
 
     def loss_recsys(self, pred, label):
