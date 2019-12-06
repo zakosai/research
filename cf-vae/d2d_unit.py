@@ -124,10 +124,9 @@ class Translation:
         # log_softmax_var = tf.nn.log_softmax(x_recon)
         #
         # neg_ll = -0.99 * tf.reduce_mean(log_softmax_var * x) - 0.01 * tf.reduce_mean((1-log_softmax_var) * (1-x))
-        neg_ll = tf.contrib.sparsemax.sparsemax_loss(x_recon, tf.contrib.sparsemax.sparsemax(x_recon), x)
+        neg_ll = -tf.contrib.sparsemax.sparsemax_loss(x_recon, tf.contrib.sparsemax.sparsemax(x_recon), x)
         neg_ll = tf.reduce_mean(tf.reduce_sum(neg_ll, axis=-1))
         return neg_ll
-
 
     def loss_recsys(self, pred, label):
         return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(label, pred), axis=1))
@@ -136,6 +135,7 @@ class Translation:
         loss_real = tf.reduce_mean(tf.squared_difference(x, 1))
         loss_fake = tf.reduce_mean(tf.squared_difference(x_fake, 0))
         return loss_real + loss_fake
+
     def loss_generator(self, x):
         return tf.reduce_mean(tf.squared_difference(x, 1))
 
