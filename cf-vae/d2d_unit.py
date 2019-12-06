@@ -97,6 +97,7 @@ class Translation:
     def gen_z(self, h, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
             z_mu = fully_connected(h, self.z_dim, self.active_function, scope="z_mu", weights_regularizer=self.regularizer)
+            z_mu = batch_norm(z_mu)
             z_sigma = fully_connected(h, self.z_dim,  self.active_function, scope="z_sigma",
                                       weights_regularizer=self.regularizer)
             e = tf.random_normal(tf.shape(z_mu))
@@ -121,8 +122,8 @@ class Translation:
 
     def loss_reconstruct(self, x, x_recon):
 
-        # log_softmax_var = tf.nn.log_softmax(x_recon)
-        log_softmax_var = tf.contrib.sparsemax.sparsemax(x_recon)
+        log_softmax_var = tf.nn.log_softmax(x_recon)
+        # log_softmax_var = tf.contrib.sparsemax.sparsemax(x_recon)
 
         neg_ll = -tf.reduce_mean(log_softmax_var * x)
         # neg_ll = tf.contrib.sparsemax.sparsemax_loss(x_recon, tf.contrib.sparsemax.sparsemax(x_recon), x)
