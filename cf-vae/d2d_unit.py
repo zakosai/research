@@ -10,9 +10,9 @@ import argparse
 
 class Translation:
     def __init__(self, batch_size, dim_A, dim_B, encode_dim_A, decode_dim_A, encode_dim_B, decode_dim_B, adv_dim_A,
-                 adv_dim_B, z_dim, share_dim, z_A=None, z_B=None, eps=1e-10, lambda_0=0.1, lambda_1=0.1, lambda_2=1,
+                 adv_dim_B, z_dim, share_dim, z_A=None, z_B=None, eps=1e-10, lambda_0=0.1, lambda_1=0.1, lambda_2=100,
                  lambda_3=0.01,
-                 lambda_4=1, learning_rate=1e-4):
+                 lambda_4=100, learning_rate=1e-4):
         self.batch_size = batch_size
         self.dim_A = dim_A
         self.dim_B = dim_B
@@ -124,7 +124,7 @@ class Translation:
         # log_softmax_var = tf.nn.log_softmax(x_recon)
         #
         # neg_ll = -0.99 * tf.reduce_mean(log_softmax_var * x) - 0.01 * tf.reduce_mean((1-log_softmax_var) * (1-x))
-        neg_ll = -tf.contrib.sparsemax.sparsemax_loss(x_recon, tf.contrib.sparsemax.sparsemax(x_recon), x)
+        neg_ll = tf.contrib.sparsemax.sparsemax_loss(x_recon, tf.contrib.sparsemax.sparsemax(x_recon), x)
         neg_ll = tf.reduce_mean(tf.reduce_sum(neg_ll, axis=-1))
         return neg_ll
 
