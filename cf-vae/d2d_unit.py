@@ -6,6 +6,7 @@ from tensorflow.contrib.framework import argsort
 import numpy as np
 import os
 import argparse
+import tensorflow_addons.activations.sparsemax as sparsemax
 
 
 class Translation:
@@ -121,7 +122,8 @@ class Translation:
 
     def loss_reconstruct(self, x, x_recon):
 
-        log_softmax_var = tf.nn.log_softmax(x_recon)
+        # log_softmax_var = tf.nn.log_softmax(x_recon)
+        log_softmax_var = sparsemax(x_recon, axis=-1)
 
         neg_ll = -tf.reduce_mean(log_softmax_var * x)
         # neg_ll = tf.contrib.sparsemax.sparsemax_loss(x_recon, tf.contrib.sparsemax.sparsemax(x_recon), x)
