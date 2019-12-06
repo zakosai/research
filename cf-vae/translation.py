@@ -40,8 +40,8 @@ class Translation:
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.5)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
@@ -56,8 +56,8 @@ class Translation:
 
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)-1):
                 x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
@@ -73,7 +73,7 @@ class Translation:
 
         with tf.variable_scope(scope, reuse=reuse):
             # if self.train:
-            # x_ = tf.nn.dropout(x_, 0.7)
+            x_ = tf.nn.dropout(x_, 0.7)
             for i in range(len(adv_dim)-1):
                 x_ = fully_connected(x_, adv_dim[i], self.active_function, scope="adv_%d" % i)
             x_ = fully_connected(x_, adv_dim[-1], scope="adv_last")
@@ -81,8 +81,8 @@ class Translation:
 
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i],  scope="share_%d"%i,
@@ -104,16 +104,14 @@ class Translation:
         return z, z_mu, z_sigma
 
     def encode(self, x, scope, dim, reuse_enc, reuse_share, reuse_z=False):
-        with tf.variable_scope("vae"):
-            h = self.enc(x, "encode_%s"%scope, dim, reuse_enc)
-            h = self.share_layer(h, "encode", self.share_dim, reuse_share)
-            z, z_mu, z_sigma = self.gen_z(h, "encode", reuse=reuse_z)
+        h = self.enc(x, "encode_%s"%scope, dim, reuse_enc)
+        h = self.share_layer(h, "encode", self.share_dim, reuse_share)
+        z, z_mu, z_sigma = self.gen_z(h, "encode", reuse=reuse_z)
         return z, z_mu, z_sigma
 
     def decode(self, x, scope, dim, reuse_dec, reuse_share):
-        with tf.variable_scope("vae"):
-            x = self.share_layer(x, "decode", self.share_dim[::-1], reuse_share)
-            x = self.dec(x, "decode_%s"%scope, dim, reuse_dec)
+        x = self.share_layer(x, "decode", self.share_dim[::-1], reuse_share)
+        x = self.dec(x, "decode_%s"%scope, dim, reuse_dec)
         return x
 
     def loss_kl(self, mu, sigma):
@@ -123,7 +121,9 @@ class Translation:
 
         log_softmax_var = tf.nn.log_softmax(x_recon)
 
-        neg_ll = -tf.reduce_mean(log_softmax_var * x)
+        neg_ll = -tf.reduce_mean(tf.reduce_sum(
+            log_softmax_var * x,
+            axis=-1))
         return neg_ll
 
 
@@ -190,6 +190,7 @@ class Translation:
                     self.lambda_4 * self.loss_reconstruct(x_A,y_BA) + self.lambda_4 * self.loss_reconstruct(x_A, y_ABA)
         loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB) + self.lambda_4 * \
                     self.loss_reconstruct(x_B,y_AB) + self.lambda_4 * self.loss_reconstruct(x_B, y_BAB)
+
 
 
         self.loss_CC = loss_CC_A + loss_CC_B
@@ -457,7 +458,8 @@ def main(args):
 
 
     model = Translation(batch_size, num_A, num_B, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-3)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-3, lambda_2=1,
+                        lambda_4=0.1)
     model.build_model()
 
     sess = tf.Session()
@@ -529,20 +531,6 @@ def main(args):
 
                 calc_recall(y_ba, dense_A_test, k, type="A")
                 calc_recall(y_ab, dense_B_test, k, type="B")
-                pred = np.argsort(-y_ba)[:, :10]
-                f = open(os.path.join(checkpoint_dir, "predict_%s.txt"%A), "w")
-                for p in pred:
-                    w = [str(i) for i in p]
-                    f.write(','.join(w))
-                    f.write("\n")
-                f.close()
-                pred = np.argsort(-y_ab)[:, :10]
-                f = open(os.path.join(checkpoint_dir, "predict_%s.txt" % B), "w")
-                for p in pred:
-                    w = [str(i) for i in p]
-                    f.write(','.join(w))
-                    f.write("\n")
-                f.close()
 
                 #test same domain
                 # input_A_test, domain_A_test = test_same_domain(dense_A_test, num_A)
