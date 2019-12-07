@@ -124,7 +124,7 @@ class Translation:
 
         # neg_ll = -tf.reduce_mean(log_softmax_var * x)
         neg_ll = tf.contrib.sparsemax.sparsemax_loss(x_recon, tf.contrib.sparsemax.sparsemax(x_recon), x)
-        neg_ll = tf.reduce_mean(tf.reduce_sum(neg_ll, axis=-1))
+        neg_ll = -tf.reduce_mean(tf.reduce_sum(neg_ll, axis=-1))
         return neg_ll
 
 
@@ -458,8 +458,8 @@ def main(args):
 
 
     model = Translation(batch_size, num_A, num_B, encoding_dim_A, decoding_dim_A, encoding_dim_B,
-                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-3, lambda_2=100,
-                        lambda_4=100)
+                        decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-3, lambda_2=1,
+                        lambda_4=0.1)
     model.build_model()
 
     sess = tf.Session()
