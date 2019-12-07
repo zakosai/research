@@ -120,10 +120,10 @@ class Translation:
     def loss_reconstruct(self, x, x_recon):
 
         # log_softmax_var = tf.nn.log_softmax(x_recon)
-        log_softmax_var = tf.log(tf.contrib.sparsemax.sparsemax(x_recon))
+        # log_softmax_var = tf.log(tf.contrib.sparsemax.sparsemax(x_recon))
 
-        neg_ll = -tf.reduce_mean(log_softmax_var * x)
-        # neg_ll = tf.contrib.sparsemax.sparsemax_loss(x_recon, tf.contrib.sparsemax.sparsemax(x_recon), x)
+        # neg_ll = -tf.reduce_mean(log_softmax_var * x)
+        neg_ll = tf.contrib.sparsemax.sparsemax_loss(x_recon, tf.contrib.sparsemax.sparsemax(x_recon), x)
         # neg_ll = tf.reduce_mean(tf.reduce_sum(neg_ll, axis=-1))
         return neg_ll
 
