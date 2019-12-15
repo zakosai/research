@@ -105,11 +105,11 @@ class Translation:
 
     def encode(self, x, scope, dim, reuse_enc, reuse_share, reuse_z=False):
         h = self.enc(x, "encode_%s"%scope, dim, reuse_enc)
-        h = self.share_layer(h, "encode", self.share_dim, reuse_share)
+        # h = self.share_layer(h, "encode", self.share_dim, reuse_share)
         return h
 
     def decode(self, x, scope, dim, reuse_dec, reuse_share):
-        x = self.share_layer(x, "decode", self.share_dim[::-1], reuse_share)
+        # x = self.share_layer(x, "decode", self.share_dim[::-1], reuse_share)
         x = self.dec(x, "decode_%s"%scope, dim, reuse_dec)
         return x
 
@@ -156,7 +156,6 @@ class Translation:
         y_BA = self.decode(z_B, "A", self.decode_dim_A, True, True)
         adv_AA = self.adversal(x_A, "adv_A", self.adv_dim_A)
         adv_BA = self.adversal(y_BA, "adv_A", self.adv_dim_A, reuse=True)
-
 
         y_AB = self.decode(z_A, "B", self.decode_dim_B, True, True)
         adv_BB = self.adversal(x_B, "adv_B", self.adv_dim_B)
