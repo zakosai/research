@@ -15,7 +15,6 @@ from operator import add
 from resnet_model import conv2d_fixed_padding, building_block, block_layer
 import os
 import math
-from time import time
 
 
 class params:
@@ -501,15 +500,15 @@ class cf_vae_extend:
             recall_vals = []
             print(len(train_users))
             for i in range(len(train_users)):
-                start = time()
+                start = time.time()
                 train = train_users[i]
                 top_M = list(pred_all[i, 0:(m +len(train))])
-                print(time() - start)
+                print(time.time() - start)
                 for u in train:
                     if u in top_M:
                         top_M.remove(u)
                 top_M = top_M[:m]
-                print(time() - start)
+                print(time.time() - start)
                 if len(top_M) != m:
                     print(top_M, train_users[i])
                 hits = set(top_M) & set(test_users[i])   # item idex from 0
