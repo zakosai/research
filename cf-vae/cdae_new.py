@@ -71,7 +71,7 @@ def main(args):
     # self.num_iter = 3000
     # self.EM_iter = 100
 
-    data = load_cvae_data(data_dir, args.data_type)
+    data = load_cvae_data(args)
     np.random.seed(0)
     tf.set_random_seed(0)
 
@@ -97,7 +97,7 @@ def main(args):
                         model = cf_vae_extend(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,
                                               input_dim=dim, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200,400,dim],
                                               decoding_dims_str=[200, 4526], loss_type='cross_entropy',
-                                              model = model_type, ckpt_folder=ckpt)
+                                              model=model_type, ckpt_folder=ckpt)
                         model.fit(data["train_users"], data["train_items"], data["content"], params, data["test_users"])
                         model.save_model(os.path.join(ckpt,"cf_dae_%d_%d.mat"%(model_type, i)))
                         # model.load_model("cf_vae.mat")
