@@ -1,4 +1,4 @@
-from translation import Translation, create_dataset, calc_recall
+from translation2 import Translation, create_dataset, calc_recall, calc_recall_same_domain, one_hot_vector
 import tensorflow as tf
 import numpy as np
 import argparse
@@ -6,7 +6,6 @@ import os
 
 
 def main():
-    iter = 300
     batch_size= 500
     args = parser.parse_args()
     A = args.A
@@ -33,27 +32,22 @@ def main():
     decoding_dim_A = [dim, num_A]
     decoding_dim_B = [dim, num_B]
 
-
     assert len(user_A) == len(user_B)
     perm = np.random.permutation(len(user_A))
     total_data = len(user_A)
     train_size = int(total_data * 0.7)
     val_size = int(total_data * 0.05)
 
-    # user_A = user_A[perm]
-    # user_B = user_B[perm]
-
-    user_A_train = user_A[:train_size]
-    user_B_train = user_B[:train_size]
-
-    user_A_val = user_A[train_size:train_size+val_size]
-    user_B_val = user_B[train_size:train_size+val_size]
     user_A_test = user_A[train_size+val_size:]
     user_B_test = user_B[train_size+val_size:]
 
     dense_A_test = dense_A[(train_size + val_size):]
     dense_B_test = dense_B[(train_size + val_size):]
 
+    train_A_same_domain = [i[:-5] for i in dense_A_test]
+    train_A_same_domain = one_hot_vector(train_A_same_domain, num_A)
+    train_B_same_domain = [i[:-5] for i in dense_B_test]
+    train_B_same_domain = one_hot_vector(train_B_same_domain, num_B)
 
     model = Translation(batch_size, num_A, num_B, encoding_dim_A, decoding_dim_A, encoding_dim_B,
                         decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-3, lambda_2=1,
@@ -70,20 +64,25 @@ def main():
     print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
     calc_recall(y_ba, dense_A_test, k, type="A")
     calc_recall(y_ab, dense_B_test, k, type="B")
-    pred = np.argsort(-y_ba)[:, :10]
-    f = open(os.path.join(checkpoint_dir, "predict_%s.txt" % A), "w")
-    for p in pred:
-        w = [str(i) for i in p]
-        f.write(','.join(w))
-        f.write("\n")
-    f.close()
-    pred = np.argsort(-y_ab)[:, :10]
-    f = open(os.path.join(checkpoint_dir, "predict_%s.txt" % B), "w")
-    for p in pred:
-        w = [str(i) for i in p]
-        f.write(','.join(w))
-        f.write("\n")
-    f.close()
+
+    y_aa, y_bb = sess.run([model.y_AA, model.y_BB],
+                          feed_dict={model.x_A: train_A_same_domain, model.x_B: train_B_same_domain})
+    recall_aa = calc_recall_same_domain(y_aa, dense_A_test, [50], type="A")
+    recall_bb = calc_recall_same_domain(y_bb, dense_B_test, [50], type="B")
+    # pred = np.argsort(-y_ba)[:, :10]
+    # f = open(os.path.join(checkpoint_dir, "predict_%s.txt" % A), "w")
+    # for p in pred:
+    #     w = [str(i) for i in p]
+    #     f.write(','.join(w))
+    #     f.write("\n")
+    # f.close()
+    # pred = np.argsort(-y_ab)[:, :10]
+    # f = open(os.path.join(checkpoint_dir, "predict_%s.txt" % B), "w")
+    # for p in pred:
+    #     w = [str(i) for i in p]
+    #     f.write(','.join(w))
+    #     f.write("\n")
+    # f.close()
 
 
 
