@@ -126,17 +126,13 @@ class Translation:
             axis=-1))
         return neg_ll
 
-
-    def loss_recsys(self, pred, label):
-        return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(label, pred), axis=1))
-
     def loss_discriminator(self, x, x_fake):
         loss_real = tf.reduce_mean(tf.squared_difference(x, 1))
         loss_fake = tf.reduce_mean(tf.squared_difference(x_fake, 0))
         return loss_real + loss_fake
+
     def loss_generator(self, x):
         return tf.reduce_mean(tf.squared_difference(x, 1))
-
 
     def build_model(self):
         self.x_A = tf.placeholder(tf.float32, [None, self.dim_A], name='input_A')
@@ -169,8 +165,6 @@ class Translation:
         z_BAB, z_mu_BAB, z_sigma_BAB = self.encode(y_BA, "A", self.encode_dim_A, True, True, True)
         y_BAB = self.decode(z_BAB, "B", self.decode_dim_B, True, True)
 
-
-
         # Loss VAE
         loss_VAE_A = self.lambda_1 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_2 * self.loss_reconstruct(x_A, y_AA)
         loss_VAE_B = self.lambda_1 * self.loss_kl(z_mu_B, z_sigma_B) + self.lambda_2 * self.loss_reconstruct(x_B, y_BB)
@@ -191,8 +185,6 @@ class Translation:
         loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB) + self.lambda_4 * \
                     self.loss_reconstruct(x_B,y_AB) + self.lambda_4 * self.loss_reconstruct(x_B, y_BAB)
 
-
-
         self.loss_CC = loss_CC_A + loss_CC_B
 
         self.loss_val_a = self.lambda_4 * self.loss_reconstruct(x_A, y_BA)
@@ -205,11 +197,7 @@ class Translation:
                         self.loss_generator(y_BA)
         # self.loss_gen = drself.loss_CC + 0.1 * tf.losses.get_regularization_loss() - loss_d_A - loss_d_B
 
-
-
         self.loss_dis = loss_d_A + loss_d_B
-
-
         self.train_op_VAE_A = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_VAE_A)
         self.train_op_VAE_B = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_VAE_B)
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
@@ -249,16 +237,6 @@ def read_data(filename):
     f = [i[1:] for i in f]
     return f
 
-def read_data2(filename):
-    data = list(open(filename).readlines())
-    data = data[1:]
-    n_data = len(data)
-    print(len(data))
-    data = [d.strip() for d in data]
-    data = [d.split(", ") for d in data]
-    data = [d[:3] for d in data]
-    data = np.array(data).reshape(n_data, 3).astype(np.int32)
-    return data
 
 def one_hot_vector(A, num_product):
     one_hot_A = np.zeros((len(A), num_product))
@@ -269,11 +247,6 @@ def one_hot_vector(A, num_product):
                 one_hot_A[i,j] = 1
     return one_hot_A
 
-def one_hot_vector2(A, num_product):
-    one_hot = np.zeros((6557, num_product))
-    for i in A:
-        one_hot[i[0], i[1]] = i[2]
-    return one_hot
 
 def test_same_domain(dense, num_product):
     input_user = np.zeros((len(dense), num_product))
@@ -286,7 +259,7 @@ def test_same_domain(dense, num_product):
     return input_user, dense_test
 
 
-def calc_recall_same_domain(pred, test, m=[100], type=None):
+def calc_recall_same_domain(pred, test, m=[100], type=None, f=None):
     for k in m:
         pred_ab = np.argsort(-pred)
         recall = []
@@ -321,7 +294,10 @@ def calc_recall_same_domain(pred, test, m=[100], type=None):
             else:
                 ndcg.append(float(actual) / best)
 
-        print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
+        if f != None:
+            f.write("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
+        else:
+            print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
     return np.mean(np.array(recall))
 
 
@@ -453,10 +429,8 @@ def main():
     dense_B_test = dense_B[(train_size + val_size):]
 
     train_A_same_domain = [i[:-5] for i in dense_A_test]
-    test_A_same_domain = [i[-5:] for i in dense_A_test]
     train_A_same_domain = one_hot_vector(train_A_same_domain, num_A)
     train_B_same_domain = [i[:-5] for i in dense_B_test]
-    test_B_same_domain = [i[-5:] for i in dense_B_test]
     train_B_same_domain = one_hot_vector(train_B_same_domain, num_B)
 
     model = Translation(batch_size, num_A, num_B, encoding_dim_A, decoding_dim_A, encoding_dim_B,
@@ -522,7 +496,7 @@ def main():
                                                                                recall))
             if recall > max_recall:
                 max_recall = recall
-                saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
+                saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'))
                 loss_test_a, loss_test_b, y_ab, y_ba = sess.run(
                     [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
                  feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
