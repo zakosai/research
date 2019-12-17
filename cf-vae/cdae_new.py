@@ -38,6 +38,7 @@ def load_rating(data, item_no):
     train_items = [] * item_no
     for i, user in enumerate(train_users):
         for item in user:
+            print(item)
             if train_items[item] == []:
                 train_items[item] = [i]
             else:
