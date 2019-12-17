@@ -494,24 +494,24 @@ class cf_vae_extend:
         val_size = int(len(self.U) * 0.05)
         pred_all = list(np.dot(self.U[train_size+val_size:], (self.V.T)))
 
-        for m in [10, 100]:
+        for m in [50]:
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
+            print(len(train_users))
             for i in range(len(train_users)):
+                print(i)
                 train = train_users[i]
                 top_M = list(np.argsort(-pred_all[i])[0:(m +len(train))])
                 for u in train:
                     if u in top_M:
                         top_M.remove(u)
                 top_M = top_M[:m]
+                print(top_M)
                 if len(top_M) != m:
                     print(top_M, train_users[i])
                 hits = set(top_M) & set(test_users[i])   # item idex from 0
                 hits_num = len(hits)
-                try:
-                    recall_val = float(hits_num) / float(len(test_users[i]))
-                except:
-                    recall_val = 1
+                recall_val = float(hits_num) / float(len(test_users[i]))
                 recall_vals.append(recall_val)
                 # precision = float(hits_num) / float(m)
                 # precision_vals.append(precision)
