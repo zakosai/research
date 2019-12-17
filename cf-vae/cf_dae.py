@@ -517,7 +517,7 @@ class cf_vae_extend:
                 recall_vals.append(recall_val)
                 # precision = float(hits_num) / float(m)
                 # precision_vals.append(precision)
-                print(time() - start)
+                print(time.time() - start)
 
             recall_avg = np.mean(np.array(recall_vals))
             # precision_avg = np.mean(np.array(precision_vals))
