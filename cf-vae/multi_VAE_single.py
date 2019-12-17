@@ -131,7 +131,8 @@ def main(args):
     train_A_same_domain = one_hot_vector([i[:-args.n_predict] for i in dense_A_test], num_A)
     train_B_same_domain = one_hot_vector([i[:-args.n_predict] for i in dense_B_test], num_B)
     train_A_same_domain = np.concatenate((train_A_same_domain, np.zeros_like(train_B_same_domain)), axis=1)
-    train_B_same_domain = np.concatenate((np.zeros(train_B_same_domain.shape[0], num_A), train_B_same_domain), axis=1)
+    train_B_same_domain = np.concatenate((np.zeros((train_B_same_domain.shape[0], num_A)),
+                                          train_B_same_domain), axis=1)
 
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(train_size)
