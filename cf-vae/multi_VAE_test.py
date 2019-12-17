@@ -113,5 +113,7 @@ parser.add_argument('--k',  type=int, default=100,
                    help='top-K')
 parser.add_argument('--ckpt',  type=str, default="multi-VAE-model",
                    help='top-K')
+parser.add_argument('--n_predict',  type=int, default=5,
+                   help='num predict')
 if __name__ == '__main__':
     main()
