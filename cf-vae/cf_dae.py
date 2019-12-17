@@ -489,19 +489,15 @@ class cf_vae_extend:
             recall_avgs.append(recall_avg)
         return recall_avgs
 
-    def predict_val(self, pred_all, train_users, test_users, file=None):
+    def predict_val(self, train_users, test_users, file=None):
         train_size = int(len(self.U) * 0.7)
         val_size = int(len(self.U) * 0.05)
-        user_all = test_users[train_size:train_size+val_size]
-        ground_tr_num = [len(user) for user in user_all]
-
-
-        pred_all = list(pred_all)
+        pred_all = list(np.dot(self.U[train_size+val_size:], (self.V.T)))
 
         for m in [10, 100]:
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
-            for i in range(len(user_all)):
+            for i in range(len(train_users)):
                 train = train_users[i]
                 top_M = list(np.argsort(-pred_all[i])[0:(m +len(train))])
                 for u in train:
@@ -510,10 +506,10 @@ class cf_vae_extend:
                 top_M = top_M[:m]
                 if len(top_M) != m:
                     print(top_M, train_users[i])
-                hits = set(top_M) & set(user_all[i])   # item idex from 0
+                hits = set(top_M) & set(test_users[i])   # item idex from 0
                 hits_num = len(hits)
                 try:
-                    recall_val = float(hits_num) / float(ground_tr_num[i])
+                    recall_val = float(hits_num) / float(len(test_users[i]))
                 except:
                     recall_val = 1
                 recall_vals.append(recall_val)
@@ -609,7 +605,7 @@ class cf_vae_extend:
     def predict_all(self):
         train_size = int(len(self.U)*0.7)
         val_size = int(len(self.U)*0.05)
-        return np.dot(self.U[train_size:train_size+val_size], (self.V.T))
+        return np.dot(self.U[train_size+val_size:], (self.V.T))
 
     def pred(self, u_id, p_type, thred):
         if p_type == "health":
