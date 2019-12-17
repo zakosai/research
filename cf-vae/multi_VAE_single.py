@@ -29,17 +29,25 @@ def create_dataset(A="Health", B="Clothing"):
     return user_A, user_B, dense_A, dense_B, num_A, num_B
 
 
-def calc_recall(pred, test, train, m=[100], type=None):
+def calc_recall(pred, test, m=[100], type=None, f=None):
     for k in m:
+        pred_ab = np.argsort(-pred)
         recall = []
         ndcg = []
-        for i in range(len(pred)):
-            pred[i, train[i]] = min(pred[i])
-            p = np.argsort(-pred[i])[:k]
-            hits = set(test[i]) & set(p)
+        for i in range(len(pred_ab)):
+            num_train = -5
+            u_train = test[i][:num_train]
+            u_test = test[i][num_train:]
+            p = list(pred_ab[i, :(k + len(u_train))])
+            for t in u_train:
+                if t in p:
+                    p.remove(t)
+            p = p[:k]
+
+            hits = set(u_test) & set(p)
 
             #recall
-            recall_val = float(len(hits)) / len(test[i])
+            recall_val = float(len(hits)) / len(u_test)
             recall.append(recall_val)
 
             #ncdg
@@ -56,7 +64,10 @@ def calc_recall(pred, test, train, m=[100], type=None):
             else:
                 ndcg.append(float(actual) / best)
 
-        print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
+        if f != None:
+            f.write("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
+        else:
+            print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
     return np.mean(np.array(recall))
 
 
@@ -79,27 +90,13 @@ def main(args):
     train_size = int(total_data * 0.7)
     val_size = int(total_data * 0.05)
 
-    # user_A = user_A[perm]
-    # user_B = user_B[perm]
     user_A = np.array(user_A)
-    user_B = np.array(user_B)
 
     user_A_train = user_A[:train_size]
-    user_B_train = user_B[:train_size]
-
-    # user_A_val = user_A[train_size:train_size+val_size]
-    # user_B_val = user_B[train_size:train_size+val_size]
-    # user_A_test = user_A[train_size+val_size:]
-    # user_B_test = user_B[train_size+val_size:]
-
     dense_A_test = dense_A[(train_size + val_size):]
-    dense_B_test = dense_B[(train_size + val_size):]
     dense_A_val = dense_A[train_size:train_size + val_size]
-    dense_B_val = dense_B[train_size:train_size + val_size]
     user_A_val = one_hot_vector([i[:-args.n_predict] for i in dense_A_val], num_A)
     user_A_test = one_hot_vector([i[:-args.n_predict] for i in dense_A_test], num_A)
-    dense_A_val = [i[-args.n_predict:] for i in dense_A_val]
-    dense_A_test = [i[-args.n_predict:] for i in dense_A_test]
 
     print("Train A")
     if A == "Drama" or A=="Romance":
