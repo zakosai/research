@@ -35,11 +35,10 @@ def load_rating(data, item_no):
     val_users = [i[-5:] for i in data[train_no: train_no + val_no]]
     train_users = data[:train_no] + [i[:-5] for i in data[train_no:]]
 
-    train_items = [] * item_no
+    train_items = [0] * item_no
     for i, user in enumerate(train_users):
         for item in user:
-            print(item)
-            if train_items[item] == []:
+            if train_items[item] == 0:
                 train_items[item] = [i]
             else:
                 train_items[item].append(i)
