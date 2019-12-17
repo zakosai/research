@@ -1,8 +1,9 @@
-from multiVAE import Translation, create_dataset, calc_recall
+from multiVAE import Translation, create_dataset, calc_recall, one_hot_vector
 import tensorflow as tf
 import numpy as np
 import argparse
 import os
+from multi_VAE_single import calc_recall_same_domain
 
 
 def main():
@@ -54,6 +55,11 @@ def main():
     user_test_A = np.concatenate((user_A_test, np.zeros(shape=user_B_test.shape)), axis=1)
     user_test_B = np.concatenate((np.zeros(shape=user_A_test.shape), user_B_test), axis=1)
 
+    train_A_same_domain = one_hot_vector([i[:-args.n_predict] for i in dense_A_test], num_A)
+    train_B_same_domain = one_hot_vector([i[:-args.n_predict] for i in dense_B_test], num_B)
+    train_A_same_domain = np.concatenate((train_A_same_domain, np.zeros_like(train_B_same_domain)), axis=1)
+    train_B_same_domain = np.concatenate((np.zeros((train_B_same_domain.shape[0], num_A)), train_B_same_domain), axis=1)
+
     # dense_A_test = np.array(dense_A)[test_A]
     # dense_B_test = np.array(dense_B)[test_B]
     # test_A = [t - train_size - val_size for t in test_A]
@@ -70,24 +76,26 @@ def main():
     loss_test_b, y_a = sess.run([model.loss, model.x_recon], feed_dict={model.x: user_test_B})
     print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
 
-    # y_ab = y_ab[test_B]
-    # y_ba = y_ba[test_A]
     calc_recall(y_a[:, :num_A], dense_A_test, k, "A")
     calc_recall(y_b[:, num_A:], dense_B_test, k, "B")
-    pred = np.argsort(-y_a[:, :num_A])[:, :10]
-    f = open(os.path.join(checkpoint_dir, "predict_%s_multiVAE.txt" % A), "w")
-    for p in pred:
-        w = [str(i) for i in p]
-        f.write(','.join(w))
-        f.write("\n")
-    f.close()
-    pred = np.argsort(-y_b)[:, :10]
-    f = open(os.path.join(checkpoint_dir, "predict_%s_multiVAE_full.txt" % B), "w")
-    for p in pred:
-        w = [str(i) for i in p]
-        f.write(','.join(w))
-        f.write("\n")
-    f.close()
+    y_aa = sess.run(model.x_recon, feed_dict={model.x: train_A_same_domain})
+    y_bb = sess.run(model.x_recon, feed_dict={model.x: train_B_same_domain})
+    calc_recall_same_domain(y_aa[:, :num_A], dense_A_test, [50], "same A")
+    calc_recall_same_domain(y_bb[:, num_A:], dense_B_test, [50], "same B")
+    # pred = np.argsort(-y_a[:, :num_A])[:, :10]
+    # f = open(os.path.join(checkpoint_dir, "predict_%s_multiVAE.txt" % A), "w")
+    # for p in pred:
+    #     w = [str(i) for i in p]
+    #     f.write(','.join(w))
+    #     f.write("\n")
+    # f.close()
+    # pred = np.argsort(-y_b)[:, :10]
+    # f = open(os.path.join(checkpoint_dir, "predict_%s_multiVAE_full.txt" % B), "w")
+    # for p in pred:
+    #     w = [str(i) for i in p]
+    #     f.write(','.join(w))
+    #     f.write("\n")
+    # f.close()
 
 
 
