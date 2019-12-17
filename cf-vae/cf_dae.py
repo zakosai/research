@@ -498,18 +498,14 @@ class cf_vae_extend:
         for m in [50]:
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
-            print(len(train_users))
             for i in range(len(train_users)):
                 start = time.time()
                 train = train_users[i]
-                print(len(train))
                 top_M = list(pred_all[i, 0:(m +len(train))])
-                print(time.time() - start)
                 for u in train:
                     if u in top_M:
                         top_M.remove(u)
                 top_M = top_M[:m]
-                print(time.time() - start)
                 if len(top_M) != m:
                     print(top_M, train_users[i])
                 hits = set(top_M) & set(test_users[i])   # item idex from 0
@@ -518,7 +514,6 @@ class cf_vae_extend:
                 recall_vals.append(recall_val)
                 # precision = float(hits_num) / float(m)
                 # precision_vals.append(precision)
-                print(time.time() - start)
 
             recall_avg = np.mean(np.array(recall_vals))
             # precision_avg = np.mean(np.array(precision_vals))
