@@ -215,10 +215,10 @@ def calc_rmse(pred, test):
     test = test[idx]
     return np.sqrt(np.mean((test-pred)**2))
 
-def main():
+
+def main(args):
     iter = 300
     batch_size= 500
-    args = parser.parse_args()
     A = args.A
     B = args.B
     checkpoint_dir = "translation/%s_%s/" % (A, B)
@@ -234,11 +234,7 @@ def main():
         encoding_dim = [600, 200]
         decoding_dim = [200, 600, num_A + num_B]
 
-
-
     z_dim = 50
-
-
     perm = np.random.permutation(len(user_A))
     total_data = len(user_A)
     train_size = int(total_data * 0.7)
@@ -342,16 +338,14 @@ def main():
 
     print(max_recall)
 
-parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument('--A',  type=str, default="Health",
-                   help='domain A')
-parser.add_argument('--B',  type=str, default='Grocery',
-                   help='domain B')
-parser.add_argument('--k', type=int, default=100, help='top-K')
-
-
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('--A', type=str, default="Health", help='domain A')
+    parser.add_argument('--B', type=str, default='Grocery', help='domain B')
+    parser.add_argument('--k', type=int, default=100, help='top-K')
+    args = parser.parse_args()
+
+    main(args)
 
 
 

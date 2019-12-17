@@ -60,10 +60,9 @@ def calc_recall(pred, test, train, m=[100], type=None):
     return np.mean(np.array(recall))
 
 
-def main():
+def main(args):
     iter = 300
     batch_size= 500
-    args = parser.parse_args()
     A = args.A
     B = args.B
     checkpoint_dir = "translation/%s_%s/" % (A, B)
@@ -156,19 +155,16 @@ def main():
 
     print(max_recall)
 
-parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument('--A',  type=str, default="Health",
-                   help='domain A')
-parser.add_argument('--B',  type=str, default='Grocery',
-                   help='domain B')
-parser.add_argument('--k', type=int, default=100, help='top-K')
-parser.add_argument('--switch', type=bool, default=False)
-parser.add_argument('--n_predict', type=int, default=5)
-
-
-
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('--A', type=str, default="Health", help='domain A')
+    parser.add_argument('--B', type=str, default='Grocery', help='domain B')
+    parser.add_argument('--k', type=int, default=100, help='top-K')
+    parser.add_argument('--switch', type=bool, default=False)
+    parser.add_argument('--n_predict', type=int, default=5)
+    args = parser.parse_args()
+
     main()
 
 
