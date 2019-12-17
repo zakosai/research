@@ -502,6 +502,7 @@ class cf_vae_extend:
             for i in range(len(train_users)):
                 start = time.time()
                 train = train_users[i]
+                print(len(train))
                 top_M = list(pred_all[i, 0:(m +len(train))])
                 print(time.time() - start)
                 for u in train:
