@@ -21,7 +21,7 @@ def load_cvae_data(args):
     data["content"] = variables.toarray()
 
     data_file = list(open("%s/%s_user_product.txt"%(args.data_dir, args.data_type)).readlines())
-    data["train_users"], data["train_items"], data["test_user"], data["val_users"] = load_rating(data_file, args.item_no)
+    data["train_users"], data["train_items"], data["test_users"], data["val_users"] = load_rating(data_file, args.item_no)
     return data
 
 
@@ -42,6 +42,9 @@ def load_rating(data, item_no):
                 train_items[item] = [i]
             else:
                 train_items[item].append(i)
+    for i in range(item_no):
+        if train_items[i] == 0:
+            train_items[i] = []
     return train_users, train_items, test_users, val_users
 
 
