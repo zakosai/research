@@ -15,6 +15,8 @@ from operator import add
 from resnet_model import conv2d_fixed_padding, building_block, block_layer
 import os
 import math
+from time import time
+
 
 class params:
     def __init__(self):
@@ -493,20 +495,21 @@ class cf_vae_extend:
         train_size = int(len(self.U) * 0.7)
         val_size = int(len(self.U) * 0.05)
         pred_all = list(np.dot(self.U[train_size+val_size:], (self.V.T)))
-
+        pred_all = np.argsort(-pred_all)
         for m in [50]:
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
             print(len(train_users))
             for i in range(len(train_users)):
-                print(i)
+                start = time()
                 train = train_users[i]
-                top_M = list(np.argsort(-pred_all[i])[0:(m +len(train))])
+                top_M = list(pred_all[i, 0:(m +len(train))])
+                print(time() - start)
                 for u in train:
                     if u in top_M:
                         top_M.remove(u)
                 top_M = top_M[:m]
-                print(top_M)
+                print(time() - start)
                 if len(top_M) != m:
                     print(top_M, train_users[i])
                 hits = set(top_M) & set(test_users[i])   # item idex from 0
@@ -515,6 +518,7 @@ class cf_vae_extend:
                 recall_vals.append(recall_val)
                 # precision = float(hits_num) / float(m)
                 # precision_vals.append(precision)
+                print(time() - start)
 
             recall_avg = np.mean(np.array(recall_vals))
             # precision_avg = np.mean(np.array(precision_vals))
