@@ -6,7 +6,7 @@ from tensorflow.contrib.framework import argsort
 import numpy as np
 import os
 import argparse
-from multiVAE import Translation, read_data, one_hot_vector, dcg_score
+from multiVAE import Translation, read_data, one_hot_vector, dcg_score, calc_recall
 
 
 def create_dataset(A="Health", B="Clothing"):
@@ -29,7 +29,7 @@ def create_dataset(A="Health", B="Clothing"):
     return user_A, user_B, dense_A, dense_B, num_A, num_B
 
 
-def calc_recall(pred, test, m=[100], type=None, f=None):
+def calc_recall_same_domain(pred, test, m=[100], type=None, f=None):
     for k in m:
         pred_ab = np.argsort(-pred)
         recall = []
@@ -77,73 +77,98 @@ def main(args):
     A = args.A
     B = args.B
     checkpoint_dir = "translation/%s_%s/" % (A, B)
-    if args.switch:
-        user_B, user_A, dense_B, dense_A, num_B, num_A = create_dataset(A, B)
-    else:
-        user_A, user_B, dense_A, dense_B, num_A, num_B = create_dataset(A, B)
+    user_A, user_B, dense_A, dense_B, num_A, num_B = create_dataset(A, B)
 
     print(num_A, num_B)
-    z_dim = 50
+    if A == "Drama" or A=="Romance":
+        k = [10, 20, 30, 40, 50]
+        encoding_dim = [200, 100]
+        decoding_dim = [100, 200, num_A + num_B]
+    else:
+        k = [50, 100, 150, 200, 250, 300]
+        encoding_dim = [600, 200]
+        decoding_dim = [200, 600, num_A + num_B]
 
+    z_dim = 50
     perm = np.random.permutation(len(user_A))
     total_data = len(user_A)
     train_size = int(total_data * 0.7)
     val_size = int(total_data * 0.05)
 
+    # user_A = user_A[perm]
+    # user_B = user_B[perm]
     user_A = np.array(user_A)
+    user_B = np.array(user_B)
 
     user_A_train = user_A[:train_size]
-    dense_A_test = dense_A[(train_size + val_size):]
-    dense_A_val = dense_A[train_size:train_size + val_size]
-    user_A_val = one_hot_vector([i[:-args.n_predict] for i in dense_A_val], num_A)
-    user_A_test = one_hot_vector([i[:-args.n_predict] for i in dense_A_test], num_A)
+    user_B_train = user_B[:train_size]
 
-    print("Train A")
-    if A == "Drama" or A=="Romance":
-        k = [10, 20, 30, 40, 50]
-        encoding_dim = [200, 100]
-        decoding_dim = [100, 200, num_A]
-    else:
-        k = [50, 100, 150, 200, 250, 300]
-        encoding_dim = [600, 200]
-        decoding_dim = [200, 600, num_A]
-    model = Translation(batch_size, num_A, encoding_dim, decoding_dim, z_dim)
+    user_A_val = user_A[train_size:train_size+val_size]
+    user_B_val = user_B[train_size:train_size+val_size]
+    user_A_test = user_A[train_size+val_size:]
+    user_B_test = user_B[train_size+val_size:]
+
+    dense_A_test = dense_A[(train_size + val_size):]
+    dense_B_test = dense_B[(train_size + val_size):]
+
+    user_train = np.concatenate((user_A_train, user_B_train), axis=1)
+    user_val_A = np.concatenate((user_A_val, np.zeros(shape=user_B_val.shape)), axis=1)
+    print(user_val_A.shape)
+    user_val_B = np.concatenate((np.zeros(shape=user_A_val.shape), user_B_val), axis=1)
+    user_test_A = np.concatenate((user_A_test, np.zeros(shape=user_B_test.shape)), axis=1)
+    user_test_B = np.concatenate((np.zeros(shape=user_A_test.shape), user_B_test), axis=1)
+
+    model = Translation(batch_size, num_A + num_B, encoding_dim, decoding_dim, z_dim)
     model.build_model()
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(max_to_keep=3)
     max_recall = 0
+    dense_A_val = dense_A[train_size:train_size+val_size]
+    dense_B_val = dense_B[train_size:train_size+val_size]
+
+    train_A_same_domain = one_hot_vector([i[:-args.n_predict] for i in dense_A_test], num_A)
+    train_B_same_domain = one_hot_vector([i[:-args.n_predict] for i in dense_B_test], num_B)
+    train_A_same_domain = np.concatenate((train_A_same_domain, np.zeros_like(train_B_same_domain)), axis=1)
+    train_B_same_domain = np.concatenate((np.zeros(train_B_same_domain.shape[0], num_A), train_B_same_domain), axis=1)
 
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(train_size)
         train_cost = 0
         for j in range(int(train_size/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
-            x = user_A_train[list_idx]
+            x = user_train[list_idx]
 
             feed = {model.x: x}
 
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
-
         # Validation Process
         if i%10 == 0:
             model.train = False
-            loss_val, y = sess.run([model.loss, model.x_recon],
-                                              feed_dict={model.x:user_A_val})
-            recall = calc_recall(y, dense_A_val, [np.where(j==1)[0] for j in user_A_val],[50])
-            print("Loss val a: %f, recall %f" % (loss_val, recall))
+            loss_val_a, y_b = sess.run([model.loss, model.x_recon],
+                                              feed_dict={model.x:user_val_A})
+            loss_val_b, y_a = sess.run([model.loss, model.x_recon],
+                                       feed_dict={model.x: user_val_B})
+            print(len(y_a[0]), len(y_b[0]))
+            recall = calc_recall(y_b[:, num_A:], dense_B_val, [50]) + calc_recall(y_a[:, :num_A], dense_A_val, [50])
+            print("Loss val a: %f, Loss val b: %f, recall %f" % (loss_val_a, loss_val_b, recall))
             if recall > max_recall:
                 max_recall = recall
                 saver.save(sess, os.path.join(checkpoint_dir, 'multi-VAE-model'))
-                loss_test_a, y_b= sess.run([model.loss, model.x_recon], feed_dict={model.x: user_A_test})
-                print("Loss test a: %f" % (loss_test_a))
+                loss_test_a, y_b = sess.run([model.loss, model.x_recon], feed_dict={model.x: user_test_A})
+                loss_test_b, y_a = sess.run([model.loss, model.x_recon], feed_dict={model.x: user_test_B})
+                print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
+                calc_recall(y_a[:, :num_A], dense_A_test, [50], "diff A")
+                calc_recall(y_b[:, num_A:], dense_B_test, [50], "diff B")
+                # print("Recall in different domain: A:%f, B:%f" % (recall_ba, recall_ab))
 
+                y_aa = sess.run(model.x_recon, feed_dict={model.x: train_A_same_domain})
+                y_bb = sess.run(model.x_recon, feed_dict={model.x: train_B_same_domain})
+                calc_recall_same_domain(y_aa[:, :num_A], dense_A_test, [50], "same A")
+                calc_recall_same_domain(y_bb[:, num_A:], dense_B_test, [50], "same B")
 
-                # y_ab = y_ab[test_B]
-                # y_ba = y_ba[test_A]
-                calc_recall(y_b, dense_A_test, [np.where(j==1)[0] for j in user_A_test], k,"A")
             model.train = True
         if i%100 == 0:
             model.learning_rate /= 2
