@@ -493,7 +493,7 @@ class cf_vae_extend:
     def predict_val(self, train_users, test_users, file=None):
         train_size = int(len(self.U) * 0.7)
         val_size = int(len(self.U) * 0.05)
-        pred_all = list(np.dot(self.U[train_size+val_size:], (self.V.T)))
+        pred_all = np.dot(self.U[train_size+val_size:], (self.V.T))
         pred_all = np.argsort(-pred_all)
         for m in [50]:
             print "m = " + "{:>10d}".format(m) + "done"
