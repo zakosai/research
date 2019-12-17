@@ -1,47 +1,33 @@
-#stdbuf -oL python CCCFNET.py --A=Video --B=TV --k=50 |tee -a translation/Video_TV/CCCFNET.txt
-#stdbuf -oL python CCCFNET.py --A=Drama --B=Comedy --k=50 |tee -a translation/Drama_Comedy/CCCFNET.txt
-#stdbuf -oL python CCCFNET.py --A=Romance --B=Thriller --k=50 |tee -a translation/Romance_Thriller/CCCFNET.txt
-#
-#stdbuf -oL python adversarial_personalized_ranking/AMF.py --path=data/Health_Clothing/ --dataset=Health_Clothing \
-#--adv_epoch=1000 --epochs=2000 --eps=0.5 --reg_adv=1 --ckpt=1 --verbose=20 |tee -a translation/Health_Clothing/AMF.txt
-#
-#stdbuf -oL python adversarial_personalized_ranking/AMF.py --path=data/Video_TV/ --dataset=Video_TV \
-#--adv_epoch=1000 --epochs=2000 --eps=0.5 --reg_adv=1 --ckpt=1 --verbose=20 |tee -a translation/Video_TV/AMF.txt
-#
-#stdbuf -oL python adversarial_personalized_ranking/AMF.py --path=data/Drama_Comedy/ --dataset=Drama_Comedy \
-#--adv_epoch=1000 --epochs=2000 --eps=0.5 --reg_adv=1 --ckpt=1 --verbose=20 |tee -a translation/Drama_Comedy/AMF.txt
-#
-#stdbuf -oL python adversarial_personalized_ranking/AMF.py --path=data/Romance_Thriller/ --dataset=Romance_Thriller \
-#--adv_epoch=1000 --epochs=2000 --eps=0.5 --reg_adv=1 --ckpt=1 --verbose=20 |tee -a translation/Romance_Thriller/AMF.txt
+python -u translation2.py --A=Video --B=TV |tee -a translation/Video_TV/d2d.log
+python -u multi_VAE_single.py --A=Video --B=TV |tee -a translation/Video_TV/multiVAE.log
+
+python -u translation2.py --A=Drama --B=Comedy |tee -a translation/Drama_Comedy/d2d.log
+python -u multi_VAE_single.py --A=Drama --B=Comedy |tee -a translation/Drama_Comedy/multiVAE.log
 
 
-folders='Video Pet Music Instrument Automotive Garden Electronics Books'
-rate="1 8"
-for f in $folders;
-do
-    mkdir wae/$f
-    user_no="$(sed -n '1p' data2/$f/info.txt)"
-    item_no="$(sed -n '2p' data2/$f/info.txt)"
-    for r in $rate;
-    do
-        mkdir wae/$f/$r
-        ckpt=wae/$f/$r
-        python train_vae.py --ckpt_folder=$ckpt --data_dir=data2/$f/ --zdim=100 \
-        --data_type=$r --type=text
-        python train_cvae_extend.py --model=0 --ckpt_folder=$ckpt --data_dir=data2/$f/ \
-        --iter=50 --data_type=$r --user_no=$user_no --item_no=$item_no --gridsearch=1 --zdim=100
+python -u translation2.py --A=Romance --B=Thriller |tee -a translation/Romance_Thriller/d2d.log
+python -u multi_VAE_single.py --A=Romance --B=Thriller |tee -a translation/Romance_Thriller/multiVAE.log
 
-        python train_dae.py --ckpt_folder=$ckpt --data_dir=data2/$f/ --zdim=100 \
-        --data_type=$r --type=text
-        python train_cf_dae.py --model=0 --ckpt_folder=$ckpt --data_dir=data2/$f/ \
-        --iter=50 --data_type=$r --user_no=$user_no --item_no=$item_no --gridsearch=1 --zdim=100
+python cdae_new.py --ckpt_folder=translation/Health_Clothing --data_dir=data/Health_Clothing \
+--data_type=Health --item_no=18226 --user_no=6557 --gridsearch=1
 
-        python wae.py --ckpt_folder=$ckpt --data_dir=data2/$f/ --zdim=100 \
-        --data_type=$r --type=text
-        python train_cf_wae.py --model=0 --ckpt_folder=$ckpt --data_dir=data2/$f/ \
-        --iter=50 --data_type=$r --user_no=$user_no --item_no=$item_no --gridsearch=1 --zdim=100
-    done
-done
+python cdae_new.py --ckpt_folder=translation/Health_Clothing --data_dir=data/Health_Clothing \
+--data_type=Clothing --item_no=16069 --user_no=6557 --gridsearch=1
 
+python train_dae.py --ckpt_folder=translation/Video_TV --data_dir=data/Video_TV
+python cdae_new.py --ckpt_folder=translation/Video_TV --data_dir=data/Video_TV \
+--data_type=Video --item_no=10072 --user_no=5459 --gridsearch=1
+python cdae_new.py --ckpt_folder=translation/Video_TV --data_dir=data/Video_TV \
+--data_type=TV --item_no=28578 --user_no=5459 --gridsearch=1
 
+python train_dae.py --ckpt_folder=translation/Drama_Comedy --data_dir=data/Drama_Comedy
+python cdae_new.py --ckpt_folder=translation/Drama_Comedy --data_dir=data/Drama_Comedy \
+--data_type=Drama --item_no=1490 --user_no=6023 --gridsearch=1
+python cdae_new.py --ckpt_folder=translation/Drama_Comedy --data_dir=data/Drama_Comedy \
+--data_type=Comedy --item_no=1081 --user_no=6023 --gridsearch=1
 
+python train_dae.py --ckpt_folder=translation/Romance_Thriller --data_dir=data/Romance_Thriller
+python cdae_new.py --ckpt_folder=translation/Romance_Thriller --data_dir=data/Romance_Thriller \
+--data_type=Romance --item_no=455 --user_no=5891 --gridsearch=1
+python cdae_new.py --ckpt_folder=translation/Romance_Thriller --data_dir=data/Romance_Thriller \
+--data_type=Thriller --item_no=475 --user_no=5891 --gridsearch=1
