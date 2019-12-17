@@ -285,17 +285,17 @@ def test_same_domain(dense, num_product):
         dense_test[i] = d[num_input:]
     return input_user, dense_test
 
-def calc_recall_same_domain(pred, test, m=[100], type=None):
 
+def calc_recall_same_domain(pred, test, m=[100], type=None):
     for k in m:
         pred_ab = np.argsort(-pred)
         recall = []
         ndcg = []
         for i in range(len(pred_ab)):
-            num_train = int(len(test[i])*0.8)
+            num_train = -5
             u_train = test[i][:num_train]
             u_test = test[i][num_train:]
-            p = list(pred_ab[i, :(k+num_train)])
+            p = list(pred_ab[i, :(k + len(u_train))])
             for t in u_train:
                 if t in p:
                     p.remove(t)
@@ -322,6 +322,7 @@ def calc_recall_same_domain(pred, test, m=[100], type=None):
                 ndcg.append(float(actual) / best)
 
         print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
+
 
 def calc_recall(pred, test, m=[100], type=None):
 
@@ -354,9 +355,8 @@ def calc_recall(pred, test, m=[100], type=None):
                 ndcg.append(float(actual) / best)
 
         print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
-
-
     return np.mean(np.array(recall))
+
 
 def dcg_score(y_true, y_score, k=50):
     """Discounted cumulative gain (DCG) at rank K.
@@ -382,11 +382,6 @@ def dcg_score(y_true, y_score, k=50):
     discounts = np.log2(np.arange(len(y_true)) + 2)
     return np.sum(gain / discounts)
 
-def calc_rmse(pred, test):
-    idx = np.where(test != 0)
-    pred = pred[idx]
-    test = test[idx]
-    return np.sqrt(np.mean((test-pred)**2))
 
 def load_rating(path, thred, test_size):
     dense_A = []
@@ -456,6 +451,12 @@ def main():
     dense_A_test = dense_A[(train_size + val_size):]
     dense_B_test = dense_B[(train_size + val_size):]
 
+    train_A_same_domain = [i[:-5] for i in dense_A_test]
+    test_A_same_domain = [i[-5:] for i in dense_A_test]
+    train_A_same_domain = one_hot_vector(train_A_same_domain, num_A)
+    train_B_same_domain = [i[:-5] for i in dense_B_test]
+    test_B_same_domain = [i[-5:] for i in dense_B_test]
+    train_B_same_domain = one_hot_vector(train_B_same_domain, num_B)
 
     model = Translation(batch_size, num_A, num_B, encoding_dim_A, decoding_dim_A, encoding_dim_B,
                         decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-3, lambda_2=1,
@@ -526,20 +527,15 @@ def main():
                  feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
                 print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
 
-                # y_ab = y_ab[test_B]
-                # y_ba = y_ba[test_A]
-
                 calc_recall(y_ba, dense_A_test, k, type="A")
                 calc_recall(y_ab, dense_B_test, k, type="B")
 
                 #test same domain
-                # input_A_test, domain_A_test = test_same_domain(dense_A_test, num_A)
-                # y_aa = sess.run(model.y_AA, feed_dict={model.x_A:input_A_test})
-                # calc_recall(y_aa, domain_A_test, [50], type="A")
-                #
-                # input_B_test, domain_B_test = test_same_domain(dense_B_test, num_B)
-                # y_bb = sess.run(model.y_BB, feed_dict={model.x_B:input_B_test})
-                # calc_recall(y_bb, domain_B_test, [50], type="B")
+                y_aa, y_bb = sess.run([model.y_AA, model.y_BB],
+                                      feed_dict={model.x_A:train_A_same_domain, model.x_B:train_B_same_domain})
+                recall_aa = calc_recall_same_domain(y_aa, dense_A_test, [50], type="A")
+                recall_bb = calc_recall_same_domain(y_bb, dense_B_test, [50], type="B")
+                print("Recall same domain A: %f, B: %f" %(recall_aa, recall_bb))
 
             model.train = True
         if i%100 == 0:
@@ -555,26 +551,7 @@ def main():
             #     saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
 
     print(max_recall)
-    # model.train = False
-    # loss_test_a, loss_test_b, y_ab, y_ba = sess.run([model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
-    #                         feed_dict={model.x_A: user_A_test[200:],model.x_B: user_B_test[200:]})
-    # print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
-    # model.train = True
-    #
-    # dense_A_test = dense_A[(train_size+200):]
-    # dense_B_test = dense_B[(train_size+200):]
-    #
-    #
-    # print("recall B: %f"%(calc_recall(y_ab, dense_B_test)))
-    # print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
 
-    # pred_a = np.array(y_ba).flatten()
-    # test_a = np.array(user_A_test).flatten()
-    # print("rmse A %f"%calc_rmse(pred_a, test_a))
-    #
-    # pred_a = np.array(y_ab).flatten()
-    # test_a = np.array(user_B_test).flatten()
-    # print("rmse B %f" % calc_rmse(pred_a, test_a))
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--A',  type=str, default="Health",
