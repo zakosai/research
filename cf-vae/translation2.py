@@ -489,8 +489,6 @@ def main():
             loss_gen, loss_val_a, loss_val_b, y_ba, y_ab = sess.run([model.loss_gen, model.loss_val_a,
                                                                      model.loss_val_b, model.y_BA, model.y_AB],
                                               feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
-
-
             recall = calc_recall(y_ba, dense_A_val, [50]) + calc_recall(y_ab, dense_B_val, [50])
             print("Loss gen: %f, Loss val a: %f, Loss val b: %f, recall %f" % (loss_gen, loss_val_a, loss_val_b,
                                                                                recall))
@@ -508,9 +506,8 @@ def main():
                 #test same domain
                 y_aa, y_bb = sess.run([model.y_AA, model.y_BB],
                                       feed_dict={model.x_A:train_A_same_domain, model.x_B:train_B_same_domain})
-                recall_aa = calc_recall_same_domain(y_aa, dense_A_test, [50], type="A")
-                recall_bb = calc_recall_same_domain(y_bb, dense_B_test, [50], type="B")
-                print("Recall same domain A: %f, B: %f" %(recall_aa, recall_bb))
+                calc_recall_same_domain(y_aa, dense_A_test, k, type="A")
+                calc_recall_same_domain(y_bb, dense_B_test, k, type="B")
 
             model.train = True
         if i%100 == 0:

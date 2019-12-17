@@ -72,7 +72,7 @@ def calc_recall_same_domain(pred, test, m=[100], type=None, f=None):
 
 
 def main(args):
-    iter = 300
+    iter = 150
     batch_size= 500
     A = args.A
     B = args.B
@@ -161,14 +161,14 @@ def main(args):
                 loss_test_a, y_b = sess.run([model.loss, model.x_recon], feed_dict={model.x: user_test_A})
                 loss_test_b, y_a = sess.run([model.loss, model.x_recon], feed_dict={model.x: user_test_B})
                 print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
-                calc_recall(y_a[:, :num_A], dense_A_test, [50], "diff A")
-                calc_recall(y_b[:, num_A:], dense_B_test, [50], "diff B")
+                calc_recall(y_a[:, :num_A], dense_A_test, k, "diff A")
+                calc_recall(y_b[:, num_A:], dense_B_test, k, "diff B")
                 # print("Recall in different domain: A:%f, B:%f" % (recall_ba, recall_ab))
 
                 y_aa = sess.run(model.x_recon, feed_dict={model.x: train_A_same_domain})
                 y_bb = sess.run(model.x_recon, feed_dict={model.x: train_B_same_domain})
-                calc_recall_same_domain(y_aa[:, :num_A], dense_A_test, [50], "same A")
-                calc_recall_same_domain(y_bb[:, num_A:], dense_B_test, [50], "same B")
+                calc_recall_same_domain(y_aa[:, :num_A], dense_A_test, k, "same A")
+                calc_recall_same_domain(y_bb[:, num_A:], dense_B_test, k, "same B")
 
             model.train = True
         if i%100 == 0:
