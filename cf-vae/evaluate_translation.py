@@ -53,7 +53,7 @@ else:
     k = [10, 20, 30, 40, 50]
 
 for m in k:
-    model.predict_val(data["train_users"][-test_size:], data["test_users"])
+    model.predict_val(data["train_users"][-test_size:], data["test_users"], m=m)
 
 
 
