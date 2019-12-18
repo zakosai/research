@@ -493,11 +493,12 @@ class cf_vae_extend:
     def predict_val(self, train_users, test_users, file=None, m_list=[10]):
         train_size = int(len(self.U) * 0.7)
         val_size = int(len(self.U) * 0.05)
-        pred_all = np.dot(self.U[train_size+val_size:], (self.V.T))
-        pred_all = np.argsort(-pred_all)
+        pred = np.dot(self.U[train_size+val_size:], (self.V.T))
+        pred_all = np.argsort(-pred)
         for m in m_list:
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
+            ndcg = []
             for i in range(len(train_users)):
                 start = time.time()
                 train = train_users[i]
@@ -515,11 +516,26 @@ class cf_vae_extend:
                 # precision = float(hits_num) / float(m)
                 # precision_vals.append(precision)
 
+                score = []
+                for j in range(m):
+                    if top_M[j] in hits:
+                        score.append(1)
+                    else:
+                        score.append(0)
+                actual = self.dcg_score(score, pred[i, top_M], m)
+                best = self.dcg_score(score, score, m)
+                if best == 0:
+                    ndcg.append(0)
+                else:
+                    ndcg.append(float(actual) / best)
+
             recall_avg = np.mean(np.array(recall_vals))
             # precision_avg = np.mean(np.array(precision_vals))
             # # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
             # #                        [u for u in user_all if len(u)!=0], m)
-            print recall_avg
+            # ncdg
+
+            print recall_avg, np.mean(np.array(ndcg))
             if file!= None:
                 file.write("m = %d, recall = %f"%(m, recall_avg))
         return recall_avg
