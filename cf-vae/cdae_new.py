@@ -125,10 +125,9 @@ def main(args):
                               input_dim=8000, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200, 400, 8000],
                               decoding_dims_str=[200, 4526], loss_type='cross_entropy',
                               model=model_type, ckpt_folder=ckpt)
-        model.fit(data["train_users"], data["train_items"], data["content"],params, data["test_users"])
+        model.fit(data["train_users"], data["train_items"], data["content"], params, data["test_users"])
         model.save_model(os.path.join(ckpt,"cf_dae_%d.mat"%(model_type)))
-        pred = model.predict_all()
-        model.predict_val(pred, data["train_users"], data["test_users"])
+        model.predict_val(data["train_users"][-test_size:], data["test_users"])
 
 if __name__ == '__main__':
     np.random.seed(0)
