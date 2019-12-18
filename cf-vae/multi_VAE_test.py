@@ -80,22 +80,22 @@ def main():
     calc_recall(y_b[:, num_A:], dense_B_test, k, "B")
     y_aa = sess.run(model.x_recon, feed_dict={model.x: train_A_same_domain})
     y_bb = sess.run(model.x_recon, feed_dict={model.x: train_B_same_domain})
-    calc_recall_same_domain(y_aa[:, :num_A], dense_A_test, [50], "same A")
-    calc_recall_same_domain(y_bb[:, num_A:], dense_B_test, [50], "same B")
-    # pred = np.argsort(-y_a[:, :num_A])[:, :10]
-    # f = open(os.path.join(checkpoint_dir, "predict_%s_multiVAE.txt" % A), "w")
-    # for p in pred:
-    #     w = [str(i) for i in p]
-    #     f.write(','.join(w))
-    #     f.write("\n")
-    # f.close()
-    # pred = np.argsort(-y_b)[:, :10]
-    # f = open(os.path.join(checkpoint_dir, "predict_%s_multiVAE_full.txt" % B), "w")
-    # for p in pred:
-    #     w = [str(i) for i in p]
-    #     f.write(','.join(w))
-    #     f.write("\n")
-    # f.close()
+    calc_recall_same_domain(y_aa[:, :num_A], dense_A_test, k, "same A")
+    calc_recall_same_domain(y_bb[:, num_A:], dense_B_test, k, "same B")
+    pred = np.argsort(-y_aa[:, :num_A])[:, :10]
+    f = open(os.path.join(checkpoint_dir, "predict_%s_multiVAE.txt" % A), "w")
+    for p in pred:
+        w = [str(i) for i in p]
+        f.write(','.join(w))
+        f.write("\n")
+    f.close()
+    pred = np.argsort(-y_bb)[:, :10]
+    f = open(os.path.join(checkpoint_dir, "predict_%s_multiVAE_full.txt" % B), "w")
+    for p in pred:
+        w = [str(i) for i in p]
+        f.write(','.join(w))
+        f.write("\n")
+    f.close()
 
 
 
