@@ -98,12 +98,6 @@ def main():
     f.close()
 
 
-
-
-
-
-
-
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--A',  type=str, default="Health",
                    help='domain A')
