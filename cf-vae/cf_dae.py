@@ -490,12 +490,12 @@ class cf_vae_extend:
             recall_avgs.append(recall_avg)
         return recall_avgs
 
-    def predict_val(self, train_users, test_users, file=None, m=50):
+    def predict_val(self, train_users, test_users, file=None, m_list=[10]):
         train_size = int(len(self.U) * 0.7)
         val_size = int(len(self.U) * 0.05)
         pred_all = np.dot(self.U[train_size+val_size:], (self.V.T))
         pred_all = np.argsort(-pred_all)
-        for m in [10]:
+        for m in m_list:
             print "m = " + "{:>10d}".format(m) + "done"
             recall_vals = []
             for i in range(len(train_users)):
