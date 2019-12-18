@@ -40,8 +40,8 @@ class Translation:
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
@@ -56,8 +56,8 @@ class Translation:
 
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)-1):
                 x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
@@ -81,8 +81,8 @@ class Translation:
 
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i],  scope="share_%d"%i,
@@ -380,9 +380,9 @@ def load_rating(path, thred, test_size):
     return dense_A, dense_B
 
 def main():
-    iter = 300
     batch_size= 500
     args = parser.parse_args()
+    iter = args.iter
     A = args.A
     B = args.B
     checkpoint_dir = "translation/%s_%s/"%(A,B)
@@ -532,6 +532,8 @@ parser.add_argument('--B',  type=str, default='Grocery',
                    help='domain B')
 parser.add_argument('--k',  type=int, default=100,
                    help='top-K')
+parser.add_argument('--iter',  type=int, default=300,
+                   help='n_iter')
 if __name__ == '__main__':
     main()
 
