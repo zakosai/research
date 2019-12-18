@@ -490,7 +490,7 @@ class cf_vae_extend:
             recall_avgs.append(recall_avg)
         return recall_avgs
 
-    def predict_val(self, train_users, test_users, file=None):
+    def predict_val(self, train_users, test_users, file=None, m=50):
         train_size = int(len(self.U) * 0.7)
         val_size = int(len(self.U) * 0.05)
         pred_all = np.dot(self.U[train_size+val_size:], (self.V.T))
