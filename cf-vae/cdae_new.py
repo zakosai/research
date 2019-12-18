@@ -29,8 +29,6 @@ def load_rating(data, item_no):
     data = [i.split(" ") for i in data]
     data = [[int(j) for j in i] for i in data]
     data = [i[1:] for i in data]
-    item_no = max([max(i) for i in data])
-    print(item_no)
     train_no = int(len(data) * 0.7)
     val_no = int(len(data) * 0.05)
     test_users = [i[-5:] for i in data[train_no + val_no:]]
