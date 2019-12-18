@@ -72,7 +72,7 @@ def calc_recall_same_domain(pred, test, m=[100], type=None, f=None):
 
 
 def main(args):
-    iter = 150
+    iter = 300
     batch_size= 500
     A = args.A
     B = args.B
