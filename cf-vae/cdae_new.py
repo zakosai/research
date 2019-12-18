@@ -59,7 +59,7 @@ def main(args):
 
     params.lambda_u = 10
     params.lambda_v = 1
-    params.lambda_r = 10
+    params.lambda_r = 1
     params.C_a = 1
     params.C_b = 0.01
     params.max_iter_m = 1
@@ -126,7 +126,7 @@ def main(args):
                               decoding_dims_str=[200, 4526], loss_type='cross_entropy',
                               model=model_type, ckpt_folder=ckpt)
         model.fit(data["train_users"], data["train_items"], data["content"], params, data["test_users"])
-        model.save_model(os.path.join(ckpt,"cf_dae_%d.mat"%(model_type)))
+        model.save_model(os.path.join(ckpt,"cf_dae_%s_%d.mat"%(args.data_type, model_type)))
         model.predict_val(data["train_users"][-test_size:], data["test_users"])
 
 if __name__ == '__main__':
