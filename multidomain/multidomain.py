@@ -9,7 +9,7 @@ class MultiDomain(nn.Module):
     def __init__(self, input_size_list, layers, n_domain):
         super(MultiDomain, self).__init__()
         self.n_domain = n_domain
-        self.domain_encode_net = self.create_domain_net(input_size_list, layers[0])
+        self.domain_encode_net = self.create_enc_domain_net(input_size_list, layers[0])
 
         sequence_net = []
         for i in range(1, len(layers)-1):
