@@ -41,7 +41,7 @@ class MultiDomain(nn.Module):
         print(x.device)
         domain_enc_net = self.domain_encode_net[domain_in](x)
         z = self.z(self.encoder(domain_enc_net))
-        output = self.domain_encode_net[domain_out](self.decoder(z))
+        output = self.domain_decode_net[domain_out](self.decoder(z))
         return z, output
 
     def reconstruction_loss(self, predict, label):
