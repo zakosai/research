@@ -81,6 +81,9 @@ def main():
             loss += train(data, op, model)
         print(loss)
 
+if __name__ == '__main__':
+    main()
+
 
 
 
