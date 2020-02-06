@@ -20,6 +20,7 @@ class MultiDomain(nn.Module):
 
         sequence_net = []
         for i in range(len(layers)-2, -1, --1):
+            print(layers[i])
             sequence_net.append(nn.Linear(layers[i+1], layers[i]))
             sequence_net.append(nn.ReLU())
         self.decoder = nn.Sequential(*sequence_net)
