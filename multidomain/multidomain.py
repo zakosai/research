@@ -47,7 +47,7 @@ class MultiDomain(nn.Module):
         return z, output
 
     def reconstruction_loss(self, predict, label):
-        log_softmax_var = F.log_softmax(predict)
+        log_softmax_var = F.log_softmax(predict, dim=-1)
         neg_ll = -torch.mean(torch.sum(log_softmax_var * label, dim=-1))
         return neg_ll
 
