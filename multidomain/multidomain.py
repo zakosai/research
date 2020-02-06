@@ -73,7 +73,7 @@ def main():
     dataset = Dataset(["Health", "Clothing", "Grocery"])
     device = torch.device("cuda:0" if (torch.cuda.is_available()) else "cpu")
     model = MultiDomain(dataset.input_size_list, [200, 100, 50], 3).to(device)
-    loss_func = nn.LogSoftmax()
+    loss_func = nn.LogSoftmax(dim=-1)
 
     for i in range(iter):
         domain, ids = dataset.random_iter(batch_size)
