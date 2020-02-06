@@ -73,7 +73,7 @@ def main():
     dataset = Dataset(["Health", "Clothing", "Grocery"])
     device = torch.device("cuda:0" if (torch.cuda.is_available()) else "cpu")
     model = MultiDomain(dataset.input_size_list, [200, 100, 50], 3).to(device)
-    loss = nn.LogSoftmax()
+    loss_func = nn.LogSoftmax()
 
     for i in range(iter):
         domain, ids = dataset.random_iter(batch_size)
@@ -87,7 +87,7 @@ def main():
                 list(model. domain_decode_net[data[2][1]].parameters()) + \
                 list(model.domain_decode_net[data[2][0]].parameters())
             op = torch.optim.Adam(parameters, lr=0.01)
-            loss += train(data, op, model, device, loss)
+            loss += train(data, op, model, device, loss_func)
         print(loss)
 
 
