@@ -67,7 +67,7 @@ def main():
     iter = 100
     batch_size = 500
     dataset = Dataset(["Health", "Clothing", "Grocery"])
-    model = MultiDomain(dataset.input_size_list, [200, 100, 50], 3)
+    model = MultiDomain(dataset.input_size_list, [200, 100, 50], 3).cuda()
 
     for i in range(iter):
         domain, ids = dataset.random_iter(batch_size)
