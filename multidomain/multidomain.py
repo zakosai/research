@@ -67,7 +67,9 @@ def main():
     iter = 100
     batch_size = 500
     dataset = Dataset(["Health", "Clothing", "Grocery"])
-    model = MultiDomain(dataset.input_size_list, [200, 100, 50], 3).cuda()
+    device = torch.device("cuda:0" if (torch.cuda.is_available()) else "cpu")
+    print(device)
+    model = MultiDomain(dataset.input_size_list, [200, 100, 50], 3).to(device)
 
     for i in range(iter):
         domain, ids = dataset.random_iter(batch_size)
