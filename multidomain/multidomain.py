@@ -52,7 +52,7 @@ class MultiDomain(nn.Module):
         return neg_ll
 
 
-def train(data, op, model, device, loss):
+def train(data, op, model, device, loss_func):
     A_data = torch.from_numpy(data[0]).float().to(device)
     B_data = torch.from_numpy(data[1]).float().to(device)
     label = data[2]
@@ -61,8 +61,8 @@ def train(data, op, model, device, loss):
     op.zero_grad()
     B_fake = model(A_data, label[0], label[1])
     A_fake = model(B_data, label[1], label[0])
-    loss = model.reconstruction_loss(B_fake, B_data, loss) + \
-           model.reconstruction_loss(A_fake, A_data, loss)
+    loss = model.reconstruction_loss(B_fake, B_data, loss_func) + \
+           model.reconstruction_loss(A_fake, A_data, loss_func)
     loss.backward()
     return loss.item()
 
