@@ -38,11 +38,9 @@ class MultiDomain(nn.Module):
         return domain_net
 
     def forward(self, x, domain_in, domain_out):
-        print(x.device)
         domain_enc_net = self.domain_encode_net[domain_in](x)
         z = self.z(self.encoder(domain_enc_net))
         decoder = self.decoder(z)
-        print(decoder.shape)
         output = self.domain_decode_net[domain_out](decoder)
         return z, output
 
@@ -56,7 +54,6 @@ def train(data, op, model, device, loss_func):
     A_data = torch.from_numpy(data[0]).float().to(device)
     B_data = torch.from_numpy(data[1]).float().to(device)
     label = data[2]
-    print(label)
 
     op.zero_grad()
     _, B_fake = model(A_data, label[0], label[1])
