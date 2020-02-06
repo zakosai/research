@@ -59,8 +59,8 @@ def train(data, op, model, device, loss_func):
     print(label)
 
     op.zero_grad()
-    B_fake = model(A_data, label[0], label[1])
-    A_fake = model(B_data, label[1], label[0])
+    _, B_fake = model(A_data, label[0], label[1])
+    _, A_fake = model(B_data, label[1], label[0])
     loss = model.reconstruction_loss(B_fake, B_data, loss_func) + \
            model.reconstruction_loss(A_fake, A_data, loss_func)
     loss.backward()
