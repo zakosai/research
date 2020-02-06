@@ -52,7 +52,8 @@ class MultiDomain(nn.Module):
 def train(data, op, model):
     A_data = torch.from_numpy(data[0]).cuda()
     B_data = torch.from_numpy(data[1]).cuda()
-    label = torch.tensor(data[2]).cuda()
+    label = data[2]
+    print(label)
 
     op.zero_grad()
     B_fake = model(A_data, label[0], label[1])
