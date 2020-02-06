@@ -38,7 +38,7 @@ class MultiDomain(nn.Module):
         return domain_net
 
     def forward(self, x, domain_in, domain_out):
-        print(x.device, self.device)
+        print(x.device)
         domain_enc_net = self.domain_encode_net[domain_in](x)
         z = self.z(self.encoder(domain_enc_net))
         output = self.domain_encode_net[domain_out](self.decoder(z))
