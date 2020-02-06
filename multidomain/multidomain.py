@@ -38,7 +38,7 @@ class MultiDomain(nn.Module):
         return domain_net
 
     def forward(self, x, domain_in, domain_out):
-        print(self.device, x.device)
+        print(x.device, self.device)
         domain_enc_net = self.domain_encode_net[domain_in](x)
         z = self.z(self.encoder(domain_enc_net))
         output = self.domain_encode_net[domain_out](self.decoder(z))
@@ -50,9 +50,9 @@ class MultiDomain(nn.Module):
         return neg_ll
 
 
-def train(data, op, model):
-    A_data = torch.from_numpy(data[0]).cuda()
-    B_data = torch.from_numpy(data[1]).cuda()
+def train(data, op, model, device):
+    A_data = torch.from_numpy(data[0]).to(device)
+    B_data = torch.from_numpy(data[1]).to(device)
     label = data[2]
     print(label)
 
@@ -84,7 +84,7 @@ def main():
                 list(model. domain_decode_net[data[2][1]].parameters()) + \
                 list(model.domain_decode_net[data[2][0]].parameters())
             op = torch.optim.Adam(parameters, lr=0.01)
-            loss += train(data, op, model)
+            loss += train(data, op, model, device)
         print(loss)
 
 
