@@ -71,8 +71,8 @@ def main():
     device = torch.device("cuda:0" if (torch.cuda.is_available()) else "cpu")
     print(device)
     model = MultiDomain(dataset.input_size_list, [200, 100, 50], 3).to(device)
-    print(model.encoder.parameters.weight.type())
-    print(model.domain_encode_net[0].parameters.weight.type)
+    print(model.encoder.weight.type())
+    print(model.domain_encode_net[0].weight.type())
 
     for i in range(iter):
         domain, ids = dataset.random_iter(batch_size)
