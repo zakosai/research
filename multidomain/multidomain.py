@@ -77,8 +77,8 @@ def main():
             parameters = list(model.domain_encode_net[data[2][0]].parameters()) + \
                 list(model.domain_encode_net[data[2][1]].parameters())+ \
                 list(model.encoder.parameters()) + list(model.z.parameters()) + list(model.decoder.parameters()) + \
-                list(model. domain_decode_net(data[2][1]).parameters()) + \
-                list(model.domain_decode_net(data[2][0]).parameters())
+                list(model. domain_decode_net[data[2][1]].parameters()) + \
+                list(model.domain_decode_net[data[2][0]].parameters())
             op = torch.optim.Adam(parameters, lr=0.01)
             loss += train(data, op, model)
         print(loss)
