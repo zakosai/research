@@ -51,8 +51,8 @@ class MultiDomain(nn.Module):
 
 
 def train(data, op, model, device):
-    A_data = torch.from_numpy(data[0]).to(device)
-    B_data = torch.from_numpy(data[1]).to(device)
+    A_data = torch.from_numpy(data[0]).float().to(device)
+    B_data = torch.from_numpy(data[1]).float().to(device)
     label = data[2]
     print(label)
 
