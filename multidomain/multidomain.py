@@ -50,15 +50,16 @@ class MultiDomain(nn.Module):
 
 
 def train(data, op, model):
-    A_data = data[0].cuda()
-    B_data = data[1].cuda()
+    A_data = torch.from_numpy(data[0]).cuda()
+    B_data = torch.from_numpy(data[1].cuda())
     label = data[2]
 
     op.zero_grad()
     B_fake = model(A_data, label[0], label[1])
     A_fake = model(B_data, label[1], label[0])
     loss = model.reconstruction_loss(B_fake, B_data) + model.reconstruction_loss(A_fake, A_data)
-    return loss
+    loss.backward()
+    return loss.item()
 
 
 def main():
