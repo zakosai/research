@@ -51,7 +51,7 @@ class MultiDomain(nn.Module):
 
 def train(data, op, model):
     A_data = torch.from_numpy(data[0]).cuda()
-    B_data = torch.from_numpy(data[1].cuda())
+    B_data = torch.from_numpy(data[1]).cuda()
     label = data[2]
 
     op.zero_grad()
