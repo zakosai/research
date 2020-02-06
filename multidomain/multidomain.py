@@ -20,7 +20,6 @@ class MultiDomain(nn.Module):
 
         sequence_net = []
         for i in range(len(layers)-2, -1, --1):
-            print(layers[i])
             sequence_net.append(nn.Linear(layers[i+1], layers[i]))
             sequence_net.append(nn.ReLU())
         self.decoder = nn.Sequential(*sequence_net)
@@ -42,7 +41,9 @@ class MultiDomain(nn.Module):
         print(x.device)
         domain_enc_net = self.domain_encode_net[domain_in](x)
         z = self.z(self.encoder(domain_enc_net))
-        output = self.domain_decode_net[domain_out](self.decoder(z))
+        decoder = self.decoder(z)
+        print(decoder.shape)
+        output = self.domain_decode_net[domain_out](decoder)
         return z, output
 
     def reconstruction_loss(self, predict, label):
