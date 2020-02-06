@@ -52,7 +52,7 @@ class MultiDomain(nn.Module):
 def train(data, op, model):
     A_data = torch.from_numpy(data[0]).cuda()
     B_data = torch.from_numpy(data[1]).cuda()
-    label = data[2]
+    label = torch.tensor(data[2]).cuda()
 
     op.zero_grad()
     B_fake = model(A_data, label[0], label[1])
@@ -74,7 +74,6 @@ def main():
         loss = 0
         for idx in shuffle_idx:
             data = dataset.get_batch_train(domain[idx], ids[idx])
-            print(data[2][0], data[2][1])
             parameters = list(model.domain_encode_net[data[2][0]].parameters()) + \
                 list(model.domain_encode_net[data[2][1]].parameters())+ \
                 list(model.encoder.parameters()) + list(model.z.parameters()) + list(model.decoder.parameters()) + \
