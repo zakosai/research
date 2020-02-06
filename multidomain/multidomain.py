@@ -73,6 +73,7 @@ def main():
         loss = 0
         for idx in shuffle_idx:
             data = dataset.get_batch_train(domain[idx], ids[idx])
+            print(data[2][0], data[2][1])
             parameters = list(model.domain_encode_net[data[2][0]].parameters()) + \
                 list(model.domain_encode_net[data[2][1]].parameters())+ \
                 list(model.encoder.parameters()) + list(model.z.parameters()) + list(model.decoder.parameters()) + \
@@ -81,6 +82,7 @@ def main():
             op = torch.optim.Adam(parameters, lr=0.01)
             loss += train(data, op, model)
         print(loss)
+
 
 if __name__ == '__main__':
     main()
