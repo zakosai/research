@@ -46,13 +46,13 @@ class MultiDomain(nn.Module):
         output = self.domain_decode_net[domain_out](decoder)
         return z, output
 
-    def reconstruction_loss(self, predict, label):
-        log_softmax_var = F.log_softmax(predict, dim=-1)
+    def reconstruction_loss(self, predict, label, loss):
+        log_softmax_var = loss(predict)
         neg_ll = -torch.mean(torch.sum(log_softmax_var * label, dim=-1))
         return neg_ll
 
 
-def train(data, op, model, device):
+def train(data, op, model, device, loss):
     A_data = torch.from_numpy(data[0]).float().to(device)
     B_data = torch.from_numpy(data[1]).float().to(device)
     label = data[2]
@@ -61,7 +61,8 @@ def train(data, op, model, device):
     op.zero_grad()
     B_fake = model(A_data, label[0], label[1])
     A_fake = model(B_data, label[1], label[0])
-    loss = model.reconstruction_loss(B_fake, B_data) + model.reconstruction_loss(A_fake, A_data)
+    loss = model.reconstruction_loss(B_fake, B_data, loss) + \
+           model.reconstruction_loss(A_fake, A_data, loss)
     loss.backward()
     return loss.item()
 
@@ -71,10 +72,8 @@ def main():
     batch_size = 500
     dataset = Dataset(["Health", "Clothing", "Grocery"])
     device = torch.device("cuda:0" if (torch.cuda.is_available()) else "cpu")
-    print(device)
     model = MultiDomain(dataset.input_size_list, [200, 100, 50], 3).to(device)
-    print(model.encoder[0].weight.type())
-    print(model.domain_encode_net[0][0].weight.type())
+    loss = nn.LogSoftmax()
 
     for i in range(iter):
         domain, ids = dataset.random_iter(batch_size)
@@ -88,7 +87,7 @@ def main():
                 list(model. domain_decode_net[data[2][1]].parameters()) + \
                 list(model.domain_decode_net[data[2][0]].parameters())
             op = torch.optim.Adam(parameters, lr=0.01)
-            loss += train(data, op, model, device)
+            loss += train(data, op, model, device, loss)
         print(loss)
 
 
