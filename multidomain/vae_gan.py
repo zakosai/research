@@ -94,8 +94,8 @@ def train(data, op, model, device, loss_func):
 
     out_GAN_A_fake = model['GAN'](A_fake, label[0])
     out_GAN_B_fake = model['GAN'](B_fake, label[1])
-    gen_loss = loss_func['gan'](out_GAN_A_fake, torch.ones_like(out_GAN_A_fake)) + \
-            loss_func['gan'](out_GAN_B_fake, torch.ones_like(out_GAN_B_fake))
+    gen_loss = loss_func['gan'](out_GAN_A_fake, torch.ones_like(out_GAN_A_fake).long()) + \
+            loss_func['gan'](out_GAN_B_fake, torch.ones_like(out_GAN_B_fake).long())
     loss += gen_loss
 
     loss.backward()
