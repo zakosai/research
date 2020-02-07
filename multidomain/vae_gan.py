@@ -104,21 +104,21 @@ def train(data, op, model, device, loss_func):
     # Discriminator
     op['dis_A'].zero_grad()
     A_fake, z_A, mu_A, logvar_A = model['VAE'](B_data, label[1], label[0])
-    out_GAN_A_fake = model['GAN'](A_fake, label[0])
-    out_GAN_A_real = model['GAN'](A_data, label[0])
+    out_GAN_A_fake = model['GAN'](A_fake, label[0]).view(-1)
+    out_GAN_A_real = model['GAN'](A_data, label[0]).view(-1)
 
-    dis_loss = loss_func['gan'](out_GAN_A_fake, torch.zeros_like(out_GAN_A_fake).long()) + \
-               loss_func['gan'](out_GAN_A_real, torch.ones_like(out_GAN_A_real).long())
+    dis_loss = loss_func['gan'](out_GAN_A_fake, torch.zeros_like(out_GAN_A_fake)) + \
+               loss_func['gan'](out_GAN_A_real, torch.ones_like(out_GAN_A_real))
     dis_loss.backward()
     op['dis_A'].step()
 
     op['dis_B'].zero_grad()
     B_fake, z_B, mu_B, logvar_B = model['VAE'](A_data, label[0], label[1])
-    out_GAN_B_fake = model['GAN'](B_fake, label[1])
-    out_GAN_B_real = model['GAN'](B_data, label[1])
+    out_GAN_B_fake = model['GAN'](B_fake, label[1]).view(-1)
+    out_GAN_B_real = model['GAN'](B_data, label[1]).view(-1)
 
-    dis_loss = loss_func['gan'](out_GAN_B_fake, torch.zeros_like(out_GAN_B_fake).long()) + \
-               loss_func['gan'](out_GAN_B_real, torch.ones_like(out_GAN_B_real).long())
+    dis_loss = loss_func['gan'](out_GAN_B_fake, torch.zeros_like(out_GAN_B_fake)) + \
+               loss_func['gan'](out_GAN_B_real, torch.ones_like(out_GAN_B_real))
     dis_loss.backward()
     op['dis_B'].step()
 
