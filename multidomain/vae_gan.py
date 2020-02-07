@@ -57,12 +57,12 @@ class VAE(nn.Module):
 
 
 class GAN(nn.Module):
-    def __init__(self, list_inputs, layers, n_domain):
+    def __init__(self, list_inputs, layers, n_domain, device):
         super(GAN, self).__init__()
         self.n_domain = n_domain
         self.net = {}
         for i in range(len(list_inputs)):
-            self.net[i] = nn.Sequential(*self.create_net(list_inputs[i], layers))
+            self.net[i] = nn.Sequential(*self.create_net(list_inputs[i], layers)).cuda()
 
     def create_net(self, input, layers):
         sequence = []
