@@ -148,7 +148,7 @@ def main():
 
     loss_func = {}
     loss_func['recon'] = nn.LogSoftmax(dim=-1)
-    loss_func['gan'] = nn.CrossEntropyLoss()
+    loss_func['gan'] = nn.BCELoss()
     result = [[0, 0], [0, 0]]
 
     op = {}
