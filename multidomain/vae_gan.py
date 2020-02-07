@@ -144,7 +144,7 @@ def main():
 
     model = {}
     model['VAE'] = VAE(dataset.input_size_list, [600, 200, 50], 3).to(device)
-    model['GAN'] = GAN(dataset.input_size_list, [50, 1]).to(device)
+    model['GAN'] = GAN(dataset.input_size_list, [50, 1], 3).to(device)
 
     loss_func = {}
     loss_func['recon'] = nn.LogSoftmax(dim=-1)
