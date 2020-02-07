@@ -92,8 +92,8 @@ def train(data, op, model, device, loss_func):
            0.5 * torch.mean(torch.sum(mu_A.pow(2) + logvar_A.exp() - logvar_A - 1, dim=-1)) + \
            0.5 * torch.mean(torch.sum(mu_B.pow(2) + logvar_B.exp() - logvar_B - 1, dim=-1))
 
-    out_GAN_A_fake = model['GAN'](A_fake, label[0])
-    out_GAN_B_fake = model['GAN'](B_fake, label[1])
+    out_GAN_A_fake = model['GAN'](A_fake, label[0]).view(-1)
+    out_GAN_B_fake = model['GAN'](B_fake, label[1]).view(-1)
     gen_loss = loss_func['gan'](out_GAN_A_fake, torch.ones_like(out_GAN_A_fake).long()) + \
             loss_func['gan'](out_GAN_B_fake, torch.ones_like(out_GAN_B_fake).long())
     loss += gen_loss
