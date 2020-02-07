@@ -15,7 +15,7 @@ class MultiDomain(nn.Module):
             sequence_net.append(nn.Linear(layers[i-1], layers[i]))
             sequence_net.append(nn.ReLU())
         self.encoder = nn.Sequential(*sequence_net)
-        self.z = nn.Sequential(nn.Linear(layers[-2], layers[-1]), nn.ReLU())
+        self.z = nn.Linear(layers[-2], layers[-1])
 
         sequence_net = []
         for i in range(len(layers)-2, -1, -1):
