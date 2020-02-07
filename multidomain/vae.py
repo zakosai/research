@@ -66,8 +66,8 @@ def train(data, op, model, device, loss_func):
     A_fake, z_A, mu_A, logvar_A = model(B_data, label[1], label[0])
     loss = model.reconstruction_loss(B_fake, B_data, loss_func) + \
            model.reconstruction_loss(A_fake, A_data, loss_func) + \
-           -0.5 * torch.mean(torch.sum(1 + logvar_A - mu_A.pow(2) - logvar_A.exp(), dim=-1)) + \
-           -0.5 * torch.mean(torch.sum(1 + logvar_B - mu_B.pow(2) - logvar_B.exp(), dim=-1))
+           0.5 * torch.mean(torch.sum(mu_A.pow(2) + logvar_A.exp() - logvar_A - 1, dim=-1)) + \
+           0.5 * torch.mean(torch.sum(mu_B.pow(2) + logvar_B.exp() - logvar_B - 1, dim=-1))
     loss.backward()
     op.step()
     return loss.item()
@@ -89,7 +89,7 @@ def main():
     batch_size = 500
     dataset = Dataset(["Health", "Clothing", "Grocery"])
     device = torch.device("cuda:0" if (torch.cuda.is_available()) else "cpu")
-    model = VAE(dataset.input_size_list, [200, 100, 50], 3).to(device)
+    model = VAE(dataset.input_size_list, [600, 200, 50], 3).to(device)
     loss_func = nn.LogSoftmax(dim=-1)
     result = [[0, 0], [0, 0]]
 
