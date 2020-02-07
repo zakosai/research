@@ -122,7 +122,7 @@ def train(data, op, model, device, loss_func):
     dis_loss.backward()
     op['dis_B'].step()
 
-    return loss.item(), dis_loss.item()
+    return loss.item()
 
 
 def test(data, model, device):
