@@ -107,8 +107,8 @@ def train(data, op, model, device, loss_func):
     out_GAN_A_fake = model['GAN'](A_fake, label[0])
     out_GAN_A_real = model['GAN'](A_data, label[0])
 
-    dis_loss = loss_func['gan'](out_GAN_A_fake, torch.zeros_like(out_GAN_A_fake)) + \
-               loss_func['gan'](out_GAN_A_real, torch.ones_like(out_GAN_A_real))
+    dis_loss = loss_func['gan'](out_GAN_A_fake, torch.zeros_like(out_GAN_A_fake).float()) + \
+               loss_func['gan'](out_GAN_A_real, torch.ones_like(out_GAN_A_real).float())
     dis_loss.backward()
     op['dis_A'].step()
 
@@ -117,8 +117,8 @@ def train(data, op, model, device, loss_func):
     out_GAN_B_fake = model['GAN'](B_fake, label[1])
     out_GAN_B_real = model['GAN'](B_data, label[1])
 
-    dis_loss = loss_func['gan'](out_GAN_B_fake, torch.zeros_like(out_GAN_B_fake)) + \
-               loss_func['gan'](out_GAN_B_real, torch.ones_like(out_GAN_B_real))
+    dis_loss = loss_func['gan'](out_GAN_B_fake, torch.zeros_like(out_GAN_B_fake).float()) + \
+               loss_func['gan'](out_GAN_B_real, torch.ones_like(out_GAN_B_real).float())
     dis_loss.backward()
     op['dis_B'].step()
 
