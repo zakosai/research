@@ -138,7 +138,7 @@ def test(data, model, device):
 
 def main():
     iter = 100
-    batch_size = 2000
+    batch_size = 1000
     dataset = Dataset(["Health", "Clothing", "Grocery"])
     device = torch.device("cuda:0" if (torch.cuda.is_available()) else "cpu")
 
