@@ -69,6 +69,7 @@ def train(data, op, model, device, loss_func):
            -0.5 * torch.sum(1 + logvar_A - mu_A.pow(2) - logvar_A.exp()) + \
            -0.5 * torch.sum(1 + logvar_B - mu_B.pow(2) - logvar_B.exp())
     loss.backward()
+    op.step()
     return loss.item()
 
 

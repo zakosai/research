@@ -60,6 +60,7 @@ def train(data, op, model, device, loss_func):
     loss = model.reconstruction_loss(B_fake, B_data, loss_func) + \
            model.reconstruction_loss(A_fake, A_data, loss_func)
     loss.backward()
+    op.step()
     return loss.item()
 
 
