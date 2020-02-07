@@ -57,7 +57,7 @@ class VAE(nn.Module):
 
 
 class GAN(nn.Module):
-    def __init__(self, list_inputs, layers, n_domain, device):
+    def __init__(self, list_inputs, layers, n_domain):
         super(GAN, self).__init__()
         self.n_domain = n_domain
         self.net = {}
