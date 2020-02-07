@@ -131,8 +131,8 @@ def test(data, model, device):
     label = data[2]
 
     with torch.no_grad():
-        B_fake, _, _, _ = model(A_data, label[0], label[1])
-        A_fake, _, _, _ = model(B_data, label[1], label[0])
+        B_fake, _, _, _ = model['VAE'](A_data, label[0], label[1])
+        A_fake, _, _, _ = model['VAE'](B_data, label[1], label[0])
     return A_fake.cpu().detach().numpy(), B_fake.cpu().detach().numpy()
 
 
