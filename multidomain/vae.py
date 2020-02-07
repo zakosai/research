@@ -64,8 +64,8 @@ def train(data, op, model, device, loss_func):
     op.zero_grad()
     B_fake, z_B, mu_B, logvar_B = model(A_data, label[0], label[1])
     A_fake, z_A, mu_A, logvar_A = model(B_data, label[1], label[0])
-    loss = 100 * model.reconstruction_loss(B_fake, B_data, loss_func) + \
-           100 * model.reconstruction_loss(A_fake, A_data, loss_func) + \
+    loss = model.reconstruction_loss(B_fake, B_data, loss_func) + \
+           model.reconstruction_loss(A_fake, A_data, loss_func) + \
            -0.5 * torch.sum(1 + logvar_A - mu_A.pow(2) - logvar_A.exp()) + \
            -0.5 * torch.sum(1 + logvar_B - mu_B.pow(2) - logvar_B.exp())
     loss.backward()
