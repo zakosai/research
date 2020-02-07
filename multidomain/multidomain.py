@@ -27,7 +27,9 @@ class MultiDomain(nn.Module):
     def create_enc_domain_net(self, input_size, output_size):
         domain_net = {}
         for i in range(self.n_domain):
-            domain_net[i] = nn.Sequential(nn.Linear(input_size[i], output_size), nn.ReLU()).cuda()
+            domain_net[i] = nn.Sequential(nn.Dropout(p=0.3),
+                                          nn.Linear(input_size[i], output_size),
+                                          nn.ReLU()).cuda()
         return domain_net
 
     def create_dec_domain_net(self, input_size, output_size):
