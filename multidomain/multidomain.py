@@ -82,8 +82,9 @@ def main():
     batch_size = 500
     dataset = Dataset(["Health", "Clothing", "Grocery"])
     device = torch.device("cuda:0" if (torch.cuda.is_available()) else "cpu")
-    model = MultiDomain(dataset.input_size_list, [200, 100, 50], 3).to(device)
+    model = MultiDomain(dataset.input_size_list, [600, 200, 100], 3).to(device)
     loss_func = nn.LogSoftmax(dim=-1)
+    result = [[0, 0], [0, 0]]
 
     for i in range(iter):
         domain, ids = dataset.random_iter(batch_size)
@@ -106,6 +107,12 @@ def main():
         recall_A = calc_recall(A_fake, A_data, [50], "A")
         recall_B = calc_recall(B_fake, B_data, [50], "B")
         print("recall A: %f, recall B: %f"%(recall_A, recall_B))
+
+        if recall_A > result[0][0]:
+            result[0] = [recall_A, recall_B]
+        if recall_B > result[1][1]:
+            result[1] = [recall_A, recall_B]
+    print(result)
 
 
 if __name__ == '__main__':
