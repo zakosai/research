@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from dataset import Dataset
+from dataset import Dataset, calc_recall
 import numpy as np
 
 
@@ -64,6 +63,17 @@ def train(data, op, model, device, loss_func):
     return loss.item()
 
 
+def test(data, model, device):
+    A_data = torch.from_numpy(data[0]).float().to(device)
+    B_data = torch.from_numpy(data[1]).float().to(device)
+    label = data[2]
+
+    with torch.no_grad():
+        _, B_fake = model(A_data, label[0], label[1])
+        _, A_fake = model(B_data, label[1], label[0])
+    return A_fake, B_fake
+
+
 def main():
     iter = 100
     batch_size = 500
@@ -86,6 +96,13 @@ def main():
             op = torch.optim.Adam(parameters, lr=0.01)
             loss += train(data, op, model, device, loss_func)
         print(loss)
+
+        data = dataset.get_batch_test(1, list(range(batch_size)))
+        A_data, B_data = data[3], data[4]
+        A_fake, B_fake = test(data, model, device)
+        recall_A = calc_recall(A_fake, A_data, [50], "A")
+        recall_B = calc_recall(B_fake, B_data, [50], "B")
+        print("recall A: %f, recall B: %f"%(recall_A, recall_B))
 
 
 if __name__ == '__main__':
