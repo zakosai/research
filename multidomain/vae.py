@@ -86,7 +86,7 @@ def test(data, model, device):
 
 def main():
     iter = 100
-    batch_size = 500
+    batch_size = 2000
     dataset = Dataset(["Health", "Clothing", "Grocery"])
     device = torch.device("cuda:0" if (torch.cuda.is_available()) else "cpu")
     model = VAE(dataset.input_size_list, [600, 200, 50], 3).to(device)
@@ -108,7 +108,7 @@ def main():
             loss += train(data, op, model, device, loss_func)
         print(loss)
 
-        data = dataset.get_batch_test(1, list(range(batch_size)))
+        data = dataset.get_batch_test(0, list(range(batch_size)))
         A_data, B_data = data[3], data[4]
         A_fake, B_fake = test(data, model, device)
         recall_A = calc_recall(A_fake, A_data, [50], "A")

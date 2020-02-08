@@ -34,7 +34,7 @@ class VAE(nn.Module):
     def create_dec_domain_net(self, input_size, output_size):
         domain_net = {}
         for i in range(self.n_domain):
-            domain_net[i] = nn.Sequential(nn.Linear(input_size, output_size[i]), nn.ReLU()).cuda()
+            domain_net[i] = nn.Sequential(nn.Linear(input_size, output_size[i]), nn.LogSoftmax()).cuda()
         return domain_net
 
     def reparameterize(self, mu, logvar):
@@ -171,7 +171,7 @@ def main():
             loss += train(data, op, model, device, loss_func)
         print(loss)
 
-        data = dataset.get_batch_test(1, list(range(batch_size)))
+        data = dataset.get_batch_test(0, list(range(batch_size)))
         A_data, B_data = data[3], data[4]
         A_fake, B_fake = test(data, model, device)
         recall_A = calc_recall(A_fake, A_data, [50], "A")
