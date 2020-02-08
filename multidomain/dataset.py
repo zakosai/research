@@ -55,10 +55,10 @@ class Dataset:
                 self.label[domain_id])
 
     def get_batch_test(self, domain_id, user_ids):
-        # in_domain = [self.data_test[domain_id][0][i] for i in user_ids]
-        # out_domain = [self.data_test[domain_id][1][i] for i in user_ids]
-        in_domain = self.data_test[0][0]
-        out_domain = self.data_test[0][1]
+        in_domain = [self.data_test[domain_id][0][i] for i in user_ids]
+        out_domain = [self.data_test[domain_id][1][i] for i in user_ids]
+        # in_domain = self.data_test[0][0]
+        # out_domain = self.data_test[0][1]
         return (self.onehot_test[domain_id][0][user_ids],
                 self.onehot_test[domain_id][1][user_ids],
                 self.label[domain_id], in_domain, out_domain)

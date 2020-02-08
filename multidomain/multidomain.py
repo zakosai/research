@@ -82,7 +82,7 @@ def main():
     batch_size = 500
     dataset = Dataset(["Health", "Clothing", "Grocery"])
     device = torch.device("cuda:0" if (torch.cuda.is_available()) else "cpu")
-    model = MultiDomain(dataset.input_size_list, [600, 200, 50], 3).to(device)
+    model = MultiDomain(dataset.input_size_list, [200, 100, 50], 3).to(device)
     loss_func = nn.LogSoftmax(dim=-1)
     result = [[0, 0], [0, 0]]
 
@@ -93,7 +93,7 @@ def main():
         for idx in shuffle_idx:
             data = dataset.get_batch_train(domain[idx], ids[idx])
             parameters = list(model.domain_encode_net[data[2][0]].parameters()) + \
-                list(model.domain_encode_net[data[2][1]].parameters())+ \
+                list(model.domain_encode_net[data[2][1]].parameters()) + \
                 list(model.encoder.parameters()) + list(model.z.parameters()) + list(model.decoder.parameters()) + \
                 list(model. domain_decode_net[data[2][1]].parameters()) + \
                 list(model.domain_decode_net[data[2][0]].parameters())
@@ -101,12 +101,12 @@ def main():
             loss += train(data, op, model, device, loss_func)
         print(loss)
 
-        data = dataset.get_batch_test(1, list(range(batch_size)))
+        data = dataset.get_batch_test(0, list(range(batch_size)))
         A_data, B_data = data[3], data[4]
         A_fake, B_fake = test(data, model, device)
         recall_A = calc_recall(A_fake, A_data, [50], "A")
         recall_B = calc_recall(B_fake, B_data, [50], "B")
-        print("recall A: %f, recall B: %f"%(recall_A, recall_B))
+        print("recall A: %f, recall B: %f" % (recall_A, recall_B))
 
         if recall_A > result[0][0]:
             result[0] = [recall_A, recall_B]
