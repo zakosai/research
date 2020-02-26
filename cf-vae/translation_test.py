@@ -65,7 +65,7 @@ def main():
     calc_recall(y_ba, dense_A_test, k, type="A")
     calc_recall(y_ab, dense_B_test, k, type="B")
 
-    y_aa, y_bb = sess.run([model.y_AA, model.y_BB],
+    y_aa, y_bb = sess.run([model.y_BA, model.y_AB],
                           feed_dict={model.x_A: train_A_same_domain, model.x_B: train_B_same_domain})
     recall_aa = calc_recall_same_domain(y_aa, dense_A_test, [50], type="A")
     recall_bb = calc_recall_same_domain(y_bb, dense_B_test, [50], type="B")
