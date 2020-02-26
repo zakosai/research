@@ -60,10 +60,13 @@ def main(args):
 
     user_A_test = user_A[train_size+val_size:]
     user_B_test = user_B[train_size+val_size:]
-    print(len(user_A_train.mean(axis=0)))
+    item_A_popular = user_A_train.mean(axis=0)
+    item_B_popular = user_B_train.mean(axis=0)
 
-    print("A: Train: %f, Test: %f" %(user_A_train.mean(axis=0).mean(), user_A_test.mean(axis=0).mean()))
-    print("B: Train: %f, Test: %f" % (user_B_train.mean(axis=0).mean(), user_B_test.mean(axis=0).mean()))
+    print("A: Train: %f, Test: %f" %((user_A_train * item_A_popular).mean(axis=1).mean(),
+                                     user_A_test * item_A_popular).mean(axis=1).mean())
+    print("B: Train: %f, Test: %f" % ((user_B_train * item_B_popular).mean(axis=1).mean(),
+                                     user_B_test * item_B_popular).mean(axis=1).mean())
 
 
 if __name__ == '__main__':
