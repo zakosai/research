@@ -64,9 +64,9 @@ def main(args):
     item_B_popular = user_B_train.mean(axis=0)
 
     print("A: Train: %f, Test: %f" %((user_A_train * item_A_popular).mean(axis=1).mean(),
-                                     user_A_test * item_A_popular).mean(axis=1).mean())
+                                     (user_A_test * item_A_popular).mean(axis=1).mean()))
     print("B: Train: %f, Test: %f" % ((user_B_train * item_B_popular).mean(axis=1).mean(),
-                                     user_B_test * item_B_popular).mean(axis=1).mean())
+                                      (user_B_test * item_B_popular).mean(axis=1).mean()))
 
 
 if __name__ == '__main__':
