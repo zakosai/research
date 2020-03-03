@@ -84,6 +84,21 @@ def main():
         f.write("\n")
     f.close()
 
+    pred = np.argsort(-y_aa)[:, :10]
+    f = open(os.path.join(checkpoint_dir, "predict_%s_samedomain.txt" % A), "w")
+    for p in pred:
+        w = [str(i) for i in p]
+        f.write(','.join(w))
+        f.write("\n")
+    f.close()
+    pred = np.argsort(-y_bb)[:, :10]
+    f = open(os.path.join(checkpoint_dir, "predict_%s_samedomain.txt" % B), "w")
+    for p in pred:
+        w = [str(i) for i in p]
+        f.write(','.join(w))
+        f.write("\n")
+    f.close()
+
 
 
 

@@ -40,6 +40,13 @@ def one_hot_vector(A, num_product):
     return one_hot_A
 
 
+def read_data2(filename):
+    f = list(open(filename).readlines())
+    f = [i.split(",") for i in f]
+    f = [[int(j) for j in i] for i in f]
+    return f
+
+
 def main(args):
     iter = 300
     batch_size = 500
@@ -67,6 +74,36 @@ def main(args):
                                      ((user_A_test * item_A_popular).sum(axis=1)/user_A_test.sum(axis=1)).mean()))
     print("B: Train: %f, Test: %f" % (((user_B_train * item_B_popular).sum(axis=1)/user_B_train.sum(axis=1)).mean(),
                                       ((user_B_train * item_B_popular).sum(axis=1)/user_B_train.sum(axis=1)).mean()))
+
+    # D2D-TM
+    pred_A = read_data2("translation/%s_%s/predict_%s.txt"%(A, B, A))
+    pred_A = one_hot_vector(pred_A, num_A)
+    pred_B = read_data2("translation/%s_%s/predict_%s.txt" % (A, B, B))
+    pred_B = one_hot_vector(pred_B, num_B)
+    print("D2D-TM: pred A: %f, pred B: %f" %(((pred_A * item_A_popular).sum(axis=1) / 10).mean(),
+                                             ((pred_B * item_B_popular).sum(axis=1) / 10).mean()))
+    # same domain
+    pred_A = read_data2("translation/%s_%s/predict_%s_samedomain.txt" % (A, B, A))
+    pred_A = one_hot_vector(pred_A, num_A)
+    pred_B = read_data2("translation/%s_%s/predict_%s_samedomain.txt" % (A, B, B))
+    pred_B = one_hot_vector(pred_B, num_B)
+    print("D2D-TM same domain: pred A: %f, pred B: %f" % (
+    ((pred_A * item_A_popular).sum(axis=1) / 10).mean(), ((pred_B * item_B_popular).sum(axis=1) / 10).mean()))
+
+    # Multi-VAE
+    pred_A = read_data2("translation/%s_%s/predict_%s_multiVAE.txt" % (A, B, A))
+    pred_A = one_hot_vector(pred_A, num_A)
+    pred_B = read_data2("translation/%s_%s/predict_%s_multiVAE.txt" % (A, B, B))
+    pred_B = one_hot_vector(pred_B, num_B)
+    print("multiVAE: pred A: %f, pred B: %f" % (
+    ((pred_A * item_A_popular).sum(axis=1) / 10).mean(), ((pred_B * item_B_popular).sum(axis=1) / 10).mean()))
+    # same domain
+    pred_A = read_data2("translation/%s_%s/predict_%s_multiVAE_samedomain.txt" % (A, B, A))
+    pred_A = one_hot_vector(pred_A, num_A)
+    pred_B = read_data2("translation/%s_%s/predict_%s_multiVAE_samedomain.txt" % (A, B, B))
+    pred_B = one_hot_vector(pred_B, num_B)
+    print("multiVAE same domain: pred A: %f, pred B: %f" % (
+        ((pred_A * item_A_popular).sum(axis=1) / 10).mean(), ((pred_B * item_B_popular).sum(axis=1) / 10).mean()))
 
 
 if __name__ == '__main__':

@@ -97,6 +97,21 @@ def main():
         f.write("\n")
     f.close()
 
+    pred = np.argsort(-y_aa[:, :num_A])[:, :10]
+    f = open(os.path.join(checkpoint_dir, "predict_%s_multiVAE_samedomain.txt" % A), "w")
+    for p in pred:
+        w = [str(i) for i in p]
+        f.write(','.join(w))
+        f.write("\n")
+    f.close()
+    pred = np.argsort(-y_bb[:, num_A:])[:, :10]
+    f = open(os.path.join(checkpoint_dir, "predict_%s_multiVAE_samedomain.txt" % B), "w")
+    for p in pred:
+        w = [str(i) for i in p]
+        f.write(','.join(w))
+        f.write("\n")
+    f.close()
+
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--A',  type=str, default="Health",
