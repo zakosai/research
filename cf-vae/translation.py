@@ -145,18 +145,18 @@ class Translation:
         x_B = self.x_B
         jaccard_AB = np.dot(x_A, self.jaccard_cross)
         jaccard_BA = np.dot(x_B, self.jaccard_cross.T)
-        jaccard_AA = np.dot(x_A, self.jaccard_A)
-        jaccard_BB = np.dot(x_B, self.jaccard_B)
+        # jaccard_AA = np.dot(x_A, self.jaccard_A)
+        # jaccard_BB = np.dot(x_B, self.jaccard_B)
 
         # VAE for domain A
         z_A, z_mu_A, z_sigma_A = self.encode(x_A, "A", self.encode_dim_A, False, False)
         y_AA = self.decode(z_A, "A", self.decode_dim_A, False, False)
-        y_AA = tf.multiply(y_AA, jaccard_AA)
+        # y_AA = tf.multiply(y_AA, jaccard_BA)
 
         # VAE for domain B
         z_B, z_mu_B, z_sigma_B = self.encode(x_B, "B", self.encode_dim_B, False, True, True)
         y_BB = self.decode(z_B, "B", self.decode_dim_B, False, True)
-        y_BB = tf.multiply(y_BB, jaccard_BB)
+        # y_BB = tf.multiply(y_BB, jaccard_AB)
         # Adversal
         y_BA = self.decode(z_B, "A", self.decode_dim_A, True, True)
         y_BA = tf.multiply(y_BA, jaccard_BA)
@@ -393,7 +393,7 @@ def load_rating(path, thred, test_size):
 
 
 def main():
-    batch_size= 500
+    batch_size = 500
     args = parser.parse_args()
     iter = args.iter
     A = args.A
@@ -451,8 +451,8 @@ def main():
                         lambda_4=0.1)
     model.build_model()
     model.jaccard_cross = np.matmul(user_A_train.T, user_B_train)
-    model.jaccard_A = np.matmul(user_A_train.T, user_A_train)
-    model.jaccard_B = np.matmul(user_B_train.T, user_B_train)
+    # model.jaccard_A = np.matmul(user_A_train.T, user_A_train)
+    # model.jaccard_B = np.matmul(user_B_train.T, user_B_train)
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
