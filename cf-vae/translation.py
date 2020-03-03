@@ -39,7 +39,7 @@ class Translation:
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
         self.jaccard_cross = np.zeros((dim_A, dim_B))
         self.jaccard_A = np.zeros((dim_A, dim_A))
-        self.jaccard_B = np.zeros(dim_B, dim_B)
+        self.jaccard_B = np.zeros((dim_B, dim_B))
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
