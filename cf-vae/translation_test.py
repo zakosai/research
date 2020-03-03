@@ -62,6 +62,9 @@ def main():
         [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
         feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
     print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
+    jaccard = np.matmul(user_A[:train_size].T, user_B[:train_size])
+    y_ab = np.dot(y_ab, jaccard[user_A_test, :])
+    y_ba = np.dot(y_ba, jaccard.T[user_B_test, :])
     calc_recall(y_ba, dense_A_test, k, type="A")
     calc_recall(y_ab, dense_B_test, k, type="B")
 
