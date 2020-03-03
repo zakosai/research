@@ -450,6 +450,9 @@ def main():
                         decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-3, lambda_2=1,
                         lambda_4=0.1)
     model.build_model()
+    model.jaccard_cross = np.matmul(user_A_train.T, user_B_train)
+    model.jaccard_A = np.matmul(user_A_train.T, user_A_train)
+    model.jaccard_B = np.matmul(user_B_train.T, user_B_train)
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
