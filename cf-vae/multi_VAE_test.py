@@ -89,7 +89,7 @@ def main():
         f.write(','.join(w))
         f.write("\n")
     f.close()
-    pred = np.argsort(-y_b)[:, :10]
+    pred = np.argsort(-y_b[:, num_A:])[:, :10]
     f = open(os.path.join(checkpoint_dir, "predict_%s_multiVAE.txt" % B), "w")
     for p in pred:
         w = [str(i) for i in p]
