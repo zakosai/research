@@ -3,7 +3,7 @@ import tensorflow as tf
 import numpy as np
 import argparse
 import os
-from multi_VAE_single import calc_recall_same_domain
+from translation2 import calc_recall_same_domain
 
 
 def main():
@@ -80,8 +80,8 @@ def main():
     calc_recall(y_b[:, num_A:], dense_B_test, k, "B")
     y_aa = sess.run(model.x_recon, feed_dict={model.x: train_A_same_domain})
     y_bb = sess.run(model.x_recon, feed_dict={model.x: train_B_same_domain})
-    calc_recall_same_domain(y_aa[:, :num_A], dense_A_test, k, "same A")
-    calc_recall_same_domain(y_bb[:, num_A:], dense_B_test, k, "same B")
+    _, predict_A = calc_recall_same_domain(y_aa[:, :num_A], dense_A_test, k, "same A")
+    _, predict_B = calc_recall_same_domain(y_bb[:, num_A:], dense_B_test, k, "same B")
     pred = np.argsort(-y_a[:, :num_A])[:, :10]
     f = open(os.path.join(checkpoint_dir, "predict_%s_multiVAE.txt" % A), "w")
     for p in pred:
@@ -97,16 +97,14 @@ def main():
         f.write("\n")
     f.close()
 
-    pred = np.argsort(-y_aa[:, :num_A])[:, :10]
     f = open(os.path.join(checkpoint_dir, "predict_%s_multiVAE_samedomain.txt" % A), "w")
-    for p in pred:
+    for p in predict_A:
         w = [str(i) for i in p]
         f.write(','.join(w))
         f.write("\n")
     f.close()
-    pred = np.argsort(-y_bb[:, num_A:])[:, :10]
     f = open(os.path.join(checkpoint_dir, "predict_%s_multiVAE_samedomain.txt" % B), "w")
-    for p in pred:
+    for p in predict_B:
         w = [str(i) for i in p]
         f.write(','.join(w))
         f.write("\n")

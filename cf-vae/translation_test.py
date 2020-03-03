@@ -67,8 +67,8 @@ def main():
 
     y_aa, y_bb = sess.run([model.y_AA, model.y_BB],
                           feed_dict={model.x_A: train_A_same_domain, model.x_B: train_B_same_domain})
-    recall_aa = calc_recall_same_domain(y_aa, dense_A_test, [50], type="A")
-    recall_bb = calc_recall_same_domain(y_bb, dense_B_test, [50], type="B")
+    recall_aa, predict_A = calc_recall_same_domain(y_aa, dense_A_test, [50], type="A")
+    recall_bb, predict_B = calc_recall_same_domain(y_bb, dense_B_test, [50], type="B")
     pred = np.argsort(-y_ba)[:, :10]
     f = open(os.path.join(checkpoint_dir, "predict_%s.txt" % A), "w")
     for p in pred:
@@ -84,21 +84,18 @@ def main():
         f.write("\n")
     f.close()
 
-    pred = np.argsort(-y_aa)[:, :10]
     f = open(os.path.join(checkpoint_dir, "predict_%s_samedomain.txt" % A), "w")
-    for p in pred:
+    for p in predict_A:
         w = [str(i) for i in p]
         f.write(','.join(w))
         f.write("\n")
     f.close()
-    pred = np.argsort(-y_bb)[:, :10]
     f = open(os.path.join(checkpoint_dir, "predict_%s_samedomain.txt" % B), "w")
-    for p in pred:
+    for p in predict_B:
         w = [str(i) for i in p]
         f.write(','.join(w))
         f.write("\n")
     f.close()
-
 
 
 
