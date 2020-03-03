@@ -37,11 +37,14 @@ class Translation:
         self.train = True
         self.freeze = True
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
+        self.jaccard_cross = []
+        self.jaccard_A = []
+        self.jaccard_B = []
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], scope="enc_%d"%i,
@@ -56,8 +59,8 @@ class Translation:
 
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)-1):
                 x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
@@ -81,8 +84,8 @@ class Translation:
 
     def share_layer(self, x, scope, dim, reuse=False):
         x_ = x
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(dim)):
                 x_ = fully_connected(x_, dim[i],  scope="share_%d"%i,
@@ -126,17 +129,13 @@ class Translation:
             axis=-1))
         return neg_ll
 
-
-    def loss_recsys(self, pred, label):
-        return tf.reduce_mean(tf.reduce_sum(K.binary_crossentropy(label, pred), axis=1))
-
     def loss_discriminator(self, x, x_fake):
         loss_real = tf.reduce_mean(tf.squared_difference(x, 1))
         loss_fake = tf.reduce_mean(tf.squared_difference(x_fake, 0))
         return loss_real + loss_fake
+
     def loss_generator(self, x):
         return tf.reduce_mean(tf.squared_difference(x, 1))
-
 
     def build_model(self):
         self.x_A = tf.placeholder(tf.float32, [None, self.dim_A], name='input_A')
@@ -144,22 +143,29 @@ class Translation:
 
         x_A = self.x_A
         x_B = self.x_B
+        jaccard_AB = self.jaccard_cross[x_A, :].mean(axis=1)
+        jaccard_BA = self.jaccard_cross.T[x_B, :].mean(axis=1)
+        jaccard_AA = self.jaccard_A[x_A, :].mean(axis=1)
+        jaccard_BB = self.jaccard_B[x_B, :].mean(axis=1)
 
         # VAE for domain A
         z_A, z_mu_A, z_sigma_A = self.encode(x_A, "A", self.encode_dim_A, False, False)
         y_AA = self.decode(z_A, "A", self.decode_dim_A, False, False)
+        y_AA = tf.multiply(y_AA, jaccard_AA)
 
         # VAE for domain B
         z_B, z_mu_B, z_sigma_B = self.encode(x_B, "B", self.encode_dim_B, False, True, True)
         y_BB = self.decode(z_B, "B", self.decode_dim_B, False, True)
-
+        y_BB = tf.multiply(y_BB, jaccard_BB)
         # Adversal
         y_BA = self.decode(z_B, "A", self.decode_dim_A, True, True)
+        y_BA = tf.multiply(y_BA, jaccard_BA)
         adv_AA = self.adversal(y_AA, "adv_A", self.adv_dim_A)
         adv_BA = self.adversal(y_BA, "adv_A", self.adv_dim_A, reuse=True)
 
 
         y_AB = self.decode(z_A, "B", self.decode_dim_B, True, True)
+        y_AB = tf.multiply(y_AB, jaccard_AB)
         adv_BB = self.adversal(y_BB, "adv_B", self.adv_dim_B)
         adv_AB = self.adversal(y_AB, "adv_B", self.adv_dim_B, reuse=True)
 
@@ -168,8 +174,6 @@ class Translation:
         y_ABA = self.decode(z_ABA, "A", self.decode_dim_A, True, True)
         z_BAB, z_mu_BAB, z_sigma_BAB = self.encode(y_BA, "A", self.encode_dim_A, True, True, True)
         y_BAB = self.decode(z_BAB, "B", self.decode_dim_B, True, True)
-
-
 
         # Loss VAE
         loss_VAE_A = self.lambda_1 * self.loss_kl(z_mu_A, z_sigma_A) + self.lambda_2 * self.loss_reconstruct(x_A, y_AA)
@@ -191,8 +195,6 @@ class Translation:
         loss_CC_B = self.lambda_3 * self.loss_kl(z_mu_BAB, z_sigma_BAB) + self.lambda_4 * \
                     self.loss_reconstruct(x_B,y_AB) + self.lambda_4 * self.loss_reconstruct(x_B, y_BAB)
 
-
-
         self.loss_CC = loss_CC_A + loss_CC_B
 
         self.loss_val_a = self.lambda_4 * self.loss_reconstruct(x_A, y_BA)
@@ -205,11 +207,7 @@ class Translation:
                         self.loss_generator(y_BA)
         # self.loss_gen = drself.loss_CC + 0.1 * tf.losses.get_regularization_loss() - loss_d_A - loss_d_B
 
-
-
         self.loss_dis = loss_d_A + loss_d_B
-
-
         self.train_op_VAE_A = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_VAE_A)
         self.train_op_VAE_B = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_VAE_B)
         self.train_op_gen = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_gen)
@@ -249,16 +247,6 @@ def read_data(filename):
     f = [i[1:] for i in f]
     return f
 
-def read_data2(filename):
-    data = list(open(filename).readlines())
-    data = data[1:]
-    n_data = len(data)
-    print(len(data))
-    data = [d.strip() for d in data]
-    data = [d.split(", ") for d in data]
-    data = [d[:3] for d in data]
-    data = np.array(data).reshape(n_data, 3).astype(np.int32)
-    return data
 
 def one_hot_vector(A, num_product):
     one_hot_A = np.zeros((len(A), num_product))
@@ -269,11 +257,6 @@ def one_hot_vector(A, num_product):
                 one_hot_A[i,j] = 1
     return one_hot_A
 
-def one_hot_vector2(A, num_product):
-    one_hot = np.zeros((6557, num_product))
-    for i in A:
-        one_hot[i[0], i[1]] = i[2]
-    return one_hot
 
 def test_same_domain(dense, num_product):
     input_user = np.zeros((len(dense), num_product))
@@ -285,21 +268,23 @@ def test_same_domain(dense, num_product):
         dense_test[i] = d[num_input:]
     return input_user, dense_test
 
-def calc_recall_same_domain(pred, test, m=[100], type=None):
 
+def calc_recall_same_domain(pred, test, m=[100], type=None, f=None):
     for k in m:
         pred_ab = np.argsort(-pred)
         recall = []
         ndcg = []
+        predict = []
         for i in range(len(pred_ab)):
-            num_train = int(len(test[i])*0.8)
+            num_train = -5
             u_train = test[i][:num_train]
             u_test = test[i][num_train:]
-            p = list(pred_ab[i, :(k+num_train)])
+            p = list(pred_ab[i, :(k + len(u_train))])
             for t in u_train:
                 if t in p:
                     p.remove(t)
             p = p[:k]
+            predict.append(p[:10])
 
             hits = set(u_test) & set(p)
 
@@ -321,7 +306,12 @@ def calc_recall_same_domain(pred, test, m=[100], type=None):
             else:
                 ndcg.append(float(actual) / best)
 
-        print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
+        if f != None:
+            f.write("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
+        else:
+            print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
+    return np.mean(np.array(recall)), predict
+
 
 def calc_recall(pred, test, m=[100], type=None):
 
@@ -354,9 +344,8 @@ def calc_recall(pred, test, m=[100], type=None):
                 ndcg.append(float(actual) / best)
 
         print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
-
-
     return np.mean(np.array(recall))
+
 
 def dcg_score(y_true, y_score, k=50):
     """Discounted cumulative gain (DCG) at rank K.
@@ -382,11 +371,6 @@ def dcg_score(y_true, y_score, k=50):
     discounts = np.log2(np.arange(len(y_true)) + 2)
     return np.sum(gain / discounts)
 
-def calc_rmse(pred, test):
-    idx = np.where(test != 0)
-    pred = pred[idx]
-    test = test[idx]
-    return np.sqrt(np.mean((test-pred)**2))
 
 def load_rating(path, thred, test_size):
     dense_A = []
@@ -408,9 +392,10 @@ def load_rating(path, thred, test_size):
     return dense_A, dense_B
 
 
-def main(args):
-    iter = 300
+def main():
     batch_size= 500
+    args = parser.parse_args()
+    iter = args.iter
     A = args.A
     B = args.B
     checkpoint_dir = "translation/%s_%s/"%(A,B)
@@ -456,6 +441,10 @@ def main(args):
     dense_A_test = dense_A[(train_size + val_size):]
     dense_B_test = dense_B[(train_size + val_size):]
 
+    train_A_same_domain = [i[:-5] for i in dense_A_test]
+    train_A_same_domain = one_hot_vector(train_A_same_domain, num_A)
+    train_B_same_domain = [i[:-5] for i in dense_B_test]
+    train_B_same_domain = one_hot_vector(train_B_same_domain, num_B)
 
     model = Translation(batch_size, num_A, num_B, encoding_dim_A, decoding_dim_A, encoding_dim_B,
                         decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-3, lambda_2=1,
@@ -464,7 +453,7 @@ def main(args):
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
-    saver = tf.train.Saver(max_to_keep=3)
+    saver = tf.train.Saver(max_to_keep=20)
     max_recall = 0
     dense_A_val = dense_A[train_size:train_size+val_size]
     dense_B_val = dense_B[train_size:train_size+val_size]
@@ -513,8 +502,6 @@ def main(args):
             loss_gen, loss_val_a, loss_val_b, y_ba, y_ab = sess.run([model.loss_gen, model.loss_val_a,
                                                                      model.loss_val_b, model.y_BA, model.y_AB],
                                               feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
-
-
             recall = calc_recall(y_ba, dense_A_val, [50]) + calc_recall(y_ab, dense_B_val, [50])
             print("Loss gen: %f, Loss val a: %f, Loss val b: %f, recall %f" % (loss_gen, loss_val_a, loss_val_b,
                                                                                recall))
@@ -526,20 +513,14 @@ def main(args):
                  feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
                 print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
 
-                # y_ab = y_ab[test_B]
-                # y_ba = y_ba[test_A]
-
                 calc_recall(y_ba, dense_A_test, k, type="A")
                 calc_recall(y_ab, dense_B_test, k, type="B")
 
                 #test same domain
-                # input_A_test, domain_A_test = test_same_domain(dense_A_test, num_A)
-                # y_aa = sess.run(model.y_AA, feed_dict={model.x_A:input_A_test})
-                # calc_recall(y_aa, domain_A_test, [50], type="A")
-                #
-                # input_B_test, domain_B_test = test_same_domain(dense_B_test, num_B)
-                # y_bb = sess.run(model.y_BB, feed_dict={model.x_B:input_B_test})
-                # calc_recall(y_bb, domain_B_test, [50], type="B")
+                y_aa, y_bb = sess.run([model.y_AA, model.y_BB],
+                                      feed_dict={model.x_A:train_A_same_domain, model.x_B:train_B_same_domain})
+                calc_recall_same_domain(y_aa, dense_A_test, k, type="A")
+                calc_recall_same_domain(y_bb, dense_B_test, k, type="B")
 
             model.train = True
         if i%100 == 0:
@@ -555,36 +536,19 @@ def main(args):
             #     saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'), i)
 
     print(max_recall)
-    # model.train = False
-    # loss_test_a, loss_test_b, y_ab, y_ba = sess.run([model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
-    #                         feed_dict={model.x_A: user_A_test[200:],model.x_B: user_B_test[200:]})
-    # print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
-    # model.train = True
-    #
-    # dense_A_test = dense_A[(train_size+200):]
-    # dense_B_test = dense_B[(train_size+200):]
-    #
-    #
-    # print("recall B: %f"%(calc_recall(y_ab, dense_B_test)))
-    # print("recall A: %f" % (calc_recall(y_ba, dense_A_test)))
-
-    # pred_a = np.array(y_ba).flatten()
-    # test_a = np.array(user_A_test).flatten()
-    # print("rmse A %f"%calc_rmse(pred_a, test_a))
-    #
-    # pred_a = np.array(y_ab).flatten()
-    # test_a = np.array(user_B_test).flatten()
-    # print("rmse B %f" % calc_rmse(pred_a, test_a))
 
 
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('--A',  type=str, default="Health",
+                   help='domain A')
+parser.add_argument('--B',  type=str, default='Grocery',
+                   help='domain B')
+parser.add_argument('--k',  type=int, default=100,
+                   help='top-K')
+parser.add_argument('--iter',  type=int, default=300,
+                   help='n_iter')
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('--A', type=str, default="Health", help='domain A')
-    parser.add_argument('--B', type=str, default='Grocery', help='domain B')
-    parser.add_argument('--k', type=int, default=100, help='top-K')
-    args = parser.parse_args()
-
-    main(args)
+    main()
 
 
 
