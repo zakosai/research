@@ -264,6 +264,7 @@ def calc_recall_same_domain(pred, test, m=[100], type=None, f=None):
         pred_ab = np.argsort(-pred)
         recall = []
         ndcg = []
+        predict = []
         for i in range(len(pred_ab)):
             num_train = -5
             u_train = test[i][:num_train]
@@ -273,6 +274,7 @@ def calc_recall_same_domain(pred, test, m=[100], type=None, f=None):
                 if t in p:
                     p.remove(t)
             p = p[:k]
+            predict.append(p)
 
             hits = set(u_test) & set(p)
 
@@ -298,7 +300,7 @@ def calc_recall_same_domain(pred, test, m=[100], type=None, f=None):
             f.write("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
         else:
             print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
-    return np.mean(np.array(recall))
+    return np.mean(np.array(recall)), predict
 
 
 def calc_recall(pred, test, m=[100], type=None):
@@ -379,6 +381,7 @@ def load_rating(path, thred, test_size):
         i += 1
     return dense_A, dense_B
 
+
 def main():
     batch_size= 500
     args = parser.parse_args()
@@ -401,11 +404,11 @@ def main():
 
     print(k)
 
-    encoding_dim_A = [600]
-    encoding_dim_B = [600]
-    share_dim = [200]
-    decoding_dim_A = [600, num_A]
-    decoding_dim_B = [600, num_B]
+    encoding_dim_A = [dim]
+    encoding_dim_B = [dim]
+    share_dim = [share]
+    decoding_dim_A = [dim, num_A]
+    decoding_dim_B = [dim, num_B]
 
 
     assert len(user_A) == len(user_B)
