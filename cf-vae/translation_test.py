@@ -1,4 +1,4 @@
-from translation2 import Translation, create_dataset, calc_recall, calc_recall_same_domain, one_hot_vector
+from translation2 import Translation, create_dataset, dcg_score, calc_recall_same_domain, one_hot_vector
 import tensorflow as tf
 import numpy as np
 import argparse
@@ -63,10 +63,9 @@ def main():
         feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
     print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
     jaccard = np.matmul(user_A[:train_size].T, user_B[:train_size])
-    y_ab = np.dot(y_ab, jaccard[dense_A_test, :].mean(axis=1))
-    y_ba = np.dot(y_ba, jaccard.T[user_B_test, :].mean(axis=1))
-    calc_recall(y_ba, dense_A_test, k, type="A")
-    calc_recall(y_ab, dense_B_test, k, type="B")
+
+    calc_recall(y_ba, dense_A_test, dense_B_test, jaccard.T, k, type="A")
+    calc_recall(y_ab, dense_B_test, dense_A_test, jaccard, k, type="B")
 
     y_aa, y_bb = sess.run([model.y_AA, model.y_BB],
                           feed_dict={model.x_A: train_A_same_domain, model.x_B: train_B_same_domain})
@@ -101,6 +100,38 @@ def main():
     f.close()
 
 
+def calc_recall(pred, test, train, jaccard, m=[100], type=None):
+
+    for k in m:
+        recall = []
+        ndcg = []
+        for i in range(len(pred)):
+            p = np.argsort(-pred[i] * jaccard[train[i], :].sum(axis=0))[:, :k]
+
+            hits = set(test[i]) & set(p)
+
+            #recall
+            recall_val = float(len(hits)) / len(test[i])
+            # if recall_val > 0.5:
+            #     print(i, p, hits, type)
+            recall.append(recall_val)
+
+            #ncdg
+            score = []
+            for j in range(k):
+                if p[j] in hits:
+                    score.append(1)
+                else:
+                    score.append(0)
+            actual = dcg_score(score, pred[i, p], k)
+            best = dcg_score(score, score, k)
+            if best == 0:
+                ndcg.append(0)
+            else:
+                ndcg.append(float(actual) / best)
+
+        print("k= %d, recall %s: %f, ndcg: %f"%(k, type, np.mean(recall), np.mean(ndcg)))
+    return np.mean(np.array(recall))
 
 
 parser = argparse.ArgumentParser(description='Process some integers.')
