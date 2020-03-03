@@ -106,7 +106,9 @@ def calc_recall(pred, test, train, jaccard, m=[100], type=None):
         recall = []
         ndcg = []
         for i in range(len(pred)):
-            p = np.argsort(-pred[i] * jaccard[train[i], :].sum(axis=0))[:, :k]
+            similar_score = jaccard[train[i], :].sum(axis=0)
+            print(similar_score.shape)
+            p = np.argsort(-pred[i] * similar_score)[:, :k]
 
             hits = set(test[i]) & set(p)
 
