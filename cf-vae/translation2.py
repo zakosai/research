@@ -274,7 +274,7 @@ def calc_recall_same_domain(pred, test, m=[100], type=None, f=None):
                 if t in p:
                     p.remove(t)
             p = p[:k]
-            predict.append(p)
+            predict.append(p[:10])
 
             hits = set(u_test) & set(p)
 
