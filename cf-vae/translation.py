@@ -143,10 +143,10 @@ class Translation:
 
         x_A = self.x_A
         x_B = self.x_B
-        jaccard_AB = self.jaccard_cross[x_A, :].mean(axis=1)
-        jaccard_BA = self.jaccard_cross.T[x_B, :].mean(axis=1)
-        jaccard_AA = self.jaccard_A[x_A, :].mean(axis=1)
-        jaccard_BB = self.jaccard_B[x_B, :].mean(axis=1)
+        jaccard_AB = np.dot(x_A, self.jaccard_cross)
+        jaccard_BA = np.dot(x_B, self.jaccard_cross.T)
+        jaccard_AA = np.dot(x_A, self.jaccard_A)
+        jaccard_BB = np.dot(x_B, self.jaccard_B)
 
         # VAE for domain A
         z_A, z_mu_A, z_sigma_A = self.encode(x_A, "A", self.encode_dim_A, False, False)
