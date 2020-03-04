@@ -7,6 +7,7 @@ import numpy as np
 import os
 import argparse
 from scipy.sparse import load_npz
+from sklearn.metrics.pairwise import cosine_distances
 
 
 class Translation:
@@ -454,7 +455,7 @@ def main():
     model.build_model()
     # jaccard_cross = np.matmul(user_A_train.T, user_B_train)
     jaccard_cross = load_npz("data/%s_%s/mult_nor.npz" % (A, B)).toarray()
-    jaccard_cross = np.matmul(jaccard_cross[:num_A, :], jaccard_cross[num_A:, :].T)
+    jaccard_cross = cosine_distances(jaccard_cross[:num_A, :], jaccard_cross[num_A:, :])
     user_jaccard_A = np.zeros((user_A.shape[0], num_A))
     user_jaccard_B = np.zeros((user_B.shape[0], num_B))
     for u in range(len(user_A)):
