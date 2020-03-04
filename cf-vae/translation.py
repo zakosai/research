@@ -6,6 +6,7 @@ from tensorflow.contrib.framework import argsort
 import numpy as np
 import os
 import argparse
+from scipy.sparse import load_npz
 
 
 class Translation:
@@ -451,7 +452,9 @@ def main():
                         decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-3, lambda_2=1,
                         lambda_4=0.1)
     model.build_model()
-    jaccard_cross = np.matmul(user_A_train.T, user_B_train)
+    # jaccard_cross = np.matmul(user_A_train.T, user_B_train)
+    jaccard_cross = load_npz("data/%s_%s/mult_norm.npz"%(A, B)).toarray()
+    jaccard_cross = np.matmul(jaccard_cross[:num_A, :], jaccard_cross[num_A:, :].T)
     user_jaccard_A = np.zeros((user_A.shape[0], num_A))
     user_jaccard_B = np.zeros((user_B.shape[0], num_B))
     for u in range(len(user_A)):
