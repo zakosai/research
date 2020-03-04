@@ -162,12 +162,12 @@ class Translation:
         # y_BB = tf.multiply(y_BB, jaccard_AB)
         # Adversal
         y_BA = self.decode(z_B, "A", self.decode_dim_A, True, True)
-        y_BA = tf.multiply(y_BA, self.jaccard_A)
+        y_BA = y_BA * 0.5 + self.jaccard_A
         adv_AA = self.adversal(y_AA, "adv_A", self.adv_dim_A)
         adv_BA = self.adversal(y_BA, "adv_A", self.adv_dim_A, reuse=True)
 
         y_AB = self.decode(z_A, "B", self.decode_dim_B, True, True)
-        y_AB = tf.multiply(y_AB, self.jaccard_B)
+        y_AB = y_AB * 0.5 + self.jaccard_B
         adv_BB = self.adversal(y_BB, "adv_B", self.adv_dim_B)
         adv_AB = self.adversal(y_AB, "adv_B", self.adv_dim_B, reuse=True)
 
@@ -460,10 +460,10 @@ def main():
     for u in range(len(user_A)):
         v_A = jaccard_cross.T[dense_B[u], :].sum(axis=0)
         v_A = v_A/np.linalg.norm(v_A)
-        user_jaccard_A[u] = v_A * 0.7 + 0.3
+        user_jaccard_A[u] = v_A * 0.5
         v_B = jaccard_cross[dense_A[u], :].sum(axis=0)
         v_B = v_B / np.linalg.norm(v_B)
-        user_jaccard_B[u] = v_B * 0.7 + 0.3
+        user_jaccard_B[u] = v_B * 0.5
 
     # model.jaccard_A = np.matmul(user_A_train.T, user_A_train)
     # model.jaccard_B = np.matmul(user_B_train.T, user_B_train)
