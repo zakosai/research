@@ -140,11 +140,13 @@ class Translation:
     def build_model(self):
         self.x_A = tf.placeholder(tf.float32, [None, self.dim_A], name='input_A')
         self.x_B = tf.placeholder(tf.float32, [None, self.dim_B], name='input_B')
+        self.jaccard_A = tf.placeholder(tf.float32, [None, self.dim_A])
+        self.jaccard_B = tf.placeholder(tf.float32, [None, self.dim_B])
 
         x_A = self.x_A
         x_B = self.x_B
-        jaccard_AB = np.dot(x_A, self.jaccard_cross)
-        jaccard_BA = np.dot(x_B, self.jaccard_cross.T)
+        # jaccard_AB = np.dot(x_A, self.jaccard_cross)
+        # jaccard_BA = np.dot(x_B, self.jaccard_cross.T)
         # jaccard_AA = np.dot(x_A, self.jaccard_A)
         # jaccard_BB = np.dot(x_B, self.jaccard_B)
 
@@ -159,13 +161,12 @@ class Translation:
         # y_BB = tf.multiply(y_BB, jaccard_AB)
         # Adversal
         y_BA = self.decode(z_B, "A", self.decode_dim_A, True, True)
-        y_BA = tf.multiply(y_BA, jaccard_BA)
+        y_BA = tf.multiply(y_BA, self.jaccard_A)
         adv_AA = self.adversal(y_AA, "adv_A", self.adv_dim_A)
         adv_BA = self.adversal(y_BA, "adv_A", self.adv_dim_A, reuse=True)
 
-
         y_AB = self.decode(z_A, "B", self.decode_dim_B, True, True)
-        y_AB = tf.multiply(y_AB, jaccard_AB)
+        y_AB = tf.multiply(y_AB, self.jaccard_B)
         adv_BB = self.adversal(y_BB, "adv_B", self.adv_dim_B)
         adv_AB = self.adversal(y_AB, "adv_B", self.adv_dim_B, reuse=True)
 
@@ -450,7 +451,17 @@ def main():
                         decoding_dim_B, adv_dim_A, adv_dim_B, z_dim, share_dim, learning_rate=1e-3, lambda_2=1,
                         lambda_4=0.1)
     model.build_model()
-    model.jaccard_cross = np.matmul(user_A_train.T, user_B_train)
+    jaccard_cross = np.matmul(user_A_train.T, user_B_train)
+    user_jaccard_A = np.zeros((user_A.shape[0], num_A))
+    user_jaccard_B = np.zeros((user_B.shape[0], num_B))
+    for u in range(len(user_A)):
+        v_A = jaccard_cross.T[dense_A[u], :].sum(axis=0)
+        v_A = v_A/np.linalg.norm(v_A)
+        user_jaccard_A[u] = v_A
+        v_B = jaccard_cross[dense_B[u], :].sum(axis=0)
+        v_B = v_B / np.linalg.norm(v_B)
+        user_jaccard_B[u] = v_B
+
     # model.jaccard_A = np.matmul(user_A_train.T, user_A_train)
     # model.jaccard_B = np.matmul(user_B_train.T, user_B_train)
 
@@ -470,7 +481,9 @@ def main():
             x_B = user_B_train[list_idx]
 
             feed = {model.x_A: x_A,
-                    model.x_B: x_B}
+                    model.x_B: x_B,
+                    model.jaccard_A: user_jaccard_A[list_idx],
+                    model.jaccard_B: user_jaccard_B[list_idx]}
 
             if i <20:
                 _, loss_vae = sess.run([model.train_op_VAE_A, model.loss_VAE], feed_dict=feed)
@@ -504,7 +517,9 @@ def main():
             #                                                                         loss_vae, loss_gan, loss_cc))
             loss_gen, loss_val_a, loss_val_b, y_ba, y_ab = sess.run([model.loss_gen, model.loss_val_a,
                                                                      model.loss_val_b, model.y_BA, model.y_AB],
-                                              feed_dict={model.x_A:user_A_val, model.x_B:user_B_val})
+                                              feed_dict={model.x_A:user_A_val, model.x_B:user_B_val,
+                                                         model.jaccard_A: user_jaccard_A[train_size: train_size + val_size],
+                                                         model.jaccard_B: user_jaccard_B[train_size: train_size + val_size]})
             recall = calc_recall(y_ba, dense_A_val, [50]) + calc_recall(y_ab, dense_B_val, [50])
             print("Loss gen: %f, Loss val a: %f, Loss val b: %f, recall %f" % (loss_gen, loss_val_a, loss_val_b,
                                                                                recall))
@@ -513,7 +528,9 @@ def main():
                 saver.save(sess, os.path.join(checkpoint_dir, 'translation-model'))
                 loss_test_a, loss_test_b, y_ab, y_ba = sess.run(
                     [model.loss_val_a, model.loss_val_b, model.y_AB, model.y_BA],
-                 feed_dict={model.x_A: user_A_test, model.x_B: user_B_test})
+                 feed_dict={model.x_A: user_A_test, model.x_B: user_B_test,
+                            model.jaccard_A: user_jaccard_A[train_size + val_size:],
+                            model.jaccard_B: user_jaccard_B[train_size + val_size: ]})
                 print("Loss test a: %f, Loss test b: %f" % (loss_test_a, loss_test_b))
 
                 calc_recall(y_ba, dense_A_test, k, type="A")
