@@ -455,10 +455,10 @@ def main():
     user_jaccard_A = np.zeros((user_A.shape[0], num_A))
     user_jaccard_B = np.zeros((user_B.shape[0], num_B))
     for u in range(len(user_A)):
-        v_A = jaccard_cross.T[dense_A[u], :].sum(axis=0)
+        v_A = jaccard_cross.T[dense_B[u], :].sum(axis=0)
         v_A = v_A/np.linalg.norm(v_A)
         user_jaccard_A[u] = v_A
-        v_B = jaccard_cross[dense_B[u], :].sum(axis=0)
+        v_B = jaccard_cross[dense_A[u], :].sum(axis=0)
         v_B = v_B / np.linalg.norm(v_B)
         user_jaccard_B[u] = v_B
 
