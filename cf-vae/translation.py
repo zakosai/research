@@ -163,12 +163,12 @@ class Translation:
         # y_BB = tf.multiply(y_BB, jaccard_AB)
         # Adversal
         y_BA = self.decode(z_B, "A", self.decode_dim_A, True, True)
-        # y_BA = tf.multiply(y_BA, self.jaccard_A)
+        y_BA = tf.multiply(y_BA, self.jaccard_A)
         adv_AA = self.adversal(y_AA, "adv_A", self.adv_dim_A)
         adv_BA = self.adversal(y_BA, "adv_A", self.adv_dim_A, reuse=True)
 
         y_AB = self.decode(z_A, "B", self.decode_dim_B, True, True)
-        # y_AB =tf.multiply(y_AB, self.jaccard_B)
+        y_AB =tf.multiply(y_AB, self.jaccard_B)
         adv_BB = self.adversal(y_BB, "adv_B", self.adv_dim_B)
         adv_AB = self.adversal(y_AB, "adv_B", self.adv_dim_B, reuse=True)
 
