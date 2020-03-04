@@ -453,17 +453,17 @@ def main():
                         lambda_4=0.1)
     model.build_model()
     # jaccard_cross = np.matmul(user_A_train.T, user_B_train)
-    jaccard_cross = load_npz("data/%s_%s/mult_norm.npz"%(A, B)).toarray()
+    jaccard_cross = load_npz("data/%s_%s/mult_nor.npz" % (A, B)).toarray()
     jaccard_cross = np.matmul(jaccard_cross[:num_A, :], jaccard_cross[num_A:, :].T)
     user_jaccard_A = np.zeros((user_A.shape[0], num_A))
     user_jaccard_B = np.zeros((user_B.shape[0], num_B))
     for u in range(len(user_A)):
         v_A = jaccard_cross.T[dense_B[u], :].sum(axis=0)
         v_A = v_A/np.linalg.norm(v_A)
-        user_jaccard_A[u] = v_A * 0.7 + 0.3
+        user_jaccard_A[u] = v_A * 0.5 + 0.5
         v_B = jaccard_cross[dense_A[u], :].sum(axis=0)
         v_B = v_B / np.linalg.norm(v_B)
-        user_jaccard_B[u] = v_B *0.7 + 0.3
+        user_jaccard_B[u] = v_B * 0.5 + 0.5
 
     # model.jaccard_A = np.matmul(user_A_train.T, user_A_train)
     # model.jaccard_B = np.matmul(user_B_train.T, user_B_train)
