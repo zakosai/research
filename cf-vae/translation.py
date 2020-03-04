@@ -457,10 +457,10 @@ def main():
     for u in range(len(user_A)):
         v_A = jaccard_cross.T[dense_B[u], :].sum(axis=0)
         v_A = v_A/np.linalg.norm(v_A)
-        user_jaccard_A[u] = v_A
+        user_jaccard_A[u] = v_A * 0.5 + 0.5
         v_B = jaccard_cross[dense_A[u], :].sum(axis=0)
         v_B = v_B / np.linalg.norm(v_B)
-        user_jaccard_B[u] = v_B
+        user_jaccard_B[u] = v_B *0.5 + 0.5
 
     # model.jaccard_A = np.matmul(user_A_train.T, user_A_train)
     # model.jaccard_B = np.matmul(user_B_train.T, user_B_train)
