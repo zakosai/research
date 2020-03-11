@@ -9,7 +9,7 @@ class Dataset:
         self.item_info = data['content']
         self.user_info = data['user']
         self.train = data['train_users']
-        self.test = data['test_user']
+        self.test = data['test_users']
         self.no_item, self.item_size, = self.item_info.shape
         self.no_user, self.user_size = self.user_info.shape
 
