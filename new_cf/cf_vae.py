@@ -138,8 +138,8 @@ def main(args):
 
     loss = {}
     loss['pred'] = nn.BCELoss(reduction='sum')
-    loss['item'] = nn.BCELoss()
-    loss['user'] = nn.BCELoss()
+    loss['item'] = nn.MSELoss()
+    loss['user'] = nn.MSELoss()
 
     best_result = 0
     for i in range(iter):
