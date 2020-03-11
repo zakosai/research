@@ -27,7 +27,7 @@ class DAE(nn.Module):
             sequence.append(nn.ReLU())
             prev = layer
         sequence.append(nn.Linear(prev, input_size))
-        sequence.append(nn.Sigmoid())
+        # sequence.append(nn.Sigmoid())
         self.decoder = nn.Sequential(*sequence).cuda()
 
     def reparameterize(self, mu, logvar):
@@ -131,7 +131,9 @@ def main(args):
     op = {}
     op['user'] = torch.optim.Adam(model['user'].parameters(), lr=0.001)
     op['item'] = torch.optim.Adam(model['item'].parameters(), lr=0.001)
-    pred_parameters = list(model['neuCF'].parameters())
+    pred_parameters = list(model['user'].encoder.parameters()) +\
+                      list(model['item'].encoder.parameters()) +\
+                        list(model['neuCF'].parameters())
     op['pred'] = torch.optim.Adam(pred_parameters, lr=0.001)
 
     loss = {}
