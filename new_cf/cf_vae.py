@@ -27,7 +27,7 @@ class DAE(nn.Module):
             sequence.append(nn.ReLU())
             prev = layer
         sequence.append(nn.Linear(prev, input_size))
-        # sequence.append(nn.Sigmoid())
+        sequence.append(nn.Sigmoid())
         self.decoder = nn.Sequential(*sequence).cuda()
 
     def reparameterize(self, mu, logvar):
