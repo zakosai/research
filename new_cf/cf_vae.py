@@ -27,7 +27,7 @@ class DAE(nn.Module):
             sequence.append(nn.ReLU())
             prev = layer
         sequence.append(nn.Linear(prev, input_size))
-        sequence.append(nn.Sigmoid())
+        # sequence.append(nn.Sigmoid())
         self.decoder = nn.Sequential(*sequence).cuda()
 
     def reparameterize(self, mu, logvar):
@@ -74,14 +74,14 @@ def train(data, model, op, loss, device):
     # # AutoEncoder - user
     op['user'].zero_grad()
     user_recon, z_user = model['user'](user_info)
-    loss_user = loss_recon(user_recon, user_info)
+    loss_user = loss['user'](user_recon, user_info)
     loss_user.backward()
     op['user'].step()
 
     # AutoEncoder - item
     op['item'].zero_grad()
     item_recon, z_item = model['item'](item_info)
-    loss_item = loss_recon(item_recon, item_info)
+    loss_item = loss['item'](item_recon, item_info)
     loss_item.backward()
     op['item'].step()
 
@@ -138,6 +138,8 @@ def main(args):
 
     loss = {}
     loss['pred'] = nn.BCELoss(reduction='sum')
+    loss['item'] = nn.BCELoss()
+    loss['user'] = nn.BCELoss()
 
     best_result = 0
     for i in range(iter):
