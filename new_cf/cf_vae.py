@@ -101,7 +101,7 @@ def train(data, model, op, loss, device):
     return predict_loss.item(),  predict_loss.item(), predict_loss.item()
 
 
-def test(data, model, device, neg_size):
+def test(data, model, device):
     with torch.no_grad():
         user_info = torch.from_numpy(data[0]).float().to(device)
         item_info = torch.from_numpy(data[1]).float().to(device)
