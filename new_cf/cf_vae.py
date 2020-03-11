@@ -125,16 +125,16 @@ def main(args):
 
     model = {}
     model['user'] = DAE(dataset.user_size, [200, 100])
-    model['item'] = DAE(dataset.item_size, [200, 100])
-    model['neuCF'] = MLP([200, 50, 1])
+    model['item'] = DAE(dataset.item_size, [100, 50])
+    model['neuCF'] = MLP([150, 20, 1])
 
     op = {}
-    op['user'] = torch.optim.Adam(model['user'].parameters(), lr=0.01)
-    op['item'] = torch.optim.Adam(model['item'].parameters(), lr=0.01)
+    op['user'] = torch.optim.Adam(model['user'].parameters(), lr=0.001)
+    op['item'] = torch.optim.Adam(model['item'].parameters(), lr=0.001)
     pred_parameters = list(model['user'].encoder.parameters()) +\
                       list(model['item'].encoder.parameters()) +\
                         list(model['neuCF'].parameters())
-    op['pred'] = torch.optim.Adam(pred_parameters, lr=0.01)
+    op['pred'] = torch.optim.Adam(pred_parameters, lr=0.001)
 
     loss = {}
     loss['pred'] = nn.BCELoss(reduction='sum')
