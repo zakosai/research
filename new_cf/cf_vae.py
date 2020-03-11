@@ -113,7 +113,7 @@ def test(data, model, device):
             # pred = torch.matmul(z_user, z_item.T)
             concat = torch.cat([z_user[i].expand(item_info.shape[0], z_user.shape[-1]), z_item], -1)
             pred = model['neuCF'](concat)
-            predict.append(pred.view(-1).numpy())
+            predict.append(pred.view(-1).cpu().numpy())
         return predict
 
 
