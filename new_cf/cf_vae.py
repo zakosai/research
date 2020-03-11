@@ -16,7 +16,7 @@ class DAE(nn.Module):
             sequence.append(nn.Linear(prev, layer))
             sequence.append(nn.ReLU())
             prev = layer
-        self.encoder = nn.Sequential(*sequence)
+        self.encoder = nn.Sequential(*sequence).cuda()
 
         # Decoder
         sequence = []
@@ -28,7 +28,7 @@ class DAE(nn.Module):
             prev = layer
         sequence.append(nn.Linear(prev, input_size))
         sequence.append(nn.Sigmoid())
-        self.decoder = nn.Sequential(*sequence)
+        self.decoder = nn.Sequential(*sequence).cuda()
 
     def reparameterize(self, mu, logvar):
         std = torch.exp(0.5 * logvar)
@@ -51,7 +51,7 @@ class MLP(nn.Module):
             sequence.append(nn.ReLU())
         sequence.append(nn.Linear(layers[-2], layers[-1]))
         sequence.append(nn.Sigmoid())
-        self.net = nn.Sequential(*sequence)
+        self.net = nn.Sequential(*sequence).cuda()
 
     def forward(self, x):
         return self.net(x)
