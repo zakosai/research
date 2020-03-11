@@ -146,13 +146,13 @@ def main(args):
         loss_gen, loss_pred = 0, 0
         for idx in range(0, len(tmp_train), batch_size):
             data = dataset.gen_batch(tmp_train[idx:idx+batch_size])
-            _loss_gen, _, _loss_pred = train(data, model, op, loss, 'gpu')
+            _loss_gen, _, _loss_pred = train(data, model, op, loss, 'cuda')
             loss_gen += _loss_gen
             loss_pred += _loss_pred
         print("Loss gen: %f loss_pred: %f "% (loss_gen/len(tmp_train), loss_pred/len(tmp_train)))
 
         # Test
-        predict = test((dataset.user_info, dataset.item_info), model, 'cpu')
+        predict = test((dataset.user_info, dataset.item_info), model, 'cuda')
         recall, map, right = recallK(dataset.train, dataset.test, predict)
         print("Test:　Recall@10: %f, mAP@10:%f "%(recall, map))
         if recall > best_result:
