@@ -138,19 +138,21 @@ def main(args):
 
     loss = {}
     loss['pred'] = nn.BCELoss(reduction='sum')
-    loss['item'] = nn.MSELoss()
-    loss['user'] = nn.MSELoss()
+    loss['item'] = nn.MSELoss(reduction='sum')
+    loss['user'] = nn.MSELoss(reduction='sum')
 
     best_result = 0
     for i in range(iter):
         tmp_train = dataset.gen_epoch()
-        loss_gen, loss_pred = 0, 0
+        loss_gen, loss_pred, loss_user = 0, 0, 0
         for idx in range(0, len(tmp_train), batch_size):
             data = dataset.gen_batch(tmp_train[idx:idx+batch_size])
-            _loss_gen, _, _loss_pred = train(data, model, op, loss, 'cuda')
+            _loss_gen, _loss_user, _loss_pred = train(data, model, op, loss, 'cuda')
             loss_gen += _loss_gen
             loss_pred += _loss_pred
-        print("Loss gen: %f loss_pred: %f "% (loss_gen/len(tmp_train), loss_pred/len(tmp_train)))
+            loss_user += _loss_user
+        print("Loss gen: %f, loss_user: %f, loss_pred: %f "%
+              (loss_gen/len(tmp_train), loss_user/len(tmp_train), loss_pred/len(tmp_train)))
 
         # Test
         predict = test((dataset.user_info, dataset.item_info), model, 'cuda')
