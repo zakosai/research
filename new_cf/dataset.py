@@ -50,7 +50,7 @@ class Dataset:
         for i in range(self.no_user):
             if len(self.train[i]) > 0:
                 user += [i] * len(self.train[i])
-                neg_item_tmp = set(range(self.no_item)) - set(self.train[i])
+                neg_item_tmp = list(set(range(self.no_item)) - set(self.train[i]))
                 neg_item_tmp = np.random.permutation(neg_item_tmp)[:len(self.train[i])]
                 neg_item += neg_item_tmp
                 pos_item += self.train[i]
