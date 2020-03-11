@@ -72,18 +72,18 @@ def train(data, model, op, loss, device):
     label = torch.from_numpy(data[2]).float().to(device)
 
     # # AutoEncoder - user
-    # op['user'].zero_grad()
-    # user_recon, z_user = model['user'](user_info)
-    # loss_user = loss_recon(user_recon, user_info)
-    # loss_user.backward()
-    # op['user'].step()
-    #
-    # # AutoEncoder - item
-    # op['item'].zero_grad()
-    # item_recon, z_item = model['item'](item_info)
-    # loss_item = loss_recon(item_recon, item_info)
-    # loss_item.backward()
-    # op['item'].step()
+    op['user'].zero_grad()
+    user_recon, z_user = model['user'](user_info)
+    loss_user = loss_recon(user_recon, user_info)
+    loss_user.backward()
+    op['user'].step()
+
+    # AutoEncoder - item
+    op['item'].zero_grad()
+    item_recon, z_item = model['item'](item_info)
+    loss_item = loss_recon(item_recon, item_info)
+    loss_item.backward()
+    op['item'].step()
 
     # Predict
     op['pred'].zero_grad()
@@ -98,7 +98,7 @@ def train(data, model, op, loss, device):
     predict_loss = loss['pred'](pred, label)
     predict_loss.backward()
     op['pred'].step()
-    return predict_loss.item(),  predict_loss.item(), predict_loss.item()
+    return loss_item.item(),  loss_user.item(), predict_loss.item()
 
 
 def test(data, model, device):
