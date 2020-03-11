@@ -152,8 +152,8 @@ def main(args):
 
         # Test
         predict = test((dataset.user_info, dataset.item_info), model, 'cuda')
-        recall, map, right = recallK(dataset.train, dataset.test, predict)
-        print("Test:　Recall@10: %f, mAP@10:%f "%(recall, map))
+        recall = recallK(dataset.train, dataset.test, predict)
+        print("Test:　Recall@10: %f "%(recall))
         if recall > best_result:
             best_result = recall
 
