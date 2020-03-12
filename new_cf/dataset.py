@@ -72,7 +72,8 @@ class Dataset:
         user = self.user_info[transaction_batch[:, 0]]
         user = np.concatenate((user, user, user))
         item = self.item_info[transaction_batch[:, 1:].flatten()]
-        label = np.concatenate((np.ones(len(transaction_batch)), np.zeros(len(transaction_batch))))
+        label = np.concatenate((np.ones(len(transaction_batch)),
+                                np.zeros(len(transaction_batch)), np.zeros(len(transaction_batch))))
 
         return user, item, label, transaction_batch
 
