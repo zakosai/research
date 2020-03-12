@@ -55,10 +55,12 @@ class MLP(nn.Module):
         sequence.append(nn.Sigmoid())
         self.net = nn.Sequential(*sequence).cuda()
 
-    def forward(self, x, user_ids, item_ids):
+    def forward(self, z_user, z_item, user_ids, item_ids):
         user_embd = self.embeddings_user(user_ids)
         item_embd = self.embeddings_item(item_ids)
-        _x = torch.cat((x, user_embd, item_embd), axis=-1)
+        user = z_user + user_embd
+        item = z_item + item_embd
+        _x = torch.cat((user, item), axis=-1)
         return self.net(_x)
 
 
@@ -100,7 +102,7 @@ def train(data, model, op, loss, device):
     # Simplest - Multiple
     # pred = torch.sum(z_user * z_item, dim=-1)
     # # NeuCF
-    pred = model['neuCF'](torch.cat([z_user, z_item], -1), user_ids, item_ids)
+    pred = model['neuCF'](z_user, z_item, user_ids, item_ids)
 
     # Loss
     predict_loss = loss['pred'](pred, label)
@@ -119,8 +121,9 @@ def test(data, model, device):
         predict = []
         for i in range(len(user_info)):
             # pred = torch.matmul(z_user, z_item.T)
-            concat = torch.cat([z_user[i].expand(item_info.shape[0], z_user.shape[-1]), z_item], -1)
-            pred = model['neuCF'](concat, torch.tensor([i]*z_item.shape[0], device=device),
+            # concat = torch.cat([z_user[i].expand(item_info.shape[0], z_user.shape[-1]), z_item], -1)
+            pred = model['neuCF'](z_user[i].expand(item_info.shape[0], z_user.shape[-1]), z_item,
+                                  torch.tensor([i]*z_item.shape[0], device=device),
                                   torch.tensor(range(z_item.shape[0]), device=device))
             predict.append(pred.view(-1).cpu().numpy())
         return predict
@@ -133,9 +136,9 @@ def main(args):
     dataset = Dataset(args.data_dir, args.data_type)
 
     model = {}
-    model['user'] = DAE(dataset.user_size, [200, 20])
-    model['item'] = DAE(dataset.item_size, [50, 20])
-    model['neuCF'] = MLP([140, 20, 1], 50, 50, dataset.no_user, dataset.no_item)
+    model['user'] = DAE(dataset.user_size, [200, 50])
+    model['item'] = DAE(dataset.item_size, [100, 50])
+    model['neuCF'] = MLP([100, 20, 1], 50, 50, dataset.no_user, dataset.no_item)
 
     op = {}
     op['user'] = torch.optim.Adam(model['user'].parameters(), lr=0.01)
