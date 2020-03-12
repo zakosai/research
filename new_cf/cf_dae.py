@@ -44,8 +44,8 @@ class DAE(nn.Module):
 class MLP(nn.Module):
     def __init__(self, layers, user_emb_dim, item_emb_dim, no_user, no_item):
         super(MLP, self).__init__()
-        self.embeddings_user = nn.Embedding(no_user, user_emb_dim)
-        self.embeddings_item = nn.Embedding(no_item, item_emb_dim)
+        self.embeddings_user = nn.Embedding(no_user, user_emb_dim).cuda()
+        self.embeddings_item = nn.Embedding(no_item, item_emb_dim).cuda()
 
         sequence = []
         for i in range(1, len(layers)-1):
