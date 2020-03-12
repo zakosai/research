@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.sparse import load_npz
+import pandas as pd
 import os
 
 
@@ -22,6 +23,13 @@ class Dataset:
         # self.user_info = np.concatenate((self.user_info, cf_data), axis=1)
         # self.item_size += self.no_user
         # self.user_size += self.no_item
+
+        # calculate score
+        self.transaction = pd.read_csv(data_dir + "review_info.txt", delimiter=', ')[['u_id', 'p_id', 'rating']]
+        self.transaction['train'] = False
+        for i in range(self.no_user):
+            self.transaction[self.transaction.u_id == i & self.transaction.p_id.isin(self.train[i])].train = True
+        self.transaction = self.transaction[self.transaction.train]
 
     def load_cvae_data(self, data_dir, data_type):
         data = {}
@@ -76,6 +84,11 @@ class Dataset:
                                 np.zeros(len(transaction_batch)), np.zeros(len(transaction_batch))))
 
         return user, item, label, transaction_batch
+
+    def gen_batch_rating(self, transaction_batch):
+        user = self.user_info[transaction_batch[:, 0]]
+        item = self.item_info[transaction_batch[:, 1]]
+        return user, item, transaction_batch[:, 2]
 
 
 def recallK(train, test, predict, k=50):
