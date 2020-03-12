@@ -31,6 +31,7 @@ class VAE(nn.Module):
             sequence.append(nn.Tanh())
             prev = layer
         sequence.append(nn.Linear(prev, input_size))
+        sequence.append(nn.Sigmoid())
         self.decoder = nn.Sequential(*sequence).cuda()
 
     def reparameterize(self, mu, logvar):
@@ -148,8 +149,8 @@ def main(args):
 
     loss = {}
     loss['pred'] = nn.BCELoss(reduction='sum')
-    loss['item'] = nn.MSELoss()
-    loss['user'] = nn.MSELoss()
+    loss['item'] = nn.BCELoss()
+    loss['user'] = nn.BCELoss()
 
     best_result = 0
     for i in range(iter):
