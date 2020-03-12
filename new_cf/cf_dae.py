@@ -120,7 +120,8 @@ def test(data, model, device):
         for i in range(len(user_info)):
             # pred = torch.matmul(z_user, z_item.T)
             concat = torch.cat([z_user[i].expand(item_info.shape[0], z_user.shape[-1]), z_item], -1)
-            pred = model['neuCF'](concat, torch.tensor([i]*z_item.shape[0]), torch.tensor(range(z_item.shape[0])))
+            pred = model['neuCF'](concat, torch.tensor([i]*z_item.shape[0], device=device),
+                                  torch.tensor(range(z_item.shape[0]), device=device))
             predict.append(pred.view(-1).cpu().numpy())
         return predict
 
