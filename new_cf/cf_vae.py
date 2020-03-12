@@ -97,8 +97,8 @@ def train(data, model, op, loss, device):
 
     # Predict
     op['pred'].zero_grad()
-    user_recon, z_user = model['user'](user_info)
-    item_recon, z_item = model['item'](item_info)
+    user_recon, z_user, _ = model['user'](user_info)
+    item_recon, z_item, _ = model['item'](item_info)
     # Simplest - Multiple
     # pred = torch.sum(z_user * z_item, dim=-1)
     # # NeuCF
