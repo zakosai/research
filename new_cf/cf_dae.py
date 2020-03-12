@@ -42,8 +42,10 @@ class DAE(nn.Module):
 
 
 class MLP(nn.Module):
-    def __init__(self, layers):
+    def __init__(self, layers, user_emb_dim, item_emb_dim, no_user, no_item):
         super(MLP, self).__init__()
+        self.embeddings_user = nn.Embedding(no_user, user_emb_dim)
+        self.embeddings_item = nn.Embedding(no_item, item_emb_dim)
 
         sequence = []
         for i in range(1, len(layers)-1):
@@ -53,8 +55,11 @@ class MLP(nn.Module):
         sequence.append(nn.Sigmoid())
         self.net = nn.Sequential(*sequence).cuda()
 
-    def forward(self, x):
-        return self.net(x)
+    def forward(self, x, user_ids, item_ids):
+        user_embd = self.embeddings_user(user_ids)
+        item_embd = self.embeddings_item(item_ids)
+        _x = torch.cat((x, user_embd, item_embd), axis=-1)
+        return self.net(_x)
 
 
 def loss_kl(mu, logvar):
@@ -124,9 +129,9 @@ def main(args):
     dataset = Dataset(args.data_dir, args.data_type)
 
     model = {}
-    model['user'] = DAE(dataset.user_size, [200, 100])
-    model['item'] = DAE(dataset.item_size, [200, 100])
-    model['neuCF'] = MLP([200, 50, 1])
+    model['user'] = DAE(dataset.user_size, [200, 20])
+    model['item'] = DAE(dataset.item_size, [50, 20])
+    model['neuCF'] = MLP([140, 20, 1], 50, 50, dataset.no_user, dataset.no_item)
 
     op = {}
     op['user'] = torch.optim.Adam(model['user'].parameters(), lr=0.01)
