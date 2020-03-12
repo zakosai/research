@@ -142,8 +142,8 @@ def main(args):
     op['user'] = torch.optim.Adam(model['user'].parameters(), lr=0.01)
     op['item'] = torch.optim.Adam(model['item'].parameters(), lr=0.01)
     pred_parameters = list(model['user'].encoder.parameters()) + list(model['user'].mu.parameters()) + \
-                        list(model['user'].sigma.parameters()) + list(model['item'].encoder.parameters()) + \
-                      list(model['item'].mu.parameters()) + list(model['item'].sigma.parameters()) + \
+                        list(model['user'].logvar.parameters()) + list(model['item'].encoder.parameters()) + \
+                      list(model['item'].mu.parameters()) + list(model['item'].logvar.parameters()) + \
                       list(model['neuCF'].parameters())
     op['pred'] = torch.optim.Adam(pred_parameters, lr=0.01)
 
