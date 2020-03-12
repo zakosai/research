@@ -79,7 +79,7 @@ class Dataset:
 
     def gen_batch(self, transaction_batch):
         user = self.user_info[transaction_batch[:, 0]]
-        user = np.concatenate((user, user, user))
+        user = np.concatenate((user, user))
         item = self.item_info[transaction_batch[:, 1:].flatten()]
         label = np.concatenate((np.ones(len(transaction_batch)),
                                 np.zeros(len(transaction_batch))))
