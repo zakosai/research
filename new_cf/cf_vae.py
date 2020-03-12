@@ -104,6 +104,7 @@ def train(data, model, op, loss, device):
     # # NeuCF
     pred = model['neuCF'](torch.cat([z_user, z_item], -1))
     pred = pred.clamp(0, 5)
+    print(pred)
 
     # Loss
     predict_loss = loss['pred'](pred, label)
@@ -161,7 +162,6 @@ def main(args):
         for idx in range(0, len(tmp_train), batch_size):
             data = dataset.gen_batch_rating(tmp_train[idx:idx+batch_size])
             _loss_gen, _loss_user, _loss_pred = train(data, model, op, loss, 'cuda')
-            print(_loss_pred)
             loss_gen += _loss_gen
             loss_pred += _loss_pred
             loss_user += _loss_user
