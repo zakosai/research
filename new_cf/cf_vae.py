@@ -103,7 +103,7 @@ def train(data, model, op, loss, device):
     # pred = torch.sum(z_user * z_item, dim=-1)
     # # NeuCF
     pred = model['neuCF'](torch.cat([z_user, z_item], -1)).view(-1)
-    pred = pred.clamp(0, 5)
+    # pred = pred.clamp(0, 5)
 
     # Loss
     predict_loss = loss['pred'](pred, label)
@@ -149,17 +149,17 @@ def main(args):
     op['pred'] = torch.optim.Adam(pred_parameters, lr=0.01)
 
     loss = {}
-    loss['pred'] = nn.MSELoss(reduction='sum')
+    loss['pred'] = nn.BCELoss(reduction='sum')
     loss['item'] = nn.BCELoss()
     loss['user'] = nn.BCELoss()
 
     best_result = 0
     for i in range(iter):
-        # tmp_train = dataset.gen_epoch()
-        tmp_train = np.random.permutation(dataset.transaction.values).astype('int')
+        tmp_train = dataset.gen_epoch()
+        # tmp_train = np.random.permutation(dataset.transaction.values).astype('int')
         loss_gen, loss_pred, loss_user = 0, 0, 0
         for idx in range(0, len(tmp_train), batch_size):
-            data = dataset.gen_batch_rating(tmp_train[idx:idx+batch_size])
+            data = dataset.gen_batch(tmp_train[idx:idx+batch_size])
             _loss_gen, _loss_user, _loss_pred = train(data, model, op, loss, 'cuda')
             loss_gen += _loss_gen
             loss_pred += _loss_pred
