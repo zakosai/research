@@ -143,9 +143,7 @@ def main(args):
     op = {}
     op['user'] = torch.optim.Adam(model['user'].parameters(), lr=0.01)
     op['item'] = torch.optim.Adam(model['item'].parameters(), lr=0.01)
-    pred_parameters = list(model['user'].encoder.parameters()) +\
-                      list(model['item'].encoder.parameters()) +\
-                        list(model['neuCF'].parameters())
+    pred_parameters = list(model['neuCF'].parameters())
     op['pred'] = torch.optim.Adam(pred_parameters, lr=0.01)
 
     loss = {}
