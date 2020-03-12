@@ -156,7 +156,7 @@ def main(args):
     best_result = 0
     for i in range(iter):
         # tmp_train = dataset.gen_epoch()
-        tmp_train = np.random.permutation(dataset.transaction.values)
+        tmp_train = np.random.permutation(dataset.transaction.values).astype('int')
         loss_gen, loss_pred, loss_user = 0, 0, 0
         for idx in range(0, len(tmp_train), batch_size):
             data = dataset.gen_batch_rating(tmp_train[idx:idx+batch_size])
@@ -165,7 +165,7 @@ def main(args):
             loss_pred += _loss_pred
             loss_user += _loss_user
         print("Loss gen: %f, loss_user: %f, loss_pred: %f "%
-              (loss_gen, loss_user, loss_pred/len(tmp_train)))
+              (loss_gen, loss_user, loss_pred))
 
         # Test
         predict = test((dataset.user_info, dataset.item_info), model, 'cuda')
