@@ -75,6 +75,7 @@ def train(data, model, op, loss, device):
     user_info = torch.from_numpy(data[0]).float().to(device)
     item_info = torch.from_numpy(data[1]).float().to(device)
     label = torch.from_numpy(data[2]).float().to(device)
+    transaction = torch.from_numpy(data[3]).to(device)
 
     # # AutoEncoder - user
     op['user'].zero_grad()
@@ -92,12 +93,14 @@ def train(data, model, op, loss, device):
 
     # Predict
     op['pred'].zero_grad()
+    user_ids = torch.cat((transaction[:, 0], transaction[:, 0]), axis=0).view(-1)
+    item_ids = torch.cat((transaction[:, 1], transaction[:, 2]), axis=0).view(-1)
     user_recon, z_user = model['user'](user_info)
     item_recon, z_item = model['item'](item_info)
     # Simplest - Multiple
     # pred = torch.sum(z_user * z_item, dim=-1)
     # # NeuCF
-    pred = model['neuCF'](torch.cat([z_user, z_item], -1))
+    pred = model['neuCF'](torch.cat([z_user, z_item], -1), user_ids, item_ids)
 
     # Loss
     predict_loss = loss['pred'](pred, label)
