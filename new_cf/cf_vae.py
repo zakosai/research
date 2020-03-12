@@ -5,18 +5,22 @@ import numpy as np
 import argparse
 
 
-class DAE(nn.Module):
+class VAE(nn.Module):
     def __init__(self, input_size, layers):
-        super(DAE, self).__init__()
+        super(VAE, self).__init__()
 
         # Encoder
         sequence = []
         prev = input_size
-        for layer in layers:
+        for layer in layers[:-1]:
             sequence.append(nn.Linear(prev, layer))
-            sequence.append(nn.Tanh())
+            sequence.append(nn.ReLU())
             prev = layer
-        self.encoder = nn.Sequential(*sequence).cuda()
+        self.encoder = nn.Sequential(*sequence)
+
+        # z layer
+        self.mu = nn.Sequential(nn.Linear(prev, layers[-1]), nn.ReLU())
+        self.logvar = nn.Sequential(nn.Linear(prev, layers[-1]), nn.ReLU())
 
         # Decoder
         sequence = []
@@ -24,11 +28,11 @@ class DAE(nn.Module):
         prev = layers[0]
         for layer in layers[1:]:
             sequence.append(nn.Linear(prev, layer))
-            sequence.append(nn.Tanh())
+            sequence.append(nn.ReLU())
             prev = layer
         sequence.append(nn.Linear(prev, input_size))
-        # sequence.append(nn.Sigmoid())
-        self.decoder = nn.Sequential(*sequence).cuda()
+        sequence.append(nn.LogSoftmax(dim=-1))
+        self.decoder = nn.Sequential(*sequence)
 
     def reparameterize(self, mu, logvar):
         std = torch.exp(0.5 * logvar)
@@ -37,8 +41,14 @@ class DAE(nn.Module):
 
     def forward(self, x):
         encoder = self.encoder(x)
-        output = self.decoder(encoder)
-        return output, encoder
+        mu, logvar = self.mu(encoder), self.logvar(encoder)
+        z = self.reparameterize(mu, logvar)
+        output = self.decoder(z)
+        loss_kl = self.loss_kl(mu, logvar)
+        return output, z, loss_kl
+
+    def loss_kl(self, mu, logvar):
+        return 0.5 * torch.mean(torch.sum(mu.pow(2) + logvar.exp() - logvar - 1, dim=-1))
 
 
 class MLP(nn.Module):
@@ -73,15 +83,15 @@ def train(data, model, op, loss, device):
 
     # # AutoEncoder - user
     op['user'].zero_grad()
-    user_recon, z_user = model['user'](user_info)
-    loss_user = loss['user'](user_recon, user_info)
+    user_recon, z_user, loss_kl_user = model['user'](user_info)
+    loss_user = 100 * loss['user'](user_recon, user_info) + loss_kl_user
     loss_user.backward()
     op['user'].step()
 
     # AutoEncoder - item
     op['item'].zero_grad()
-    item_recon, z_item = model['item'](item_info)
-    loss_item = loss['item'](item_recon, item_info)
+    item_recon, z_item, loss_kl_item = model['item'](item_info)
+    loss_item = 100 * loss['item'](item_recon, item_info) + loss_kl_item
     loss_item.backward()
     op['item'].step()
 
@@ -105,8 +115,8 @@ def test(data, model, device):
     with torch.no_grad():
         user_info = torch.from_numpy(data[0]).float().to(device)
         item_info = torch.from_numpy(data[1]).float().to(device)
-        user_recon, z_user = model['user'](user_info)
-        item_recon, z_item = model['item'](item_info)
+        user_recon, z_user, _ = model['user'](user_info)
+        item_recon, z_item, _ = model['item'](item_info)
 
         predict = []
         for i in range(len(user_info)):
@@ -124,17 +134,18 @@ def main(args):
     dataset = Dataset(args.data_dir, args.data_type)
 
     model = {}
-    model['user'] = DAE(dataset.user_size, [200, 100])
-    model['item'] = DAE(dataset.item_size, [200, 100])
+    model['user'] = VAE(dataset.user_size, [200, 100])
+    model['item'] = VAE(dataset.item_size, [200, 100])
     model['neuCF'] = MLP([200, 50, 1])
 
     op = {}
-    op['user'] = torch.optim.Adam(model['user'].parameters(), lr=0.001)
-    op['item'] = torch.optim.Adam(model['item'].parameters(), lr=0.001)
-    pred_parameters = list(model['user'].encoder.parameters()) +\
-                      list(model['item'].encoder.parameters()) +\
-                        list(model['neuCF'].parameters())
-    op['pred'] = torch.optim.Adam(pred_parameters, lr=0.001)
+    op['user'] = torch.optim.Adam(model['user'].parameters(), lr=0.01)
+    op['item'] = torch.optim.Adam(model['item'].parameters(), lr=0.01)
+    pred_parameters = list(model['user'].encoder.parameters()) + list(model['user'].mu.parameters()) + \
+                        list(model['user'].sigma.parameters()) + list(model['item'].encoder.parameters()) + \
+                      list(model['item'].mu.parameters()) + list(model['item'].sigma.parameters()) + \
+                      list(model['neuCF'].parameters())
+    op['pred'] = torch.optim.Adam(pred_parameters, lr=0.01)
 
     loss = {}
     loss['pred'] = nn.BCELoss(reduction='sum')
