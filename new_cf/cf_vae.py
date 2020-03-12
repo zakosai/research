@@ -134,9 +134,9 @@ def main(args):
     dataset = Dataset(args.data_dir, args.data_type)
 
     model = {}
-    model['user'] = VAE(dataset.user_size, [200, 100])
-    model['item'] = VAE(dataset.item_size, [200, 100])
-    model['neuCF'] = MLP([200, 50, 1])
+    model['user'] = VAE(dataset.user_size, [200, 100, 50])
+    model['item'] = VAE(dataset.item_size, [200, 100, 50])
+    model['neuCF'] = MLP([100, 50, 1])
 
     op = {}
     op['user'] = torch.optim.Adam(model['user'].parameters(), lr=0.01)
