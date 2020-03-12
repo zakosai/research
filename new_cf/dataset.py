@@ -25,14 +25,14 @@ class Dataset:
         # self.user_size += self.no_item
 
         # calculate score
-        self.transaction = list(open(data_dir + "review_info.txt"))
-        cols = self.transaction[0].split(', ')[:3]
-        self.transaction = [i.strip().split(', ')[:3] for i in self.transaction[1:]]
-        self.transaction = pd.DataFrame(self.transaction, columns=cols).astype('int')
-        self.transaction['train'] = False
-        for i in range(self.no_user):
-            self.transaction.train[(self.transaction.u_id == i) & (self.transaction.p_id.isin(self.train[i]))] = True
-        self.transaction = self.transaction[self.transaction.train]
+        # self.transaction = list(open(data_dir + "review_info.txt"))
+        # cols = self.transaction[0].split(', ')[:3]
+        # self.transaction = [i.strip().split(', ')[:3] for i in self.transaction[1:]]
+        # self.transaction = pd.DataFrame(self.transaction, columns=cols).astype('int')
+        # self.transaction['train'] = False
+        # for i in range(self.no_user):
+        #     self.transaction.train[(self.transaction.u_id == i) & (self.transaction.p_id.isin(self.train[i]))] = True
+        # self.transaction = self.transaction[self.transaction.train]
 
     def load_cvae_data(self, data_dir, data_type):
         data = {}
