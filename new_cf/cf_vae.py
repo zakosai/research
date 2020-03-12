@@ -14,13 +14,13 @@ class VAE(nn.Module):
         prev = input_size
         for layer in layers[:-1]:
             sequence.append(nn.Linear(prev, layer))
-            sequence.append(nn.ReLU())
+            sequence.append(nn.Tanh())
             prev = layer
         self.encoder = nn.Sequential(*sequence).cuda()
 
         # z layer
-        self.mu = nn.Sequential(nn.Linear(prev, layers[-1]), nn.ReLU()).cuda()
-        self.logvar = nn.Sequential(nn.Linear(prev, layers[-1]), nn.ReLU()).cuda()
+        self.mu = nn.Sequential(nn.Linear(prev, layers[-1])).cuda()
+        self.logvar = nn.Sequential(nn.Linear(prev, layers[-1])).cuda()
 
         # Decoder
         sequence = []
@@ -28,10 +28,9 @@ class VAE(nn.Module):
         prev = layers[0]
         for layer in layers[1:]:
             sequence.append(nn.Linear(prev, layer))
-            sequence.append(nn.ReLU())
+            sequence.append(nn.Tanh())
             prev = layer
         sequence.append(nn.Linear(prev, input_size))
-        sequence.append(nn.LogSoftmax(dim=-1))
         self.decoder = nn.Sequential(*sequence).cuda()
 
     def reparameterize(self, mu, logvar):
