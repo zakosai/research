@@ -75,7 +75,7 @@ class Dataset:
         item = np.concatenate((self.item_info[transaction_batch[:, 1]], self.item_info[transaction_batch[:, 2]]))
         label = np.concatenate((np.ones(len(transaction_batch)), np.zeros(len(transaction_batch))))
 
-        return user, item, label
+        return user, item, label, transaction_batch
 
 
 def recallK(train, test, predict, k=50):
