@@ -31,7 +31,7 @@ class Dataset:
         self.transaction = pd.DataFrame(self.transaction, columns=cols).astype('int')
         self.transaction['train'] = False
         for i in range(self.no_user):
-            self.transaction[self.transaction.u_id == i & self.transaction.p_id.isin(self.train[i])].train = True
+            self.transaction[(self.transaction.u_id == i) & (self.transaction.p_id.isin(self.train[i]))].train = True
         self.transaction = self.transaction[self.transaction.train]
 
     def load_cvae_data(self, data_dir, data_type):
