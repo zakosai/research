@@ -63,7 +63,7 @@ class Dataset:
                 neg_item_tmp = list(set(range(self.no_item)) - set(self.train[i]))
                 neg_item_tmp = np.random.permutation(neg_item_tmp)[:len(self.train[i]) * 2].tolist()
                 neg_item += neg_item_tmp[:len(self.train[i])]
-                neg_item_2 += neg_item_tmp[len(self.train[i])]
+                neg_item_2 += neg_item_tmp[len(self.train[i]):]
                 pos_item += self.train[i]
         train = np.column_stack((user, pos_item, neg_item, neg_item_2))
         return np.random.permutation(train)
