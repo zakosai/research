@@ -135,7 +135,7 @@ def main(args):
 
     model = {}
     model['user'] = VAE(dataset.user_size, [200, 100, 50])
-    model['item'] = VAE(dataset.item_size, [200, 100, 50])
+    model['item'] = VAE(dataset.item_size, [100, 50])
     model['neuCF'] = MLP([100, 50, 1])
 
     op = {}
