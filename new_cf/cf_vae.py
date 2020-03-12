@@ -16,11 +16,11 @@ class VAE(nn.Module):
             sequence.append(nn.Linear(prev, layer))
             sequence.append(nn.ReLU())
             prev = layer
-        self.encoder = nn.Sequential(*sequence)
+        self.encoder = nn.Sequential(*sequence).cuda()
 
         # z layer
-        self.mu = nn.Sequential(nn.Linear(prev, layers[-1]), nn.ReLU())
-        self.logvar = nn.Sequential(nn.Linear(prev, layers[-1]), nn.ReLU())
+        self.mu = nn.Sequential(nn.Linear(prev, layers[-1]), nn.ReLU()).cuda()
+        self.logvar = nn.Sequential(nn.Linear(prev, layers[-1]), nn.ReLU()).cuda()
 
         # Decoder
         sequence = []
@@ -32,7 +32,7 @@ class VAE(nn.Module):
             prev = layer
         sequence.append(nn.Linear(prev, input_size))
         sequence.append(nn.LogSoftmax(dim=-1))
-        self.decoder = nn.Sequential(*sequence)
+        self.decoder = nn.Sequential(*sequence).cuda()
 
     def reparameterize(self, mu, logvar):
         std = torch.exp(0.5 * logvar)
