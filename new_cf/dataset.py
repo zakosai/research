@@ -66,17 +66,15 @@ class Dataset:
     def gen_epoch(self):
         user = []
         neg_item = []
-        neg_item_2 = []
         pos_item = []
         for i in range(self.no_user):
             if len(self.train[i]) > 0:
                 user += [i] * len(self.train[i])
                 neg_item_tmp = list(set(range(self.no_item)) - set(self.train[i]))
-                neg_item_tmp = np.random.permutation(neg_item_tmp)[:len(self.train[i]) * 2].tolist()
+                neg_item_tmp = np.random.permutation(neg_item_tmp)[:len(self.train[i])].tolist()
                 neg_item += neg_item_tmp[:len(self.train[i])]
-                neg_item_2 += neg_item_tmp[len(self.train[i]):]
                 pos_item += self.train[i]
-        train = np.column_stack((user, pos_item, neg_item, neg_item_2))
+        train = np.column_stack((user, pos_item, neg_item))
         return np.random.permutation(train)
 
     def gen_batch(self, transaction_batch):
@@ -84,7 +82,7 @@ class Dataset:
         user = np.concatenate((user, user, user))
         item = self.item_info[transaction_batch[:, 1:].flatten()]
         label = np.concatenate((np.ones(len(transaction_batch)),
-                                np.zeros(len(transaction_batch)), np.zeros(len(transaction_batch))))
+                                np.zeros(len(transaction_batch))))
 
         return user, item, label, transaction_batch
 
