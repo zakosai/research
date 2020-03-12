@@ -56,11 +56,11 @@ class MLP(nn.Module):
         self.net = nn.Sequential(*sequence).cuda()
 
     def forward(self, z_user, z_item, user_ids, item_ids):
-        user_embd = self.embeddings_user(user_ids)
-        item_embd = self.embeddings_item(item_ids)
-        user = z_user + user_embd
-        item = z_item + item_embd
-        _x = torch.cat((user, item), axis=-1)
+        # user_embd = self.embeddings_user(user_ids)
+        # item_embd = self.embeddings_item(item_ids)
+        # user = z_user + user_embd
+        # item = z_item + item_embd
+        _x = torch.cat((z_user, z_item), axis=-1)
         return self.net(_x)
 
 
@@ -136,9 +136,9 @@ def main(args):
     dataset = Dataset(args.data_dir, args.data_type)
 
     model = {}
-    model['user'] = DAE(dataset.user_size, [200, 100])
-    model['item'] = DAE(dataset.item_size, [100, 100])
-    model['neuCF'] = MLP([200, 50, 1], 100, 100, dataset.no_user, dataset.no_item)
+    model['user'] = DAE(dataset.user_size, [200, 50])
+    model['item'] = DAE(dataset.item_size, [100, 50])
+    model['neuCF'] = MLP([100, 20, 1], 50, 50, dataset.no_user, dataset.no_item)
 
     op = {}
     op['user'] = torch.optim.Adam(model['user'].parameters(), lr=0.01)
