@@ -25,7 +25,10 @@ class Dataset:
         # self.user_size += self.no_item
 
         # calculate score
-        self.transaction = pd.read_csv(data_dir + "review_info.txt", delimiter=', ')[['u_id', 'p_id', 'rating']]
+        self.transaction = list(open(data_dir + "review_info.txt"))
+        cols = self.transaction[0].split(', ')[:3]
+        self.transaction = [i.strip().split(', ')[:3] for i in self.transaction[1:]]
+        self.transaction = pd.DataFrame(self.transaction, columns=cols)
         self.transaction['train'] = False
         for i in range(self.no_user):
             self.transaction[self.transaction.u_id == i & self.transaction.p_id.isin(self.train[i])].train = True
