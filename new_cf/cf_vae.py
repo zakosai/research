@@ -60,7 +60,7 @@ class MLP(nn.Module):
             sequence.append(nn.Linear(layers[i-1], layers[i]))
             sequence.append(nn.ReLU())
         sequence.append(nn.Linear(layers[-2], layers[-1]))
-        # sequence.append(nn.Sigmoid())
+        sequence.append(nn.Sigmoid())
         self.net = nn.Sequential(*sequence).cuda()
 
     def forward(self, x):
