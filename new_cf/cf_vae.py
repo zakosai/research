@@ -125,7 +125,7 @@ def main(args):
 
     model = {}
     model['user'] = DAE(dataset.user_size, [200, 100])
-    model['item'] = DAE(dataset.item_size, [200, 10])
+    model['item'] = DAE(dataset.item_size, [200, 100])
     model['neuCF'] = MLP([200, 50, 1])
 
     op = {}
