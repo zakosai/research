@@ -84,14 +84,14 @@ def train(data, model, op, loss, device):
     # # AutoEncoder - user
     op['user'].zero_grad()
     user_recon, z_user, loss_kl_user = model['user'](user_info)
-    loss_user = 100 * loss['user'](user_recon, user_info) + loss_kl_user
+    loss_user = loss['user'](user_recon, user_info) + 0.1 * loss_kl_user
     loss_user.backward()
     op['user'].step()
 
     # AutoEncoder - item
     op['item'].zero_grad()
     item_recon, z_item, loss_kl_item = model['item'](item_info)
-    loss_item = 100 * loss['item'](item_recon, item_info) + loss_kl_item
+    loss_item = loss['item'](item_recon, item_info) + 0.1 * loss_kl_item
     loss_item.backward()
     op['item'].step()
 
