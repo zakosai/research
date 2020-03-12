@@ -149,7 +149,7 @@ def main(args):
     op['pred'] = torch.optim.Adam(pred_parameters, lr=0.01)
 
     loss = {}
-    loss['pred'] = nn.MSELoss()
+    loss['pred'] = nn.MSELoss(reduction='sum')
     loss['item'] = nn.BCELoss()
     loss['user'] = nn.BCELoss()
 
@@ -165,7 +165,7 @@ def main(args):
             loss_pred += _loss_pred
             loss_user += _loss_user
         print("Loss gen: %f, loss_user: %f, loss_pred: %f "%
-              (loss_gen, loss_user, loss_pred))
+              (loss_gen, loss_user, loss_pred/len(tmp_train)))
 
         # Test
         predict = test((dataset.user_info, dataset.item_info), model, 'cuda')
