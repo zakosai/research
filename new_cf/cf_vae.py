@@ -102,9 +102,8 @@ def train(data, model, op, loss, device):
     # Simplest - Multiple
     # pred = torch.sum(z_user * z_item, dim=-1)
     # # NeuCF
-    pred = model['neuCF'](torch.cat([z_user, z_item], -1))
+    pred = model['neuCF'](torch.cat([z_user, z_item], -1)).view(-1)
     pred = pred.clamp(0, 5)
-    print(pred)
 
     # Loss
     predict_loss = loss['pred'](pred, label)
