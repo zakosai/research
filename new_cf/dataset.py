@@ -14,14 +14,14 @@ class Dataset:
         self.no_user, self.user_size = self.user_info.shape
 
         cf_data = self.gen_cf_matrix()
-        self.item_info = cf_data.T
-        self.user_info = cf_data
-        self.item_size = self.item_info.shape[1]
-        self.user_size = self.user_info.shape[1]
-        # self.item_info = np.concatenate((self.item_info, cf_data.T), axis=1)
-        # self.user_info = np.concatenate((self.user_info, cf_data), axis=1)
-        # self.item_size += self.no_user
-        # self.user_size += self.no_item
+        # self.item_info = cf_data.T
+        # self.user_info = cf_data
+        # self.item_size = self.item_info.shape[1]
+        # self.user_size = self.user_info.shape[1]
+        self.item_info = np.concatenate((self.item_info, cf_data.T), axis=1)
+        self.user_info = np.concatenate((self.user_info, cf_data), axis=1)
+        self.item_size += self.no_user
+        self.user_size += self.no_item
 
     def load_cvae_data(self, data_dir, data_type):
         data = {}
