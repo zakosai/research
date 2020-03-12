@@ -125,8 +125,8 @@ def main(args):
 
     model = {}
     model['user'] = DAE(dataset.user_size, [200, 100])
-    model['item'] = DAE(dataset.item_size, [100, 50])
-    model['neuCF'] = MLP([150, 20, 1])
+    model['item'] = DAE(dataset.item_size, [200, 10])
+    model['neuCF'] = MLP([200, 50, 1])
 
     op = {}
     op['user'] = torch.optim.Adam(model['user'].parameters(), lr=0.001)
@@ -138,8 +138,8 @@ def main(args):
 
     loss = {}
     loss['pred'] = nn.BCELoss(reduction='sum')
-    loss['item'] = nn.MSELoss(reduction='sum')
-    loss['user'] = nn.MSELoss(reduction='sum')
+    loss['item'] = nn.MSELoss()
+    loss['user'] = nn.MSELoss()
 
     best_result = 0
     for i in range(iter):
@@ -152,7 +152,7 @@ def main(args):
             loss_pred += _loss_pred
             loss_user += _loss_user
         print("Loss gen: %f, loss_user: %f, loss_pred: %f "%
-              (loss_gen/len(tmp_train), loss_user/len(tmp_train), loss_pred/len(tmp_train)))
+              (loss_gen, loss_user, loss_pred/len(tmp_train)))
 
         # Test
         predict = test((dataset.user_info, dataset.item_info), model, 'cuda')

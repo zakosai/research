@@ -13,6 +13,12 @@ class Dataset:
         self.no_item, self.item_size, = self.item_info.shape
         self.no_user, self.user_size = self.user_info.shape
 
+        cf_data = self.gen_cf_matrix()
+        self.item_info = np.concatenate((self.item_info, cf_data.T), axis=1)
+        self.user_info = np.concatenate((self.user_info, cf_data), axis=1)
+        self.item_size += self.no_user
+        self.user_size += self.no_item
+
     def load_cvae_data(self, data_dir, data_type):
         data = {}
         # variables = scipy.io.loadmat(data_dir + "mult_nor.mat")
@@ -41,6 +47,12 @@ class Dataset:
             else:
                 l = [int(x) for x in a[1:]]
             arr.append(l)
+        return arr
+
+    def gen_cf_matrix(self):
+        arr = np.zeros((self.no_user, self.no_item))
+        for i in range(self.no_user):
+            arr[i, self.train[i]] = 1
         return arr
 
     def gen_epoch(self):
