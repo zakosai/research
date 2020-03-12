@@ -44,8 +44,8 @@ class DAE(nn.Module):
 class MLP(nn.Module):
     def __init__(self, layers, user_emb_dim, item_emb_dim, no_user, no_item):
         super(MLP, self).__init__()
-        self.embeddings_user = nn.Embedding(no_user, user_emb_dim).cuda()
-        self.embeddings_item = nn.Embedding(no_item, item_emb_dim).cuda()
+        self.embeddings_user = nn.Embedding(no_user, user_emb_dim, scale_grad_by_freq=True).cuda()
+        self.embeddings_item = nn.Embedding(no_item, item_emb_dim, scale_grad_by_freq=True).cuda()
 
         sequence = []
         for i in range(1, len(layers)-1):
@@ -117,7 +117,6 @@ def test(data, model, device):
         item_info = torch.from_numpy(data[1]).float().to(device)
         user_recon, z_user = model['user'](user_info)
         item_recon, z_item = model['item'](item_info)
-        print(model['neuCF'].embeddings_user(torch.tensor([0,1], device=device)))
 
         predict = []
         for i in range(len(user_info)):
