@@ -157,7 +157,6 @@ def main(args):
     for i in range(iter):
         # tmp_train = dataset.gen_epoch()
         tmp_train = np.random.permutation(dataset.transaction.values).astype('int')
-        print(tmp_train[:5])
         loss_gen, loss_pred, loss_user = 0, 0, 0
         for idx in range(0, len(tmp_train), batch_size):
             data = dataset.gen_batch_rating(tmp_train[idx:idx+batch_size])
