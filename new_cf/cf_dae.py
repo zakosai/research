@@ -117,7 +117,7 @@ def test(data, model, device):
         item_info = torch.from_numpy(data[1]).float().to(device)
         user_recon, z_user = model['user'](user_info)
         item_recon, z_item = model['item'](item_info)
-        print(model['neuCF'].embeddings_user(0))
+        print(model['neuCF'].embeddings_user(torch.tensor([0,1], device=device)))
 
         predict = []
         for i in range(len(user_info)):
