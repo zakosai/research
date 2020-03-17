@@ -40,7 +40,7 @@ class VAE(nn.Module):
     def reparameterize(self, mu, logvar):
         std = torch.exp(logvar)
         eps = torch.randn_like(std)
-        return mu + torch.sqrt(torch.max(std, 1e-10)) * eps
+        return mu + torch.sqrt(std.clamp_min(1e-10)) * eps
 
     def forward(self, x):
         encoder = self.encoder(x)
