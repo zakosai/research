@@ -152,7 +152,7 @@ def main(args):
     op['pred'] = torch.optim.Adam(pred_parameters, lr=0.01)
 
     loss = {}
-    loss['pred'] = nn.BCELoss()
+    loss['pred'] = nn.CrossEntropyLoss()
     loss['item'] = nn.MSELoss()
     loss['user'] = nn.MSELoss()
 
