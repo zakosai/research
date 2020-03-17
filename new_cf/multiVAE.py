@@ -124,7 +124,7 @@ def main(args):
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
 
-    for i in range(1, 30):
+    for i in range(1, 100):
         loss_user, loss_item = 0, 0
         shuffle_idx = np.random.permutation(range(dataset.no_user))
         for j in range(int(len(shuffle_idx) / batch_size)):
