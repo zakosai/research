@@ -128,7 +128,7 @@ def train_user(data, model, op, loss, device):
 
 
 def train_item(data, model, op, loss, device):
-    item_info = torch.from_numpy(data[1]).float().to(device)
+    item_info = torch.from_numpy(data).float().to(device)
     op['item'].zero_grad()
     item_recon, z_item, loss_kl_item = model['item'](item_info)
     loss_item = loss['item'](item_recon, item_info) + 0.01 * loss_kl_item
@@ -214,8 +214,7 @@ def main(args):
 
         tmp_user = np.random.permutation(range(dataset.no_user))
         for i in range(0, dataset.no_user, batch_size):
-            loss_trans += train_item([dataset.transaction[tmp_user[i:i+batch_size]]],
-                                    model, op, loss, 'cuda')
+            loss_trans += train_item([dataset.transaction[tmp_user[i:i+batch_size]], dataset.user_info[tmp_user[i:i+batch_size]], dataset.item_info], model, op, loss, 'cuda')
 
         # Test
         predict = test((dataset.user_info, dataset.item_info, dataset.transaction), model, 'cuda')
