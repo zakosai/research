@@ -192,7 +192,7 @@ def main(args):
                         list(model['user'].logvar.parameters()) + list(model['item'].encoder.parameters()) + \
                       list(model['item'].mu.parameters()) + list(model['item'].logvar.parameters()) + \
                       list(model['neuCF'].parameters())
-    op['pred'] = torch.optim.Adam(model['neuCF'], lr=0.01)
+    op['pred'] = torch.optim.Adam(model['neuCF'].parameters(), lr=0.01)
 
     loss = {}
     loss['pred'] = nn.BCELoss(reduction='sum')
