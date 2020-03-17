@@ -117,6 +117,7 @@ def test(data, model, device):
         item_info = torch.from_numpy(data[1]).float().to(device)
         user_recon, z_user = model['user'](user_info)
         item_recon, z_item = model['item'](item_info)
+        rating = torch.Tensor(range(1,6)).T.long()
 
         predict = []
         for i in range(len(user_info)):
@@ -125,9 +126,8 @@ def test(data, model, device):
             pred = model['neuCF'](z_user[i].expand(item_info.shape[0], z_user.shape[-1]), z_item,
                                   torch.tensor([i]*z_item.shape[0], device=device),
                                   torch.tensor(range(z_item.shape[0]), device=device))
-            pred = pred.cpu().numpy()
-            pred = [[sum(pred[i, j] * (j+1) for j in range(5)) for i in range(len(pred))]]
-            predict.append(pred)
+            pred = torch.matmul(pred, rating)
+            predict.append(pred.cpu().numpy())
 
         return predict
 
