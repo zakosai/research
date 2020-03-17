@@ -33,8 +33,7 @@ class VAE(nn.Module):
         sequence.append(nn.Linear(prev, input_size))
         if not last_layer:
             sequence.append(nn.Sigmoid())
-        else:
-            sequence.append(nn.LogSoftmax())
+
         self.decoder = nn.Sequential(*sequence).cuda()
 
     def reparameterize(self, mu, logvar):
@@ -78,7 +77,8 @@ def loss_kl(mu, logvar):
 
 
 def loss_recon(x_recon, x):
-    neg_ll = -torch.mean(torch.sum(x_recon * x, dim=-1))
+    log_var = torch.log_softmax(x_recon)
+    neg_ll = -torch.mean(torch.sum(log_var * x, dim=-1))
     return neg_ll
 
 
