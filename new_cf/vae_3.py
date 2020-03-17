@@ -20,8 +20,8 @@ class VAE(nn.Module):
         self.encoder = nn.Sequential(*sequence).cuda()
 
         # z layer
-        self.mu = nn.Sequential(nn.Linear(prev, layers[-1])).cuda()
-        self.logvar = nn.Sequential(nn.Linear(prev, layers[-1])).cuda()
+        self.mu = nn.Sequential(nn.Linear(prev, layers[-1]), nn.Tanh()).cuda()
+        self.logvar = nn.Sequential(nn.Linear(prev, layers[-1]), nn.Tanh()).cuda()
 
         # Decoder
         sequence = []
