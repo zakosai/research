@@ -52,7 +52,7 @@ class MLP(nn.Module):
             sequence.append(nn.Linear(layers[i-1], layers[i]))
             sequence.append(nn.ReLU())
         sequence.append(nn.Linear(layers[-2], layers[-1]))
-        sequence.append(nn.Sigmoid())
+        # sequence.append(nn.Sigmoid())
         self.net = nn.Sequential(*sequence).cuda()
 
     def forward(self, z_user, z_item, user_ids=None, item_ids=None):
@@ -76,7 +76,7 @@ def loss_recon(x_recon, x):
 def train(data, model, op, loss, device):
     user_info = torch.from_numpy(data[0]).float().to(device)
     item_info = torch.from_numpy(data[1]).float().to(device)
-    label = torch.from_numpy(data[2]).float().to(device)
+    label = torch.from_numpy(data[2]).long().to(device)
     # transaction = torch.from_numpy(data[3]).to(device)
 
     # # AutoEncoder - user
