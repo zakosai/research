@@ -1,5 +1,6 @@
 import tensorflow as tf
 from tensorflow.contrib.layers import fully_connected, flatten, batch_norm
+from keras.backend import binary_crossentropy
 from dataset import Dataset, recallK
 import numpy as np
 import os
@@ -7,23 +8,20 @@ import argparse
 
 
 class Translation:
-    def __init__(self, batch_size, dim, encode_dim, decode_dim, z_dim, eps=1e-10,
-                 lambda_0=10, lambda_1=0.1, lambda_2=100,
-                 lambda_3=0.1,
-                 lambda_4=100, learning_rate=1e-4):
+    def __init__(self, batch_size, dim, user_info_dim, item_info_dim, encode_dim, decode_dim, z_dim, eps=1e-10,
+                 lambda_1=0.1, lambda_2=100, learning_rate=1e-4):
         self.batch_size = batch_size
         self.dim = dim
         self.encode_dim = encode_dim
         self.decode_dim = decode_dim
         self.z_dim = z_dim
         self.eps = eps
-        self.lambda_0 = lambda_0
         self.lambda_1 = lambda_1
         self.lambda_2 = lambda_2
-        self.lambda_3 = lambda_3
-        self.lambda_4 = lambda_4
         self.learning_rate = learning_rate
         self.active_function = tf.nn.tanh
+        self.user_info_dim = user_info_dim
+        self.item_info_dim = item_info_dim
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
@@ -60,14 +58,13 @@ class Translation:
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
         return z, z_mu, z_sigma
 
-    def encode(self, x, dim):
-        h = self.enc(x, "encode", dim)
-        z, z_mu, z_sigma = self.gen_z(h, "VAE")
-        return z, z_mu, z_sigma
-
-    def decode(self, x, dim):
-        y = self.dec(x, "decode", dim)
-        return y
+    def vae(self, x, encode_dim, decode_dim, scope, reuse=False):
+        with tf.variable_scope(scope, reuse=reuse):
+            h = self.enc(x, "encode", encode_dim)
+            z, z_mu, z_sigma = self.gen_z(h, "VAE")
+            loss_kl = self.loss_kl(z_mu, z_sigma)
+            y = self.dec(z_mu, "decode", decode_dim)
+        return z, y, loss_kl
 
     def loss_kl(self, mu, sigma):
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
@@ -83,20 +80,30 @@ class Translation:
 
     def build_model(self):
         self.x = tf.placeholder(tf.float32, [None, self.dim], name='input')
+        self.user_info = tf.placeholder(tf.float32, [None, self.user_info_dim], name='user_info')
+        self.item_info = tf.placeholder(tf.float32, [None, self.item_info_dim], name='item_info')
 
-        x = self.x
+        # VAE for user
+        user_recon, z_user, loss_kl_user = self.vae(self.user_info, [100], [100, self.user_info_dim], "user")
+        self.loss_user = self.lambda_2 * tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon), axis=1)) +\
+            self.lambda_1 * loss_kl_user + tf.losses.get_regularization_loss()
 
-        # VAE for domain A
-        z, z_mu, z_sigma = self.encode(x, self.encode_dim)
-        x_recon = self.decode(z, self.decode_dim)
-        self.x_recon = x_recon
+        # VAE for item
+        item_recon, z_item, loss_kl_item = self.vae(self.item_info, [200], [200, self.item_info_dim], "item")
+        self.loss_item = self.lambda_2 * tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon),
+                                                                      axis=1)) + self.lambda_1 * loss_kl_user + tf.losses.get_regularization_loss()
 
+        content_matrix = tf.matmul(z_user, z_item.T)
+        x = self.x * content_matrix
+        # VAE for CF
+        self.x_recon, _, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         # Loss VAE
-        self.loss = self.lambda_1 * self.loss_kl(z_mu, z_sigma) + self.lambda_2 * self.loss_reconstruct(x,
-                                                                                                        x_recon) + \
+        self.loss = self.lambda_1 * loss_kl + self.lambda_2 * self.loss_reconstruct(x, self.x_recon) + \
                     tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
+        self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
+        self.train_op_item = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_item)
 
 
 def main(args):
@@ -109,20 +116,33 @@ def main(args):
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
-    saver = tf.train.Saver(max_to_keep=3)
-    max_recall = 0
 
     for i in range(1, iter):
+        shuffle_idx = np.random.permutation(range(dataset.no_user))
+        for j in range(int(len(shuffle_idx) / batch_size)):
+            list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
+            x = dataset.user_info[list_idx]
+            feed = {model.user_info: x}
+            _, loss_user = sess.run([model.train_op_user, model.loss_user], feed_dict=feed)
+
+        shuffle_idx = np.random.permutation(range(dataset.no_item))
+        for j in range(int(len(shuffle_idx) / batch_size)):
+            list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
+            x = dataset.item_info[list_idx]
+            feed = {model.item_info: x}
+            _, loss_item = sess.run([model.train_op_item, model.loss_item], feed_dict=feed)
+
         shuffle_idx = np.random.permutation(range(len(dataset.transaction)))
-        train_cost = 0
         for j in range(int(len(shuffle_idx)/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             x = dataset.transaction[list_idx]
-            feed = {model.x: x}
+            feed = {model.x: x,
+                    model.user_info: dataset.user_info[list_idx],
+                    model.item_info: dataset.item_info}
 
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
-        print("loss: %f", loss)
+        print("loss user: %f, loss item: %f, loss pred: %f"%(loss_user, loss_item, loss))
 
         # Validation Process
         if i%10 == 0:
