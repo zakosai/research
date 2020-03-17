@@ -15,13 +15,13 @@ class VAE(nn.Module):
         prev = input_size
         for layer in layers[:-1]:
             sequence.append(nn.Linear(prev, layer))
-            sequence.append(nn.Tanh())
+            sequence.append(nn.ReLU())
             prev = layer
         self.encoder = nn.Sequential(*sequence).cuda()
 
         # z layer
-        self.mu = nn.Sequential(nn.Linear(prev, layers[-1]), nn.Tanh()).cuda()
-        self.logvar = nn.Sequential(nn.Linear(prev, layers[-1]), nn.Tanh()).cuda()
+        self.mu = nn.Sequential(nn.Linear(prev, layers[-1]), nn.ReLU()).cuda()
+        self.logvar = nn.Sequential(nn.Linear(prev, layers[-1]), nn.ReLU()).cuda()
 
         # Decoder
         sequence = []
@@ -29,7 +29,7 @@ class VAE(nn.Module):
         prev = layers[0]
         for layer in layers[1:]:
             sequence.append(nn.Linear(prev, layer))
-            sequence.append(nn.Tanh())
+            sequence.append(nn.ReLU())
             prev = layer
         sequence.append(nn.Linear(prev, input_size))
         # if not last_layer:
