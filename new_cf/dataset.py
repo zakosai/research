@@ -41,10 +41,10 @@ class Dataset:
         data["content"] = variables.toarray()
         user = np.load(os.path.join(data_dir, "user_info_%s.npy" % data_type))
         data["user"] = user
-        data["train_users"] = self.load_rating(data_dir + "cf-train-%sp-users.dat" % data_type)
-        data["train_items"] = self.load_rating(data_dir + "cf-train-%sp-items.dat" % data_type)
-        data["test_users"] = self.load_rating(data_dir + "cf-test-%sp-users.dat" % data_type)
-        data["test_items"] = self.load_rating(data_dir + "cf-test-%sp-items.dat" % data_type)
+        data["train_users"] = self.load_rating(data_dir + "cf-train-%s-users.dat" % data_type)
+        data["train_items"] = self.load_rating(data_dir + "cf-train-%s-items.dat" % data_type)
+        data["test_users"] = self.load_rating(data_dir + "cf-test-%s-users.dat" % data_type)
+        data["test_items"] = self.load_rating(data_dir + "cf-test-%s-items.dat" % data_type)
         return data
 
     def load_rating(self, path):
