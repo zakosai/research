@@ -217,7 +217,7 @@ def main(args):
             loss_trans += train_cf([dataset.transaction[tmp_user[i:i+batch_size]], dataset.user_info[tmp_user[i:i+batch_size]], dataset.item_info], model, op, 'cuda')
 
         # Test
-        predict = test((dataset.user_info, dataset.item_info, dataset.transaction), model, 'cuda')
+        predict = test((dataset.user_info, dataset.item_info, dataset.transaction), model, 'cuda', batch_size)
         recall = recallK(dataset.train, dataset.test, predict, 10)
         print("Test:　Recall@10: %f "%(recall))
         if recall > best_result:
