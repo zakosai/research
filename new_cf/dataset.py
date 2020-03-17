@@ -32,7 +32,7 @@ class Dataset:
         self.transaction['train'] = False
         for i in range(self.no_user):
             self.transaction.train[(self.transaction.u_id == i) & (self.transaction.p_id.isin(self.train[i]))] = True
-        self.transaction = self.transaction[self.transaction.train]
+        self.transaction = self.transaction[self.transaction.train][cols].to_numpy()
 
     def load_cvae_data(self, data_dir, data_type):
         data = {}
