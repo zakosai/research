@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from dataset import Dataset, recallK
 import numpy as np
 import argparse
@@ -77,7 +78,7 @@ def loss_kl(mu, logvar):
 
 
 def loss_recon(x_recon, x):
-    log_var = torch.nn.functional.log_softmax(x_recon)
+    log_var = F.log_softmax(x_recon)
     neg_ll = -torch.mean(torch.sum(log_var * x, dim=-1))
     return neg_ll
 
@@ -147,6 +148,7 @@ def train_cf(data, model, op, device):
     _, z_item, _ = model['item'](item_info)
 
     content_matrix = torch.matmul(z_user, z_item.T)
+    content_matrix = F.normalize(content_matrix, dim=-1)
     transaction = user_transaction * content_matrix
     trans_recon, _, loss_kl = model['neuCF'](transaction)
     loss = loss_recon(trans_recon, transaction) + 0.01 * loss_kl
@@ -164,6 +166,7 @@ def test(data, model, device, batch_size):
         user_recon, z_user, _ = model['user'](user_info)
         item_recon, z_item, _ = model['item'](item_info)
         content_matrix = torch.matmul(z_user, z_item.T)
+        content_matrix = F.normalize(content_matrix, dim=-1)
         transaction = content_matrix * user_transaction
 
         predict = []
