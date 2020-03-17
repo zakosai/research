@@ -140,17 +140,17 @@ def train_item(data, model, op, loss, device):
 
 def train_cf(data, model, op, device):
     user_transaction = torch.from_numpy(data[0]).float().to(device)
-    user_info = torch.from_numpy(data[1]).float().to(device)
-    item_info = torch.from_numpy(data[2]).float().to(device)
-
-    op['pred'].zero_grad()
-    _, z_user, _ = model['user'](user_info)
-    _, z_item, _ = model['item'](item_info)
-
-    content_matrix = torch.matmul(z_user, z_item.T)
-    content_matrix = F.normalize(content_matrix, dim=-1)
-    transaction = user_transaction * content_matrix
-    trans_recon, _, loss_kl = model['neuCF'](transaction)
+    # user_info = torch.from_numpy(data[1]).float().to(device)
+    # item_info = torch.from_numpy(data[2]).float().to(device)
+    #
+    # op['pred'].zero_grad()
+    # _, z_user, _ = model['user'](user_info)
+    # _, z_item, _ = model['item'](item_info)
+    #
+    # content_matrix = torch.matmul(z_user, z_item.T)
+    # content_matrix = F.normalize(content_matrix, dim=-1)
+    # transaction = user_transaction * content_matrix
+    trans_recon, _, loss_kl = model['neuCF'](user_transaction)
     loss = loss_recon(trans_recon, user_transaction) + 0.01 * loss_kl
     loss.backward()
     op['pred'].step()
