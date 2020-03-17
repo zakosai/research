@@ -183,7 +183,7 @@ def main(args):
     model = {}
     model['user'] = VAE(dataset.user_size, [200, 100, 50])
     model['item'] = VAE(dataset.item_size, [100, 50])
-    model['neuCF'] = VAE(dataset.no_item, [50, dataset.no_item])
+    model['neuCF'] = VAE(dataset.no_item, [50, dataset.no_item], nn.LogSoftmax())
 
     op = {}
     op['user'] = torch.optim.Adam(model['user'].parameters(), lr=0.01)
@@ -215,6 +215,8 @@ def main(args):
         tmp_user = np.random.permutation(range(dataset.no_user))
         for i in range(0, dataset.no_user, batch_size):
             loss_trans += train_cf([dataset.transaction[tmp_user[i:i+batch_size]], dataset.user_info[tmp_user[i:i+batch_size]], dataset.item_info], model, op, 'cuda')
+
+        print("Loss user: %f, loss_item: %f, loss_pred: %f " % (loss_user, loss_item, loss_trans))
 
         # Test
         predict = test((dataset.user_info, dataset.item_info, dataset.transaction), model, 'cuda', batch_size)
