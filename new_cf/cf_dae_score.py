@@ -14,7 +14,7 @@ class DAE(nn.Module):
         prev = input_size
         for layer in layers:
             sequence.append(nn.Linear(prev, layer))
-            sequence.append(nn.ReLU())
+            sequence.append(nn.Tanh())
             prev = layer
         self.encoder = nn.Sequential(*sequence).cuda()
 
@@ -24,10 +24,10 @@ class DAE(nn.Module):
         prev = layers[0]
         for layer in layers[1:]:
             sequence.append(nn.Linear(prev, layer))
-            sequence.append(nn.ReLU())
+            sequence.append(nn.Tanh())
             prev = layer
         sequence.append(nn.Linear(prev, input_size))
-        # sequence.append(nn.Sigmoid())
+        sequence.append(nn.Sigmoid())
         self.decoder = nn.Sequential(*sequence).cuda()
 
     def reparameterize(self, mu, logvar):
@@ -50,7 +50,7 @@ class MLP(nn.Module):
         sequence = []
         for i in range(1, len(layers)-1):
             sequence.append(nn.Linear(layers[i-1], layers[i]))
-            sequence.append(nn.ReLU())
+            sequence.append(nn.Tanh())
         sequence.append(nn.Linear(layers[-2], layers[-1]))
         # sequence.append(nn.Sigmoid())
         self.net = nn.Sequential(*sequence).cuda()
