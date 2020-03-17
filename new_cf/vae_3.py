@@ -151,7 +151,7 @@ def train_cf(data, model, op, device):
     content_matrix = F.normalize(content_matrix, dim=-1)
     transaction = user_transaction * content_matrix
     trans_recon, _, loss_kl = model['neuCF'](transaction)
-    loss = loss_recon(trans_recon, transaction) + 0.01 * loss_kl
+    loss = loss_recon(trans_recon, user_transaction) + 0.01 * loss_kl
     loss.backward()
     op['pred'].step()
 
