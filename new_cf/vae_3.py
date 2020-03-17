@@ -214,7 +214,7 @@ def main(args):
 
         tmp_user = np.random.permutation(range(dataset.no_user))
         for i in range(0, dataset.no_user, batch_size):
-            loss_trans += train_item([dataset.transaction[tmp_user[i:i+batch_size]], dataset.user_info[tmp_user[i:i+batch_size]], dataset.item_info], model, op, loss, 'cuda')
+            loss_trans += train_cf([dataset.transaction[tmp_user[i:i+batch_size]], dataset.user_info[tmp_user[i:i+batch_size]], dataset.item_info], model, op, 'cuda')
 
         # Test
         predict = test((dataset.user_info, dataset.item_info, dataset.transaction), model, 'cuda')
