@@ -117,7 +117,7 @@ def test(data, model, device):
         item_info = torch.from_numpy(data[1]).float().to(device)
         user_recon, z_user = model['user'](user_info)
         item_recon, z_item = model['item'](item_info)
-        rating = torch.Tensor(range(1,6)).T.long()
+        rating = torch.Tensor(range(1,6)).T.long().to(device)
 
         predict = []
         for i in range(len(user_info)):
