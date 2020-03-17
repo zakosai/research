@@ -77,7 +77,7 @@ def loss_kl(mu, logvar):
 
 
 def loss_recon(x_recon, x):
-    log_var = torch.log_softmax(x_recon)
+    log_var = torch.nn.functional.log_softmax(x_recon)
     neg_ll = -torch.mean(torch.sum(log_var * x, dim=-1))
     return neg_ll
 
