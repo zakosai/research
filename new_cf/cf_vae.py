@@ -14,7 +14,7 @@ class VAE(nn.Module):
         prev = input_size
         for layer in layers[:-1]:
             sequence.append(nn.Linear(prev, layer))
-            sequence.append(nn.Tanh())
+            sequence.append(nn.ReLU())
             prev = layer
         self.encoder = nn.Sequential(*sequence).cuda()
 
@@ -28,7 +28,7 @@ class VAE(nn.Module):
         prev = layers[0]
         for layer in layers[1:]:
             sequence.append(nn.Linear(prev, layer))
-            sequence.append(nn.Tanh())
+            sequence.append(nn.ReLU())
             prev = layer
         sequence.append(nn.Linear(prev, input_size))
         sequence.append(nn.Sigmoid())
@@ -84,14 +84,14 @@ def train(data, model, op, loss, device):
     # # AutoEncoder - user
     op['user'].zero_grad()
     user_recon, z_user, loss_kl_user = model['user'](user_info)
-    loss_user = loss['user'](user_recon, user_info) + 0.1 * loss_kl_user
+    loss_user = loss['user'](user_recon, user_info) + 0.01 * loss_kl_user
     loss_user.backward()
     op['user'].step()
 
     # AutoEncoder - item
     op['item'].zero_grad()
     item_recon, z_item, loss_kl_item = model['item'](item_info)
-    loss_item = loss['item'](item_recon, item_info) + 0.1 * loss_kl_item
+    loss_item = loss['item'](item_recon, item_info) + 0.01 * loss_kl_item
     loss_item.backward()
     op['item'].step()
 
