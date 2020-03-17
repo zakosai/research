@@ -14,25 +14,25 @@ class Dataset:
         self.no_item, self.item_size, = self.item_info.shape
         self.no_user, self.user_size = self.user_info.shape
 
-        cf_data = self.gen_cf_matrix()
+        # cf_data = self.gen_cf_matrix()
         # self.item_info = cf_data.T
         # self.user_info = cf_data
         # self.item_size = self.item_info.shape[1]
         # self.user_size = self.user_info.shape[1]
-        self.item_info = np.concatenate((self.item_info, cf_data.T), axis=1)
-        self.user_info = np.concatenate((self.user_info, cf_data), axis=1)
-        self.item_size += self.no_user
-        self.user_size += self.no_item
+        # self.item_info = np.concatenate((self.item_info, cf_data.T), axis=1)
+        # self.user_info = np.concatenate((self.user_info, cf_data), axis=1)
+        # self.item_size += self.no_user
+        # self.user_size += self.no_item
 
         # calculate score
-        # self.transaction = list(open(data_dir + "review_info.txt"))
-        # cols = self.transaction[0].split(', ')[:3]
-        # self.transaction = [i.strip().split(', ')[:3] for i in self.transaction[1:]]
-        # self.transaction = pd.DataFrame(self.transaction, columns=cols).astype('int')
-        # self.transaction['train'] = False
-        # for i in range(self.no_user):
-        #     self.transaction.train[(self.transaction.u_id == i) & (self.transaction.p_id.isin(self.train[i]))] = True
-        # self.transaction = self.transaction[self.transaction.train]
+        self.transaction = list(open(data_dir + "review_info.txt"))
+        cols = self.transaction[0].split(', ')[:3]
+        self.transaction = [i.strip().split(', ')[:3] for i in self.transaction[1:]]
+        self.transaction = pd.DataFrame(self.transaction, columns=cols).astype('int')
+        self.transaction['train'] = False
+        for i in range(self.no_user):
+            self.transaction.train[(self.transaction.u_id == i) & (self.transaction.p_id.isin(self.train[i]))] = True
+        self.transaction = self.transaction[self.transaction.train]
 
     def load_cvae_data(self, data_dir, data_type):
         data = {}
