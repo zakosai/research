@@ -163,11 +163,11 @@ def test(data, model, device, batch_size):
         user_info = torch.from_numpy(data[0]).float().to(device)
         item_info = torch.from_numpy(data[1]).float().to(device)
         user_transaction = torch.from_numpy(data[2]).float().to(device)
-        user_recon, z_user, _ = model['user'](user_info)
-        item_recon, z_item, _ = model['item'](item_info)
-        content_matrix = torch.matmul(z_user, z_item.T)
-        content_matrix = F.normalize(content_matrix, dim=-1)
-        transaction = content_matrix * user_transaction
+        # user_recon, z_user, _ = model['user'](user_info)
+        # item_recon, z_item, _ = model['item'](item_info)
+        # content_matrix = torch.matmul(z_user, z_item.T)
+        # content_matrix = F.normalize(content_matrix, dim=-1)
+        transaction = user_transaction
 
         predict = []
         for i in range(0, len(user_info), batch_size):
