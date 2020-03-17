@@ -142,7 +142,7 @@ def train_cf(data, model, op, device):
     user_info = torch.from_numpy(data[1]).float().to(device)
     item_info = torch.from_numpy(data[2]).float().to(device)
 
-    op['neuCF'].zero_grad()
+    op['pred'].zero_grad()
     _, z_user, _ = model['user'](user_info)
     _, z_item, _ = model['item'](item_info)
 
@@ -151,7 +151,7 @@ def train_cf(data, model, op, device):
     trans_recon, _, loss_kl = model['neuCF'](transaction)
     loss = loss_recon(trans_recon, transaction) + 0.01 * loss_kl
     loss.backward()
-    op['neuCF'].step()
+    op['pred'].step()
 
     return loss.item()
 
