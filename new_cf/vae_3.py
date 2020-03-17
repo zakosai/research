@@ -186,7 +186,7 @@ def main(args):
     model = {}
     model['user'] = VAE(dataset.user_size, [200, 100, 50])
     model['item'] = VAE(dataset.item_size, [100, 50])
-    model['neuCF'] = VAE(dataset.no_item, [600, 200], nn.LogSoftmax())
+    model['neuCF'] = VAE(dataset.no_item, [600, 200, 50], nn.LogSoftmax())
 
     op = {}
     op['user'] = torch.optim.Adam(model['user'].parameters(), lr=0.01)
