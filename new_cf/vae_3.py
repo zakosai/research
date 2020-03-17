@@ -15,13 +15,13 @@ class VAE(nn.Module):
         prev = input_size
         for layer in layers[:-1]:
             sequence.append(nn.Linear(prev, layer))
-            sequence.append(nn.ReLU())
+            sequence.append(nn.Tanh())
             prev = layer
         self.encoder = nn.Sequential(*sequence).cuda()
 
         # z layer
-        self.mu = nn.Sequential(nn.Linear(prev, layers[-1]), nn.ReLU()).cuda()
-        self.logvar = nn.Sequential(nn.Linear(prev, layers[-1]), nn.ReLU()).cuda()
+        self.mu = nn.Sequential(nn.Linear(prev, layers[-1]), nn.Tanh()).cuda()
+        self.logvar = nn.Sequential(nn.Linear(prev, layers[-1]), nn.Tanh()).cuda()
 
         # Decoder
         sequence = []
@@ -29,11 +29,12 @@ class VAE(nn.Module):
         prev = layers[0]
         for layer in layers[1:]:
             sequence.append(nn.Linear(prev, layer))
-            sequence.append(nn.ReLU())
+            sequence.append(nn.Tanh())
             prev = layer
         sequence.append(nn.Linear(prev, input_size))
         # if not last_layer:
         #     sequence.append(nn.Sigmoid())
+        sequence.append(nn.Tanh())
 
         self.decoder = nn.Sequential(*sequence).cuda()
 
@@ -195,7 +196,7 @@ def main(args):
                         list(model['user'].logvar.parameters()) + list(model['item'].encoder.parameters()) + \
                       list(model['item'].mu.parameters()) + list(model['item'].logvar.parameters()) + \
                       list(model['neuCF'].parameters())
-    op['pred'] = torch.optim.Adam(model['neuCF'].parameters(), lr=0.01)
+    op['pred'] = torch.optim.Adam(model['neuCF'].parameters(), lr=1e-4)
 
     loss = {}
     loss['pred'] = nn.BCELoss(reduction='sum')
