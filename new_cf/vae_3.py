@@ -170,7 +170,7 @@ def test(data, model, device, batch_size):
         for i in range(0, len(user_info), batch_size):
             # pred = torch.matmul(z_user, z_item.T)
             pred = model['neuCF'](transaction[i:i+batch_size])
-            predict.append(pred.view(-1).cpu().numpy())
+            predict.append(pred.cpu().numpy())
         return np.concatenate(predict)
 
 
