@@ -204,12 +204,12 @@ def main(args):
         loss_user, loss_item, loss_trans = 0, 0, 0
         tmp_user = np.random.permutation(range(dataset.no_user))
         for i in range(0, dataset.no_user, batch_size):
-            loss_user += train_user([dataset.user_info[tmp_user[i:i+batch_size]]],
+            loss_user += train_user(dataset.user_info[tmp_user[i:i+batch_size]],
                                     model, op, loss, 'cuda')
 
         tmp_item = np.random.permutation(range(dataset.no_item))
         for i in range(0, dataset.no_item, batch_size):
-            loss_item += train_item([dataset.item_info[tmp_item[i:i+batch_size]]],
+            loss_item += train_item(dataset.item_info[tmp_item[i:i+batch_size]],
                                     model, op, loss, 'cuda')
 
         tmp_user = np.random.permutation(range(dataset.no_user))
