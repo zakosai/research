@@ -93,7 +93,7 @@ class Translation:
         self.loss_item = self.lambda_2 * tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon),
                                                                       axis=1)) + self.lambda_1 * loss_kl_item + tf.losses.get_regularization_loss()
 
-        content_matrix = tf.matmul(z_user, z_item.T)
+        content_matrix = tf.matmul(z_user, tf.transpose(z_item))
         x = self.x * content_matrix
         # VAE for CF
         _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
