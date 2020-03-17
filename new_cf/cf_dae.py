@@ -136,9 +136,9 @@ def main(args):
     dataset = Dataset(args.data_dir, args.data_type)
 
     model = {}
-    model['user'] = DAE(dataset.user_size, [200, 50])
-    model['item'] = DAE(dataset.item_size, [100, 50])
-    model['neuCF'] = MLP([100, 20, 1], 50, 50, dataset.no_user, dataset.no_item)
+    model['user'] = DAE(dataset.user_size, [200, 100])
+    model['item'] = DAE(dataset.item_size, [100, 100])
+    model['neuCF'] = MLP([200, 50, 1], 50, 50, dataset.no_user, dataset.no_item)
 
     op = {}
     op['user'] = torch.optim.Adam(model['user'].parameters(), lr=0.01)
@@ -149,7 +149,7 @@ def main(args):
     op['pred'] = torch.optim.Adam(pred_parameters, lr=0.01)
 
     loss = {}
-    loss['pred'] = nn.BCELoss()
+    loss['pred'] = nn.BCELoss(reduction='sum')
     loss['item'] = nn.MSELoss()
     loss['user'] = nn.MSELoss()
 
