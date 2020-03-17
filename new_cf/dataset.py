@@ -89,7 +89,7 @@ class Dataset:
     def gen_batch_rating(self, transaction_batch):
         user = self.user_info[transaction_batch[:, 0]]
         item = self.item_info[transaction_batch[:, 1]]
-        return user, item, transaction_batch[:, 2]
+        return user, item, transaction_batch[:, 2] - 1
 
 
 def recallK(train, test, predict, k=50):
