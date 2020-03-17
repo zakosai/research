@@ -32,8 +32,8 @@ class VAE(nn.Module):
             sequence.append(nn.Tanh())
             prev = layer
         sequence.append(nn.Linear(prev, input_size))
-        if not last_layer:
-            sequence.append(nn.Sigmoid())
+        # if not last_layer:
+        #     sequence.append(nn.Sigmoid())
 
         self.decoder = nn.Sequential(*sequence).cuda()
 
