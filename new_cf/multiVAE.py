@@ -78,37 +78,33 @@ class Translation:
         # return tf.reduce_mean(tf.abs(x - x_recon))
         return neg_ll
 
-    def pre_train(self):
+    def build_model(self):
+        self.x = tf.placeholder(tf.float32, [None, self.dim], name='input')
         self.user_info = tf.placeholder(tf.float32, [None, self.user_info_dim], name='user_info')
         self.item_info = tf.placeholder(tf.float32, [None, self.item_info_dim], name='item_info')
 
         # VAE for user
         z_user, user_recon, loss_kl_user = self.vae(self.user_info, [100], [100, self.user_info_dim], "user")
-        self.loss_user = self.lambda_2 * tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon),
-                                                                      axis=1)) + self.lambda_1 * loss_kl_user + tf.losses.get_regularization_loss()
+        self.loss_user = self.lambda_2 * tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon), axis=1)) +\
+            self.lambda_1 * loss_kl_user + tf.losses.get_regularization_loss()
 
         # VAE for item
-        z_item, item_recon, loss_kl_item = self.vae(self.item_info, [200], [200, self.item_info_dim], "item")
+        z_item, item_recon, loss_kl_item = self.vae(self.item_info, [200, 100], [100, 200, self.item_info_dim], "item")
         self.loss_item = self.lambda_2 * tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon),
                                                                       axis=1)) + self.lambda_1 * loss_kl_item + tf.losses.get_regularization_loss()
+
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
-        self.content_matrix = tf.keras.backend.l2_normalize(content_matrix, axis=-1)
-        self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
-        self.train_op_item = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_item)
-
-    def build_model(self):
-        self.x = tf.placeholder(tf.float32, [None, self.dim], name='input')
-        self.content = tf.placeholder(tf.float32, [None, self.dim], name='content')
-
-        x = self.x * self.content
+        content_matrix = tf.keras.backend.l2_normalize(content_matrix, axis=-1)
+        x = self.x * content_matrix
         # VAE for CF
         _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         # Loss VAE
-        self.loss = self.lambda_1 * loss_kl + self.lambda_2 * self.loss_reconstruct(self.x, self.x_recon) + \
+        self.loss = self.lambda_1 * loss_kl + self.lambda_2 * self.loss_reconstruct(x, self.x_recon) + \
                     tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
-
+        self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
+        self.train_op_item = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_item)
 
 
 def main(args):
@@ -118,14 +114,12 @@ def main(args):
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
                         [600, 200], [200, 600, dataset.no_item], 50)
-    model.pre_train()
     model.build_model()
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
 
-    for i in range(1, 100):
-        loss_user, loss_item = 0, 0
+    for i in range(1, iter):
         shuffle_idx = np.random.permutation(range(dataset.no_user))
         for j in range(int(len(shuffle_idx) / batch_size)):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
@@ -139,28 +133,26 @@ def main(args):
             x = dataset.item_info[list_idx]
             feed = {model.item_info: x}
             _, loss_item = sess.run([model.train_op_item, model.loss_item], feed_dict=feed)
-        print("loss user: %f, loss item: %f" % (loss_user, loss_item))
 
-    content_matrix = sess.run(model.content_matrix, feed_dict={model.user_info:dataset.user_info,
-                                                               model.item_info:dataset.item_info})
-    for i in range(1, iter):
         shuffle_idx = np.random.permutation(range(len(dataset.transaction)))
         for j in range(int(len(shuffle_idx)/batch_size)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             x = dataset.transaction[list_idx]
             feed = {model.x: x,
-                    model.content: content_matrix[list_idx]}
+                    model.user_info: dataset.user_info[list_idx],
+                    model.item_info: dataset.item_info}
 
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
-        print("loss pred: %f"%(loss))
+        print("loss user: %f, loss item: %f, loss pred: %f"%(loss_user, loss_item, loss))
 
         # Validation Process
         if i%10 == 0:
             model.train = False
             loss_val_a, y_b = sess.run([model.loss, model.x_recon],
                                               feed_dict={model.x: dataset.transaction,
-                                                         model.content: content_matrix})
+                                                         model.user_info: dataset.user_info,
+                                                         model.item_info: dataset.item_info})
             recall = recallK(dataset.train, dataset.test, y_b)
             print("recall: %f"%recall)
 
