@@ -14,7 +14,7 @@ class DAE(nn.Module):
         prev = input_size
         for layer in layers:
             sequence.append(nn.Linear(prev, layer))
-            sequence.append(nn.Tanh())
+            sequence.append(nn.ReLU())
             prev = layer
         self.encoder = nn.Sequential(*sequence).cuda()
 
@@ -24,7 +24,7 @@ class DAE(nn.Module):
         prev = layers[0]
         for layer in layers[1:]:
             sequence.append(nn.Linear(prev, layer))
-            sequence.append(nn.Tanh())
+            sequence.append(nn.ReLU())
             prev = layer
         sequence.append(nn.Linear(prev, input_size))
         # sequence.append(nn.Sigmoid())
