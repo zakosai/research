@@ -9,7 +9,7 @@ import argparse
 
 class Translation:
     def __init__(self, batch_size, dim, user_info_dim, item_info_dim, encode_dim, decode_dim, z_dim, eps=1e-10,
-                 lambda_1=0.1, lambda_2=100, learning_rate=1e-3):
+                 lambda_1=0.1, lambda_2=100, learning_rate=1e-4):
         self.batch_size = batch_size
         self.dim = dim
         self.encode_dim = encode_dim
@@ -161,7 +161,7 @@ def main(args):
         print("loss user: %f, loss item: %f, loss pred: %f"%(loss_user, loss_item, loss))
 
         # Validation Process
-        if i%5 == 0:
+        if i%1 == 0:
             model.train = False
             loss_val_a, y_b = sess.run([model.loss, model.x_recon],
                                               feed_dict={model.x: dataset.transaction,
