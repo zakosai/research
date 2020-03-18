@@ -95,7 +95,7 @@ class Translation:
 
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
         content_matrix = tf.keras.backend.l2_normalize(content_matrix, axis=-1)
-        x = self.x*0.9 + content_matrix*0.1
+        x = (self.x * 0.9 + 0.1) * content_matrix
         # VAE for CF
         _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         # Loss VAE
