@@ -112,7 +112,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [600, 200], [200, 600, dataset.no_item], 50)
+                        [600, 200], [200, 600, dataset.no_item], 50, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
@@ -173,7 +173,7 @@ def main(args):
             model.train = True
             if recall > best:
                 best = recall
-        if (i%50 == 0) :
+        if (i == 10) :
             model.learning_rate /= 10
     print(best)
 
@@ -183,6 +183,8 @@ if __name__ == '__main__':
     parser.add_argument('--data_type', type=str, default='5')
     parser.add_argument('--data_dir', type=str, default='data/amazon')
     parser.add_argument('--iter', type=int, default=30)
+    parser.add_argument('--learning_rate', type=int, default=1e-4)
+
     args = parser.parse_args()
 
     main(args)
