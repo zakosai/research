@@ -89,7 +89,7 @@ class Translation:
             self.lambda_1 * loss_kl_user + tf.losses.get_regularization_loss()
 
         # VAE for item
-        z_item, item_recon, loss_kl_item = self.vae(self.item_info, [200, 100], [100, 200, self.item_info_dim], "item")
+        z_item, item_recon, loss_kl_item = self.vae(self.item_info, [400, 200], [200, 400, self.item_info_dim], "item")
         self.loss_item = self.lambda_2 * tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon),
                                                                       axis=1)) + self.lambda_1 * loss_kl_item + tf.losses.get_regularization_loss()
 
@@ -113,11 +113,26 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [600, 200], [200, 600, dataset.no_item], 50)
+                        [600, 200], [200, 600, dataset.no_item], 100)
     model.build_model()
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
+
+    for i in range(1, 30):
+        shuffle_idx = np.random.permutation(range(dataset.no_user))
+        for j in range(int(len(shuffle_idx) / batch_size)):
+            list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
+            x = dataset.user_info[list_idx]
+            feed = {model.user_info: x}
+            _, loss_user = sess.run([model.train_op_user, model.loss_user], feed_dict=feed)
+
+        shuffle_idx = np.random.permutation(range(dataset.no_item))
+        for j in range(int(len(shuffle_idx) / batch_size)):
+            list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
+            x = dataset.item_info[list_idx]
+            feed = {model.item_info: x}
+            _, loss_item = sess.run([model.train_op_item, model.loss_item], feed_dict=feed)
 
     for i in range(1, iter):
         shuffle_idx = np.random.permutation(range(dataset.no_user))
