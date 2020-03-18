@@ -109,7 +109,7 @@ class Translation:
 
 def main(args):
     iter = args.iter
-    batch_size = 100
+    batch_size = 500
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
