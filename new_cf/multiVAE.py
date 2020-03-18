@@ -19,7 +19,7 @@ class Translation:
         self.lambda_1 = lambda_1
         self.lambda_2 = lambda_2
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.relu
+        self.active_function = tf.nn.tanh
         self.user_info_dim = user_info_dim
         self.item_info_dim = item_info_dim
         # self.z_A = z_A
@@ -86,12 +86,12 @@ class Translation:
         # VAE for user
         z_user, user_recon, loss_kl_user = self.vae(self.user_info, [100], [100, self.user_info_dim], "user")
         self.loss_user = self.lambda_2 * tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon), axis=1)) +\
-            self.lambda_1 * loss_kl_user + tf.losses.get_regularization_loss()
+            self.lambda_1 * loss_kl_user + self.lambda_1 * tf.losses.get_regularization_loss()
 
         # VAE for item
         z_item, item_recon, loss_kl_item = self.vae(self.item_info, [400, 200], [200, 400, self.item_info_dim], "item")
         self.loss_item = self.lambda_2 * tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon),
-                                                                      axis=1)) + self.lambda_1 * loss_kl_item + tf.losses.get_regularization_loss()
+                                                                      axis=1)) + self.lambda_1 * loss_kl_item + self.lambda_1 * tf.losses.get_regularization_loss()
 
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
         content_matrix = tf.keras.backend.l2_normalize(content_matrix, axis=-1)
@@ -100,7 +100,7 @@ class Translation:
         _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         # Loss VAE
         self.loss = self.lambda_1 * loss_kl + self.lambda_2 * self.loss_reconstruct(self.x, self.x_recon) + \
-                    tf.losses.get_regularization_loss()
+                    self.lambda_1 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.train_op_user = tf.train.AdamOptimizer(self.learning_rate*10).minimize(self.loss_user)
@@ -162,7 +162,7 @@ def main(args):
         print("loss user: %f, loss item: %f, loss pred: %f"%(loss_user, loss_item, loss))
 
         # Validation Process
-        if i%10 == 0:
+        if i%5 == 0:
             model.train = False
             loss_val_a, y_b = sess.run([model.loss, model.x_recon],
                                               feed_dict={model.x: dataset.transaction,
