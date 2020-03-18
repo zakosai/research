@@ -80,9 +80,9 @@ def load_rating(path):
 
 
 params = params()
-params.lambda_u = 10
+params.lambda_u = 1
 params.lambda_v = 10
-params.lambda_r = 1
+params.lambda_r = 0.1
 params.C_a = 1
 params.C_b = 0.01
 params.max_iter_m = 1
@@ -134,9 +134,9 @@ if gs == 1:
                 i += 1
 else:
     model = cf_vae_extend(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,
-                          input_dim=8000, encoding_dims=[200, 100], z_dim = zdim, decoding_dims=[100, 200, 8000],
+                          input_dim=8000, encoding_dims=[200, 100], z_dim=zdim, decoding_dims=[100, 200, 8000],
                           encoding_dims_str=[500, 200], decoding_dims_str=[200, 500, 4526], loss_type='cross_entropy',
-                          model = model_type, ckpt_folder=ckpt, initial=initial, user_dim=args.user_dim)
+                          model=model_type, ckpt_folder=ckpt, initial=initial, user_dim=args.user_dim)
     model.fit(data["train_users"], data["train_items"], data["content"], params, data["test_users"], data["user"])
     model.save_model(os.path.join(ckpt,"cvae_user_%d_tanh.mat"%(model_type)))
     #model.load_model(os.path.join(ckpt, "vae_user.mat"))
