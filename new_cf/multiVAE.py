@@ -27,7 +27,6 @@ class Translation:
         self.train = True
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
 
-
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
 
@@ -37,7 +36,7 @@ class Translation:
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                # x_ = batch_norm(x_, decay=0.995)
+                x_ = batch_norm(x_, decay=0.995)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
@@ -113,7 +112,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [600, 200], [200, 600, dataset.no_item], 100)
+                        [600, 200], [200, 600, dataset.no_item], 50)
     model.build_model()
 
     sess = tf.Session()
@@ -171,7 +170,7 @@ def main(args):
             recall = recallK(dataset.train, dataset.test, y_b)
             print("recall: %f"%recall)
             model.train = True
-        if i%40 == 0:
+        if (i%40 == 0) and (i < 100):
             model.learning_rate /= 10
 
 
