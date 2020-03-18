@@ -69,13 +69,13 @@ class Translation:
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
     def loss_reconstruct(self, x, x_recon):
-        log_softmax_var = tf.nn.log_softmax(x_recon)
-
-        neg_ll = -tf.reduce_mean(tf.reduce_sum(
-            log_softmax_var * x,
-            axis=-1))
-        # return tf.reduce_mean(tf.abs(x - x_recon))
-        return neg_ll
+        # log_softmax_var = tf.nn.log_softmax(x_recon)
+        #
+        # neg_ll = -tf.reduce_mean(tf.reduce_sum(
+        #     log_softmax_var * x,
+        #     axis=-1))
+        return tf.reduce_mean(tf.abs(x - x_recon))
+        # return neg_ll
 
     def build_model(self):
         self.x = tf.placeholder(tf.float32, [None, self.dim], name='input')
@@ -145,15 +145,15 @@ def main(args):
         print("loss user: %f, loss item: %f, loss pred: %f"%(loss, loss, loss))
 
         # Validation Process
-        if i%1 == 0:
+        if i%10 == 0:
             model.train = False
             loss_val_a, y_b = sess.run([model.loss, model.x_recon],
                                               feed_dict={model.x: dataset.transaction})
             recall = recallK(dataset.train, dataset.test, y_b)
             print("recall: %f"%recall)
             model.train = True
-        if (i%50 == 0) :
-            model.learning_rate /= 10
+        # if (i%50 == 0) :
+        #     model.learning_rate /= 10
 
 
 if __name__ == '__main__':

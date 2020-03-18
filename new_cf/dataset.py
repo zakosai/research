@@ -97,7 +97,7 @@ def recallK(train, test, predict, k=50):
     recall = []
     for i in range(len(train)):
         pred = np.argsort(predict[i])[::-1][:k+len(train[i])]
-        # pred = [item for item in pred if item not in train[i]]
+        pred = [item for item in pred if item not in train[i]]
         pred = pred[:k]
         hits = len(set(pred) & set(test[i]))
         recall.append(float(hits)/len(test[i]))
