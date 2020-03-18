@@ -170,7 +170,7 @@ def main(args):
             recall = recallK(dataset.train, dataset.test, y_b)
             print("recall: %f"%recall)
             model.train = True
-        if (i%40 == 0) and (i < 100):
+        if (i%50 == 0) :
             model.learning_rate /= 10
 
 
