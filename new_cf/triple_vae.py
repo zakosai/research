@@ -83,7 +83,7 @@ class Translation:
         self.item_info = tf.placeholder(tf.float32, [None, self.item_info_dim], name='item_info')
 
         # VAE for user
-        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [100], [100, self.user_info_dim], "user")
+        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [200], [200, self.user_info_dim], "user")
         self.loss_user = self.lambda_2 * tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon), axis=1)) +\
             self.lambda_1 * loss_kl_user + self.lambda_1 * tf.losses.get_regularization_loss()
 
@@ -117,6 +117,7 @@ def main(args):
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
+    best = 0
 
     for i in range(1, 30):
         shuffle_idx = np.random.permutation(range(dataset.no_user))
@@ -170,8 +171,11 @@ def main(args):
             recall = recallK(dataset.train, dataset.test, y_b)
             print("recall: %f"%recall)
             model.train = True
+            if recall > best:
+                best = recall
         if (i%50 == 0) :
             model.learning_rate /= 10
+    print(best)
 
 
 if __name__ == '__main__':
