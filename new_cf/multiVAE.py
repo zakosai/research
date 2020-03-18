@@ -31,8 +31,8 @@ class Translation:
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
 
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
@@ -42,8 +42,8 @@ class Translation:
 
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
@@ -95,7 +95,7 @@ class Translation:
 
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
         content_matrix = tf.keras.backend.l2_normalize(content_matrix, axis=-1)
-        x = self.x + content_matrix
+        x = self.x*0.9 + content_matrix*0.1
         # VAE for CF
         _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         # Loss VAE
@@ -170,6 +170,7 @@ def main(args):
                                                          model.item_info: dataset.item_info})
             recall = recallK(dataset.train, dataset.test, y_b)
             print("recall: %f"%recall)
+            model.train = True
 
 
 if __name__ == '__main__':
