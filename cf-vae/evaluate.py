@@ -66,6 +66,7 @@ model = cf_vae_extend(num_users=5584, num_items=13790, num_factors=num_factors, 
 
 # d = os.path.join(ckpt, "vae.mat")
 # print(d)
+print(os.path.join(ckpt, extend_file))
 model.load_model(os.path.join(ckpt, extend_file))
 pred = model.predict_all()
 model.predict_val(pred, data['train_users'], data['test_users'])
