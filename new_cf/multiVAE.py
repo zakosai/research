@@ -9,7 +9,7 @@ import argparse
 
 class Translation:
     def __init__(self, batch_size, dim, user_info_dim, item_info_dim, encode_dim, decode_dim, z_dim, eps=1e-10,
-                 lambda_1=0.1, lambda_2=100, learning_rate=1e-4):
+                 lambda_1=0.1, lambda_2=100, learning_rate=1e-3):
         self.batch_size = batch_size
         self.dim = dim
         self.encode_dim = encode_dim
@@ -103,8 +103,8 @@ class Translation:
                     self.lambda_1 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
-        self.train_op_user = tf.train.AdamOptimizer(self.learning_rate*10).minimize(self.loss_user)
-        self.train_op_item = tf.train.AdamOptimizer(self.learning_rate*10).minimize(self.loss_item)
+        self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
+        self.train_op_item = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_item)
 
 
 def main(args):
@@ -171,6 +171,8 @@ def main(args):
             recall = recallK(dataset.train, dataset.test, y_b)
             print("recall: %f"%recall)
             model.train = True
+        if i%40 == 0:
+            model.learning_rate /= 10
 
 
 if __name__ == '__main__':
