@@ -103,8 +103,8 @@ class Translation:
                     self.lambda_1 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
-        self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
-        self.train_op_item = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_item)
+        # self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
+        # self.train_op_item = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_item)
 
 
 def main(args):
