@@ -94,7 +94,7 @@ class Translation:
                                                                       axis=1)) + self.lambda_1 * loss_kl_item + self.lambda_1 * tf.losses.get_regularization_loss()
 
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
-        content_matrix = content_matrix / tf.norm(content_matrix, axis=-1)
+        content_matrix = content_matrix / tf.norm(content_matrix, axis=-1, keep_dims=True)
         x = (self.x * 0.9 + 0.1) * content_matrix
         # VAE for CF
         _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
