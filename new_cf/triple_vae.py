@@ -183,7 +183,7 @@ if __name__ == '__main__':
     parser.add_argument('--data_type', type=str, default='5')
     parser.add_argument('--data_dir', type=str, default='data/amazon')
     parser.add_argument('--iter', type=int, default=30)
-    parser.add_argument('--learning_rate', type=int, default=1e-4)
+    parser.add_argument('--learning_rate', type=float, default=1e-4)
 
     args = parser.parse_args()
 
