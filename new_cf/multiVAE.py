@@ -134,7 +134,7 @@ def main(args):
         #     _, loss_item = sess.run([model.train_op_item, model.loss_item], feed_dict=feed)
 
         shuffle_idx = np.random.permutation(range(len(dataset.transaction)))
-        for j in range(int(len(shuffle_idx)/batch_size)):
+        for j in range(int(len(shuffle_idx)/batch_size + 1)):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             x = dataset.transaction[list_idx]
             feed = {model.x: x}
