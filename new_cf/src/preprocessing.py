@@ -2,6 +2,7 @@ import gzip
 import pandas as pd
 import numpy as np
 import argparse
+import os
 
 
 def parse(path):
@@ -35,13 +36,12 @@ def convert_categories(data):
     categories = [i for s in categories for i in s]
     categories = list(set(categories))
     output = np.zeros((len(data), len(categories)))
-    index_list = data.index
     data = data.tolist()
     for i, d in enumerate(data):
         if len(d) != 0:
             near_list = [categories.index(s) for s in d]
             output[i, near_list] = 1
-    return pd.DataFrame(output, columns=categories, index=index_list)
+    return output
 
 
 def load_rating(path):
@@ -68,6 +68,9 @@ def preprocess(folder):
     rating_score = pd.get_dummies(data.rating)
     data = pd.concat([data.u_id, data.p_id, weekday, rating_score], axis=1)
     columns = data.columns.tolist()[2:]
+
+    if not os.path.exists("../data/%s" % folder):
+        os.makedirs("../data/%s" % folder)
 
     for type in [1, 8]:
         train = load_rating("/media/linh/DATA/research/cf-vae/data2/%s/cf-train-%dp-users.dat"%(folder, type))
