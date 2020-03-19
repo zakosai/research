@@ -93,7 +93,7 @@ if __name__ == '__main__':
     # parser = argparse.ArgumentParser()
     # parser.add_argument('--data', type=str, default='Baby')
     # args = parser.parse_args()
-    folders = ['Automative', 'Baby', 'CD', 'Clothing', 'Garden', 'Grocery', 'Health', 'Instrument',
+    folders = ['Automotive', 'Baby', 'CD', 'Clothing', 'Garden', 'Grocery', 'Health', 'Instrument',
                'Kindle', 'Music', 'Office', 'Pet', 'Phone', 'Video']
     summary = open("data/summary.txt", "w")
     for f in folders:
