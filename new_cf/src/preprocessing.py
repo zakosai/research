@@ -72,7 +72,7 @@ def preprocess(folder, f):
     if not os.path.exists("data/%s" % folder):
         os.makedirs("data/%s" % folder)
 
-    f.write(folders)
+    f.write(folder)
     for type in [1, 8]:
         train = load_rating("/media/linh/DATA/research/cf-vae/data2/%s/cf-train-%dp-users.dat"%(folder, type))
         grouped = data.groupby('u_id')
