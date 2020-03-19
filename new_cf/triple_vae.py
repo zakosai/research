@@ -1,9 +1,8 @@
 import tensorflow as tf
 from tensorflow.contrib.layers import fully_connected, flatten, batch_norm
 from keras.backend import binary_crossentropy
-from dataset import Dataset, recallK
+from src.dataset import Dataset, recallK
 import numpy as np
-import os
 import argparse
 
 

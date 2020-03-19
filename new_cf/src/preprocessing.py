@@ -56,7 +56,7 @@ def load_rating(path):
     return arr
 
 
-def preprocess(folder):
+def preprocess(folder, f):
     data = pd.read_csv("/media/linh/DATA/research/cf-vae/data2/%s/review_info.txt" % folder, delimiter=', ')
     data.columns = ['u_id', 'p_id', 'rating', 'unixTime', 'brand', 'categories']
     categories = get_categories(folder)
@@ -69,9 +69,10 @@ def preprocess(folder):
     data = pd.concat([data.u_id, data.p_id, weekday, rating_score], axis=1)
     columns = data.columns.tolist()[2:]
 
-    if not os.path.exists("../data/%s" % folder):
-        os.makedirs("../data/%s" % folder)
+    if not os.path.exists("data/%s" % folder):
+        os.makedirs("data/%s" % folder)
 
+    f.write(folders)
     for type in [1, 8]:
         train = load_rating("/media/linh/DATA/research/cf-vae/data2/%s/cf-train-%dp-users.dat"%(folder, type))
         grouped = data.groupby('u_id')
@@ -81,15 +82,23 @@ def preprocess(folder):
             d = group[group.p_id.isin(p_lists)][columns].as_matrix().mean(axis=0)
             cat = categories[p_lists].mean(axis=0)
             user_info[name] = d.tolist() + cat.tolist()
-        np.save("../data/%s/user_info_%s.npy"%(folder, type), np.array(user_info))
+        np.save("data/%s/user_info_%s.npy"%(folder, type), np.array(user_info))
+        f.write(np.array(user_info).shape)
+        print("Finish %s %d"%(folder, type))
+
+    print("---------------------------------")
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--data', type=str, default='Baby')
-    args = parser.parse_args()
-
-    preprocess(args.data)
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('--data', type=str, default='Baby')
+    # args = parser.parse_args()
+    folders = ['Automative', 'Baby', 'CD', 'Clothing', 'Garden', 'Grocery', 'Health', 'Instrument',
+               'Kindle', 'Music', 'Office', 'Pet', 'Phone', 'Video']
+    summary = open("data/summary.txt", "w")
+    for f in folders:
+        preprocess(f, summary)
+    summary.close()
 
 
 
