@@ -83,7 +83,7 @@ def preprocess(folder, f):
             cat = categories[p_lists].mean(axis=0)
             user_info[name] = d.tolist() + cat.tolist()
         np.save("data/%s/user_info_%s.npy"%(folder, type), np.array(user_info))
-        f.write(np.array(user_info).shape)
+        f.write("%d, %d" % np.array(user_info).shape)
         print("Finish %s %d"%(folder, type))
 
     print("---------------------------------")
