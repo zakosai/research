@@ -16,6 +16,7 @@ class Dataset:
 
         cf_data = self.gen_cf_matrix()
         self.transaction = cf_data
+        print(self.item_info.shape, self.user_info.shape, self.transaction.shape)
         # self.item_info = cf_data.T
         # self.user_info = cf_data
         # self.item_size = self.item_info.shape[1]
