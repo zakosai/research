@@ -16,8 +16,6 @@ parser.add_argument('--zdim',  type=int, default=50,
                    help='where model is stored')
 parser.add_argument('--data_type',  type=str, default='5',
                    help='where model is stored')
-parser.add_argument('--user_dim',  type=int, default=9975,
-                   help='where model is stored')
 parser.add_argument('--type',  type=str, default="text",
                    help='where model is stored')
 args = parser.parse_args()
@@ -41,14 +39,7 @@ else:
 idx = np.random.rand(data.shape[0]) < 0.8
 train_X = data
 test_X = data[~idx]
-# print(train_X[0])
-#
-# images = np.fromfile("data/amazon/images.bin")
-# images = images.reshape((16000, 3072))
-# train_img = images[idx]
-# test_img = images[~idx]
 
-# model = vanilla_vae(input_dim=args.user_dim, encoding_dims=[100], z_dim=zdim, decoding_dims=[100, args.user_dim], loss='cross_entropy', ckpt_folder=ckpt)
 dim = train_X.shape[1]
 if args.type == "text":
     model = vanilla_vae(input_dim=dim, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200, 400, dim],
@@ -59,7 +50,7 @@ if args.type == "text":
     model.fit(train_X, epochs=5000,learning_rate=0.001, batch_size=500, print_size=50, train=True, scope="text")
 
 else:
-    model = vanilla_vae(input_dim=args.user_dim, encoding_dims=[200], z_dim=zdim, decoding_dims=[200, args.user_dim], loss='cross_entropy', ckpt_folder=ckpt)
+    model = vanilla_vae(input_dim=dim, encoding_dims=[200], z_dim=zdim, decoding_dims=[200, args.user_dim], loss='cross_entropy', ckpt_folder=ckpt)
     print('fitting data starts...')
     model.fit(train_X, epochs=5000,learning_rate=0.001, batch_size=500, print_size=50, train=True, scope="user")
 
