@@ -85,12 +85,7 @@ class cf_vae_extend:
             with tf.variable_scope("text"):
                 x = self.x_
                 depth_inf = len(self.encoding_dims)
-                #x = tf.layers.dropout(x, rate=0.3)
-                # noisy_level = 1
-                # x = x + noisy_level*tf.random_normal(tf.shape(x))
-                reg_loss = 0
-                attention = dense(x, self.input_dim, scope='att_layer', activation=tf.nn.sigmoid)
-                x = multiply([x, attention], name='attention_mul')
+
                 for i in range(depth_inf):
                     x = dense(x, self.encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
@@ -192,9 +187,6 @@ class cf_vae_extend:
 
             x_u = self.x_u_
             depth_inf = len(encoding_dims)
-
-            attention = dense(x_u, self.user_dim, scope='att_layer', activation=tf.nn.sigmoid)
-            x_u = multiply([x_u, attention],name='attention_mul')
             for i in range(depth_inf):
                 x_u = dense(x_u, encoding_dims[i], scope="enc_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
@@ -562,7 +554,7 @@ class cf_vae_extend:
             # # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
             # #                        [u for u in user_all if len(u)!=0], m)
             mapk = np.mean(np.array(apk_vals))
-            print recall_avg
+            print(recall_avg)
             recall_avgs.append(recall_avg)
             # precision_avgs.append(precision_avg)
             mapk_avgs.append(mapk)
@@ -605,7 +597,7 @@ class cf_vae_extend:
             # precision_avg = np.mean(np.array(precision_vals))
             # # mapk = ml_metrics.mapk([list(np.argsort(-pred_all[k])) for k in range(len(pred_all)) if len(user_all[k])!= 0],
             # #                        [u for u in user_all if len(u)!=0], m)
-            print recall_avg
+            print(recall_avg)
             if file != None:
                 file.write("m = %d, recall = %f\t"%(m, recall_avg))
             # precision_avgs.append(precision_avg)
