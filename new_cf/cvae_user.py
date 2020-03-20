@@ -599,7 +599,7 @@ class cf_vae_extend:
             # #                        [u for u in user_all if len(u)!=0], m)
             print(recall_avg)
             if file != None:
-                file.write("m = %d, recall = %f\t"%(m, recall_avg))
+                file.write("m = %d, recall = %f\n"%(m, recall_avg))
             # precision_avgs.append(precision_avg)
 
 
