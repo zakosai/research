@@ -100,9 +100,8 @@ tf.set_random_seed(0)
 # img = images.reshape((13791, 32, 32, 3))
 # img = img.astype(np.float32)/255
 num_factors = zdim
-user_no = len(data['train_users'])
-item_no = len(data['train_items'])
-user_dim = data['user'].shape[1]
+user_no, user_dim = data['user'].shape
+item_no, item_dim = data['content'].shape
 params.batch_size = min(params.batch_size, user_no)
 
 if gs == 1:
@@ -116,7 +115,7 @@ if gs == 1:
                 params.lambda_r = r
                 if i > -1:
                     model = cf_vae_extend(num_users=user_no, num_items=item_no, num_factors=num_factors, params=params,
-                                          input_dim=8000, encoding_dims=[400,200], z_dim=zdim, decoding_dims=[200,400,8000],
+                                          input_dim=8000, encoding_dims=[400,200], z_dim=zdim, decoding_dims=[200,400,item_dim],
                                           encoding_dims_str=[200], decoding_dims_str=[200, 4526], loss_type='cross_entropy',
                                           model=model_type, ckpt_folder=ckpt, initial=initial, user_dim=user_dim)
                     model.fit(data["train_users"], data["train_items"], data["content"], params,
