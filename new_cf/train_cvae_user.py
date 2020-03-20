@@ -30,12 +30,7 @@ parser.add_argument('--gridsearch',  type=int, default=0,
                    help='gridsearch or not')
 parser.add_argument('--data_type',  type=str, default='5',
                    help='gridsearch or not')
-parser.add_argument('--user_dim',  type=int, default=9975,
-                   help='gridsearch or not')
-parser.add_argument('--user_no',  type=int, default=6040,
-                   help='gridsearch or not')
-parser.add_argument('--item_no',  type=int, default=3883,
-                   help='gridsearch or not')
+
 args = parser.parse_args()
 model_type = args.model
 ckpt = args.ckpt_folder
@@ -55,7 +50,7 @@ def load_cvae_data(data_dir):
   data["content"] = variables.toarray()
   # variables = np.load(os.path.join(data_dir, "structure.npy"))
   # data["structure"] = variables
-  user = np.load(os.path.join(data_dir, "user_info_%s.npy"%data_type))
+  user = np.load(os.path.join("data", data_dir.split('/')[-2], "user_info_%s.npy"%data_type))
   # user = user[:, 7:30]
   data["user"] = user
   data["train_users"] = load_rating(data_dir + "cf-train-%sp-users.dat"%data_type)
@@ -105,6 +100,9 @@ tf.set_random_seed(0)
 # img = images.reshape((13791, 32, 32, 3))
 # img = img.astype(np.float32)/255
 num_factors = zdim
+user_no = len(data['train_users'])
+item_no = len(data['train_items'])
+user_dim = data['user'].shape[1]
 
 if gs == 1:
     i = 0
@@ -116,10 +114,10 @@ if gs == 1:
             for r in [0.1, 1, 10]:
                 params.lambda_r = r
                 if i > -1:
-                    model = cf_vae_extend(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,
-                                          input_dim=8000, encoding_dims=[200,100], z_dim = zdim, decoding_dims=[100,200,8000],
+                    model = cf_vae_extend(num_users=user_no, num_items=item_no, num_factors=num_factors, params=params,
+                                          input_dim=8000, encoding_dims=[200,100], z_dim=zdim, decoding_dims=[100,200,8000],
                                           encoding_dims_str=[200], decoding_dims_str=[200, 4526], loss_type='cross_entropy',
-                                          model = model_type, ckpt_folder=ckpt, initial=initial, user_dim=args.user_dim)
+                                          model=model_type, ckpt_folder=ckpt, initial=initial, user_dim=user_dim)
                     model.fit(data["train_users"], data["train_items"], data["content"], params,
                               data["test_users"], data["user"])
                     model.save_model(os.path.join(ckpt,"cvae_user_new_%d_%d.mat"%(model_type, i)))
@@ -133,10 +131,10 @@ if gs == 1:
                     print(u, v, r)
                 i += 1
 else:
-    model = cf_vae_extend(num_users=args.user_no, num_items=args.item_no, num_factors=num_factors, params=params,
+    model = cf_vae_extend(num_users=user_no, num_items=item_no, num_factors=num_factors, params=params,
                           input_dim=8000, encoding_dims=[400, 200], z_dim=zdim, decoding_dims=[200, 400, 8000],
                           encoding_dims_str=[500, 200], decoding_dims_str=[200, 500, 4526], loss_type='cross_entropy',
-                          model=model_type, ckpt_folder=ckpt, initial=initial, user_dim=args.user_dim)
+                          model=model_type, ckpt_folder=ckpt, initial=initial, user_dim=user_dim)
     model.fit(data["train_users"], data["train_items"], data["content"], params, data["test_users"], data["user"])
     model.save_model(os.path.join(ckpt,"cvae_user_%d_tanh.mat"%(model_type)))
     #model.load_model(os.path.join(ckpt, "vae_user.mat"))
