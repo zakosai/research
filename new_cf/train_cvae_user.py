@@ -103,6 +103,7 @@ num_factors = zdim
 user_no = len(data['train_users'])
 item_no = len(data['train_items'])
 user_dim = data['user'].shape[1]
+params.batch_size = min(params.batch_size, user_no)
 
 if gs == 1:
     i = 0
