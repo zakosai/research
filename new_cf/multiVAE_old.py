@@ -50,10 +50,12 @@ class Translation:
 
     def gen_z(self, h, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
-            z_mu = fully_connected(h, self.z_dim, self.active_function, scope="z_mu")
-            z_sigma = fully_connected(h, self.z_dim, self.active_function, scope="z_sigma")
+            # z_mu = fully_connected(h, self.z_dim, self.active_function, scope="z_mu")
+            # z_sigma = fully_connected(h, self.z_dim, self.active_function, scope="z_sigma")
+            z_mu = h[:, :self.z_dim]
+            z_sigma = h[:, self.z_dim:]
             e = tf.random_normal(tf.shape(z_mu))
-            z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
+            z = z_mu + tf.sqrt(tf.exp(0.5 * z_sigma)) * e
         return z, z_mu, z_sigma
 
     def vae(self, x, encode_dim, decode_dim, scope, reuse=False):
@@ -112,7 +114,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [600, 200], [200, 600, dataset.no_item], 50, learning_rate=args.learning_rate)
+                        [600, 200, 100], [200, 600, dataset.no_item], 50, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
