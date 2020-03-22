@@ -31,10 +31,12 @@ class Translation:
         # if self.train:
         #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
-            for i in range(len(encode_dim)):
+            for i in range(len(encode_dim)-1):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                x_ = batch_norm(x_, decay=0.995)
+                x_ = fully_connected(x_, encode_dim[i], scope="enc_%d" % i,
+                                     weights_regularizer=self.regularizer)
+                # x_ = batch_norm(x_, decay=0.995)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
@@ -97,8 +99,8 @@ class Translation:
         # VAE for CF
         _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         # Loss VAE
-        self.loss = self.lambda_1 * loss_kl + self.lambda_2 * self.loss_reconstruct(self.x, self.x_recon) + \
-                    self.lambda_1 * tf.losses.get_regularization_loss()
+        self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
+                    2 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         # self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
