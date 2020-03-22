@@ -29,8 +29,8 @@ class Translation:
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
 
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
+        x_ = tf.nn.l2_normalize(x_, 1)
+        x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
@@ -97,8 +97,8 @@ class Translation:
         # VAE for CF
         _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         # Loss VAE
-        self.loss = self.lambda_1 * loss_kl + self.lambda_2 * self.loss_reconstruct(self.x, self.x_recon) + \
-                    self.lambda_1 * tf.losses.get_regularization_loss()
+        self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
+                    2 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
