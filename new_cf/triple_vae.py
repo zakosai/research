@@ -65,7 +65,7 @@ class Translation:
             loss_kl = self.loss_kl(z_mu, z_sigma)
             y = self.dec(z_mu, "decode", decode_dim)
             if scope != "CF":
-                y = tf.nn.sigmoid(y)
+                y = tf.nn.tanh(y)
         return z, y, loss_kl
 
     def loss_kl(self, mu, sigma):
