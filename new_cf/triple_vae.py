@@ -43,11 +43,11 @@ class Translation:
         # if self.train:
         #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
-            for i in range(len(decode_dim)):
+            for i in range(len(decode_dim)-1):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
-                # x_ = fully_connected(x_, decode_dim[-1], scope="dec_last",
-                #                      weights_regularizer=self.regularizer)
+            x_ = fully_connected(x_, decode_dim[-1], scope="dec_last",
+                                 weights_regularizer=self.regularizer)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
@@ -64,6 +64,8 @@ class Translation:
             z, z_mu, z_sigma = self.gen_z(h, "VAE")
             loss_kl = self.loss_kl(z_mu, z_sigma)
             y = self.dec(z_mu, "decode", decode_dim)
+            if scope != "CF":
+                y = tf.nn.sigmoid(y)
         return z, y, loss_kl
 
     def loss_kl(self, mu, sigma):
