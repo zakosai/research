@@ -34,7 +34,7 @@ class Translation:
             for i in range(len(encode_dim)-1):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                x_ = fully_connected(x_, encode_dim[i], scope="enc_%d" % i,
+            x_ = fully_connected(x_, encode_dim[-1], scope="enc_%d" % i,
                                      weights_regularizer=self.regularizer)
                 # x_ = batch_norm(x_, decay=0.995)
         return x_
