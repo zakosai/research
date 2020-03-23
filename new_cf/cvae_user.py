@@ -511,7 +511,7 @@ class cf_vae_extend:
         for i in range(params.EM_iter):
             print("iter: %d"%i)
 
-            self.m_step(users, items, params)
+            self.pmf_estimate(users, items, params)
             self.e_step(x_data, im_data, str_data, u_data)
             self.exp_z, self.exp_z_im, self.exp_z_s, self.exp_z_u = self.get_exp_hidden(x_data, im_data, str_data, u_data)
 
