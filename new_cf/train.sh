@@ -1,4 +1,4 @@
-folders="Automotive Baby CD Clothing Garden Grocery Instrument Kindle Music Office Pet Phone Video"
+folders="Video"
 for f in $folders; do
     echo ${f}
 #    python multiVAE.py --data_dir=/media/linh/DATA/research/cf-vae/data2/${f}/ --data_type=1p --iter=200  >> /media/linh/DATA/research/new_cf/result/multi_${f}_1.txt
@@ -18,3 +18,6 @@ for f in $folders; do
 
 
 done
+#python triple_vae.py --data_dir=/media/linh/DATA/research/cf-vae/data2/Tool/ --data_type=8p --iter=100
+#python train_vae.py --ckpt_folder=experiment/Tool/1 --data_dir=../cf-vae/data2/Tool/ --data_type=1
+# python train_cvae_user.py --data_dir=../cf-vae/data2/Tool/ --ckpt_folder=experiment/Tool/1 --data_type=1
