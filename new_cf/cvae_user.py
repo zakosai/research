@@ -479,7 +479,7 @@ class cf_vae_extend:
                 rx = params.C_a * np.sum(self.U[items[v], :], axis=0) + params.lambda_v * self.exp_z[v, :]
                 self.V[v, :] = scipy.linalg.solve(Lambda_inv, rx)
 
-            print("iter: %d\t time:%d" %(i, time.time()-start))
+            print("iter: %d\t time:%d, likelihood:%f" %(i, time.time()-start, likelihood))
         return None
 
     def get_exp_hidden(self, x_data, im_data, str_data, u_data):
