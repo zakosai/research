@@ -40,8 +40,8 @@ class Dataset:
         data = {}
         variables = load_npz(os.path.join(data_dir, "mult_nor.npz"))
         data["content"] = variables.toarray()
-        # user = np.load(os.path.join("data", data_dir.split("/")[-2], "user_info_%s.npy" % data_type[0]))
-        user = np.load(os.path.join(data_dir,  "user_info_%s.npy" % data_type[0]))
+        user = np.load(os.path.join("data", data_dir.split("/")[-2], "user_info_%s.npy" % data_type[0]))
+        # user = np.load(os.path.join(data_dir,  "user_info_%s.npy" % data_type[0]))
         data["user"] = user
         data["train_users"] = self.load_rating(data_dir + "cf-train-%s-users.dat" % data_type)
         data["train_items"] = self.load_rating(data_dir + "cf-train-%s-items.dat" % data_type)
