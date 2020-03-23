@@ -76,9 +76,9 @@ def load_rating(path):
 
 
 params = params()
-params.lambda_u = 100
-params.lambda_v = 100
-params.lambda_r = 0.1
+params.lambda_u = 5
+params.lambda_v = 5
+params.lambda_r = 1
 params.C_a = 10.0
 params.C_b = 0.0
 params.max_iter_m = 1
