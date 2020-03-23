@@ -448,6 +448,40 @@ class cf_vae_extend:
 
         return likelihood
 
+    def m_step(self, users, items, params):
+        num_users = len(users)
+        num_items = len(items)
+        print("M-step")
+        start =time.time()
+        for i in range(params.max_iter_m):
+            likelihood = 0
+
+            for u in range(num_users):
+
+                idx_a = np.ones(num_items) < 0
+                idx_a[users[u]] = True   # pick those rated ids
+                Lambda_inv = params.C_a * np.dot(self.V[idx_a].T, self.V[idx_a]) + \
+                             params.C_b * np.dot(self.V[~idx_a].T, self.V[~idx_a]) + \
+                             np.eye(self.num_factors) * params.lambda_u
+
+                rx = params.C_a * np.sum(self.V[users[u], :], axis=0) + params.lambda_u * self.exp_z_u[u, :]
+                self.U[u, :] = scipy.linalg.solve(Lambda_inv, rx)
+
+                likelihood += -0.5 * params.lambda_u * np.sum(self.U[u] * self.U[u])
+
+            for v in range(num_items):
+                idx_a = np.ones(num_users) < 0
+                idx_a[items[v]] = True
+                Lambda_inv = params.C_a * np.dot(self.U[idx_a].T, self.U[idx_a]) + \
+                             params.C_b * np.dot(self.U[~idx_a].T, self.U[~idx_a]) + \
+                             np.eye(self.num_factors) * params.lambda_v
+
+                rx = params.C_a * np.sum(self.U[items[v], :], axis=0) + params.lambda_v * self.exp_z[v, :]
+                self.V[v, :] = scipy.linalg.solve(Lambda_inv, rx)
+
+            print("iter: %d\t time:%d" %(i, time.time()-start))
+        return None
+
     def get_exp_hidden(self, x_data, im_data, str_data, u_data):
         if self.model != 6:
             self.exp_z = self.sess.run(self.z_mu, feed_dict={self.x_: x_data})
@@ -477,7 +511,7 @@ class cf_vae_extend:
         for i in range(params.EM_iter):
             print("iter: %d"%i)
 
-            self.pmf_estimate(users, items, params)
+            self.m_step(users, items, params)
             self.e_step(x_data, im_data, str_data, u_data)
             self.exp_z, self.exp_z_im, self.exp_z_s, self.exp_z_u = self.get_exp_hidden(x_data, im_data, str_data, u_data)
 
