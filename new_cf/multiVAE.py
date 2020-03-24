@@ -74,7 +74,7 @@ class Translation:
         #     axis=-1))
         # return tf.reduce_mean(tf.abs(x - x_recon))
         p_x = tf.contrib.distributions.Bernoulli(x_recon)
-        neg_ll = - tf.reduce_mean(tf.reduce_sum(p_x.log_prob(x), 1))
+        neg_ll = - tf.reduce_mean(tf.reduce_sum(p_x * x, 1))
         return neg_ll
 
     def build_model(self):
