@@ -91,7 +91,7 @@ class Translation:
 
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
         content_matrix = tf.nn.l2_normalize(content_matrix)
-        print(content_matrix)
+        self.content_matrix = content_matrix
         x = (self.x * (1 - 1e-5) + 1e-5) * content_matrix
         # VAE for CF
         _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
@@ -156,7 +156,8 @@ def main(args):
                     model.user_info: dataset.user_info[list_idx],
                     model.item_info: dataset.item_info}
 
-            _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
+            _, loss, cont = sess.run([model.train_op, model.loss, model.content_matrix], feed_dict=feed)
+            print(cont)
 
         print("loss user: %f, loss item: %f, loss pred: %f"%(loss_user, loss_item, loss))
 
