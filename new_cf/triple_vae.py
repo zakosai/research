@@ -90,12 +90,12 @@ class Translation:
                          self.lambda_1 * loss_kl_item + self.lambda_1 * tf.losses.get_regularization_loss()
 
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
-        content_matrix = tf.keras.backend.l2_normalize(content_matrix, axis=-1)
+        # content_matrix = tf.keras.backend.l2_normalize(content_matrix, axis=-1)
         x = self.x * content_matrix
         # VAE for CF
         _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         # Loss VAE
-        self.loss = self.lambda_1 * loss_kl + self.lambda_2 * self.loss_reconstruct(self.x, self.x_recon) + \
+        self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
                     self.lambda_1 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
