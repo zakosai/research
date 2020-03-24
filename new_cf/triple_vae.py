@@ -91,6 +91,7 @@ class Translation:
 
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
         content_matrix = tf.nn.l2_normalize(content_matrix)
+        print(content_matrix)
         x = (self.x * (1 - 1e-5) + 1e-5) * content_matrix
         # VAE for CF
         _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
