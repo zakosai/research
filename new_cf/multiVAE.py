@@ -67,14 +67,13 @@ class Translation:
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
     def loss_reconstruct(self, x, x_recon):
-        # log_softmax_var = tf.nn.log_softmax(x_recon)
-        #
-        # neg_ll = -tf.reduce_mean(tf.reduce_sum(
-        #     log_softmax_var * x + (1-log_softmax_var) * (1-x),
-        #     axis=-1))
+        log_softmax_var = tf.nn.log_softmax(x_recon)
+
+        neg_ll = -tf.reduce_mean(tf.reduce_sum(
+            log_softmax_var * x,
+            axis=-1))
         # return tf.reduce_mean(tf.abs(x - x_recon))
-        p_x = tf.contrib.distributions.Bernoulli(x_recon)
-        neg_ll = - tf.reduce_mean(tf.reduce_sum(p_x * x, 1))
+
         return neg_ll
 
     def build_model(self):
