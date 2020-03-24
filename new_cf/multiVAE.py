@@ -60,7 +60,7 @@ class Translation:
             h = self.enc(x, "encode", encode_dim)
             z, z_mu, z_sigma = self.gen_z(h, "VAE")
             loss_kl = self.loss_kl(z_mu, z_sigma)
-            y = self.dec(z_mu, "decode", decode_dim)
+            y = self.dec(h, "decode", decode_dim)
         return z, y, loss_kl
 
     def loss_kl(self, mu, sigma):
@@ -98,7 +98,7 @@ class Translation:
         # VAE for CF
         _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         # Loss VAE
-        self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
+        self.loss =  self.loss_reconstruct(self.x, self.x_recon) + \
                     2 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
