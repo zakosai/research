@@ -70,7 +70,7 @@ class Translation:
         log_softmax_var = tf.nn.log_softmax(x_recon)
 
         neg_ll = -tf.reduce_mean(tf.reduce_sum(
-            log_softmax_var * x,
+            log_softmax_var * x + (1-log_softmax_var) * (1-x),
             axis=-1))
         # return tf.reduce_mean(tf.abs(x - x_recon))
         return neg_ll
