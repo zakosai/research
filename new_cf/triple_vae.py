@@ -30,7 +30,7 @@ class Translation:
         x_ = x
 
         # x_ = tf.nn.l2_normalize(x_, 1)
-        x_ = tf.nn.dropout(x_, 0.7)
+        # x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
