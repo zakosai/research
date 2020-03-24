@@ -92,6 +92,7 @@ class Translation:
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
         min = tf.reduce_min(content_matrix, axis=1, keep_dims=True)
         max = tf.reduce_max(content_matrix, axis=1, keep_dims=True)
+        content_matrix = (content_matrix - min) / (max - min)
         self.content_matrix = content_matrix
         x = (self.x * (1 - 1e-5) + 1e-5) * content_matrix
         # VAE for CF
