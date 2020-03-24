@@ -90,7 +90,9 @@ class Translation:
                          self.lambda_1 * loss_kl_item + self.lambda_1 * tf.losses.get_regularization_loss()
 
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
-        content_matrix = (content_matrix - tf.reduce_min(content_matrix, axis=1))/(tf.reduce_max(content_matrix, axis=1) - tf.reduce_min(content_matrix, axis=1))
+        min = tf.broadcast_to(tf.reduce_min(content_matrix, axis=1), content_matrix.shape)
+        max = tf.broadcast_to(tf.reduce_max(content_matrix, axis=1), content_matrix.shape)
+        content_matrix = (content_matrix - min)/(max - min)
         self.content_matrix = content_matrix
         x = (self.x * (1 - 1e-5) + 1e-5) * content_matrix
         # VAE for CF
