@@ -58,6 +58,8 @@ class Translation:
 
     def vae(self, x, encode_dim, decode_dim, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
+            if scope == "CF":
+                x = tf.nn.l2_normalize(x, 1)
             h = self.enc(x, "encode", encode_dim)
             z, z_mu, z_sigma = self.gen_z(h, "VAE")
             loss_kl = self.loss_kl(z_mu, z_sigma)
