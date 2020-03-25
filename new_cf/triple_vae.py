@@ -71,11 +71,11 @@ class Translation:
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
     def loss_reconstruct(self, x, x_recon):
-        log_softmax_var = tf.nn.log_softmax(x_recon)
-
-        neg_ll = - tf.reduce_mean(tf.reduce_sum(log_softmax_var * x, axis=-1))
-        # return tf.reduce_mean(tf.abs(x - x_recon))
-        return neg_ll
+        # log_softmax_var = tf.nn.log_softmax(x_recon)
+        #
+        # neg_ll = - tf.reduce_mean(tf.reduce_sum(log_softmax_var * x, axis=-1))
+        return tf.reduce_mean(tf.abs(x - x_recon))
+        # return neg_ll
 
     def build_model(self):
         self.x = tf.placeholder(tf.float32, [None, self.dim], name='input')
@@ -85,12 +85,12 @@ class Translation:
         # VAE for user
         z_user, user_recon, loss_kl_user = self.vae(self.user_info, [], [self.user_info_dim], "user")
         self.loss_user = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon), axis=1)) +\
-              loss_kl_user + 10 * tf.losses.get_regularization_loss()
+              loss_kl_user + 2 * tf.losses.get_regularization_loss()
 
         # VAE for item
         z_item, item_recon, loss_kl_item = self.vae(self.item_info, [200], [200, self.item_info_dim], "item")
         self.loss_item = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon), axis=1)) +\
-                         loss_kl_item + 10 * tf.losses.get_regularization_loss()
+                         loss_kl_item + 2 * tf.losses.get_regularization_loss()
 
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
         content_matrix = tf.keras.backend.l2_normalize(content_matrix)
@@ -104,7 +104,7 @@ class Translation:
         # self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
         #             2 * tf.losses.get_regularization_loss()
         self.x_recon = self.vae(x, self.encode_dim, self.decode_dim, "CF")
-        self.loss = self.loss_reconstruct(self.x, self.x_recon) + 10 * tf.losses.get_regularization_loss()
+        self.loss = self.loss_reconstruct(x, self.x_recon) + 10 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
