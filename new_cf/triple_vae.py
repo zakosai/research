@@ -71,11 +71,11 @@ class Translation:
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
     def loss_reconstruct(self, x, x_recon):
-        # log_softmax_var = tf.nn.log_softmax(x_recon)
-        #
-        # neg_ll = - tf.reduce_mean(tf.reduce_sum(log_softmax_var * x, axis=-1))
-        return tf.reduce_mean(tf.reduce_sum((x - x_recon)**2, 1))
-        # return neg_ll
+        log_softmax_var = tf.nn.log_softmax(x_recon)
+
+        neg_ll = - tf.reduce_mean(tf.reduce_sum(log_softmax_var * x, axis=-1))
+        # return tf.reduce_mean(tf.reduce_sum((x - x_recon)**2, 1))
+        return neg_ll
 
     def build_model(self):
         self.x = tf.placeholder(tf.float32, [None, self.dim], name='input')
@@ -97,15 +97,16 @@ class Translation:
         # min = tf.reduce_min(content_matrix, axis=1, keep_dims=True)
         # max = tf.reduce_max(content_matrix, axis=1, keep_dims=True)
         # content_matrix = (content_matrix - min) / (max - min)
-        x = (self.x * (1-1e-2) + 1e-2) * content_matrix
+        # x = (self.x * (1-1e-2) + 1e-2) * content_matrix
+        x = self.x
         # VAE for CF
         # _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         # # Loss VAE
         # self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
         #             2 * tf.losses.get_regularization_loss()
         self.x_recon = self.vae(x, self.encode_dim, self.decode_dim, "CF")
-        self.x_recon = content_matrix
         self.loss = self.loss_reconstruct(x, self.x_recon) + 10 * tf.losses.get_regularization_loss()
+        self.x_recon = self.x_recon * content_matrix
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
