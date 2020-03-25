@@ -74,7 +74,7 @@ class Translation:
         # log_softmax_var = tf.nn.log_softmax(x_recon)
         #
         # neg_ll = - tf.reduce_mean(tf.reduce_sum(log_softmax_var * x, axis=-1))
-        return tf.reduce_mean(tf.abs(x - x_recon))
+        return tf.reduce_mean(tf.reduce_sum((x - x_recon)**2, 1))
         # return neg_ll
 
     def build_model(self):
