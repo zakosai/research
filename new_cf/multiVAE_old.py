@@ -114,7 +114,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [600, 200, 100], [200, 600, dataset.no_item], 50, learning_rate=args.learning_rate)
+                        [600, 200], [200, 600, dataset.no_item], 50, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
@@ -151,7 +151,7 @@ def main(args):
             model.train = False
             loss_val_a, y_b = sess.run([model.loss, model.x_recon],
                                               feed_dict={model.x: dataset.transaction})
-            recall = recallK(dataset.train, dataset.test, y_b)
+            recall = recallK(dataset.train, dataset.test, y_b, 10)
             print("recall: %f"%recall)
             model.train = True
             if recall > best:
