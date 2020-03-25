@@ -97,14 +97,14 @@ class Translation:
         # min = tf.reduce_min(content_matrix, axis=1, keep_dims=True)
         # max = tf.reduce_max(content_matrix, axis=1, keep_dims=True)
         # content_matrix = (content_matrix - min) / (max - min)
-        x = self.x * content_matrix
+        x = self.x
         # VAE for CF
         # _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         # # Loss VAE
         # self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
         #             2 * tf.losses.get_regularization_loss()
         self.x_recon = self.vae(x, self.encode_dim, self.decode_dim, "CF")
-        self.loss = self.loss_reconstruct(self.x, self.x_recon) + 100 * tf.losses.get_regularization_loss()
+        self.loss = self.loss_reconstruct(self.x, self.x_recon) + 10 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
