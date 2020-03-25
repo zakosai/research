@@ -27,13 +27,14 @@ class Translation:
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
-        x_ = tf.nn.l2_normalize(x_, 1)
-        x_ = tf.nn.dropout(x_, 0.7)
+
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                # x_ = batch_norm(x_, decay=0.995)
+                x_ = batch_norm(x_, decay=0.995)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
@@ -41,21 +42,17 @@ class Translation:
         # if self.train:
         #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
-            for i in range(len(decode_dim)-1):
+            for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
-            x_ = fully_connected(x_, decode_dim[-1], scope="dec_last",
-                                 weights_regularizer=self.regularizer)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
-            # z_mu = fully_connected(h, self.z_dim, self.active_function, scope="z_mu")
-            # z_sigma = fully_connected(h, self.z_dim, self.active_function, scope="z_sigma")
-            z_mu = h[:, :self.z_dim]
-            z_sigma = h[:, self.z_dim:]
+            z_mu = fully_connected(h, self.z_dim, self.active_function, scope="z_mu")
+            z_sigma = fully_connected(h, self.z_dim, self.active_function, scope="z_sigma")
             e = tf.random_normal(tf.shape(z_mu))
-            z = z_mu + tf.sqrt(tf.exp(0.5 * z_sigma)) * e
+            z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
         return z, z_mu, z_sigma
 
     def vae(self, x, encode_dim, decode_dim, scope, reuse=False):
@@ -100,8 +97,8 @@ class Translation:
         # VAE for CF
         _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         # Loss VAE
-        self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
-                    2 * tf.losses.get_regularization_loss()
+        self.loss = 0.1 * loss_kl + 100* self.loss_reconstruct(self.x, self.x_recon) + \
+                    0.1 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         # self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
@@ -114,7 +111,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [600, 200, 100], [200, 600, dataset.no_item], 50, learning_rate=args.learning_rate)
+                        [600, 200], [200, 600, dataset.no_item], 50, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
