@@ -30,7 +30,7 @@ class Translation:
         x_ = x
 
         # x_ = tf.nn.l2_normalize(x_, 1)
-        # x_ = tf.nn.dropout(x_, 0.7)
+        x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
@@ -83,7 +83,7 @@ class Translation:
         self.item_info = tf.placeholder(tf.float32, [None, self.item_info_dim], name='item_info')
 
         # VAE for user
-        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [100], [100, self.user_info_dim], "user")
+        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [], [self.user_info_dim], "user")
         self.loss_user = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon), axis=1)) +\
               loss_kl_user + 2 * tf.losses.get_regularization_loss()
 
