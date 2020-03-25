@@ -24,7 +24,7 @@ class Translation:
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
-        self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.001)
+        self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.01)
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
@@ -104,7 +104,7 @@ class Translation:
         # self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
         #             2 * tf.losses.get_regularization_loss()
         self.x_recon = self.vae(x, self.encode_dim, self.decode_dim, "CF")
-        self.loss = self.loss_reconstruct(self.x, self.x_recon) + 10 * tf.losses.get_regularization_loss()
+        self.loss = self.loss_reconstruct(self.x, self.x_recon) + tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
