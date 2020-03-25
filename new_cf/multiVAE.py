@@ -29,12 +29,12 @@ class Translation:
         x_ = x
 
         # x_ = tf.nn.l2_normalize(x_, 1)
-        x_ = tf.nn.dropout(x_, 0.7)
+        # x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                x_ = batch_norm(x_, decay=0.995)
+                # x_ = batch_norm(x_, decay=0.995)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
@@ -98,7 +98,7 @@ class Translation:
         # VAE for CF
         _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         # Loss VAE
-        self.loss =  self.loss_reconstruct(self.x, self.x_recon) + \
+        self.loss = self.loss_reconstruct(self.x, self.x_recon) + \
                     2 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
@@ -112,7 +112,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [50], [dataset.no_item], 50, learning_rate=args.learning_rate)
+                        [100, 50], [100, dataset.no_item], 50, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
