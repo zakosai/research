@@ -24,7 +24,7 @@ class Translation:
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
-        self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.9)
+        self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.5)
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
