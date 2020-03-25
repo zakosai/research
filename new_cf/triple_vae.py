@@ -97,7 +97,7 @@ class Translation:
         # min = tf.reduce_min(content_matrix, axis=1, keep_dims=True)
         # max = tf.reduce_max(content_matrix, axis=1, keep_dims=True)
         # content_matrix = (content_matrix - min) / (max - min)
-        x = (self.x * 0.9 + 0.1) * content_matrix
+        x = (self.x * 0.99 + 0.01) * content_matrix
         # x = tf.concat((self.x, content_matrix), axis=1)
         # VAE for CF
         # _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
