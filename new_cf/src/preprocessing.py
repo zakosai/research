@@ -57,7 +57,7 @@ def load_rating(path):
 
 
 def preprocess(folder, f):
-    data = pd.read_csv("/media/linh/DATA/research/cf-vae/data2/%s/review_info.txt" % folder, delimiter=', ')
+    data = pd.read_csv("/media/linh/DATA/research/cf-vae/data2/%s/review_info.txt" % folder, delimiter=', ', engine='python')
     data.columns = ['u_id', 'p_id', 'rating', 'unixTime', 'brand', 'categories']
     categories = get_categories(folder)
     categories = convert_categories(categories)
