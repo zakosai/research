@@ -93,6 +93,7 @@ class Translation:
                          self.lambda_1 * loss_kl_item + self.lambda_1 * tf.losses.get_regularization_loss()
 
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
+        content_matrix = tf.keras.backend.l2_normalize(content_matrix)
         # min = tf.reduce_min(content_matrix, axis=1, keep_dims=True)
         # max = tf.reduce_max(content_matrix, axis=1, keep_dims=True)
         # content_matrix = (content_matrix - min) / (max - min)
