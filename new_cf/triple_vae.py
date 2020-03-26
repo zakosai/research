@@ -155,7 +155,6 @@ def main(args):
             x = dataset.item_info[list_idx]
             feed = {model.item_info: x}
             _, loss_item = sess.run([model.train_op_item, model.loss_item], feed_dict=feed)
-            print(loss_item)
 
         shuffle_idx = np.random.permutation(range(len(dataset.transaction)))
         for j in range(iter_no):
