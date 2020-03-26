@@ -18,7 +18,7 @@ class Translation:
         self.lambda_1 = lambda_1
         self.lambda_2 = lambda_2
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.relu
+        self.active_function = tf.nn.tanh
         self.user_info_dim = user_info_dim
         self.item_info_dim = item_info_dim
         # self.z_A = z_A
