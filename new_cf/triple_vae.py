@@ -90,8 +90,7 @@ class Translation:
         # VAE for item
         z_item, item_recon, loss_kl_item = self.vae(self.item_info, [400, 200], [200, 400, self.item_info_dim], "item")
         self.loss_item = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon), axis=1)) +\
-                        loss_kl_item + tf.losses.get_regularization_loss()
-
+                        loss_kl_item + 0.1 * tf.losses.get_regularization_loss()
 
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
         content_matrix = tf.keras.backend.l2_normalize(content_matrix)
@@ -149,7 +148,6 @@ def main(args):
             x = dataset.user_info[list_idx]
             feed = {model.user_info: x}
             _, loss_user = sess.run([model.train_op_user, model.loss_user], feed_dict=feed)
-            print(loss_user)
 
         shuffle_idx = np.random.permutation(range(dataset.no_item))
         for j in range(int(len(shuffle_idx) / batch_size + 1)):
@@ -157,6 +155,7 @@ def main(args):
             x = dataset.item_info[list_idx]
             feed = {model.item_info: x}
             _, loss_item = sess.run([model.train_op_item, model.loss_item], feed_dict=feed)
+            print(loss_item)
 
         shuffle_idx = np.random.permutation(range(len(dataset.transaction)))
         for j in range(iter_no):
