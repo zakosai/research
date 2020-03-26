@@ -90,14 +90,13 @@ def preprocess(folder, f):
 
 
 if __name__ == '__main__':
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument('--data', type=str, default='Baby')
-    # args = parser.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data', type=str, default='Baby')
+    args = parser.parse_args()
     # folders = ['Instrument', 'Kindle', 'Music', 'Office', 'Pet', 'Phone', 'Video']
-    folders = ['Kitchen', 'TV', 'Beauty', 'Toy', 'Health', 'Clothing']
+    # folders = ['Kitchen', 'TV', 'Beauty', 'Toy', 'Health', 'Clothing']
     summary = open("data/summary.txt", "a")
-    for f in folders:
-        preprocess(f, summary)
+    preprocess(args.data, summary)
     summary.close()
 
 
