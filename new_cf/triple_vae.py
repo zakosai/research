@@ -83,7 +83,7 @@ class Translation:
         self.item_info = tf.placeholder(tf.float32, [None, self.item_info_dim], name='item_info')
 
         # VAE for user
-        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [100], [100, self.user_info_dim], "user")
+        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [], [self.user_info_dim], "user")
         self.loss_user = self.lambda_2 * tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon), axis=1)) +\
              self.lambda_1 * loss_kl_user + self.lambda_1 * tf.losses.get_regularization_loss()
 
@@ -96,7 +96,7 @@ class Translation:
         min = tf.reduce_min(content_matrix, axis=1, keep_dims=True)
         max = tf.reduce_max(content_matrix, axis=1, keep_dims=True)
         content_matrix = (content_matrix - min) / (max - min)
-        x = self.x * content_matrix
+        x = (self.x * (1 - 1e-2) + 1e-2) * content_matrix
         # x = tf.concat((self.x, content_matrix), axis=1)
         # VAE for CF
         # _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
@@ -117,7 +117,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [100, 50], [dataset.no_item], 50, learning_rate=args.learning_rate)
+                        [50], [dataset.no_item], 50, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
