@@ -103,8 +103,8 @@ class Translation:
         # VAE for CF
         _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         # Loss VAE
-        self.loss = 0.1 * loss_kl + 100 * self.loss_reconstruct(self.x, self.x_recon) + \
-                    0.1 * tf.losses.get_regularization_loss()
+        self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
+                    2 * tf.losses.get_regularization_loss()
         # self.x_recon = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         # self.loss = 100 * self.loss_reconstruct(self.x, self.x_recon) + 0.1 * tf.losses.get_regularization_loss()
 
