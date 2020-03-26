@@ -97,7 +97,8 @@ class Translation:
         # min = tf.reduce_min(content_matrix, axis=1, keep_dims=True)
         # max = tf.reduce_max(content_matrix, axis=1, keep_dims=True)
         # content_matrix = (content_matrix - min) / (max - min)
-        x = (self.x * 0.99 + 0.01) * content_matrix
+        # x = (self.x * 0.99 + 0.01) * content_matrix
+        x = self.x * content_matrix
         # x = tf.concat((self.x, content_matrix), axis=1)
         # VAE for CF
         # _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
@@ -118,7 +119,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [1000, 500, 100, 50], [100, 500, 1000, dataset.no_item], 50, learning_rate=args.learning_rate)
+                        [600, 200, 50], [200, 600, dataset.no_item], 50, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
