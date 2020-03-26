@@ -94,7 +94,7 @@ if __name__ == '__main__':
     # parser.add_argument('--data', type=str, default='Baby')
     # args = parser.parse_args()
     # folders = ['Instrument', 'Kindle', 'Music', 'Office', 'Pet', 'Phone', 'Video']
-    folders = ['Outdoor', 'Kitchen', 'TV', 'Beauty', 'Toy', 'Health']
+    folders = ['Kitchen', 'TV', 'Beauty', 'Toy', 'Health', 'Clothing']
     summary = open("data/summary.txt", "a")
     for f in folders:
         preprocess(f, summary)
