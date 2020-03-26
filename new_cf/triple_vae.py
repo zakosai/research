@@ -151,6 +151,7 @@ def main(args):
             x = dataset.user_info[list_idx]
             feed = {model.user_info: x}
             _, loss_user = sess.run([model.train_op_user, model.loss_user], feed_dict=feed)
+            print(loss_user)
 
         shuffle_idx = np.random.permutation(range(dataset.no_item))
         for j in range(int(len(shuffle_idx) / batch_size + 1)):
