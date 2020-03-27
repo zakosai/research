@@ -93,12 +93,10 @@ class Translation:
                          self.lambda_1 * loss_kl_item + self.lambda_1 * tf.losses.get_regularization_loss()
 
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
-        content_matrix = tf.keras.backend.l2_normalize(content_matrix)
-        # min = tf.reduce_min(content_matrix, axis=1, keep_dims=True)
-        # max = tf.reduce_max(content_matrix, axis=1, keep_dims=True)
-        # content_matrix = (content_matrix - min) / (max - min)
-        x = (self.x * (1 - 1e-2) + 1e-2) * content_matrix
-        # x = tf.concat((self.x, content_matrix), axis=1)
+        min = tf.reduce_min(content_matrix, axis=1, keep_dims=True)
+        max = tf.reduce_max(content_matrix, axis=1, keep_dims=True)
+        content_matrix = (content_matrix - min) / (max - min)
+        x = self.x * content_matrix
         # VAE for CF
         # _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         # # Loss VAE
@@ -181,7 +179,7 @@ def main(args):
             model.train = True
             if recall > best:
                 best = recall
-        if (i%10 == 0) and (i < 30):
+        if (i%20 == 0) and (model.learning_rate >= 1e-5):
             model.learning_rate /= 10
     print(best)
 
