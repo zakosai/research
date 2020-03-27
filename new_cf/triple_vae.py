@@ -118,7 +118,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [100, 50], [100, dataset.no_item], 50, learning_rate=args.learning_rate)
+                        [50], [dataset.no_item], 50, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
@@ -126,7 +126,7 @@ def main(args):
     best = 0
     iter_no = int(dataset.no_user / batch_size + 1)
 
-    for i in range(1, 30):
+    for i in range(1, 5):
         shuffle_idx = np.random.permutation(range(dataset.no_user))
         for j in range(iter_no):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
@@ -134,6 +134,7 @@ def main(args):
             feed = {model.user_info: x}
             _, loss_user = sess.run([model.train_op_user, model.loss_user], feed_dict=feed)
 
+    for i in range(1, 50):
         shuffle_idx = np.random.permutation(range(dataset.no_item))
         for j in range(int(len(shuffle_idx) / batch_size + 1)):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
