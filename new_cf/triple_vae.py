@@ -30,8 +30,8 @@ class Translation:
         x_ = x
 
         # x_ = tf.nn.l2_normalize(x_, 1)
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
@@ -117,7 +117,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [50], [dataset.no_item], 50, learning_rate=args.learning_rate)
+                        [40], [dataset.no_item], 50, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
