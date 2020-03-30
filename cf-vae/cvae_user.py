@@ -590,7 +590,7 @@ class cf_vae_extend:
                 if len(top_M) != m:
                     print(top_M, train_users[i])
                 hits = len(set(top_M) & set(user_all[i]))   # item idex from 0
-                recall_vals.append(len(hits) / len(user_all[i]))
+                recall_vals.append(float(hits) / len(user_all[i]))
                 # precision = float(hits_num) / float(m)
                 # precision_vals.append(precision)
 
