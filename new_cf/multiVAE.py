@@ -60,7 +60,7 @@ class Translation:
             h = self.enc(x, "encode", encode_dim)
             z, z_mu, z_sigma = self.gen_z(h, "VAE")
             loss_kl = self.loss_kl(z_mu, z_sigma)
-            y = self.dec(z_mu, "decode", decode_dim)
+            y = self.dec(z, "decode", decode_dim)
         return z, y, loss_kl
 
     def loss_kl(self, mu, sigma):
@@ -112,7 +112,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [100], [dataset.no_item], 50, learning_rate=args.learning_rate)
+                        [], [dataset.no_item], 50, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
