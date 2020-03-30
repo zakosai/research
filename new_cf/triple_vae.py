@@ -31,7 +31,7 @@ class Translation:
 
         # x_ = tf.nn.l2_normalize(x_, 1)
         # if self.train:
-        # x_ = tf.nn.dropout(x_, 0.7)
+        x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
@@ -61,8 +61,7 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             h = self.enc(x, "encode", encode_dim)
             if scope == "CF":
-                y = fully_connected(h, decode_dim[0],
-                                     weights_regularizer=self.regularizer)
+                y = self.dec(h, "decode", decode_dim)
                 return y
             z, z_mu, z_sigma = self.gen_z(h, "VAE")
             loss_kl = self.loss_kl(z_mu, z_sigma)
