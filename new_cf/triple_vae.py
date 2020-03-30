@@ -116,7 +116,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [200, 100], [dataset.no_item], 50, learning_rate=args.learning_rate)
+                        [500, 100], [dataset.no_item], 50, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
