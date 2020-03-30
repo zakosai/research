@@ -61,7 +61,8 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             h = self.enc(x, "encode", encode_dim)
             if scope == "CF":
-                y = self.dec(h, "decode", decode_dim)
+                y = fully_connected(h, decode_dim[0],
+                                     weights_regularizer=self.regularizer)
                 return y
             z, z_mu, z_sigma = self.gen_z(h, "VAE")
             loss_kl = self.loss_kl(z_mu, z_sigma)
