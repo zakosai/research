@@ -584,10 +584,8 @@ class cf_vae_extend:
             recall_vals = []
             for i in range(len(user_all)):
                 train = train_users[i]
-                top_M = list(np.argsort(-pred_all[i])[0:(m +len(train))])
-                for u in train:
-                    if u in top_M:
-                        top_M.remove(u)
+                top_M = list(np.argsort(pred_all[i])[::-1][:(m +len(train))])
+                top_M = [p for p in top_M if p not in train]
                 top_M = top_M[:m]
                 if len(top_M) != m:
                     print(top_M, train_users[i])
