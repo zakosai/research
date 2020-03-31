@@ -144,12 +144,12 @@ def main(args):
             _, loss_item = sess.run([model.train_op_item, model.loss_item], feed_dict=feed)
 
     for i in range(1, iter):
-        shuffle_idx = np.random.permutation(range(dataset.no_user))
-        for j in range(iter_no):
-            list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
-            x = dataset.user_info[list_idx]
-            feed = {model.user_info: x}
-            _, loss_user = sess.run([model.train_op_user, model.loss_user], feed_dict=feed)
+        # shuffle_idx = np.random.permutation(range(dataset.no_user))
+        # for j in range(iter_no):
+        #     list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
+        #     x = dataset.user_info[list_idx]
+        #     feed = {model.user_info: x}
+        #     _, loss_user = sess.run([model.train_op_user, model.loss_user], feed_dict=feed)
 
         shuffle_idx = np.random.permutation(range(dataset.no_item))
         for j in range(int(len(shuffle_idx) / batch_size + 1)):
@@ -166,7 +166,7 @@ def main(args):
                     model.user_info: dataset.user_info[list_idx],
                     model.item_info: dataset.item_info}
 
-            _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
+            _, loss, _, loss_user = sess.run([model.train_op, model.loss, model.train_op_user, model.loss_user], feed_dict=feed)
 
         print("loss user: %f, loss item: %f, loss pred: %f"%(loss_user, loss_item, loss))
 
