@@ -65,7 +65,7 @@ class Dataset:
         arr = np.zeros((self.no_user, self.no_item))
         arr_test = np.zeros((self.no_user, self.no_item))
         for i in range(self.no_user):
-            arr[i, self.train[i][:7]] = 1
+            arr[i, self.train[i][:5]] = 1
             arr_test[i, self.train[i]] = 1
         return arr, arr_test
 
