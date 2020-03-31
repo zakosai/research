@@ -181,7 +181,7 @@ def main(args):
             loss_val_a, y_b = sess.run([model.loss, model.x_recon],
                                               feed_dict={model.x: dataset.transaction,
                                                          model.user_info: dataset.user_info,
-                                                         model.item_info: dataset.item_info})
+                                                         model.item_value: z_item})
             recall = recallK(dataset.train, dataset.test, y_b)
             print("recall: %f"%recall)
             model.train = True
