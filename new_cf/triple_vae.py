@@ -131,13 +131,13 @@ def main(args):
     best = 0
     iter_no = int(dataset.no_user / batch_size + 1)
 
-    for i in range(1, 30):
-        shuffle_idx = np.random.permutation(range(dataset.no_user))
-        for j in range(iter_no):
-            list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
-            x = dataset.user_info[list_idx]
-            feed = {model.user_info: x}
-            _, loss_user = sess.run([model.train_op_user, model.loss_user], feed_dict=feed)
+    # for i in range(1, 30):
+    #     shuffle_idx = np.random.permutation(range(dataset.no_user))
+    #     for j in range(iter_no):
+    #         list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
+    #         x = dataset.user_info[list_idx]
+    #         feed = {model.user_info: x}
+    #         _, loss_user = sess.run([model.train_op_user, model.loss_user], feed_dict=feed)
 
     for i in range(1, 50):
         shuffle_idx = np.random.permutation(range(dataset.no_item))
