@@ -93,7 +93,7 @@ class Translation:
         z_item, item_recon, loss_kl_item = self.vae(self.item_info, [400, 200], [200, 400, self.item_info_dim], "item")
         self.loss_item = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon), axis=1)) +\
                          loss_kl_item + tf.losses.get_regularization_loss()
-        z_item = tf.reduce_sum(z_item, axis=-1)
+        z_item = tf.reduce_mean(z_item, axis=-1)
         x = tf.multiply(self.x, z_item)
 
         # content_matrix = tf.matmul(z_user, tf.transpose(z_item))
@@ -107,7 +107,7 @@ class Translation:
         # # Loss VAE
         # self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
         #             2 * tf.losses.get_regularization_loss()
-        self.x_recon = self.vae(self.x, self.encode_dim, self.decode_dim, "CF", z_user=z_user)
+        self.x_recon = self.vae(x, self.encode_dim, self.decode_dim, "CF", z_user=z_user)
         self.loss = self.loss_reconstruct(self.x, self.x_recon) + tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
