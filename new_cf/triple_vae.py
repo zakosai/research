@@ -80,6 +80,7 @@ class Translation:
 
     def build_model(self):
         self.x = tf.placeholder(tf.float32, [None, self.dim], name='input')
+        self.x_out = tf.placeholder(tf.float32, [None, self.dim], name='input_out')
         self.user_info = tf.placeholder(tf.float32, [None, self.user_info_dim], name='user_info')
         self.item_info = tf.placeholder(tf.float32, [None, self.item_info_dim], name='item_info')
 
@@ -104,7 +105,7 @@ class Translation:
         # self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
         #             2 * tf.losses.get_regularization_loss()
         self.x_recon = self.vae(x, self.encode_dim, self.decode_dim, "CF")
-        self.loss = self.loss_reconstruct(self.x, self.x_recon) + 2 * tf.losses.get_regularization_loss()
+        self.loss = self.loss_reconstruct(self.x_out, self.x_recon) + 2 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
@@ -117,7 +118,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [600, 200, 50], [200, 600, dataset.no_item], 50, learning_rate=args.learning_rate)
+                        [50], [dataset.no_item], 50, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
@@ -161,6 +162,7 @@ def main(args):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
             x = dataset.transaction[list_idx]
             feed = {model.x: x,
+                    model.x_out: dataset.transaction_out[list_idx],
                     model.user_info: dataset.user_info[list_idx],
                     model.item_info: dataset.item_info}
 
@@ -172,7 +174,7 @@ def main(args):
         if i%1 == 0:
             model.train = False
             loss_val_a, y_b = sess.run([model.loss, model.x_recon],
-                                              feed_dict={model.x: dataset.transaction,
+                                              feed_dict={model.x: dataset.transaction_out,
                                                          model.user_info: dataset.user_info,
                                                          model.item_info: dataset.item_info})
             recall = recallK(dataset.train, dataset.test, y_b)
