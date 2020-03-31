@@ -112,7 +112,7 @@ class Translation:
         self.x_recon = self.vae(x, self.encode_dim, self.decode_dim, "CF", z_user=z_user)
         self.loss = self.loss_reconstruct(self.x, self.x_recon) + tf.losses.get_regularization_loss()
 
-        self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
+        self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss + self.loss_user)
         self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
         self.train_op_item = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_item)
 
@@ -172,7 +172,7 @@ def main(args):
                     model.user_info: dataset.user_info[list_idx],
                     model.item_value: z_item}
 
-            _, loss, _, loss_user = sess.run([model.train_op, model.loss, model.train_op_user, model.loss_user], feed_dict=feed)
+            _, loss, loss_user = sess.run([model.train_op, model.loss,model.loss_user], feed_dict=feed)
 
         print("loss user: %f, loss item: %f, loss pred: %f"%(loss_user, loss_item, loss))
 
