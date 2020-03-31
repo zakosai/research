@@ -105,7 +105,7 @@ class Translation:
         # # Loss VAE
         # self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
         #             2 * tf.losses.get_regularization_loss()
-        self.x_recon = self.vae(self.x, self.encode_dim, self.decode_dim, "CF", z_user)
+        self.x_recon = self.vae(self.x, self.encode_dim, self.decode_dim, "CF", z_user=z_user)
         self.loss = self.loss_reconstruct(self.x, self.x_recon) + tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
