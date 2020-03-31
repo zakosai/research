@@ -125,6 +125,7 @@ def main(args):
     sess.run(tf.global_variables_initializer())
     best = 0
     iter_no = int(dataset.no_user / batch_size + 1)
+    print(dataset.transaction.shape, dataset.transaction_out.shape)
 
     for i in range(1, 5):
         shuffle_idx = np.random.permutation(range(dataset.no_user))
@@ -174,7 +175,7 @@ def main(args):
         if i%1 == 0:
             model.train = False
             loss_val_a, y_b = sess.run([model.loss, model.x_recon],
-                                              feed_dict={model.x: dataset.transaction_out,
+                                              feed_dict={model.x: dataset.transaction,
                                                          model.user_info: dataset.user_info,
                                                          model.item_info: dataset.item_info})
             recall = recallK(dataset.train, dataset.test, y_b)
