@@ -93,6 +93,9 @@ class Translation:
         z_item, item_recon, loss_kl_item = self.vae(self.item_info, [400, 200], [200, 400, self.item_info_dim], "item")
         self.loss_item = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon), axis=1)) +\
                          loss_kl_item + tf.losses.get_regularization_loss()
+        z_item = tf.reduce_sum(z_item, axis=-1)
+        z_item = tf.broadcast_to(z_item, [tf.shape(z_user)[0], self.z_dim])
+        x = self.x * z_item
 
         # content_matrix = tf.matmul(z_user, tf.transpose(z_item))
         # min = tf.reduce_min(content_matrix, axis=1, keep_dims=True)
@@ -106,7 +109,7 @@ class Translation:
         # self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
         #             2 * tf.losses.get_regularization_loss()
         self.x_recon = self.vae(self.x, self.encode_dim, self.decode_dim, "CF", z_user=z_user)
-        self.loss = self.loss_reconstruct(self.x, self.x_recon) + tf.losses.get_regularization_loss()
+        self.loss = self.loss_reconstruct(x, self.x_recon) + tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
@@ -119,7 +122,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [100], [dataset.no_item], 20, learning_rate=args.learning_rate)
+                        [100], [dataset.no_item], 50, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
