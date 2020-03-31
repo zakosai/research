@@ -124,7 +124,6 @@ def main(args):
     sess.run(tf.global_variables_initializer())
     best = 0
     iter_no = int(dataset.no_user / batch_size + 1)
-    print(dataset.transaction.shape, dataset.transaction_out.shape)
 
     for i in range(1, 5):
         shuffle_idx = np.random.permutation(range(dataset.no_user))
