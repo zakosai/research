@@ -161,7 +161,7 @@ def main(args):
         shuffle_idx = np.random.permutation(range(len(dataset.transaction)))
         for j in range(iter_no):
             list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
-            x = dataset.transaction_out[list_idx]
+            x = dataset.transaction[list_idx]
             feed = {model.x: x,
                     model.x_out: dataset.transaction_out[list_idx],
                     model.user_info: dataset.user_info[list_idx],
