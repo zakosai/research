@@ -106,7 +106,7 @@ class Translation:
         # x = self.x * content_matrix
         # x = tf.concat((self.x, z_user), axis=-1)
         # VAE for CF
-        _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
+        _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF", z_user=z_user)
         # Loss VAE
         self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
                     2 * tf.losses.get_regularization_loss()
@@ -124,7 +124,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [200], [dataset.no_item], 50, learning_rate=args.learning_rate)
+                        [], [dataset.no_item], 50, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
