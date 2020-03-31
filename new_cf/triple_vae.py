@@ -83,6 +83,7 @@ class Translation:
         self.x = tf.placeholder(tf.float32, [None, self.dim], name='input')
         self.user_info = tf.placeholder(tf.float32, [None, self.user_info_dim], name='user_info')
         self.item_info = tf.placeholder(tf.float32, [None, self.item_info_dim], name='item_info')
+        self.item_value = tf.placeholder(tf.float, [None, self.dim], name='item_value')
 
         # VAE for user
         z_user, user_recon, loss_kl_user = self.vae(self.user_info, [200], [200, self.user_info_dim], "user")
@@ -93,8 +94,8 @@ class Translation:
         z_item, item_recon, loss_kl_item = self.vae(self.item_info, [400, 200], [200, 400, self.item_info_dim], "item")
         self.loss_item = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon), axis=1)) +\
                          loss_kl_item + tf.losses.get_regularization_loss()
-        z_item = tf.reduce_sum(z_item, axis=-1)
-        x = tf.multiply(self.x, z_item)
+        self.z_item = z_item
+        x = tf.multiply(self.x, self.item_value)
 
         # content_matrix = tf.matmul(z_user, tf.transpose(z_item))
         # min = tf.reduce_min(content_matrix, axis=1, keep_dims=True)
@@ -144,6 +145,7 @@ def main(args):
             x = dataset.item_info[list_idx]
             feed = {model.item_info: x}
             _, loss_item = sess.run([model.train_op_item, model.loss_item], feed_dict=feed)
+    z_item = sess.run([model.z_item], feed_dict={model.item_info: dataset.item_info})
 
     for i in range(1, iter):
         # shuffle_idx = np.random.permutation(range(dataset.no_user))
@@ -153,12 +155,12 @@ def main(args):
         #     feed = {model.user_info: x}
         #     _, loss_user = sess.run([model.train_op_user, model.loss_user], feed_dict=feed)
 
-        shuffle_idx = np.random.permutation(range(dataset.no_item))
-        for j in range(int(len(shuffle_idx) / batch_size + 1)):
-            list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
-            x = dataset.item_info[list_idx]
-            feed = {model.item_info: x}
-            _, loss_item = sess.run([model.train_op_item, model.loss_item], feed_dict=feed)
+        # shuffle_idx = np.random.permutation(range(dataset.no_item))
+        # for j in range(int(len(shuffle_idx) / batch_size + 1)):
+        #     list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
+        #     x = dataset.item_info[list_idx]
+        #     feed = {model.item_info: x}
+        #     _, loss_item = sess.run([model.train_op_item, model.loss_item], feed_dict=feed)
 
         shuffle_idx = np.random.permutation(range(len(dataset.transaction)))
         for j in range(iter_no):
@@ -166,7 +168,7 @@ def main(args):
             x = dataset.transaction[list_idx]
             feed = {model.x: x,
                     model.user_info: dataset.user_info[list_idx],
-                    model.item_info: dataset.item_info}
+                    model.item_value: z_item}
 
             _, loss, _, loss_user = sess.run([model.train_op, model.loss, model.train_op_user, model.loss_user], feed_dict=feed)
 
