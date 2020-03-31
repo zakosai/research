@@ -83,7 +83,7 @@ class Translation:
         self.x = tf.placeholder(tf.float32, [None, self.dim], name='input')
         self.user_info = tf.placeholder(tf.float32, [None, self.user_info_dim], name='user_info')
         self.item_info = tf.placeholder(tf.float32, [None, self.item_info_dim], name='item_info')
-        self.item_value = tf.placeholder(tf.float32, [self.dim], name='item_value')
+        self.item_value = tf.placeholder(tf.float32, [1, self.dim], name='item_value')
 
         # VAE for user
         z_user, user_recon, loss_kl_user = self.vae(self.user_info, [200], [200, self.user_info_dim], "user")
