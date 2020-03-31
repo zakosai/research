@@ -95,7 +95,8 @@ class Translation:
         self.loss_item = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon), axis=1)) +\
                          loss_kl_item + tf.losses.get_regularization_loss()
         self.z_item = z_item
-        x = tf.multiply(self.x, self.item_value)
+        # x = tf.multiply(self.x, self.item_value)
+        x = self.x
 
         # content_matrix = tf.matmul(z_user, tf.transpose(z_item))
         # min = tf.reduce_min(content_matrix, axis=1, keep_dims=True)
