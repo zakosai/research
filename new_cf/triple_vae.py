@@ -117,7 +117,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [600, 200], [dataset.no_item], 50, learning_rate=args.learning_rate)
+                        [1000, 500], [dataset.no_item], 50, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
@@ -125,7 +125,7 @@ def main(args):
     best = 0
     iter_no = int(dataset.no_user / batch_size + 1)
 
-    for i in range(1, 5):
+    for i in range(1, 30):
         shuffle_idx = np.random.permutation(range(dataset.no_user))
         for j in range(iter_no):
             list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
