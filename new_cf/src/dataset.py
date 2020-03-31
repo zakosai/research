@@ -14,8 +14,9 @@ class Dataset:
         self.no_item, self.item_size, = self.item_info.shape
         self.no_user, self.user_size = self.user_info.shape
 
-        cf_data = self.gen_cf_matrix()
-        self.transaction = cf_data
+        cf_in, cf_out = self.gen_cf_matrix()
+        self.transaction = cf_in
+        self.transaction_out = cf_out
         print(self.item_info.shape, self.user_info.shape, self.transaction.shape)
         # self.item_info = cf_data.T
         # self.user_info = cf_data
@@ -62,9 +63,11 @@ class Dataset:
 
     def gen_cf_matrix(self):
         arr = np.zeros((self.no_user, self.no_item))
+        arr_test = np.zeros((self.no_user, self.no_item))
         for i in range(self.no_user):
-            arr[i, self.train[i]] = 1
-        return arr
+            arr[i, self.train[i][:5]] = 1
+            arr_test[i, self.train[i]] = 1
+        return arr, arr_test
 
     def gen_epoch(self):
         user = []
