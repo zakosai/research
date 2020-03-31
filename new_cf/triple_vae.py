@@ -49,22 +49,22 @@ class Translation:
                                      weights_regularizer=self.regularizer)
         return x_
 
-    def gen_z(self, h, scope, reuse=False):
+    def gen_z(self, h, scope, dim, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
-            z_mu = fully_connected(h, self.z_dim, self.active_function, scope="z_mu")
-            z_sigma = fully_connected(h, self.z_dim, self.active_function, scope="z_sigma")
+            z_mu = fully_connected(h, dim, self.active_function, scope="z_mu")
+            z_sigma = fully_connected(h, dim, self.active_function, scope="z_sigma")
             e = tf.random_normal(tf.shape(z_mu))
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
         return z, z_mu, z_sigma
 
-    def vae(self, x, encode_dim, decode_dim, scope, reuse=False, z_user=None):
+    def vae(self, x, encode_dim, decode_dim, scope, z_dim=None, reuse=False, z_user=None):
         with tf.variable_scope(scope, reuse=reuse):
             h = self.enc(x, "encode", encode_dim)
             # if scope == "CF":
             #     x_ = tf.concat((h, z_user), axis=-1)
             #     y = self.dec(x_, "decode", decode_dim)
             #     return y
-            z, z_mu, z_sigma = self.gen_z(h, "VAE")
+            z, z_mu, z_sigma = self.gen_z(h, "VAE", z_dim)
             loss_kl = self.loss_kl(z_mu, z_sigma)
             if scope == "CF":
                 z = tf.concat((z, z_user), axis=-1)
@@ -88,12 +88,12 @@ class Translation:
         self.item_value = tf.placeholder(tf.float32, [1, self.dim], name='item_value')
 
         # VAE for user
-        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [200], [200, self.user_info_dim], "user")
+        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [200], [200, self.user_info_dim], "user", self.z_dim)
         self.loss_user = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon), axis=1)) +\
             loss_kl_user + tf.losses.get_regularization_loss()
 
         # VAE for item
-        z_item, item_recon, loss_kl_item = self.vae(self.item_info, [400, 200], [200, 400, self.item_info_dim], "item")
+        z_item, item_recon, loss_kl_item = self.vae(self.item_info, [400, 200], [200, 400, self.item_info_dim], "item", self.z_dim)
         self.loss_item = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon), axis=1)) +\
                          loss_kl_item + tf.losses.get_regularization_loss()
         self.z_item = z_item
@@ -106,7 +106,7 @@ class Translation:
         # x = self.x * content_matrix
         # x = tf.concat((self.x, z_user), axis=-1)
         # VAE for CF
-        _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF", z_user=z_user)
+        _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF", 200, z_user=z_user)
         # Loss VAE
         self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
                     2 * tf.losses.get_regularization_loss()
@@ -124,7 +124,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [200], [dataset.no_item], 50, learning_rate=args.learning_rate)
+                        [], [dataset.no_item], 50, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
