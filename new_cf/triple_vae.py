@@ -57,11 +57,12 @@ class Translation:
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
         return z, z_mu, z_sigma
 
-    def vae(self, x, encode_dim, decode_dim, scope, reuse=False):
+    def vae(self, x, encode_dim, decode_dim, scope, reuse=False, z_user=None):
         with tf.variable_scope(scope, reuse=reuse):
             h = self.enc(x, "encode", encode_dim)
             if scope == "CF":
-                y = self.dec(h, "decode", decode_dim)
+                x_ = tf.concat((h, z_user), axis=-1)
+                y = self.dec(x_, "decode", decode_dim)
                 return y
             z, z_mu, z_sigma = self.gen_z(h, "VAE")
             loss_kl = self.loss_kl(z_mu, z_sigma)
@@ -98,13 +99,13 @@ class Translation:
         # max = tf.reduce_max(content_matrix, axis=1, keep_dims=True)
         # content_matrix = (content_matrix - min) / (max - min)
         # x = self.x * content_matrix
-        x = tf.concat((self.x, z_user), axis=-1)
+        # x = tf.concat((self.x, z_user), axis=-1)
         # VAE for CF
         # _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         # # Loss VAE
         # self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
         #             2 * tf.losses.get_regularization_loss()
-        self.x_recon = self.vae(x, self.encode_dim, self.decode_dim, "CF")
+        self.x_recon = self.vae(self.x, self.encode_dim, self.decode_dim, "CF", z_user)
         self.loss = self.loss_reconstruct(self.x, self.x_recon) + tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
