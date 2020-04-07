@@ -115,75 +115,77 @@ class Translation:
 def main(args):
     iter = args.iter
     batch_size = 500
+    layers = [[50], [100], [150], [200], [250], [300], [200, 50], [200, 100], [500, 50], [500, 100], [1000, 50],
+              [1000, 100], [1000, 200]]
+    for layer in layers:
+        dataset = Dataset(args.data_dir, args.data_type)
+        model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
+                            layer, [dataset.no_item], 50, learning_rate=args.learning_rate)
+        model.build_model()
 
-    dataset = Dataset(args.data_dir, args.data_type)
-    model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [200, 50], [dataset.no_item], 50, learning_rate=args.learning_rate)
-    model.build_model()
+        sess = tf.Session()
+        sess.run(tf.global_variables_initializer())
+        best = 0
+        iter_no = int(dataset.no_user / batch_size + 1)
 
-    sess = tf.Session()
-    sess.run(tf.global_variables_initializer())
-    best = 0
-    iter_no = int(dataset.no_user / batch_size + 1)
+        for i in range(1, 5):
+            shuffle_idx = np.random.permutation(range(dataset.no_user))
+            for j in range(iter_no):
+                list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
+                x = dataset.user_info[list_idx]
+                feed = {model.user_info: x}
+                _, loss_user = sess.run([model.train_op_user, model.loss_user], feed_dict=feed)
 
-    for i in range(1, 5):
-        shuffle_idx = np.random.permutation(range(dataset.no_user))
-        for j in range(iter_no):
-            list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
-            x = dataset.user_info[list_idx]
-            feed = {model.user_info: x}
-            _, loss_user = sess.run([model.train_op_user, model.loss_user], feed_dict=feed)
+        for i in range(1, 50):
+            shuffle_idx = np.random.permutation(range(dataset.no_item))
+            for j in range(int(len(shuffle_idx) / batch_size + 1)):
+                list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
+                x = dataset.item_info[list_idx]
+                feed = {model.item_info: x}
+                _, loss_item = sess.run([model.train_op_item, model.loss_item], feed_dict=feed)
 
-    for i in range(1, 50):
-        shuffle_idx = np.random.permutation(range(dataset.no_item))
-        for j in range(int(len(shuffle_idx) / batch_size + 1)):
-            list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
-            x = dataset.item_info[list_idx]
-            feed = {model.item_info: x}
-            _, loss_item = sess.run([model.train_op_item, model.loss_item], feed_dict=feed)
+        for i in range(1, iter):
+            shuffle_idx = np.random.permutation(range(dataset.no_user))
+            for j in range(iter_no):
+                list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
+                x = dataset.user_info[list_idx]
+                feed = {model.user_info: x}
+                _, loss_user = sess.run([model.train_op_user, model.loss_user], feed_dict=feed)
 
-    for i in range(1, iter):
-        shuffle_idx = np.random.permutation(range(dataset.no_user))
-        for j in range(iter_no):
-            list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
-            x = dataset.user_info[list_idx]
-            feed = {model.user_info: x}
-            _, loss_user = sess.run([model.train_op_user, model.loss_user], feed_dict=feed)
+            shuffle_idx = np.random.permutation(range(dataset.no_item))
+            for j in range(int(len(shuffle_idx) / batch_size + 1)):
+                list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
+                x = dataset.item_info[list_idx]
+                feed = {model.item_info: x}
+                _, loss_item = sess.run([model.train_op_item, model.loss_item], feed_dict=feed)
 
-        shuffle_idx = np.random.permutation(range(dataset.no_item))
-        for j in range(int(len(shuffle_idx) / batch_size + 1)):
-            list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
-            x = dataset.item_info[list_idx]
-            feed = {model.item_info: x}
-            _, loss_item = sess.run([model.train_op_item, model.loss_item], feed_dict=feed)
+            shuffle_idx = np.random.permutation(range(len(dataset.transaction)))
+            for j in range(iter_no):
+                list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
+                x = dataset.transaction[list_idx]
+                feed = {model.x: x,
+                        model.user_info: dataset.user_info[list_idx],
+                        model.item_info: dataset.item_info}
 
-        shuffle_idx = np.random.permutation(range(len(dataset.transaction)))
-        for j in range(iter_no):
-            list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
-            x = dataset.transaction[list_idx]
-            feed = {model.x: x,
-                    model.user_info: dataset.user_info[list_idx],
-                    model.item_info: dataset.item_info}
+                _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
-            _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
+            print("loss user: %f, loss item: %f, loss pred: %f"%(loss_user, loss_item, loss))
 
-        print("loss user: %f, loss item: %f, loss pred: %f"%(loss_user, loss_item, loss))
-
-        # Validation Process
-        if i%1 == 0:
-            model.train = False
-            loss_val_a, y_b = sess.run([model.loss, model.x_recon],
-                                              feed_dict={model.x: dataset.transaction,
-                                                         model.user_info: dataset.user_info,
-                                                         model.item_info: dataset.item_info})
-            recall = recallK(dataset.train, dataset.test, y_b)
-            print("recall: %f"%recall)
-            model.train = True
-            if recall > best:
-                best = recall
-        if (i%20 == 0) and (model.learning_rate >= 1e-6):
-            model.learning_rate /= 10
-    print(best)
+            # Validation Process
+            if i%1 == 0:
+                model.train = False
+                loss_val_a, y_b = sess.run([model.loss, model.x_recon],
+                                                  feed_dict={model.x: dataset.transaction,
+                                                             model.user_info: dataset.user_info,
+                                                             model.item_info: dataset.item_info})
+                recall = recallK(dataset.train, dataset.test, y_b)
+                print("recall: %f"%recall)
+                model.train = True
+                if recall > best:
+                    best = recall
+            if (i%20 == 0) and (model.learning_rate >= 1e-6):
+                model.learning_rate /= 10
+        print("Layers ", layer, " : ", best)
 
 
 if __name__ == '__main__':
