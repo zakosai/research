@@ -4,6 +4,7 @@ from keras.backend import binary_crossentropy
 from src.dataset import Dataset, recallK
 import numpy as np
 import argparse
+from numba import cuda
 
 
 class Translation:
@@ -186,6 +187,8 @@ def main(args):
             if (i%20 == 0) and (model.learning_rate >= 1e-6):
                 model.learning_rate /= 10
         print("Layers ", layer, " : ", best)
+        sess.close()
+        cuda.close()
 
 
 if __name__ == '__main__':
