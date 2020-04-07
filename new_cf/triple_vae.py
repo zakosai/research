@@ -19,7 +19,7 @@ class Translation:
         self.lambda_1 = lambda_1
         self.lambda_2 = lambda_2
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.tanh
+        self.active_function = tf.nn.relu
         self.user_info_dim = user_info_dim
         self.item_info_dim = item_info_dim
         # self.z_A = z_A
@@ -106,7 +106,7 @@ class Translation:
         # self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
         #             2 * tf.losses.get_regularization_loss()
         self.x_recon = self.vae(x, self.encode_dim, self.decode_dim, "CF")
-        self.loss = self.loss_reconstruct(self.x, self.x_recon) + 2 * tf.losses.get_regularization_loss()
+        self.loss = self.loss_reconstruct(self.x, self.x_recon) + 10 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
@@ -116,7 +116,7 @@ class Translation:
 def main(args):
     iter = args.iter
     batch_size = 500
-    layers = [[10], [20], [30], [40], [50], [80], [100],[120], [150]]
+    layers = [[30], [50], [80], [100],[150], [200]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
