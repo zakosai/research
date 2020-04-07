@@ -61,7 +61,7 @@ class Translation:
         with tf.variable_scope(scope, reuse=reuse):
             h = self.enc(x, "encode", encode_dim)
             if scope == "CF":
-                h = tf.concat((h, user_info), axis=-1)
+                # h = tf.concat((h, user_info), axis=-1)
                 y = self.dec(h, "decode", decode_dim)
                 return y
             z, z_mu, z_sigma = self.gen_z(h, "VAE")
@@ -104,7 +104,7 @@ class Translation:
         # # Loss VAE
         # self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
         #             2 * tf.losses.get_regularization_loss()
-        self.x_recon = self.vae(x, self.encode_dim, self.decode_dim, "CF", user_info=z_user)
+        self.x_recon = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         self.loss = self.loss_reconstruct(self.x, self.x_recon) + 10 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
