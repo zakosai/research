@@ -187,8 +187,7 @@ def main(args):
             if (i%20 == 0) and (model.learning_rate >= 1e-6):
                 model.learning_rate /= 10
         print("Layers ", layer, " : ", best)
-        sess.close()
-        cuda.close()
+        tf.keras.backend.clear_session()
 
 
 if __name__ == '__main__':
