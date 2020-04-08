@@ -31,8 +31,8 @@ class Translation:
         x_ = x
 
         # x_ = tf.nn.l2_normalize(x_, 1)
-        if self.train:
-            x_ = tf.nn.dropout(x_, 0.7)
+        # if self.train:
+        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
@@ -99,7 +99,7 @@ class Translation:
         min = tf.reduce_min(content_matrix, axis=1, keep_dims=True)
         max = tf.reduce_max(content_matrix, axis=1, keep_dims=True)
         content_matrix = (content_matrix - min) / (max - min)
-        x = (self.x * (1-1e-4) + 1e-4) * content_matrix
+        x = self.x * content_matrix
         # VAE for CF
         # _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF", z_user=z_user)
         # # Loss VAE
@@ -117,7 +117,7 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[4000, 2000, 1000, 500]]
+    layers = [[4000, 2000, 1000]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
