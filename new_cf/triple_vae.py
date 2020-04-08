@@ -117,7 +117,7 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[4000, 2000, 4000]]
+    layers = [[4000, 2000, 1000], [4000, 2000, 4000], [6000, 3000, 1000], [1000, 800, 600, 200, 800], [1000, 800, 600, 200]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
@@ -171,7 +171,7 @@ def main(args):
 
                 _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
-            print("loss user: %f, loss item: %f, loss pred: %f"%(loss_user, loss_item, loss))
+            # print("loss user: %f, loss item: %f, loss pred: %f"%(loss_user, loss_item, loss))
 
             # Validation Process
             if i%1 == 0:
@@ -181,7 +181,7 @@ def main(args):
                                                              model.user_info: dataset.user_info,
                                                              model.item_info: dataset.item_info})
                 recall = recallK(dataset.train, dataset.test, y_b)
-                print("recall: %f"%recall)
+                # print("recall: %f"%recall)
                 model.train = True
                 if recall > best:
                     best = recall
