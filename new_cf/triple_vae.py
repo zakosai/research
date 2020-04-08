@@ -68,7 +68,7 @@ class Translation:
             z, z_mu, z_sigma = self.gen_z(h, "VAE")
             loss_kl = self.loss_kl(z_mu, z_sigma)
             y = self.dec(z, "decode", decode_dim)
-        return z, y, loss_kl
+        return z_mu, y, loss_kl
 
     def loss_kl(self, mu, sigma):
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
