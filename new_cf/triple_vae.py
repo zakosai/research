@@ -88,12 +88,12 @@ class Translation:
         # VAE for user
         z_user, user_recon, loss_kl_user = self.vae(self.user_info, [200], [200, self.user_info_dim], "user")
         self.loss_user = self.lambda_2 * tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon), axis=1)) +\
-             self.lambda_1 * loss_kl_user + 10 * tf.losses.get_regularization_loss()
+             self.lambda_1 * loss_kl_user + 0.1 * tf.losses.get_regularization_loss()
 
         # VAE for item
         z_item, item_recon, loss_kl_item = self.vae(self.item_info, [400, 200], [200, 400, self.item_info_dim], "item")
         self.loss_item = self.lambda_2 * tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon), axis=1)) +\
-                         self.lambda_1 * loss_kl_item + 10 * tf.losses.get_regularization_loss()
+                         self.lambda_1 * loss_kl_item + 0.1 * tf.losses.get_regularization_loss()
 
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
         min = tf.reduce_min(content_matrix, axis=1, keep_dims=True)
@@ -117,7 +117,7 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[4000, 2000, 1000, 500]]
+    layers = [[6000, 3000, 1000, 500]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
