@@ -30,7 +30,7 @@ class Translation:
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
 
-        x_ = tf.nn.l2_normalize(x_, 1)
+        # x_ = tf.nn.l2_normalize(x_, 1)
         # if self.train:
         #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
