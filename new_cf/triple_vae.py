@@ -30,7 +30,7 @@ class Translation:
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
 
-        # x_ = tf.nn.l2_normalize(x_, 1)
+        x_ = tf.nn.l2_normalize(x_, 1)
         # if self.train:
         #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
@@ -99,7 +99,7 @@ class Translation:
         min = tf.reduce_min(content_matrix, axis=1, keep_dims=True)
         max = tf.reduce_max(content_matrix, axis=1, keep_dims=True)
         content_matrix = (content_matrix - min) / (max - min)
-        x = self.x * content_matrix
+        x = (self.x * (1-1e-2) + 1e-2) * content_matrix
         # VAE for CF
         # _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF", z_user=z_user)
         # # Loss VAE
