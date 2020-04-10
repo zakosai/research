@@ -37,7 +37,7 @@ class Translation:
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                x_ = batch_norm(x_, decay=0.995)
+                x_ = batch_norm(x_, decay=0.99)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
@@ -99,7 +99,7 @@ class Translation:
         min = tf.reduce_min(content_matrix, axis=1, keep_dims=True)
         max = tf.reduce_max(content_matrix, axis=1, keep_dims=True)
         content_matrix = (content_matrix - min) / (max - min)
-        x = (self.x * (1-1e-2) + 1e-2) * content_matrix
+        x = self.x * content_matrix
         # VAE for CF
         # _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF", z_user=z_user)
         # # Loss VAE
@@ -117,7 +117,7 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[4000, 2000, 4000], [4000, 2000, 4000], [6000, 3000, 1000], [1000, 800, 600, 200, 800], [1000, 800, 600, 200]]
+    layers = [[4000, 2000, 4000]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
