@@ -106,7 +106,7 @@ class Translation:
         # self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
         #             2 * tf.losses.get_regularization_loss()
         self.x_recon = self.vae(x, self.encode_dim, self.decode_dim, "CF")
-        self.loss = self.loss_reconstruct(self.x, self.x_recon) + 2 * tf.losses.get_regularization_loss()
+        self.loss = self.loss_reconstruct(self.x, self.x_recon) + 10 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
@@ -117,7 +117,7 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[4000, 2000, 1000]]
+    layers = [[2000, 1000, 1000, 500]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
