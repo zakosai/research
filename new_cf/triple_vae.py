@@ -86,12 +86,12 @@ class Translation:
         self.item_info = tf.placeholder(tf.float32, [None, self.item_info_dim], name='item_info')
 
         # VAE for user
-        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [200], [200, self.user_info_dim], "user", tf.nn.relu())
+        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [200], [200, self.user_info_dim], "user", tf.nn.relu)
         self.loss_user = self.lambda_2 * tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon), axis=1)) +\
              self.lambda_1 * loss_kl_user + tf.losses.get_regularization_loss()
 
         # VAE for item
-        z_item, item_recon, loss_kl_item = self.vae(self.item_info, [400, 200], [200, 400, self.item_info_dim], "item", tf.nn.relu())
+        z_item, item_recon, loss_kl_item = self.vae(self.item_info, [400, 200], [200, 400, self.item_info_dim], "item", tf.nn.relu)
         self.loss_item = self.lambda_2 * tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon), axis=1)) +\
                          self.lambda_1 * loss_kl_item + tf.losses.get_regularization_loss()
 
