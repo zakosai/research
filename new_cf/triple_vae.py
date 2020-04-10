@@ -117,7 +117,7 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[4000, 2000, 1000]]
+    layers = [[4000, 2000, 4000]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
@@ -185,7 +185,7 @@ def main(args):
                 model.train = True
                 if recall > best:
                     best = recall
-            if (i%20 == 0) and (model.learning_rate >= 1e-6):
+            if (i%4 == 0) and (model.learning_rate >= 1e-6):
                 model.learning_rate /= 10
         print("Layers ", layer, " : ", best)
         tf.keras.backend.clear_session()
