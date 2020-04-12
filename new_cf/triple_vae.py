@@ -52,8 +52,8 @@ class Translation:
 
     def gen_z(self, h, scope, reuse=False):
         with tf.variable_scope(scope, reuse=reuse):
-            z_mu = fully_connected(h, self.z_dim, scope="z_mu")
-            z_sigma = fully_connected(h, self.z_dim, scope="z_sigma")
+            z_mu = fully_connected(h, self.z_dim, self.active_function, scope="z_mu")
+            z_sigma = fully_connected(h, self.z_dim, self.active_function, scope="z_sigma")
             e = tf.random_normal(tf.shape(z_mu))
             z = z_mu + tf.sqrt(tf.maximum(tf.exp(z_sigma), self.eps)) * e
         return z, z_mu, z_sigma
@@ -101,7 +101,7 @@ class Translation:
         min = tf.reduce_min(content_matrix, axis=1, keep_dims=True)
         max = tf.reduce_max(content_matrix, axis=1, keep_dims=True)
         content_matrix = (content_matrix - min) / (max - min)
-        x = self.x * content_matrix
+        x = (self.x * (1-1e-2) + 1e-2) * content_matrix
         # VAE for CF
         # _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF", z_user=z_user)
         # # Loss VAE
@@ -119,7 +119,7 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[1000, 800, 600], [1200, 600, 300], [800, 700, 600]]
+    layers = [[200]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
