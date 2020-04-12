@@ -98,8 +98,8 @@ class Translation:
                          self.lambda_1 * loss_kl_item + tf.losses.get_regularization_loss()
 
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
-        min = tf.reduce_min(content_matrix, axis=1, keep_dims=True)
-        max = tf.reduce_max(content_matrix, axis=1, keep_dims=True)
+        min = tf.reduce_min(content_matrix, axis=1, keepdims=True)
+        max = tf.reduce_max(content_matrix, axis=1, keepdims=True)
         content_matrix = (content_matrix - min) / (max - min)
         x = (self.x + 1e-2) * content_matrix
         # VAE for CF
@@ -119,7 +119,7 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[200]]
+    layers = [[4000, 2000, 1000]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
