@@ -88,14 +88,14 @@ class Translation:
         # VAE for user
         z_user, user_recon, loss_kl_user = self.vae(self.user_info, [100], [100, self.user_info_dim], "user",
                                                     activation=tf.nn.tanh)
-        self.loss_user = 100 * tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon), axis=1)) +\
-             0.1 * loss_kl_user + tf.losses.get_regularization_loss()
+        self.loss_user = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon), axis=1)) +\
+             loss_kl_user + tf.losses.get_regularization_loss()
 
         # VAE for item
         z_item, item_recon, loss_kl_item = self.vae(self.item_info, [400, 200], [200, 400, self.item_info_dim],
                                                     "item", activation=tf.nn.tanh)
-        self.loss_item = 100 * tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon), axis=1)) +\
-                         0.1 * loss_kl_item + tf.losses.get_regularization_loss()
+        self.loss_item = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon), axis=1)) +\
+                         loss_kl_item + tf.losses.get_regularization_loss()
 
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
         min = tf.reduce_min(content_matrix, axis=1, keepdims=True)
@@ -119,7 +119,7 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[4000, 2000, 1000]]
+    layers = [[4000, 2000, 1000], [5000, 3000, 2000], [4000, 2000, 1000, 500], [1000, 800, 600, 400]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
@@ -173,7 +173,7 @@ def main(args):
 
                 _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
-            print("loss user: %f, loss item: %f, loss pred: %f"%(loss_user, loss_item, loss))
+            # print("loss user: %f, loss item: %f, loss pred: %f"%(loss_user, loss_item, loss))
 
             # Validation Process
             if i%1 == 0:
@@ -183,7 +183,7 @@ def main(args):
                                                              model.user_info: dataset.user_info,
                                                              model.item_info: dataset.item_info})
                 recall = recallK(dataset.train, dataset.test, y_b)
-                print("recall: %f"%recall)
+                # print("recall: %f"%recall)
                 model.train = True
                 if recall > best:
                     best = recall
