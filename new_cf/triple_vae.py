@@ -119,7 +119,7 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[1000, 800, 600, 400, 200]]
+    layers = [[1200, 1000, 800, 600, 400]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
