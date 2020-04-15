@@ -86,7 +86,7 @@ class Translation:
         self.item_info = tf.placeholder(tf.float32, [None, self.item_info_dim], name='item_info')
 
         # VAE for user
-        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [100], [100, self.user_info_dim], "user",
+        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [], [self.user_info_dim], "user",
                                                     activation=tf.nn.tanh)
         self.loss_user = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon), axis=1)) +\
              loss_kl_user + tf.losses.get_regularization_loss()
@@ -108,7 +108,7 @@ class Translation:
         # self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
         #             2 * tf.losses.get_regularization_loss()
         self.x_recon = self.vae(x, self.encode_dim, self.decode_dim, "CF", activation=tf.nn.tanh)
-        self.loss = self.loss_reconstruct(self.x, self.x_recon) + 10 * tf.losses.get_regularization_loss()
+        self.loss = self.loss_reconstruct(self.x, self.x_recon) + 2 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
@@ -119,12 +119,12 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[5000, 3000, 2000]]
+    layers = [[5000, 3000, 2000, 1000]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
         model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                            layer, [dataset.no_item], 50, learning_rate=args.learning_rate)
+                            layer, [dataset.no_item], 100, learning_rate=args.learning_rate)
         model.build_model()
 
         sess = tf.Session()
