@@ -34,7 +34,6 @@ class Translation:
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                x_ = batch_norm(x_, decay=0.995)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False):
@@ -150,13 +149,13 @@ def main(args):
             loss_val_a, y_b = sess.run([model.loss, model.x_recon],
                                               feed_dict={model.x: dataset.transaction})
             recall = recallK(dataset.train, dataset.test, y_b)
-            print("recall: %f"%recall)
+            # print("recall: %f"%recall)
             model.train = True
             if recall > best:
                 best = recall
         # if (i%50 == 0) :
         #     model.learning_rate /= 10
-    print(best)
+    print("[200]", best)
 
 
 if __name__ == '__main__':
