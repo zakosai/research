@@ -149,7 +149,7 @@ def main(args):
             loss_val_a, y_b = sess.run([model.loss, model.x_recon],
                                               feed_dict={model.x: dataset.transaction})
             recall = recallK(dataset.train, dataset.test, y_b)
-            # print("recall: %f"%recall)
+            print("recall: %f"%recall)
             model.train = True
             if recall > best:
                 best = recall
