@@ -111,7 +111,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [200], [200, dataset.no_item], 50, learning_rate=args.learning_rate)
+                        [600], [600, dataset.no_item], 200, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
@@ -141,7 +141,7 @@ def main(args):
 
             _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
-        print("loss user: %f, loss item: %f, loss pred: %f"%(loss, loss, loss))
+        # print("loss user: %f, loss item: %f, loss pred: %f"%(loss, loss, loss))
 
         # Validation Process
         if i%1 == 0:
