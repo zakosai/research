@@ -61,10 +61,10 @@ class Translation:
     def vae(self, x, encode_dim, decode_dim, scope, reuse=False, activation=None):
         with tf.variable_scope(scope, reuse=reuse):
             h = self.enc(x, "encode", encode_dim, activation=activation)
-            if scope == "CF":
-                # h = tf.concat((h, user_info), axis=-1)
-                y = self.dec(h, "decode", decode_dim, activation=activation)
-                return y
+            # if scope == "CF":
+            #     # h = tf.concat((h, user_info), axis=-1)
+            #     y = self.dec(h, "decode", decode_dim, activation=activation)
+            #     return y
             z, z_mu, z_sigma = self.gen_z(h, "VAE")
             loss_kl = self.loss_kl(z_mu, z_sigma)
             y = self.dec(z, "decode", decode_dim, activation=activation)
