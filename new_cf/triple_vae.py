@@ -83,7 +83,6 @@ class Translation:
                                      weights_regularizer=regular)
         return x_
 
-
     def loss_kl(self, mu, sigma):
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
@@ -187,7 +186,7 @@ def main(args):
 
                 _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
-            print("loss user: %f, loss item: %f, loss pred: %f"%(loss_user, loss_item, loss))
+            # print("loss user: %f, loss item: %f, loss pred: %f"%(loss_user, loss_item, loss))
 
             # Validation Process
             if i%1 == 0:
@@ -197,7 +196,7 @@ def main(args):
                                                              model.user_info: dataset.user_info,
                                                              model.item_info: dataset.item_info})
                 recall = recallK(dataset.train, dataset.test, y_b)
-                print("recall: %f"%recall)
+                # print("recall: %f"%recall)
                 model.train = True
                 if recall > best:
                     best = recall
