@@ -70,6 +70,20 @@ class Translation:
             y = self.dec(z, "decode", decode_dim, activation=activation)
         return z, y, loss_kl
 
+    def dae(self, x, encode_dim, decode_dim, scope, reuse=False, activation=None):
+        x_ = x
+        x_ = tf.nn.dropout(x_, 0.5)
+        regular = tf.contrib.layers.l2_regularizer(scale=0.01)
+        with tf.variable_scope(scope, reuse=reuse):
+            for i in range(len(encode_dim)):
+                x_ = fully_connected(x_, encode_dim[i], activation, scope="enc_%d" % i,
+                                     weights_regularizer=regular)
+            for i in range(len(encode_dim)):
+                x_ = fully_connected(x_, decode_dim[i], activation, scope="enc_%d" % i,
+                                     weights_regularizer=regular)
+        return x_
+
+
     def loss_kl(self, mu, sigma):
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
@@ -107,7 +121,7 @@ class Translation:
         # # Loss VAE
         # self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
         #             2 * tf.losses.get_regularization_loss()
-        self.x_recon = self.vae(x, self.encode_dim, self.decode_dim, "CF", activation=tf.nn.tanh)
+        self.x_recon = self.dae(x, self.encode_dim, self.decode_dim, "CF", activation=tf.nn.tanh)
         self.loss = self.loss_reconstruct(self.x, self.x_recon) + 2 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
@@ -119,12 +133,12 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[200]]
+    layers = [[200, 50]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
         model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                            layer, [dataset.no_item], 50, learning_rate=args.learning_rate)
+                            layer, [200, dataset.no_item], 50, learning_rate=args.learning_rate)
         model.build_model()
 
         sess = tf.Session()
@@ -140,7 +154,7 @@ def main(args):
                 feed = {model.user_info: x}
                 _, loss_user = sess.run([model.train_op_user, model.loss_user], feed_dict=feed)
 
-        for i in range(1, 50):
+        for i in range(1, 5):
             shuffle_idx = np.random.permutation(range(dataset.no_item))
             for j in range(int(len(shuffle_idx) / batch_size + 1)):
                 list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
