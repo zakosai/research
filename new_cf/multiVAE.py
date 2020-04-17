@@ -97,8 +97,7 @@ class Translation:
         # VAE for CF
         _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         # Loss VAE
-        self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
-                    2 * tf.losses.get_regularization_loss()
+        self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon)
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         # self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
