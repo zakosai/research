@@ -23,13 +23,13 @@ class Translation:
         # self.z_A = z_A
         # self.z_B = z_B
         self.train = True
-        self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
+        self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.01)
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
 
         # x_ = tf.nn.l2_normalize(x_, 1)
-        x_ = tf.nn.dropout(x_, 0.5)
+        x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
@@ -59,8 +59,8 @@ class Translation:
             h = self.enc(x, "encode", encode_dim)
             z, z_mu, z_sigma = self.gen_z(h, "VAE")
             loss_kl = self.loss_kl(z_mu, z_sigma)
-            y = self.dec(z, "decode", decode_dim)
-        return z, y, loss_kl
+            y = self.dec(h, "decode", decode_dim)
+        return h, y, loss_kl
 
     def loss_kl(self, mu, sigma):
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
@@ -97,7 +97,8 @@ class Translation:
         # VAE for CF
         _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
         # Loss VAE
-        self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon)
+        self.loss = self.loss_reconstruct(self.x, self.x_recon) + \
+                    2 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         # self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
@@ -110,7 +111,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [200], [200, dataset.no_item], 50, learning_rate=args.learning_rate)
+                        [200, 50], [200, dataset.no_item], 50, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
