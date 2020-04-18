@@ -72,8 +72,8 @@ class Translation:
 
     def dae(self, x, encode_dim, decode_dim, scope, reuse=False, activation=None):
         x_ = x
-        x_ = tf.nn.dropout(x_, 0.5)
-        regular = tf.contrib.layers.l2_regularizer(scale=0.01)
+        x_ = tf.nn.dropout(x_, 0.7)
+        regular = tf.contrib.layers.l2_regularizer(scale=0.1)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], activation, scope="enc_%d" % i,
@@ -132,7 +132,7 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[300]]
+    layers = [[200, 100]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
