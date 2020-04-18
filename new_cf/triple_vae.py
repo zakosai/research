@@ -100,7 +100,7 @@ class Translation:
         self.item_info = tf.placeholder(tf.float32, [None, self.item_info_dim], name='item_info')
 
         # VAE for user
-        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [], [self.user_info_dim], "user",
+        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [100], [100, self.user_info_dim], "user",
                                                     activation=tf.nn.tanh)
         self.loss_user = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon), axis=1)) +\
              loss_kl_user + tf.losses.get_regularization_loss()
@@ -133,7 +133,7 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[200, 100]]
+    layers = [[200, 100], [100], [200], [150, 50], [200, 50, 200]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
