@@ -91,7 +91,6 @@ class Translation:
         loss_recon = tf.losses.log_loss(self.x, self.y)
         self.loss = loss_recon - kl_z_y - 0.01 * kl_h_x - kl_h_xy
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
-        self.loss_values = [loss_recon, kl_z_y, kl_h_x, kl_z_y]
 
 
 def main(args):
@@ -115,10 +114,9 @@ def main(args):
             user_info = dataset.user_info[list_idx]
             feed = {model.x: x, model.user_info:user_info}
 
-            _, loss = sess.run([model.train_op, model.loss_values], feed_dict=feed)
+            _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
-            # print("loss user: %f, loss item: %f, loss pred: %f"%(loss, loss, loss))
-            print(loss)
+            print("loss user: %f, loss item: %f, loss pred: %f"%(loss, loss, loss))
 
         # Validation Process
         if i%1 == 0:
