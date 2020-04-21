@@ -103,8 +103,6 @@ class cf_vae_extend:
                 for i in range(depth_gen):
                     y = dense(y, self.decoding_dims[i], scope="dec_layer"+"%s" %i, activation=tf.nn.sigmoid)
 
-
-
                 x_recons = y
 
         if self.model == 2 or self.model == 3:

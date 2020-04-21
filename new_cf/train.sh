@@ -3,7 +3,8 @@ folders="Tool Outdoor Kitchen TV Beauty Toy Automotive Baby CD Garden Grocery Ki
 #folders="Outdoor Beauty CD Music Pet Phone Video"
 for f in $folders; do
     echo ${f}
-    python triple_vae.py --data_dir=/media/linh/DATA/research/cf-vae/data2/${f}/ --data_type=1p --iter=400 --learning_rate=0.001 >> /media/linh/DATA/research/new_cf/result9/${f}_1.txt
+    python cvae_cf.py --data_dir=/media/linh/DATA/research/cf-vae/data2/${f}/ --data_type=1p --iter=400 --learning_rate=0.001 >> /media/linh/DATA/research/new_cf/result9/cvaecf_${f}_1.txt
+    python cvae_cf.py --data_dir=/media/linh/DATA/research/cf-vae/data2/${f}/ --data_type=8p --iter=400 --learning_rate=0.001 >> /media/linh/DATA/research/new_cf/result9/cvaecf_${f}_8.txt
 #    python multiVAE.py --data_dir=/media/linh/DATA/research/cf-vae/data2/${f}/ --data_type=1p --iter=200 --learning_rate=0.001 >> /media/linh/DATA/research/new_cf/result8/multi_${f}_1.txt
 #    python multiVAE.py --data_dir=/media/linh/DATA/research/cf-vae/data2/${f}/ --data_type=8p --iter=200 --learning_rate=0.001 >> /media/linh/DATA/research/new_cf/result8/multi_${f}_8.txt
 #    python triple_vae.py --data_dir=/media/linh/DATA/research/cf-vae/data2/${f}/ --data_type=1p  --iter=200 --learning_rate=0.001 >> /media/linh/DATA/research/new_cf/result7/${f}_1.txt
