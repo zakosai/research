@@ -86,7 +86,7 @@ class Translation:
         kl_h_xy = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.exp(h_x_sigma)/tf.exp(h_y_sigma) + tf.square(h_y_mu-h_x_mu)/h_y_sigma +
                                                      h_y_sigma - h_x_sigma - 1, 1))
 
-        self.y = self.dec(tf.concat((h_x, z_y), axis=-1), self.decode_dim, "decode")
+        self.y = self.dec(tf.concat((h_x, z_y), axis=-1), "decode", self.decode_dim)
         loss_recon = tf.losses.log_loss(self.x, self.y)
         self.loss = loss_recon - kl_z_y - 0.01 * kl_h_x - kl_h_xy
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
