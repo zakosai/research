@@ -121,8 +121,8 @@ class Translation:
         # # Loss VAE
         # self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
         #             2 * tf.losses.get_regularization_loss()
-        self.x_recon = self.dae(x, self.encode_dim, self.decode_dim, "CF", activation=tf.nn.tanh)
-        self.loss = self.loss_reconstruct(self.x, self.x_recon) + 2 * tf.losses.get_regularization_loss()
+        _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF", activation=tf.nn.tanh)
+        self.loss = self.loss_reconstruct(self.x, self.x_recon) + 2 * tf.losses.get_regularization_loss() + loss_kl
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
@@ -133,7 +133,7 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[200, 100], [100], [200], [150, 50], [200, 50, 200]]
+    layers = [[200, 100], [200]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
@@ -203,7 +203,7 @@ def main(args):
                     best = recall
             if (i%4 == 0) and (model.learning_rate >= 1e-6):
                 model.learning_rate /= 10
-        print("Layers ", layer, " : ", best)
+        print("VAE Layers ", layer, " : ", best)
         tf.keras.backend.clear_session()
 
 
