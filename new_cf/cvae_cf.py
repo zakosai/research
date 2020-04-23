@@ -7,7 +7,7 @@ import argparse
 
 class Translation:
     def __init__(self, batch_size, dim, user_info_dim, item_info_dim, encode_dim, decode_dim, z_dim, eps=1e-10,
-                 lambda_1=0.1, lambda_2=100, learning_rate=1e-4):
+                 lambda_1=0.1, lambda_2=100, learning_rate=1e-3):
         self.batch_size = batch_size
         self.dim = dim
         self.encode_dim = encode_dim
