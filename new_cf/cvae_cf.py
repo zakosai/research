@@ -94,7 +94,7 @@ class Translation:
         self.loss_enc = loss_recon + kl_z_y + kl_h_x + loss_recon_h
 
         self.train_op_enc = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_enc)
-        self.loss_values = [self.loss_enc, loss_recon, kl_z_y, kl_h_x, kl_h_xy]
+        self.loss_values = [self.loss_enc, loss_recon, kl_z_y, kl_h_x, kl_h_xy, self.y]
 
 
 def main(args):
