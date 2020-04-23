@@ -91,13 +91,7 @@ class Translation:
                                                      h_y_sigma - h_x_sigma - 1, 1))
 
         self.y = self.dec(tf.concat((h_x, z_y), axis=-1), "decode", self.decode_dim)
-        loss_recon = tf.reduce_sum(
-                    tf.nn.sigmoid_cross_entropy_with_logits(
-                        logits=self.y,
-                        targets=self.x,
-                        name="sigmoid_loss"
-                    )
-                )
+        loss_recon = tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(labels=self.x, logits=self.y))
         self.loss_enc = kl_z_y + 0.1 * kl_h_x + kl_h_xy
 
         enc_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="encode_gen")
