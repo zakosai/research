@@ -98,7 +98,7 @@ class Translation:
         dec_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="decode")
         self.train_op_enc = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_enc, var_list=enc_vars)
         self.train_op_dec = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_recon, var_list=dec_vars)
-        self.loss_values = [self.loss_enc, loss_recon, kl_z_y, kl_h_x, kl_z_y]
+        self.loss_values = [self.loss_enc, loss_recon, kl_z_y, kl_h_x, kl_z_y, self.x, self.y]
 
 
 def main(args):
