@@ -90,9 +90,9 @@ class Translation:
                                                      h_y_sigma - h_x_sigma - 1, 1))
 
         self.y = self.dec(tf.concat((h_x, z_y), axis=-1), "decode", self.decode_dim)
-        loss_recon = tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(labels=self.x, logits=self.y))
+        loss_recon = tf.reduce_sum(0.5 * tf.square(self.y - self.x))
         recon_h = self.dec(h_x, "decode_h", [200, self.user_info_dim])
-        loss_recon_h = tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(labels=self.user_info, logits=recon_h))
+        loss_recon_h = tf.reduce_sum(0.5 * tf.square(self.user_info - recon_h))
         self.loss_enc = loss_recon + kl_z_y + kl_h_x + loss_recon_h
 
         self.train_op_enc = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_enc)
