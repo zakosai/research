@@ -82,8 +82,8 @@ class Translation:
         z_y, z_y_mu, z_y_sigma = self.vae(self.x, self.encode_dim, "rating")
         h_y, h_y_mu, h_y_sigma = self.vae(self.x, self.encode_dim, "added_kl")
 
-        kl_z_y = tf.reduce_mean(self.loss_kl(z_y_mu, z_y_sigma))
-        kl_h_x = tf.reduce_mean(self.loss_kl(h_x_mu, h_x_sigma))
+        kl_z_y = self.loss_kl(z_y_mu, z_y_sigma)
+        kl_h_x = self.loss_kl(h_x_mu, h_x_sigma)
         kl_h_xy = 0.5 * tf.reduce_sum(tf.reduce_sum(tf.exp(h_x_sigma)/tf.exp(h_y_sigma) + tf.square(h_y_mu-h_x_mu)/h_y_sigma +
                                                      h_y_sigma - h_x_sigma - 1, 1))
 
