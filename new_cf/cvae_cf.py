@@ -93,7 +93,7 @@ class Translation:
         loss_recon = tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(labels=self.x, logits=self.y))
         recon_h = self.dec(h_x, "decode_h", [200, self.user_info_dim])
         loss_recon_h = tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(labels=self.user_info, logits=recon_h))
-        self.loss_enc = loss_recon + kl_z_y + 0.1 * kl_h_x + loss_recon_h
+        self.loss_enc = loss_recon + kl_z_y + kl_h_x + loss_recon_h
 
         self.train_op_enc = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_enc)
         self.loss_values = [self.loss_enc, loss_recon, kl_z_y, kl_h_x, kl_h_xy]
