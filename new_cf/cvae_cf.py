@@ -17,7 +17,7 @@ class Translation:
         self.lambda_1 = lambda_1
         self.lambda_2 = lambda_2
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.relu
+        self.active_function = tf.identity
         self.user_info_dim = user_info_dim
         self.item_info_dim = item_info_dim
         # self.z_A = z_A
@@ -61,8 +61,10 @@ class Translation:
             z, z_mu, z_sigma = self.gen_z(h, "VAE")
         return z, z_mu, z_sigma
 
-    def loss_kl(self, mu, sigma):
-        return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
+    def loss_kl(self, mu, log_sigma_sq):
+        return -0.5 * tf.reduce_sum(1 + tf.clip_by_value(log_sigma_sq, -10.0, 10.0)
+                                    - tf.clip_by_value(mu, -10.0, 10.0) ** 2
+                                    - tf.exp(tf.clip_by_value(log_sigma_sq, -10.0, 10.0)), 1)
 
     def loss_reconstruct(self, x, x_recon):
         log_softmax_var = tf.nn.log_softmax(x_recon)
@@ -82,8 +84,8 @@ class Translation:
         z_y, z_y_mu, z_y_sigma = self.vae(self.x, self.encode_dim, "rating")
         h_y, h_y_mu, h_y_sigma = self.vae(self.x, self.encode_dim, "added_kl")
 
-        kl_z_y = self.loss_kl(z_y_mu, z_y_sigma)
-        kl_h_x = self.loss_kl(h_x_mu, h_x_sigma)
+        kl_z_y = tf.reduce_mean(self.loss_kl(z_y_mu, z_y_sigma))
+        kl_h_x = tf.reduce_mean(self.loss_kl(h_x_mu, h_x_sigma))
         kl_h_xy = 0.5 * tf.reduce_mean(tf.reduce_sum(tf.exp(h_x_sigma)/tf.exp(h_y_sigma) + tf.square(h_y_mu-h_x_mu)/h_y_sigma +
                                                      h_y_sigma - h_x_sigma - 1, 1))
 
