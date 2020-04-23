@@ -61,10 +61,8 @@ class Translation:
             z, z_mu, z_sigma = self.gen_z(h, "VAE")
         return z, z_mu, z_sigma
 
-    def loss_kl(self, mu, log_sigma_sq):
-        return -0.5 * tf.reduce_sum(1 + tf.clip_by_value(log_sigma_sq, -10.0, 10.0)
-                                    - tf.clip_by_value(mu, -10.0, 10.0) ** 2
-                                    - tf.exp(tf.clip_by_value(log_sigma_sq, -10.0, 10.0)), 1)
+    def loss_kl(self, mu, sigma):
+        return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
     def loss_reconstruct(self, x, x_recon):
         log_softmax_var = tf.nn.log_softmax(x_recon)
