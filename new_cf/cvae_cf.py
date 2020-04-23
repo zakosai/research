@@ -44,7 +44,7 @@ class Translation:
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
                                      weights_regularizer=self.regularizer)
-            x_ = tf.nn.sigmoid(x_)
+            # x_ = tf.nn.sigmoid(x_)
         return x_
 
     def gen_z(self, h, scope, reuse=False):
