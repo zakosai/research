@@ -80,9 +80,10 @@ class Translation:
         self.x = tf.placeholder(tf.float32, [None, self.dim], name='input')
         self.user_info = tf.placeholder(tf.float32, [None, self.user_info_dim], name='user_info')
 
-        h_x, h_x_mu, h_x_sigma = self.vae(self.user_info, self.encode_dim, "content")
-        z_y, z_y_mu, z_y_sigma = self.vae(self.x, self.encode_dim, "rating")
-        h_y, h_y_mu, h_y_sigma = self.vae(self.x, self.encode_dim, "added_kl")
+        with tf.variable_scope('encode_gen'):
+            h_x, h_x_mu, h_x_sigma = self.vae(self.user_info, self.encode_dim, "content")
+            z_y, z_y_mu, z_y_sigma = self.vae(self.x, self.encode_dim, "rating")
+            h_y, h_y_mu, h_y_sigma = self.vae(self.x, self.encode_dim, "added_kl")
 
         kl_z_y = tf.reduce_mean(self.loss_kl(z_y_mu, z_y_sigma))
         kl_h_x = tf.reduce_mean(self.loss_kl(h_x_mu, h_x_sigma))
@@ -91,9 +92,13 @@ class Translation:
 
         self.y = self.dec(tf.concat((h_x, z_y), axis=-1), "decode", self.decode_dim)
         loss_recon = tf.losses.log_loss(self.x, self.y)
-        self.loss = loss_recon + kl_z_y + 0.1 * kl_h_x + kl_h_xy
-        self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
-        self.loss_values = [self.loss, loss_recon, kl_z_y, kl_h_x, kl_z_y]
+        self.loss_enc = kl_z_y + 0.1 * kl_h_x + kl_h_xy
+
+        enc_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="encode_gen")
+        dec_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="decode")
+        self.train_op_enc = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_enc, var_list=enc_vars)
+        self.train_op_dec = tf.train.AdamOptimizer(self.learning_rate).minimize(loss_recon, var_list=dec_vars)
+        self.loss_values = [self.loss_enc, loss_recon, kl_z_y, kl_h_x, kl_z_y]
 
 
 def main(args):
@@ -117,7 +122,7 @@ def main(args):
             user_info = dataset.user_info[list_idx]
             feed = {model.x: x, model.user_info:user_info}
 
-            _, loss = sess.run([model.train_op, model.loss_values], feed_dict=feed)
+            _,_, loss = sess.run([model.train_op_enc, model.train_op_dec, model.loss_values], feed_dict=feed)
 
             # print("loss user: %f, loss item: %f, loss pred: %f"%(loss, loss, loss))
             print(loss)
