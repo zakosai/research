@@ -84,15 +84,15 @@ class Translation:
         z_y, z_y_mu, z_y_sigma = self.vae(self.x, self.encode_dim, "rating")
         h_y, h_y_mu, h_y_sigma = self.vae(self.x, self.encode_dim, "added_kl")
 
-        kl_z_y = tf.reduce_sum(self.loss_kl(z_y_mu, z_y_sigma))
-        kl_h_x = tf.reduce_sum(self.loss_kl(h_x_mu, h_x_sigma))
+        kl_z_y = tf.reduce_mean(self.loss_kl(z_y_mu, z_y_sigma))
+        kl_h_x = tf.reduce_mean(self.loss_kl(h_x_mu, h_x_sigma))
         kl_h_xy = 0.5 * tf.reduce_sum(tf.reduce_sum(tf.exp(h_x_sigma)/tf.exp(h_y_sigma) + tf.square(h_y_mu-h_x_mu)/h_y_sigma +
                                                      h_y_sigma - h_x_sigma - 1, 1))
 
         self.y = self.dec(tf.concat((h_x, z_y), axis=-1), "decode", self.decode_dim)
-        loss_recon = tf.reduce_sum(0.5 * tf.square(self.y - self.x))
+        loss_recon = tf.reduce_mean(tf.reduce_sum(0.5 * tf.square(self.y - self.x), 1))
         recon_h = self.dec(h_x, "decode_h", [200, self.user_info_dim])
-        loss_recon_h = tf.reduce_sum(0.5 * tf.square(self.user_info - recon_h))
+        loss_recon_h = tf.reduce_mean(tf.reduce_sum(0.5 * tf.square(self.user_info - recon_h), 1))
         self.loss_enc = loss_recon + kl_z_y + kl_h_x + loss_recon_h
 
         self.train_op_enc = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_enc)
