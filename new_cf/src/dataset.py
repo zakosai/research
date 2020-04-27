@@ -97,13 +97,39 @@ class Dataset:
 
 def recallK(train, test, predict, k=50):
     recall = []
+    ndcg = []
     for i in range(len(train)):
         pred = np.argsort(predict[i])[::-1][:k+len(train[i])]
         pred = [item for item in pred if item not in train[i]]
         pred = pred[:k]
         hits = len(set(pred) & set(test[i]))
         recall.append(float(hits)/len(test[i]))
-    return np.mean(recall)
+
+        # ncdg
+        score = []
+        for j in range(k):
+            if pred[j] in hits:
+                score.append(1)
+            else:
+                score.append(0)
+        actual = dcg_score(score, predict[i, pred], k)
+        best = dcg_score(score, score, k)
+        if best == 0:
+            ndcg.append(0)
+        else:
+            ndcg.append(float(actual) / best)
+
+    return np.mean(recall), np.mean(ndcg)
+
+
+def dcg_score(y_true, y_score, k=50):
+    order = np.argsort(y_score)[::-1]
+    y_true = np.take(y_true, order[:k])
+
+    gain = 2 ** y_true - 1
+
+    discounts = np.log2(np.arange(len(y_true)) + 2)
+    return np.sum(gain / discounts)
 
 
 

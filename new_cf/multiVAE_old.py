@@ -94,6 +94,7 @@ def main(args):
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
     best = 0
+    best_ndcg = 0
 
     for i in range(1, iter):
         # shuffle_idx = np.random.permutation(range(dataset.no_user))
@@ -125,14 +126,15 @@ def main(args):
             model.train = False
             loss_val_a, y_b = sess.run([model.loss, model.x_recon],
                                               feed_dict={model.x: dataset.transaction})
-            recall = recallK(dataset.train, dataset.test, y_b, 10)
+            recall, ndcg = recallK(dataset.train, dataset.test, y_b, 10)
             print("recall: %f"%recall)
             model.train = True
             if recall > best:
                 best = recall
+                best_ndcg = best_ndcg
         # if (i%50 == 0) :
         #     model.learning_rate /= 10
-    print(best)
+    print(best, best_ndcg)
 
 
 if __name__ == '__main__':

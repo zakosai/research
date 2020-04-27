@@ -144,6 +144,7 @@ def main(args):
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
         best = 0
+        best_ndcg = 0
         iter_no = int(dataset.no_user / batch_size + 1)
 
         for i in range(1, 5):
@@ -196,14 +197,15 @@ def main(args):
                                                   feed_dict={model.x: dataset.transaction,
                                                              model.user_info: dataset.user_info,
                                                              model.item_info: dataset.item_info})
-                recall = recallK(dataset.train, dataset.test, y_b, 10)
+                recall, ndcg = recallK(dataset.train, dataset.test, y_b, 10)
                 print("recall: %f"%recall)
                 model.train = True
                 if recall > best:
                     best = recall
+                    best_ndcg = ndcg
             if (i%10 == 0) and (model.learning_rate >= 1e-6):
                 model.learning_rate /= 10
-        print("VAE Layers ", layer, " : ", best)
+        print("VAE Layers ", layer, " : ", best, ", ", best_ndcg)
         tf.keras.backend.clear_session()
 
 
