@@ -106,12 +106,7 @@ def recallK(train, test, predict, k=50):
         recall.append(float(len(hits))/len(test[i]))
 
         # ncdg
-        score = []
-        for j in range(k):
-            if pred[j] in hits:
-                score.append(1)
-            else:
-                score.append(0)
+        score = [1 if p in hits else 0 for p in pred]
         actual = dcg_score(score, predict[i, pred], k)
         best = dcg_score(score, score, k)
         if best == 0:
