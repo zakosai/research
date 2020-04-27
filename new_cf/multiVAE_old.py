@@ -25,8 +25,8 @@ class RSVAE:
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
@@ -88,7 +88,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = RSVAE(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [200], [200, dataset.no_item], 50, learning_rate=args.learning_rate)
+                        [], [dataset.no_item], 100, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
