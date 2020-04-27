@@ -76,8 +76,8 @@ class RSVAE:
         _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
 
         # Loss VAE
-        self.loss = self.lambda_1 * loss_kl + self.lambda_2 * self.loss_reconstruct(self.x, self.x_recon) + \
-                    self.lambda_1 * tf.losses.get_regularization_loss()
+        self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
+                    2 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
