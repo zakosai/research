@@ -5,7 +5,7 @@ import numpy as np
 import argparse
 
 
-class Translation:
+class RSVAE:
     def __init__(self, batch_size, dim, user_info_dim, item_info_dim, encode_dim, decode_dim, z_dim, eps=1e-10,
                  lambda_1=0.1, lambda_2=100, learning_rate=1e-4):
         self.batch_size = batch_size
@@ -20,16 +20,13 @@ class Translation:
         self.active_function = tf.nn.tanh
         self.user_info_dim = user_info_dim
         self.item_info_dim = item_info_dim
-        # self.z_A = z_A
-        # self.z_B = z_B
         self.train = True
         self.regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
 
     def enc(self, x, scope, encode_dim, reuse=False):
         x_ = x
-
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
+        if self.train:
+            x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], self.active_function, scope="enc_%d"%i,
@@ -39,8 +36,6 @@ class Translation:
 
     def dec(self, x, scope, decode_dim, reuse=False):
         x_ = x
-        # if self.train:
-        #     x_ = tf.nn.dropout(x_, 0.7)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], self.active_function, scope="dec_%d" % i,
@@ -63,46 +58,28 @@ class Translation:
             y = self.dec(z_mu, "decode", decode_dim)
         return z, y, loss_kl
 
-    def loss_kl(self, mu, sigma):
+    @staticmethod
+    def loss_kl(mu, sigma):
         return 0.5 * tf.reduce_mean(tf.reduce_sum(tf.square(mu) + tf.exp(sigma) - sigma - 1, 1))
 
-    def loss_reconstruct(self, x, x_recon):
+    @staticmethod
+    def loss_reconstruct(x, x_recon):
         log_softmax_var = tf.nn.log_softmax(x_recon)
-
-        neg_ll = -tf.reduce_mean(tf.reduce_sum(
-            log_softmax_var * x,
-            axis=-1))
-        # return tf.reduce_mean(tf.abs(x - x_recon))
+        neg_ll = -tf.reduce_mean(tf.reduce_sum(log_softmax_var * x, axis=-1))
         return neg_ll
 
     def build_model(self):
         self.x = tf.placeholder(tf.float32, [None, self.dim], name='input')
-        # self.user_info = tf.placeholder(tf.float32, [None, self.user_info_dim], name='user_info')
-        # self.item_info = tf.placeholder(tf.float32, [None, self.item_info_dim], name='item_info')
-        #
-        # # VAE for user
-        # z_user, user_recon, loss_kl_user = self.vae(self.user_info, [100], [100, self.user_info_dim], "user")
-        # self.loss_user = self.lambda_2 * tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon), axis=1)) +\
-        #     self.lambda_1 * loss_kl_user + self.lambda_1 * tf.losses.get_regularization_loss()
-        #
-        # # VAE for item
-        # z_item, item_recon, loss_kl_item = self.vae(self.item_info, [400, 200], [200, 400, self.item_info_dim], "item")
-        # self.loss_item = self.lambda_2 * tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon),
-        #                                                               axis=1)) + self.lambda_1 * loss_kl_item + self.lambda_1 * tf.losses.get_regularization_loss()
-        #
-        # content_matrix = tf.matmul(z_user, tf.transpose(z_item))
-        # content_matrix = tf.keras.backend.l2_normalize(content_matrix, axis=-1)
-        # x = self.x * content_matrix
         x = self.x
+
         # VAE for CF
         _, self.x_recon, loss_kl = self.vae(x, self.encode_dim, self.decode_dim, "CF")
+
         # Loss VAE
-        self.loss = 0.1 * loss_kl + 100* self.loss_reconstruct(self.x, self.x_recon) + \
-                    0.1 * tf.losses.get_regularization_loss()
+        self.loss = self.lambda_1 * loss_kl + self.lambda_2 * self.loss_reconstruct(self.x, self.x_recon) + \
+                    self.lambda_1 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
-        # self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
-        # self.train_op_item = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_item)
 
 
 def main(args):
@@ -110,8 +87,8 @@ def main(args):
     batch_size = 500
 
     dataset = Dataset(args.data_dir, args.data_type)
-    model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [600, 200], [200, 600, dataset.no_item], 50, learning_rate=args.learning_rate)
+    model = RSVAE(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
+                        [200], [200, dataset.no_item], 50, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
