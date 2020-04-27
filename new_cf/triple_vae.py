@@ -106,7 +106,7 @@ class Translation:
              loss_kl_user + tf.losses.get_regularization_loss()
 
         # VAE for item
-        z_item, item_recon, loss_kl_item = self.vae(self.item_info, [], [self.item_info_dim],
+        z_item, item_recon, loss_kl_item = self.vae(self.item_info, [200], [200, self.item_info_dim],
                                                     "item", activation=tf.nn.tanh)
         self.loss_item = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon), axis=1)) +\
                          loss_kl_item + tf.losses.get_regularization_loss()
