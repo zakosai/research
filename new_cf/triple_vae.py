@@ -198,7 +198,7 @@ def main(args):
                                                              model.user_info: dataset.user_info,
                                                              model.item_info: dataset.item_info})
                 recall, ndcg = recallK(dataset.train, dataset.test, y_b, 50)
-                print("recall: %f"%recall)
+                print("recall: %f, ndcg: %f"%recall, ndcg)
                 model.train = True
                 if recall > best:
                     best = recall
