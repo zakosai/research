@@ -136,7 +136,7 @@ def mAP_score(test, pred):
     j = 1
     for i in range(len(pred)):
         if pred[i] in test:
-            AP += float(j)/i
+            AP += float(j)/(i+1)
             j += 1
     return AP
 
