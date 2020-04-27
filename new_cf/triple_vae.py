@@ -72,7 +72,7 @@ class Translation:
 
     def dae(self, x, encode_dim, decode_dim, scope, reuse=False, activation=None):
         x_ = x
-        x_ = tf.nn.dropout(x_, 0.5)
+        x_ = tf.nn.dropout(x_, 0.7)
         regular = tf.contrib.layers.l2_regularizer(scale=0.01)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
