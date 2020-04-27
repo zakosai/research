@@ -133,7 +133,7 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[200]]
+    layers = [[200], [200, 100]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
@@ -143,8 +143,9 @@ def main(args):
 
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
-        best = 0
+        best = [0, 0, 0]
         best_ndcg = 0
+        best_mAP = 0
         iter_no = int(dataset.no_user / batch_size + 1)
 
         for i in range(1, 5):
@@ -188,7 +189,7 @@ def main(args):
 
                 _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
-            print("loss user: %f, loss item: %f, loss pred: %f"%(loss_user, loss_item, loss))
+            # print("loss user: %f, loss item: %f, loss pred: %f"%(loss_user, loss_item, loss))
 
             # Validation Process
             if i%1 == 0:
@@ -197,16 +198,18 @@ def main(args):
                                                   feed_dict={model.x: dataset.transaction,
                                                              model.user_info: dataset.user_info,
                                                              model.item_info: dataset.item_info})
-                recall, ndcg = recallK(dataset.train, dataset.test, y_b, 50)
-                print("recall: %f, ndcg: %f"%(recall, ndcg))
+                recall, ndcg, mAP = recallK(dataset.train, dataset.test, y_b, 50)
+                # print("recall: %f, ndcg: %f"%(recall, ndcg))
                 model.train = True
-                if recall > best:
-                    best = recall
+                if recall > best[0]:
+                    best = [recall, ndcg, mAP]
                 if ndcg > best_ndcg:
                     best_ndcg = ndcg
+                if mAP > best_mAP:
+                    best_mAP = mAP
             if (i%10 == 0) and (model.learning_rate >= 1e-6):
                 model.learning_rate /= 10
-        print("VAE Layers ", layer, " : ", best, ", ", best_ndcg)
+        print("VAE Layers ", layer, " : ", best, ", ", best_ndcg, ", ", best_mAP)
         tf.keras.backend.clear_session()
 
 

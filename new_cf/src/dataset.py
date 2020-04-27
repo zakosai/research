@@ -98,6 +98,7 @@ class Dataset:
 def recallK(train, test, predict, k=50):
     recall = []
     ndcg = []
+    mAP = []
     for i in range(len(train)):
         pred = np.argsort(predict[i])[::-1][:k+len(train[i])]
         pred = [item for item in pred if item not in train[i]]
@@ -114,7 +115,10 @@ def recallK(train, test, predict, k=50):
         else:
             ndcg.append(float(actual) / best)
 
-    return np.mean(recall), np.mean(ndcg)
+        # mAP
+        mAP.append(mAP_score(test[i], pred))
+
+    return np.mean(recall), np.mean(ndcg), np.mean(mAP)
 
 
 def dcg_score(y_true, y_score, k=50):
@@ -125,6 +129,16 @@ def dcg_score(y_true, y_score, k=50):
 
     discounts = np.log2(np.arange(len(y_true)) + 2)
     return np.sum(gain / discounts)
+
+
+def mAP_score(test, pred):
+    AP = 0
+    j = 1
+    for i in range(len(pred)):
+        if pred[i] in test:
+            AP += float(j)/i
+            j += 1
+    return AP
 
 
 

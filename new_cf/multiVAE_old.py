@@ -93,8 +93,8 @@ def main(args):
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
-    best = 0
-    best_ndcg = 0
+    best = [0, 0, 0]
+    best_ndcg, best_mAP = 0, 0
 
     for i in range(1, iter):
         # shuffle_idx = np.random.permutation(range(dataset.no_user))
@@ -126,15 +126,18 @@ def main(args):
             model.train = False
             loss_val_a, y_b = sess.run([model.loss, model.x_recon],
                                               feed_dict={model.x: dataset.transaction})
-            recall, ndcg = recallK(dataset.train, dataset.test, y_b, 50)
+            recall, ndcg, mAP = recallK(dataset.train, dataset.test, y_b, 50)
             print("recall: %f, ndcg: %f" % (recall, ndcg))
             model.train = True
-            if recall > best:
-                best = recall
+            if recall > best[0]:
+                best = [recall, ndcg, mAP]
             if ndcg > best_ndcg:
                 best_ndcg = ndcg
-        # if (i%50 == 0) :
-        #     model.learning_rate /= 10
+            if mAP > best_mAP:
+                best_mAP = mAP
+        if (i % 10 == 0) and (model.learning_rate >= 1e-6):
+            model.learning_rate /= 10
+        print("[200] : ", best, ", ", best_ndcg, ", ", best_mAP)
     print(best, best_ndcg)
 
 
