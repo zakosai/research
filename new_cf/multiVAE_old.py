@@ -138,7 +138,7 @@ def main(args):
         if (i % 10 == 0) and (model.learning_rate >= 1e-6):
             model.learning_rate /= 10
         print("[200] : ", best, ", ", best_ndcg, ", ", best_mAP)
-    print(best, best_ndcg)
+    # print(best, best_ndcg)
 
 
 if __name__ == '__main__':
