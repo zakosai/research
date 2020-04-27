@@ -201,7 +201,7 @@ def main(args):
                 model.train = True
                 if recall > best:
                     best = recall
-            if (i%4 == 0) and (model.learning_rate >= 1e-6):
+            if (i%10 == 0) and (model.learning_rate >= 1e-6):
                 model.learning_rate /= 10
         print("VAE Layers ", layer, " : ", best)
         tf.keras.backend.clear_session()
