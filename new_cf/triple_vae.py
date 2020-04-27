@@ -100,7 +100,7 @@ class Translation:
         self.item_info = tf.placeholder(tf.float32, [None, self.item_info_dim], name='item_info')
 
         # VAE for user
-        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [100], [100, self.user_info_dim], "user",
+        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [], [self.user_info_dim], "user",
                                                     activation=tf.nn.tanh)
         self.loss_user = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon), axis=1)) +\
              loss_kl_user + tf.losses.get_regularization_loss()
