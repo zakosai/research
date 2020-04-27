@@ -131,7 +131,8 @@ def main(args):
             model.train = True
             if recall > best:
                 best = recall
-                best_ndcg = best_ndcg
+            if ndcg > best_ndcg:
+                best_ndcg = ndcg
         # if (i%50 == 0) :
         #     model.learning_rate /= 10
     print(best, best_ndcg)

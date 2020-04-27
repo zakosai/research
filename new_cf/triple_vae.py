@@ -202,6 +202,7 @@ def main(args):
                 model.train = True
                 if recall > best:
                     best = recall
+                if ndcg > best_ndcg:
                     best_ndcg = ndcg
             if (i%10 == 0) and (model.learning_rate >= 1e-6):
                 model.learning_rate /= 10
