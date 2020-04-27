@@ -196,7 +196,7 @@ def main(args):
                                                   feed_dict={model.x: dataset.transaction,
                                                              model.user_info: dataset.user_info,
                                                              model.item_info: dataset.item_info})
-                recall = recallK(dataset.train, dataset.test, y_b)
+                recall = recallK(dataset.train, dataset.test, y_b, 10)
                 print("recall: %f"%recall)
                 model.train = True
                 if recall > best:
