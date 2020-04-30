@@ -108,10 +108,12 @@ def gen_neucf(folder):
             tmp_trans = transaction[transaction.u_id == i]
             neg = list(set(range(n_item)) - set(train[i] + test[i]))
             for j in train[i]:
+                print(i, j)
                 r = tmp_trans[tmp_trans.p_id == j].rating[0]
                 train_neucf.append([i, j, r])
 
             for j in test[i]:
+                print(i,j)
                 r = tmp_trans[tmp_trans.p_id == j].rating[0]
                 test_file.write('%d\t%d\t%d\n'%(i, j, r))
                 n = np.random.permutation(neg)[:99].tolist()
