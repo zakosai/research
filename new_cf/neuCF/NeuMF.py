@@ -236,6 +236,7 @@ if __name__ == '__main__':
                 predict = model.predict([np.array(user), np.array(item)], batch_size=1000, verbose=0)
                 pred.append(predict)
             recall, ndcg, mAP = recallK(datatest.train, datatest.test, np.array(pred), 50)
+            print(recall, ndcg, mAP)
             if recall > max_recall[0]:
                 max_recall = [recall, ndcg, mAP]
             if ndcg > max_ndcg[1]:
