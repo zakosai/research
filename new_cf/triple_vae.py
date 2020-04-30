@@ -72,7 +72,7 @@ class Translation:
 
     def dae(self, x, encode_dim, decode_dim, scope, reuse=False, activation=None):
         x_ = x
-        # x_ = tf.nn.dropout(x_, 0.7)
+        x_ = tf.nn.dropout(x_, 0.7)
         regular = tf.contrib.layers.l2_regularizer(scale=0.05)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
@@ -133,7 +133,7 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[4000, 2000, 1000]]
+    layers = [[5000, 3000, 2000]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
