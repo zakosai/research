@@ -123,7 +123,7 @@ if __name__ == '__main__':
     topK = 10
     evaluation_threads = 1 #mp.cpu_count()
     print("MLP arguments: %s " %(args))
-    model_out_file = 'Pretrain/%s_MLP_%s_%d.h5' %(args.dataset, args.layers, time())
+    model_out_file = 'Pretrain/%s_MLP.h5' %(args.dataset)
     
     # Loading data
     t1 = time()

@@ -172,9 +172,9 @@ if __name__ == '__main__':
     mlp_pretrain = args.mlp_pretrain
             
     topK = 50
-    evaluation_threads = 1#mp.cpu_count()
-    print("NeuMF arguments: %s " %(args))
-    model_out_file = os.path.join(args.ckpt, "NeuMF.h5")
+    evaluation_threads = 1  # mp.cpu_count()
+    print("GMF arguments: %s" % (args))
+    model_out_file = 'Pretrain/%s_neuCF.h5' % (args.dataset)
 
     # Loading data
     t1 = time()
