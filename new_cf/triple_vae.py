@@ -78,7 +78,7 @@ class Translation:
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], activation, scope="enc_%d" % i,
                                      weights_regularizer=regular)
-                x_ = batch_norm(x_, decay=0.9)
+                # x_ = batch_norm(x_, decay=0.9)
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], activation, scope="dec_%d" % i,
                                      weights_regularizer=regular)
