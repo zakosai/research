@@ -78,7 +78,7 @@ class Translation:
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], activation, scope="enc_%d" % i,
                                      weights_regularizer=regular)
-                x_ = batch_norm(x_, decay=0.9)
+                # x_ = batch_norm(x_, decay=0.9)
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], activation, scope="dec_%d" % i,
                                      weights_regularizer=regular)
@@ -133,7 +133,7 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[5000, 3000, 2000]]
+    layers = [[4000, 2000, 1000]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
