@@ -89,15 +89,57 @@ def preprocess(folder, f):
     print("---------------------------------")
 
 
+def gen_neucf(folder):
+    for type in [1, 8]:
+        train = load_rating("/media/linh/DATA/research/cf-vae/data2/%s/cf-train-%dp-users.dat"%(folder, type))
+        test = load_rating("/media/linh/DATA/research/cf-vae/data2/%s/cf-train-%dp-users.dat"%(folder, type))
+        n_item = len(list(open("/media/linh/DATA/research/cf-vae/data2/%s/cf-train-%dp-items.dat"%(folder, type))))
+        transaction = list(open("/media/linh/DATA/research/cf-vae/data2/%s/review_info.txt" % (folder)))
+        transaction = [t.strip().split(', ')[:3] for t in transaction]
+        columns = transaction[0]
+        transaction = pd.DataFrame(transaction[1:], columns=columns, dtype='int')
+
+        train_file = open("../data/%s/%s%d.train.rating"%(folder, folder, type), 'w')
+        test_file = open("../data/%s/%s%d.test.rating" % (folder, folder, type), 'w')
+        test_negative = open("../data/%s/%s%d.test.negative" % (folder, folder, type), 'w')
+
+        train_neucf = []
+        for i in range(len(train)):
+            tmp_trans = transaction[transaction.u_id == i]
+            neg = list(set(range(n_item)) - set(train[i] + test[i]))
+            for j in train[i]:
+                r = tmp_trans[tmp_trans.p_id == j].rating[0]
+                train_neucf.append([i, j, r])
+
+            for j in test[i]:
+                r = tmp_trans[tmp_trans.p_id == j].rating[0]
+                test_file.write('%d\t%d\t%d\n'%(i, j, r))
+                n = np.random.permutation(neg)[:99].tolist()
+                n = '\t'.join([str(ne) for ne in n])
+                test_negative.write('(%d,%d)\t%s\n'%(i, j, n))
+
+        rand = np.random.permutation(range(len(train_neucf)))
+        for i in rand:
+            train_file.write('%d\t%d\t%d\n'%(train_neucf[i][0], train_neucf[i][1], train_neucf[i][2]))
+
+        train_file.close()
+        test_file.close()
+        test_negative.close()
+
+
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--data', type=str, default='Baby')
-    args = parser.parse_args()
-    # folders = ['Instrument', 'Kindle', 'Music', 'Office', 'Pet', 'Phone', 'Video']
-    # folders = ['Kitchen', 'TV', 'Beauty', 'Toy', 'Health', 'Clothing']
-    summary = open("data/summary.txt", "a")
-    preprocess(args.data, summary)
-    summary.close()
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('--data', type=str, default='Baby')
+    # args = parser.parse_args()
+    # # folders = ['Instrument', 'Kindle', 'Music', 'Office', 'Pet', 'Phone', 'Video']
+    # # folders = ['Kitchen', 'TV', 'Beauty', 'Toy', 'Health', 'Clothing']
+    # summary = open("data/summary.txt", "a")
+    # preprocess(args.data, summary)
+    # summary.close()
+
+    folders = ["Tool", "Kitchen", "Beauty", "TV", "Toy", "Garden", "Office", "Kindle"]
+    for f in folders:
+        gen_neucf(f)
 
 
 
