@@ -37,7 +37,7 @@ class Translation:
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], activation, scope="enc_%d"%i,
                                      weights_regularizer=self.regularizer)
-                # x_ = batch_norm(x_, decay=0.9)
+                x_ = batch_norm(x_, decay=0.9)
         return x_
 
     def dec(self, x, scope, decode_dim, reuse=False, activation=None):
@@ -103,13 +103,13 @@ class Translation:
         z_user, user_recon, loss_kl_user = self.vae(self.user_info, [100], [100, self.user_info_dim], "user",
                                                     activation=tf.nn.tanh)
         self.loss_user = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon), axis=1)) +\
-             loss_kl_user + tf.losses.get_regularization_loss()
+             loss_kl_user + 10 * tf.losses.get_regularization_loss()
 
         # VAE for item
         z_item, item_recon, loss_kl_item = self.vae(self.item_info, [200], [200, self.item_info_dim],
                                                     "item", activation=tf.nn.tanh)
         self.loss_item = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon), axis=1)) +\
-                         loss_kl_item + tf.losses.get_regularization_loss()
+                         loss_kl_item + 10 * tf.losses.get_regularization_loss()
 
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
         min = tf.reduce_min(content_matrix, axis=1, keepdims=True)
