@@ -29,9 +29,9 @@ import os
 #################### Arguments ####################
 def parse_args():
     parser = argparse.ArgumentParser(description="Run NeuMF.")
-    parser.add_argument('--ckpt', nargs='?', default='data/',
+    parser.add_argument('--path', nargs='?', default='data/',
                         help='Input data path.')
-    parser.add_argument('--data', nargs='?', default='ml-1m',
+    parser.add_argument('--dataset', nargs='?', default='ml-1m',
                         help='Choose a dataset.')
     parser.add_argument('--type', type=str, default='1p',
                         help='Choose a dataset.')
