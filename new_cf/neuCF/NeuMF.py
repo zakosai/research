@@ -230,12 +230,12 @@ if __name__ == '__main__':
         # Evaluation
         if epoch %verbose == 0:
             pred = []
-            for i in range(len(dataset.train)):
+            for i in range(len(datatest.train)):
                 user = [i]*num_items
                 item = list(range(num_items))
                 predict = model.predict([np.array(user), np.array(item)], batch_size=1000, verbose=0)
                 pred.append(predict)
-            recall, ndcg, mAP = recallK(dataset.train, dataset.test, pred, 50)
+            recall, ndcg, mAP = recallK(datatest.train, datatest.test, pred, 50)
             if recall > max_recall[0]:
                 max_recall = [recall, ndcg, mAP]
             if ndcg > max_ndcg[1]:
