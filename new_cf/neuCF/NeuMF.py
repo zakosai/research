@@ -230,7 +230,7 @@ if __name__ == '__main__':
         # Evaluation
         if epoch %verbose == 0:
             pred = []
-            for i in dataset['user_item_test'].keys():
+            for i in range(len(dataset.train)):
                 user = [i]*num_items
                 item = list(range(num_items))
                 predict = model.predict([np.array(user), np.array(item)], batch_size=1000, verbose=0)
