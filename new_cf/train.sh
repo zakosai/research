@@ -6,7 +6,7 @@ for f in $folders; do
 
     python neuCF/GMF.py --path data/${f}/ --dataset ${f}1 --epochs 20 --batch_size 512 --num_factors 8 --regs [0,0] --num_neg 10 --lr 0.001 --learner adam --verbose 1 --out 1
     python neuCF/MLP.py --path data/${f}/ --dataset ${f}1 --epochs 20 --batch_size 512 --layers [64,32,16,8] --reg_layers [0,0,0,0] --num_neg 10 --lr 0.001 --learner adam --verbose 1 --out 1
-     python neuCF/NeuMF.py --path data/${f}/ --dataset ${f}1 --type 1p --epochs 100 --batch_size 512 --num_factors 8 --layers [64,32,16,8] --num_neg 10 --lr 0.001 --learner adam --verbose 1 --out 1 --mf_pretrain Pretrain/${f}8_GMF.h5 --mlp_pretrain Pretrain/${f}8_MLP.h5 >>/media/linh/DATA/research/new_cf/result8/neuCF_${f}_1.txt
+     python neuCF/NeuMF.py --path data/${f}/ --dataset ${f}1 --type 1p --epochs 100 --batch_size 512 --num_factors 8 --layers [64,32,16,8] --num_neg 10 --lr 0.001 --learner adam --verbose 1 --out 1 --mf_pretrain Pretrain/${f}1_GMF.h5 --mlp_pretrain Pretrain/${f}1_MLP.h5 >>/media/linh/DATA/research/new_cf/result8/neuCF_${f}_1.txt
 
     python neuCF/GMF.py --path data/${f}/ --dataset ${f}8 --epochs 20 --batch_size 512 --num_factors 8 --regs [0,0] --num_neg 10 --lr 0.001 --learner adam --verbose 1 --out 1
     python neuCF/MLP.py --path data/${f}/ --dataset ${f}8 --epochs 20 --batch_size 512 --layers [64,32,16,8] --reg_layers [0,0,0,0] --num_neg 10 --lr 0.001 --learner adam --verbose 1 --out 1
@@ -32,4 +32,6 @@ for f in $folders; do
 
 done
 
-python triple_vae.py --data_dir=../cf-vae/data2/Garden/ --data_type=8p  --iter=400 --learning_rate=0.0001
+#python triple_vae.py --data_dir=../cf-vae/data2/Garden/ --data_type=8p  --iter=400 --learning_rate=0.0001
+
+#python neuCF/NeuMF.py --path data/${f}/ --dataset ${f}1 --type 1p --epochs 2 --batch_size 512 --num_factors 8 --layers [64,32,16,8] --num_neg 10 --lr 0.001 --learner adam --verbose 1 --out 1 --mf_pretrain Pretrain/${f}1_GMF.h5 --mlp_pretrain Pretrain/${f}1_MLP.h5
