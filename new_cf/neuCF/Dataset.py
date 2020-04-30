@@ -28,7 +28,7 @@ class Dataset(object):
         with open(filename, "r") as f:
             line = f.readline()
             while line != None and line != "":
-                arr = line.split(",")
+                arr = line.split("\t")
                 user, item = int(arr[0]), int(arr[1])
                 ratingList.append([user, item])
                 line = f.readline()
@@ -39,7 +39,7 @@ class Dataset(object):
         with open(filename, "r") as f:
             line = f.readline()
             while line != None and line != "":
-                arr = line.split(",")
+                arr = line.split("\t")
                 negatives = []
                 for x in arr[1: ]:
                     negatives.append(int(x))
@@ -57,7 +57,7 @@ class Dataset(object):
         with open(filename, "r") as f:
             line = f.readline()
             while line != None and line != "":
-                arr = line.split(",")
+                arr = line.split("\t")
                 u, i = int(arr[0]), int(arr[1])
                 num_users = max(num_users, u)
                 num_items = max(num_items, i)
@@ -67,7 +67,7 @@ class Dataset(object):
         with open(filename, "r") as f:
             line = f.readline()
             while line != None and line != "":
-                arr = line.split(",")
+                arr = line.split("\t")
                 user, item, rating = int(arr[0]), int(arr[1]), float(arr[2])
                 if (rating > 0):
                     mat[user, item] = 1.0
