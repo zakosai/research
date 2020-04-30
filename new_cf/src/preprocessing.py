@@ -90,6 +90,7 @@ def preprocess(folder, f):
 
 
 def gen_neucf(folder):
+    print(folder)
     for type in [1, 8]:
         train = load_rating("/media/linh/DATA/research/cf-vae/data2/%s/cf-train-%dp-users.dat"%(folder, type))
         test = load_rating("/media/linh/DATA/research/cf-vae/data2/%s/cf-train-%dp-users.dat"%(folder, type))
