@@ -73,7 +73,7 @@ class Translation:
     def dae(self, x, encode_dim, decode_dim, scope, reuse=False, activation=None):
         x_ = x
         # x_ = tf.nn.dropout(x_, 0.7)
-        regular = tf.contrib.layers.l2_regularizer(scale=0.1)
+        regular = tf.contrib.layers.l2_regularizer(scale=0.01)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], activation, scope="enc_%d" % i,
@@ -109,7 +109,7 @@ class Translation:
         z_item, item_recon, loss_kl_item = self.vae(self.item_info, [], [self.item_info_dim],
                                                     "item", activation=tf.nn.tanh)
         self.loss_item = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon), axis=1)) +\
-                         loss_kl_item + 2 * tf.losses.get_regularization_loss()
+                         loss_kl_item + 10 * tf.losses.get_regularization_loss()
 
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
         min = tf.reduce_min(content_matrix, axis=1, keepdims=True)
@@ -122,7 +122,7 @@ class Translation:
         # self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
         #             2 * tf.losses.get_regularization_loss()
         self.x_recon = self.dae(x, self.encode_dim, self.decode_dim, "CF", activation=tf.nn.tanh)
-        self.loss = self.loss_reconstruct(self.x, self.x_recon) + 2 * tf.losses.get_regularization_loss()
+        self.loss = self.loss_reconstruct(self.x, self.x_recon)
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
