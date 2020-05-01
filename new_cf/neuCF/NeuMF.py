@@ -234,8 +234,7 @@ if __name__ == '__main__':
                 user = [i]*num_items
                 item = list(range(num_items))
                 predict = model.predict([np.array(user), np.array(item)], batch_size=1000, verbose=0)
-                print(predict)
-                pred.append(predict)
+                pred.append(predict.reshape(num_items))
             recall, ndcg, mAP = recallK(datatest.train, datatest.test, np.array(pred), 50)
             print(recall, ndcg, mAP)
             if recall > max_recall[0]:
