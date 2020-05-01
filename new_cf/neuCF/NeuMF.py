@@ -75,7 +75,7 @@ def get_model(num_users, num_items, mf_dim=10, layers=[10], reg_layers=[0], reg_
     item_input = Input(shape=(1,), dtype='int32', name = 'item_input')
     
     # Embedding layer
-    MF_Embedding_User = Embedding(input_dim = num_users, output_dim = mf_dim, name = 'mf_embedding_user',
+    MF_Embedding_User = Embedding(input_dim=num_users, output_dim=mf_dim, name = 'mf_embedding_user',
                                   init = init_normal, W_regularizer = l2(reg_mf), input_length=1)
     MF_Embedding_Item = Embedding(input_dim = num_items, output_dim = mf_dim, name = 'mf_embedding_item',
                                   init = init_normal, W_regularizer = l2(reg_mf), input_length=1)   
@@ -223,7 +223,7 @@ if __name__ == '__main__':
         
         # Training
         hist = model.fit([np.array(user_input), np.array(item_input)], #input
-                         np.array(labels), # labels 
+                         np.array(labels),# labels
                          batch_size=batch_size, nb_epoch=1, verbose=0, shuffle=True)
         t2 = time()
         
@@ -234,6 +234,7 @@ if __name__ == '__main__':
                 user = [i]*num_items
                 item = list(range(num_items))
                 predict = model.predict([np.array(user), np.array(item)], batch_size=1000, verbose=0)
+                print(predict)
                 pred.append(predict)
             recall, ndcg, mAP = recallK(datatest.train, datatest.test, np.array(pred), 50)
             print(recall, ndcg, mAP)
