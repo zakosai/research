@@ -158,6 +158,7 @@ if __name__ == '__main__':
     #
     folders = ["TV", "Toy", "Tool"]
     for f in folders:
+        print(f)
         re_cal_review_info(f)
 
     # folders = ['Instrument', 'Kindle', 'Music', 'Office', 'Pet', 'Phone', 'Video', 'Garden', 'Beauty', 'Health',
