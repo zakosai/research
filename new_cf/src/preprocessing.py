@@ -156,12 +156,13 @@ if __name__ == '__main__':
     # preprocess(args.data, summary)
     # summary.close()
     #
-    # folders = ["Kitchen", "TV", "Toy", "Tool"]
-    # for f in folders:
-    #     re_cal_review_info(f)
+    folders = ["TV", "Toy", "Tool"]
+    for f in folders:
+        re_cal_review_info(f)
 
-    folders = ['Instrument', 'Kindle', 'Music', 'Office', 'Pet', 'Phone', 'Video', 'Garden', 'Beauty', 'Health',
-               'Kitchen', 'TV', 'Toy', 'Tool']
+    # folders = ['Instrument', 'Kindle', 'Music', 'Office', 'Pet', 'Phone', 'Video', 'Garden', 'Beauty', 'Health',
+    #            'Kitchen', 'TV', 'Toy', 'Tool']
+    folders = ['Tool', "Beauty", "TV", "Toy", "Garden", "Office", "Kindle"]
     for f in folders:
         print(f)
         preprocess(f, summary)
