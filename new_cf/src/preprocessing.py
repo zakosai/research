@@ -57,7 +57,7 @@ def load_rating(path):
 
 
 def preprocess(folder, f):
-    data = pd.read_csv("/media/linh/DATA/research/cf-vae/data2/%s/review_info.txt" % folder, delimiter=', ', engine='python')
+    data = pd.read_csv("data/%s/review_info.txt" % folder, index_col=0)
     data.columns = ['u_id', 'p_id', 'rating', 'unixTime', 'brand', 'categories']
     categories = get_categories(folder)
     categories = convert_categories(categories)
@@ -152,16 +152,19 @@ if __name__ == '__main__':
     # args = parser.parse_args()
     # # folders = ['Instrument', 'Kindle', 'Music', 'Office', 'Pet', 'Phone', 'Video']
     # # folders = ['Kitchen', 'TV', 'Beauty', 'Toy', 'Health', 'Clothing']
-    # summary = open("data/summary.txt", "a")
+    summary = open("data/summary.txt", "a")
     # preprocess(args.data, summary)
     # summary.close()
+    #
+    # folders = ["Kitchen", "TV", "Toy", "Tool"]
+    # for f in folders:
+    #     re_cal_review_info(f)
 
-    folders = ["Kitchen", "TV", "Toy", "Tool"]
-    # folders = ['Instrument', 'Kindle', 'Music', 'Office', 'Pet', 'Phone', 'Video', 'Garden', 'Beauty', 'Health',
-    #            'Kitchen', 'TV', 'Toy', 'Tool']
+    folders = ['Instrument', 'Kindle', 'Music', 'Office', 'Pet', 'Phone', 'Video', 'Garden', 'Beauty', 'Health',
+               'Kitchen', 'TV', 'Toy', 'Tool']
     for f in folders:
         print(f)
-        re_cal_review_info(f)
+        preprocess(f, summary)
 
 
 
