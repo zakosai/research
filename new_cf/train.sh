@@ -2,6 +2,7 @@
 #python src/preprocessing.py
 #folders="Tool Outdoor Kitchen TV Beauty Toy Automotive Baby CD Garden Grocery Kindle Music Office Pet Phone Video"
 #folders="Tool Beauty TV Toy Garden Office Kindle"
+python src/preprocessing.py
 folders="Music Office Pet Phone Video Garden Beauty Kindle"
 for f in $folders; do
     echo ${f}
