@@ -92,17 +92,20 @@ def preprocess(folder, f):
 def gen_neucf(folder):
     print(folder)
     for type in [1, 8]:
-        train = load_rating("/media/linh/DATA/research/cf-vae/data2/%s/cf-train-%dp-users.dat"%(folder, type))
-        test = load_rating("/media/linh/DATA/research/cf-vae/data2/%s/cf-train-%dp-users.dat"%(folder, type))
-        n_item = len(list(open("/media/linh/DATA/research/cf-vae/data2/%s/cf-train-%dp-items.dat"%(folder, type))))
-        transaction = list(open("/media/linh/DATA/research/cf-vae/data2/%s/review_info.txt" % (folder)))
+        folder = 'kitchen'
+        train = load_rating("/media/linh/DATA/research/cf-vae/data/%s/cf-train-%dp-users.dat"%(folder, type))
+        test = load_rating("/media/linh/DATA/research/cf-vae/data/%s/cf-train-%dp-users.dat"%(folder, type))
+        n_item = len(list(open("/media/linh/DATA/research/cf-vae/data/%s/cf-train-%dp-items.dat"%(folder, type))))
+        transaction = list(open("/media/linh/DATA/research/cf-vae/data/%s/review_info.txt" % (folder)))
         transaction = [t.strip().split(', ')[:3] for t in transaction]
         columns = transaction[0]
         transaction = pd.DataFrame(transaction[1:], columns=columns, dtype='int')
 
+        folder = 'Kitchen'
         train_file = open("../data/%s/%s%d.train.rating"%(folder, folder, type), 'w')
         test_file = open("../data/%s/%s%d.test.rating" % (folder, folder, type), 'w')
         test_negative = open("../data/%s/%s%d.test.negative" % (folder, folder, type), 'w')
+
 
         train_neucf = []
         for i in range(len(train)):
@@ -138,7 +141,8 @@ if __name__ == '__main__':
     # preprocess(args.data, summary)
     # summary.close()
 
-    folders = ["Tool", "Kitchen", "Beauty", "TV", "Toy", "Garden", "Office", "Kindle"]
+    # folders = ["Tool", "Kitchen", "Beauty", "TV", "Toy", "Garden", "Office", "Kindle"]
+    folders = ['Kitchen']
     for f in folders:
         gen_neucf(f)
 
