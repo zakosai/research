@@ -93,9 +93,9 @@ def gen_neucf(folder):
     print(folder)
     for type in [1, 8]:
         folder = 'kitchen'
-        train = load_rating("/media/linh/DATA/research/cf-vae/data/%s/cf-train-%dp-users.dat"%(folder, type))
-        test = load_rating("/media/linh/DATA/research/cf-vae/data/%s/cf-train-%dp-users.dat"%(folder, type))
-        n_item = len(list(open("/media/linh/DATA/research/cf-vae/data/%s/cf-train-%dp-items.dat"%(folder, type))))
+        train = load_rating("/media/linh/DATA/research/cf-vae/data/%s/cf-train-%d-users.dat"%(folder, type))
+        test = load_rating("/media/linh/DATA/research/cf-vae/data/%s/cf-train-%d-users.dat"%(folder, type))
+        n_item = len(list(open("/media/linh/DATA/research/cf-vae/data/%s/cf-train-%d-items.dat"%(folder, type))))
         transaction = list(open("/media/linh/DATA/research/cf-vae/data/%s/review_info.txt" % (folder)))
         transaction = [t.strip().split(', ')[:3] for t in transaction]
         columns = transaction[0]
