@@ -92,16 +92,14 @@ def preprocess(folder, f):
 def gen_neucf(folder):
     print(folder)
     for type in [1, 8]:
-        folder = 'kitchen'
-        train = load_rating("/media/linh/DATA/research/cf-vae/data/%s/cf-train-%d-users.dat"%(folder, type))
-        test = load_rating("/media/linh/DATA/research/cf-vae/data/%s/cf-train-%d-users.dat"%(folder, type))
-        n_item = len(list(open("/media/linh/DATA/research/cf-vae/data/%s/cf-train-%d-items.dat"%(folder, type))))
-        transaction = list(open("/media/linh/DATA/research/cf-vae/data/%s/review_info.txt" % (folder)))
+        train = load_rating("/media/linh/DATA/research/cf-vae/data2/%s/cf-train-%dp-users.dat"%(folder, type))
+        test = load_rating("/media/linh/DATA/research/cf-vae/data2/%s/cf-train-%dp-users.dat"%(folder, type))
+        n_item = len(list(open("/media/linh/DATA/research/cf-vae/data2/%s/cf-train-%dp-items.dat"%(folder, type))))
+        transaction = list(open("/media/linh/DATA/research/cf-vae/data2/%s/review_info.txt" % (folder)))
         transaction = [t.strip().split(', ')[:3] for t in transaction]
         columns = transaction[0]
         transaction = pd.DataFrame(transaction[1:], columns=columns, dtype='int')
 
-        folder = 'Kitchen'
         train_file = open("../data/%s/%s%d.train.rating"%(folder, folder, type), 'w')
         test_file = open("../data/%s/%s%d.test.rating" % (folder, folder, type), 'w')
         test_negative = open("../data/%s/%s%d.test.negative" % (folder, folder, type), 'w')
@@ -131,6 +129,23 @@ def gen_neucf(folder):
         test_negative.close()
 
 
+def re_cal_review_info(folder):
+    product_id = list(open("/media/linh/DATA/research/cf-vae/data2/%s/product_ids.txt" % folder))
+    product_id = [u.strip() for u in product_id]
+
+    review_info = pd.read_csv("/media/linh/DATA/research/cf-vae/data2/%s/review_info.txt" % folder, delimiter=', ')
+    reviews = getDF("/media/linh/DATA/research/cf-vae/data/%s/meta.json.gz" % folder)
+
+    def convert(x):
+        re = reviews[reviews.asin == product_id[int(x.p_id)]]
+        x.brand = re.brand.values[0]
+        x.categories = ','.join(re.categories.values[0][0])
+        return x
+
+    review_info = review_info.apply(lambda x: convert(x))
+    review_info = review_info.astype({'u_id': int, 'p_id': int, 'rating': int, 'unixTime': int})
+    review_info.to_csv("data/%s/review_info.txt" % folder)
+
 if __name__ == '__main__':
     # parser = argparse.ArgumentParser()
     # parser.add_argument('--data', type=str, default='Baby')
@@ -142,9 +157,11 @@ if __name__ == '__main__':
     # summary.close()
 
     # folders = ["Tool", "Kitchen", "Beauty", "TV", "Toy", "Garden", "Office", "Kindle"]
-    folders = ['Kitchen']
+    folders = ['Instrument', 'Kindle', 'Music', 'Office', 'Pet', 'Phone', 'Video', 'Garden', 'Beauty', 'Health', 'Clothing',
+               'Kitchen', 'TV', 'Toy']
     for f in folders:
-        gen_neucf(f)
+        print(f)
+        re_cal_review_info(f)
 
 
 
