@@ -142,7 +142,7 @@ def re_cal_review_info(folder):
         x.categories = ','.join(re.categories.values[0][0])
         return x
 
-    review_info = review_info.apply(lambda x: convert(x))
+    review_info = review_info.apply(lambda x: convert(x), axis=1)
     review_info = review_info.astype({'u_id': int, 'p_id': int, 'rating': int, 'unixTime': int})
     review_info.to_csv("data/%s/review_info.txt" % folder)
 
@@ -158,7 +158,7 @@ if __name__ == '__main__':
 
     # folders = ["Tool", "Kitchen", "Beauty", "TV", "Toy", "Garden", "Office", "Kindle"]
     folders = ['Instrument', 'Kindle', 'Music', 'Office', 'Pet', 'Phone', 'Video', 'Garden', 'Beauty', 'Health', 'Clothing',
-               'Kitchen', 'TV', 'Toy']
+               'Kitchen', 'TV', 'Toy', 'Tool']
     for f in folders:
         print(f)
         re_cal_review_info(f)
