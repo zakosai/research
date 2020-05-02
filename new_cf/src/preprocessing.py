@@ -134,7 +134,7 @@ def re_cal_review_info(folder):
     product_id = [u.strip() for u in product_id]
 
     # review_info = pd.read_csv("/media/linh/DATA/research/cf-vae/data2/%s/review_info.txt" % folder, delimiter=', ')
-    review_info = list(open("/media/linh/DATA/research/cf-vae/data2/%s/review_info.txt" % folder,))
+    review_info = list(open("/media/linh/DATA/research/cf-vae/data2/%s/review_info.txt" % folder))
     review_info = [r.split(', ')[:4] for r in review_info]
     cols = review_info[0]
     review_info = pd.DataFrame(review_info, columns=cols, dtype='int')
@@ -162,14 +162,14 @@ if __name__ == '__main__':
     # preprocess(args.data, summary)
     # summary.close()
     #
-    folders = ["TV", "Toy", "Tool"]
-    for f in folders:
-        print(f)
-        re_cal_review_info(f)
+    # folders = ["TV", "Toy", "Tool"]
+    # for f in folders:
+    #     print(f)
+    #     re_cal_review_info(f)
 
     # folders = ['Instrument', 'Kindle', 'Music', 'Office', 'Pet', 'Phone', 'Video', 'Garden', 'Beauty', 'Health',
     #            'Kitchen', 'TV', 'Toy', 'Tool']
-    folders = ['Tool', "Beauty", "TV", "Toy", "Garden", "Office", "Kindle"]
+    folders = ['Music', 'Office', 'Pet', 'Phone', 'Video', 'Garden', 'Beauty', 'Kindle']
     for f in folders:
         print(f)
         preprocess(f, summary)

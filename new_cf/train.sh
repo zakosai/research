@@ -1,8 +1,8 @@
 #folders="Automotive Baby CD Clothing Garden Grocery Kindle Music Office Pet Phone Video"
 #python src/preprocessing.py
 #folders="Tool Outdoor Kitchen TV Beauty Toy Automotive Baby CD Garden Grocery Kindle Music Office Pet Phone Video"
-folders="Tool Beauty TV Toy Garden Office Kindle"
-
+#folders="Tool Beauty TV Toy Garden Office Kindle"
+folders="Music Office Pet Phone Video Garden Beauty Kindle"
 for f in $folders; do
     echo ${f}
 
