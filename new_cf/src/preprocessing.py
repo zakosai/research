@@ -156,9 +156,9 @@ if __name__ == '__main__':
     # preprocess(args.data, summary)
     # summary.close()
 
-    # folders = ["Tool", "Kitchen", "Beauty", "TV", "Toy", "Garden", "Office", "Kindle"]
-    folders = ['Instrument', 'Kindle', 'Music', 'Office', 'Pet', 'Phone', 'Video', 'Garden', 'Beauty', 'Health', 'Clothing',
-               'Kitchen', 'TV', 'Toy', 'Tool']
+    folders = ["Kitchen", "TV", "Toy", "Tool"]
+    # folders = ['Instrument', 'Kindle', 'Music', 'Office', 'Pet', 'Phone', 'Video', 'Garden', 'Beauty', 'Health',
+    #            'Kitchen', 'TV', 'Toy', 'Tool']
     for f in folders:
         print(f)
         re_cal_review_info(f)
