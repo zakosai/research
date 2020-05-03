@@ -12,7 +12,7 @@ for f in $folders; do
     python neuCF/GMF.py --path data/${f}/ --dataset ${f}8 --epochs 20 --batch_size 512 --num_factors 50 --regs [0,0] --num_neg 10 --lr 0.001 --learner adam --verbose 1 --out 1
     python neuCF/MLP.py --path data/${f}/ --dataset ${f}8 --epochs 20 --batch_size 512 --layers [1000,200,50] --reg_layers [0,0,0] --num_neg 10 --lr 0.001 --learner adam --verbose 1 --out 1
     python neuCF/NeuMF.py --path data/${f}/ --dataset ${f}8 --type 8p --epochs 40 --batch_size 512 --num_factors 50 --layers [1000,200,50] --reg_layers [0,0,0] --num_neg 10 --lr 0.001 --learner adam --verbose 1 --out 1 --mf_pretrain Pretrain/${f}8_GMF.h5 --mlp_pretrain Pretrain/${f}8_MLP.h5 >>/media/linh/DATA/research/new_cf/result8/neuCF_${f}_8.txt
-
+done
 
 folders="Kindle"
 for f in $folders; do
