@@ -87,7 +87,7 @@ def main(args):
     batch_size = 500
 
     dataset = Dataset(args.data_dir, args.data_type)
-    layers = [[100], [200], [200, 100], [1000, 500, 100], [4000, 2000, 1000]]
+    layers = [[100], [200], [200, 100], [1000, 500, 100], [4000, 2000, 1000], [5000, 3000, 2000]]
     for layer in layers:
         model = RSVAE(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
                             layer[:-1], layer[:-1][::-1]+[dataset.no_item], layer[-1], learning_rate=args.learning_rate)
