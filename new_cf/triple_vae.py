@@ -72,13 +72,13 @@ class Translation:
 
     def dae(self, x, encode_dim, decode_dim, scope, reuse=False, activation=None):
         x_ = x
-        # x_ = tf.nn.dropout(x_, 0.7)
+        x_ = tf.nn.dropout(x_, 0.7)
         regular = tf.contrib.layers.l2_regularizer(scale=0.01)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], activation, scope="enc_%d" % i,
                                      weights_regularizer=regular)
-                # x_ = batch_norm(x_, decay=0.9)
+                x_ = batch_norm(x_, decay=0.9)
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], activation, scope="dec_%d" % i,
                                      weights_regularizer=regular)
@@ -138,7 +138,7 @@ def main(args):
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
         model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                            [200], [dataset.no_item], 50, learning_rate=args.learning_rate)
+                            [200, 100], [dataset.no_item], 50, learning_rate=args.learning_rate)
         model.build_model()
         model.lambda_1 = layer
 
