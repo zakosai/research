@@ -88,7 +88,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = RSVAE(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [], [dataset.no_item], 100, learning_rate=args.learning_rate)
+                        [600, 200], [200, 600, dataset.no_item], 50, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
@@ -127,7 +127,7 @@ def main(args):
             loss_val_a, y_b = sess.run([model.loss, model.x_recon],
                                               feed_dict={model.x: dataset.transaction})
             recall, ndcg, mAP = recallK(dataset.train, dataset.test, y_b, 50)
-            # print("recall: %f, ndcg: %f" % (recall, ndcg))
+            print("recall: %f, ndcg: %f" % (recall, ndcg))
             model.train = True
             if recall > best[0]:
                 best = [recall, ndcg, mAP]
@@ -137,7 +137,7 @@ def main(args):
                 best_mAP = mAP
         if (i % 10 == 0) and (model.learning_rate >= 1e-6):
             model.learning_rate /= 10
-        print("[200] : ", best, ", ", best_ndcg, ", ", best_mAP)
+    print("[200] : ", best, ", ", best_ndcg, ", ", best_mAP)
     # print(best, best_ndcg)
 
 
