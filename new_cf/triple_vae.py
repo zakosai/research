@@ -106,7 +106,7 @@ class Translation:
              loss_kl_user + 10 * tf.losses.get_regularization_loss()
 
         # VAE for item
-        z_item, item_recon, loss_kl_item = self.vae(self.item_info, [200], [200, self.item_info_dim],
+        z_item, item_recon, loss_kl_item = self.vae(self.item_info, [], [self.item_info_dim],
                                                     "item", activation=tf.nn.tanh)
         self.loss_item = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon), axis=1)) +\
                          loss_kl_item + 10 * tf.losses.get_regularization_loss()
@@ -133,12 +133,12 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [0.1, 0.5, 1, 5, 10]
+    layers = [0, 0.1, 0.5, 1, 5, 10]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
         model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                            [200, 100], [dataset.no_item], 50, learning_rate=args.learning_rate)
+                            [200], [dataset.no_item], 50, learning_rate=args.learning_rate)
         model.build_model()
         model.lambda_1 = layer
 
