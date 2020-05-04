@@ -77,7 +77,7 @@ class RSVAE:
 
         # Loss VAE
         self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
-                    2 * tf.losses.get_regularization_loss()
+                    10 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
