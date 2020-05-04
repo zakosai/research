@@ -138,7 +138,7 @@ def main(args):
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
         model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                            layers, [dataset.no_item], 50, learning_rate=args.learning_rate)
+                            layer, [dataset.no_item], 50, learning_rate=args.learning_rate)
         model.build_model()
 
         sess = tf.Session()
