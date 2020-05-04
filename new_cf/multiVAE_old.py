@@ -88,7 +88,7 @@ def main(args):
 
     dataset = Dataset(args.data_dir, args.data_type)
     model = RSVAE(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [600, 200], [200, 600, dataset.no_item], 50, learning_rate=args.learning_rate)
+                        [600], [600, dataset.no_item], 200, learning_rate=args.learning_rate)
     model.build_model()
 
     sess = tf.Session()
