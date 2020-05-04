@@ -189,7 +189,7 @@ def main(args):
 
                 _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
-            print("loss user: %f, loss item: %f, loss pred: %f"%(loss_user, loss_item, loss))
+            # print("loss user: %f, loss item: %f, loss pred: %f"%(loss_user, loss_item, loss))
 
             # Validation Process
             if i%1 == 0:
@@ -199,7 +199,7 @@ def main(args):
                                                              model.user_info: dataset.user_info,
                                                              model.item_info: dataset.item_info})
                 recall, ndcg, mAP = recallK(dataset.train, dataset.test, y_b, 50)
-                # print("recall: %f, ndcg: %f"%(recall, ndcg))
+                print("recall: %f, ndcg: %f"%(recall, ndcg))
                 model.train = True
                 if recall > best[0]:
                     best = [recall, ndcg, mAP]
