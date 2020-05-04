@@ -100,16 +100,16 @@ class Translation:
         self.item_info = tf.placeholder(tf.float32, [None, self.item_info_dim], name='item_info')
 
         # VAE for user
-        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [200], [200, self.user_info_dim], "user",
+        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [], [self.user_info_dim], "user",
                                                     activation=tf.nn.tanh)
         self.loss_user = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon), axis=1)) +\
              loss_kl_user + 10 * tf.losses.get_regularization_loss()
 
         # VAE for item
-        z_item, item_recon, loss_kl_item = self.vae(self.item_info, [400, 200], [200, 400,self.item_info_dim],
+        z_item, item_recon, loss_kl_item = self.vae(self.item_info, [200], [200, self.item_info_dim],
                                                     "item", activation=tf.nn.tanh)
         self.loss_item = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon), axis=1)) +\
-                         loss_kl_item + 10 * tf.losses.get_regularization_loss()
+                         loss_kl_item + 5 * tf.losses.get_regularization_loss()
 
         content_matrix = tf.matmul(z_user, tf.transpose(z_item))
         min = tf.reduce_min(content_matrix, axis=1, keepdims=True)
@@ -133,7 +133,7 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[5000, 3000, 2000]]
+    layers = [[5000, 3000, 1000]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
