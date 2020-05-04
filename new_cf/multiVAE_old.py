@@ -87,57 +87,59 @@ def main(args):
     batch_size = 500
 
     dataset = Dataset(args.data_dir, args.data_type)
-    model = RSVAE(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                        [600], [600, dataset.no_item], 200, learning_rate=args.learning_rate)
-    model.build_model()
+    layers = [[100], [200], [200, 100], [1000, 500, 100], [4000, 2000, 1000]]
+    for layer in layers:
+        model = RSVAE(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
+                            layer[:-1], layer[:-1][::-1]+[dataset.no_item], layer[-1], learning_rate=args.learning_rate)
+        model.build_model()
 
-    sess = tf.Session()
-    sess.run(tf.global_variables_initializer())
-    best = [0, 0, 0]
-    best_ndcg, best_mAP = 0, 0
+        sess = tf.Session()
+        sess.run(tf.global_variables_initializer())
+        best = [0, 0, 0]
+        best_ndcg, best_mAP = 0, 0
 
-    for i in range(1, iter):
-        # shuffle_idx = np.random.permutation(range(dataset.no_user))
-        # for j in range(int(len(shuffle_idx) / batch_size)):
-        #     list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
-        #     x = dataset.user_info[list_idx]
-        #     feed = {model.user_info: x}
-        #     _, loss_user = sess.run([model.train_op_user, model.loss_user], feed_dict=feed)
-        #
-        # shuffle_idx = np.random.permutation(range(dataset.no_item))
-        # for j in range(int(len(shuffle_idx) / batch_size)):
-        #     list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
-        #     x = dataset.item_info[list_idx]
-        #     feed = {model.item_info: x}
-        #     _, loss_item = sess.run([model.train_op_item, model.loss_item], feed_dict=feed)
+        for i in range(1, iter):
+            # shuffle_idx = np.random.permutation(range(dataset.no_user))
+            # for j in range(int(len(shuffle_idx) / batch_size)):
+            #     list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
+            #     x = dataset.user_info[list_idx]
+            #     feed = {model.user_info: x}
+            #     _, loss_user = sess.run([model.train_op_user, model.loss_user], feed_dict=feed)
+            #
+            # shuffle_idx = np.random.permutation(range(dataset.no_item))
+            # for j in range(int(len(shuffle_idx) / batch_size)):
+            #     list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
+            #     x = dataset.item_info[list_idx]
+            #     feed = {model.item_info: x}
+            #     _, loss_item = sess.run([model.train_op_item, model.loss_item], feed_dict=feed)
 
-        shuffle_idx = np.random.permutation(range(len(dataset.transaction)))
-        for j in range(int(len(shuffle_idx)/batch_size + 1)):
-            list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
-            x = dataset.transaction[list_idx]
-            feed = {model.x: x}
+            shuffle_idx = np.random.permutation(range(len(dataset.transaction)))
+            for j in range(int(len(shuffle_idx)/batch_size + 1)):
+                list_idx = shuffle_idx[j*batch_size:(j+1)*batch_size]
+                x = dataset.transaction[list_idx]
+                feed = {model.x: x}
 
-            _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
+                _, loss = sess.run([model.train_op, model.loss], feed_dict=feed)
 
-        # print("loss user: %f, loss item: %f, loss pred: %f"%(loss, loss, loss))
+            # print("loss user: %f, loss item: %f, loss pred: %f"%(loss, loss, loss))
 
-        # Validation Process
-        if i%1 == 0:
-            model.train = False
-            loss_val_a, y_b = sess.run([model.loss, model.x_recon],
-                                              feed_dict={model.x: dataset.transaction})
-            recall, ndcg, mAP = recallK(dataset.train, dataset.test, y_b, 50)
-            print("recall: %f, ndcg: %f" % (recall, ndcg))
-            model.train = True
-            if recall > best[0]:
-                best = [recall, ndcg, mAP]
-            if ndcg > best_ndcg:
-                best_ndcg = ndcg
-            if mAP > best_mAP:
-                best_mAP = mAP
-        if (i % 10 == 0) and (model.learning_rate >= 1e-6):
-            model.learning_rate /= 10
-    print("[200] : ", best, ", ", best_ndcg, ", ", best_mAP)
+            # Validation Process
+            if i%1 == 0:
+                model.train = False
+                loss_val_a, y_b = sess.run([model.loss, model.x_recon],
+                                                  feed_dict={model.x: dataset.transaction})
+                recall, ndcg, mAP = recallK(dataset.train, dataset.test, y_b, 50)
+                print("recall: %f, ndcg: %f" % (recall, ndcg))
+                model.train = True
+                if recall > best[0]:
+                    best = [recall, ndcg, mAP]
+                if ndcg > best_ndcg:
+                    best_ndcg = ndcg
+                if mAP > best_mAP:
+                    best_mAP = mAP
+            if (i % 10 == 0) and (model.learning_rate >= 1e-6):
+                model.learning_rate /= 10
+        print(layer, " : ", best, ", ", best_ndcg, ", ", best_mAP)
     # print(best, best_ndcg)
 
 
