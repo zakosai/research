@@ -135,12 +135,12 @@ def main(args):
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
     # layers = [[4000, 2000, 1000], [5000, 3000, 2000], [100], [200], [200, 100], [1000, 500, 100]]
-    layers = [[1000]]
+    layers = [[600, 200]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
         model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                            layer, [dataset.no_item], 100, learning_rate=args.learning_rate)
+                            layer, [600, dataset.no_item], 100, learning_rate=args.learning_rate)
         model.build_model()
 
         sess = tf.Session()
