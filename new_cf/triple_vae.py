@@ -135,7 +135,7 @@ def main(args):
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
     # layers = [[4000, 2000, 1000], [5000, 3000, 2000], [100], [200], [200, 100], [1000, 500, 100]]
-    layers = [[2000, 1000]]
+    layers = [[2000, 500]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
@@ -150,21 +150,21 @@ def main(args):
         best_mAP = 0
         iter_no = int(dataset.no_user / batch_size + 1)
 
-        # for i in range(1, 5):
-        #     shuffle_idx = np.random.permutation(range(dataset.no_user))
-        #     for j in range(iter_no):
-        #         list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
-        #         x = dataset.user_info[list_idx]
-        #         feed = {model.user_info: x}
-        #         _, loss_user = sess.run([model.train_op_user, model.loss_user], feed_dict=feed)
-        #
-        # for i in range(1, 5):
-        #     shuffle_idx = np.random.permutation(range(dataset.no_item))
-        #     for j in range(int(len(shuffle_idx) / batch_size + 1)):
-        #         list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
-        #         x = dataset.item_info[list_idx]
-        #         feed = {model.item_info: x}
-        #         _, loss_item = sess.run([model.train_op_item, model.loss_item], feed_dict=feed)
+        for i in range(1, 5):
+            shuffle_idx = np.random.permutation(range(dataset.no_user))
+            for j in range(iter_no):
+                list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
+                x = dataset.user_info[list_idx]
+                feed = {model.user_info: x}
+                _, loss_user = sess.run([model.train_op_user, model.loss_user], feed_dict=feed)
+
+        for i in range(1, 5):
+            shuffle_idx = np.random.permutation(range(dataset.no_item))
+            for j in range(int(len(shuffle_idx) / batch_size + 1)):
+                list_idx = shuffle_idx[j * batch_size:(j + 1) * batch_size]
+                x = dataset.item_info[list_idx]
+                feed = {model.item_info: x}
+                _, loss_item = sess.run([model.train_op_item, model.loss_item], feed_dict=feed)
 
         for i in range(1, iter):
             shuffle_idx = np.random.permutation(range(dataset.no_user))
