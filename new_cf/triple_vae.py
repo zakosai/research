@@ -74,11 +74,12 @@ class Translation:
         x_ = x
         # x_ = tf.nn.dropout(x_, 0.7)
         regular = tf.contrib.layers.l2_regularizer(scale=0.1)
+        x_ = batch_norm(x_, decay=0.9)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], activation, scope="enc_%d" % i,
                                      weights_regularizer=regular)
-                x_ = batch_norm(x_, decay=0.9)
+
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], activation, scope="dec_%d" % i,
                                      weights_regularizer=regular)
