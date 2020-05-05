@@ -200,7 +200,7 @@ def main(args):
                                                              model.user_info: dataset.user_info,
                                                              model.item_info: dataset.item_info})
                 recall, ndcg, mAP = recallK(dataset.train, dataset.test, y_b, 50)
-                # print("recall: %f, ndcg: %f, map: %f"%(recall, ndcg, mAP))
+                print("recall: %f, ndcg: %f, map: %f"%(recall, ndcg, mAP))
                 model.train = True
                 if recall > best[0]:
                     best = [recall, ndcg, mAP]
