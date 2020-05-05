@@ -100,7 +100,7 @@ class Translation:
         self.item_info = tf.placeholder(tf.float32, [None, self.item_info_dim], name='item_info')
 
         # VAE for user
-        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [], [self.user_info_dim], "user",
+        z_user, user_recon, loss_kl_user = self.vae(self.user_info, [100], [100, self.user_info_dim], "user",
                                                     activation=tf.nn.tanh)
         self.loss_user = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.user_info, user_recon), axis=1)) +\
              loss_kl_user + 10 * tf.losses.get_regularization_loss()
@@ -208,7 +208,7 @@ def main(args):
                     best_ndcg = ndcg
                 if mAP > best_mAP:
                     best_mAP = mAP
-            if (i%10 == 0) and (model.learning_rate >= 1e-6):
+            if (i%4 == 0) and (model.learning_rate >= 1e-6):
                 model.learning_rate /= 10
         print("Lambda ", layer, " : ", best, ", ", best_ndcg, ", ", best_mAP)
         tf.keras.backend.clear_session()
