@@ -81,7 +81,7 @@ class Translation:
                 x_ = batch_norm(x_, decay=0.995)
 
             for i in range(len(decode_dim)):
-                x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
+                x_ = fully_connected(x_, decode_dim[i], tf.nn.sigmoid, scope="dec_%d" % i,
                                      weights_regularizer=regular)
         return x_
 
