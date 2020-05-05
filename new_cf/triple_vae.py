@@ -209,7 +209,7 @@ def main(args):
                     best_ndcg = ndcg
                 if mAP > best_mAP:
                     best_mAP = mAP
-            if (i%4 == 0) and (model.learning_rate >= 1e-6):
+            if (i%10 == 0) and (model.learning_rate >= 1e-6):
                 model.learning_rate /= 10
         print("Lambda ", layer, " : ", best, ", ", best_ndcg, ", ", best_mAP)
         tf.keras.backend.clear_session()
