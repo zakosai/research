@@ -78,7 +78,7 @@ class Translation:
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], activation, scope="enc_%d" % i,
                                      weights_regularizer=regular)
-                # x_ = batch_norm(x_, decay=0.9)
+                x_ = batch_norm(x_, decay=0.9)
             for i in range(len(decode_dim)):
                 x_ = fully_connected(x_, decode_dim[i], activation, scope="dec_%d" % i,
                                      weights_regularizer=regular)
@@ -106,7 +106,7 @@ class Translation:
              loss_kl_user + 10 * tf.losses.get_regularization_loss()
 
         # VAE for item
-        z_item, item_recon, loss_kl_item = self.vae(self.item_info, [], [self.item_info_dim],
+        z_item, item_recon, loss_kl_item = self.vae(self.item_info, [200], [200, self.item_info_dim],
                                                     "item", activation=tf.nn.tanh)
         self.loss_item = tf.reduce_mean(tf.reduce_sum(binary_crossentropy(self.item_info, item_recon), axis=1)) +\
                          loss_kl_item + 10 * tf.losses.get_regularization_loss()
@@ -133,12 +133,13 @@ def main(args):
     iter = args.iter
     batch_size = 500
     # layers = [[50], [100], [150], [200], [200, 50], [200, 100], [500, 50], [500, 100]]
-    layers = [[100], [200], [200, 100], [1000, 500, 100], [4000, 2000, 1000], [5000, 3000, 2000]]
+    # layers = [[4000, 2000, 1000], [5000, 3000, 2000], [100], [200], [200, 100], [1000, 500, 100]]
+    layers = [[4000, 2000, 1000]]
 
     for layer in layers:
         dataset = Dataset(args.data_dir, args.data_type)
         model = Translation(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
-                            layer, [dataset.no_item], 50, learning_rate=args.learning_rate)
+                            layer, [dataset.no_item], 100, learning_rate=args.learning_rate)
         model.build_model()
 
         sess = tf.Session()
