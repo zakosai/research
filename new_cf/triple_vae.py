@@ -81,9 +81,8 @@ class Translation:
                 x_ = batch_norm(x_, decay=0.9)
 
             for i in range(len(decode_dim)):
-                x_ = fully_connected(x_, decode_dim[i], activation, scope="dec_%d" % i,
+                x_ = fully_connected(x_, decode_dim[i], scope="dec_%d" % i,
                                      weights_regularizer=regular)
-                x_ = batch_norm(x_, decay=0.9)
         return x_
 
     def loss_kl(self, mu, sigma):
