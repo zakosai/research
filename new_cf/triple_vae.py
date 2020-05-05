@@ -19,7 +19,7 @@ class Translation:
         self.lambda_1 = lambda_1
         self.lambda_2 = lambda_2
         self.learning_rate = learning_rate
-        self.active_function = tf.nn.relu
+        self.active_function = tf.nn.tanh
         self.user_info_dim = user_info_dim
         self.item_info_dim = item_info_dim
         # self.z_A = z_A
@@ -73,7 +73,7 @@ class Translation:
     def dae(self, x, encode_dim, decode_dim, scope, reuse=False, activation=None):
         x_ = x
         # x_ = tf.nn.dropout(x_, 0.7)
-        regular = tf.contrib.layers.l2_regularizer(scale=0.01)
+        regular = tf.contrib.layers.l2_regularizer(scale=0.1)
         with tf.variable_scope(scope, reuse=reuse):
             for i in range(len(encode_dim)):
                 x_ = fully_connected(x_, encode_dim[i], activation, scope="enc_%d" % i,
@@ -123,7 +123,7 @@ class Translation:
         # self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
         #             2 * tf.losses.get_regularization_loss()
         self.x_recon = self.dae(x, self.encode_dim, self.decode_dim, "CF", activation=tf.nn.tanh)
-        self.loss = self.loss_reconstruct(self.x, self.x_recon) + 0.1 * tf.losses.get_regularization_loss()
+        self.loss = self.loss_reconstruct(self.x, self.x_recon) + 5 * tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.train_op_user = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss_user)
