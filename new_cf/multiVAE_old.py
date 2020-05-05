@@ -77,7 +77,7 @@ class RSVAE:
 
         # Loss VAE
         self.loss = loss_kl + self.loss_reconstruct(self.x, self.x_recon) + \
-                    10 * tf.losses.get_regularization_loss()
+                    tf.losses.get_regularization_loss()
 
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
@@ -87,7 +87,7 @@ def main(args):
     batch_size = 500
 
     dataset = Dataset(args.data_dir, args.data_type)
-    layers = [[100], [200], [200, 100], [1000, 500, 100], [4000, 2000, 1000], [5000, 3000, 2000]]
+    layers = [[200, 100]]
     for layer in layers:
         model = RSVAE(batch_size, dataset.no_item, dataset.user_size, dataset.item_size,
                             layer[:-1], layer[:-1][::-1]+[dataset.no_item], layer[-1], learning_rate=args.learning_rate)
